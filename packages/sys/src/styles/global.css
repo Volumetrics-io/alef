@@ -1,0 +1,155 @@
+/* Variables */
+:root {
+	--max-width: 48rem;
+	--max-width-content: 72rem;
+	--animation-duration: 0.2s;
+	--bounce: cubic-bezier(0, 1.5, 0.5, 1);
+	/* Thickness for all the strokes */
+	--thickness: 1px;
+	--border: var(--thickness) solid var(--border-color);
+	--border-shadow: inset 0px 0px 0px var(--thickness) var(--border-color);
+
+	--toolbar-height: 5rem;
+
+	/* Shadows */
+	--shadow: -0.08px 8px 12px 0px rgba(85, 3, 77, 0.08), -0.02px 2px 3px 0px rgba(85, 3, 77, 0.04), -0.01px 1px 1px 0px rgba(85, 3, 77, 0.025);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--animation-duration: 0s;
+	}
+}
+
+/* Light theme */
+:root {
+	/* GLOBAL */
+	--paper: hsl(230, 100%, 98%);
+	--hover: hsl(230, 100%, 99%);
+	--track: hsl(230, 100%, 100%);
+	--ink: hsl(0, 0%, 20%);
+	--faded: hsl(0, 0%, 50%);
+	--dimmed: hsla(0, 0%, 0%, 0.15);
+	--focus: hsl(255, 100%, 70%);
+	/* Any thin line in the app */
+	--border-color: hsla(27, 0%, 0%, 0.15);
+	--border-hover: hsla(27, 0%, 0%, 0.4);
+	--border-press: hsla(27, 0%, 0%, 0.8);
+	/* People and things */
+	--sunny-paper: hsl(60, 90%, 90%);
+	--sunny-hover: hsl(60, 90%, 86%);
+	--sunny-press: hsl(60, 90%, 82%);
+	--sunny-ink: hsl(44, 30%, 30%);
+	/* Destructive actions */
+	--yummy-paper: hsl(345, 100%, 95%);
+	--yummy-hover: hsl(345, 100%, 88%);
+	--yummy-press: hsl(345, 100%, 83%);
+	--yummy-ink: hsl(345, 30%, 30%);
+	/* Call to action */
+	--happy-paper: hsl(180, 100%, 90%);
+	--happy-hover: hsl(180, 100%, 85%);
+	--happy-press: hsl(180, 100%, 80%);
+	--happy-ink: hsl(180, 70%, 15%);
+	/* Selection */
+	--selection-paper: hsl(240, 100%, 96%);
+	--selection-hover: hsl(240, 100%, 93%);
+	--selection-press: hsl(240, 100%, 90%);
+	--selection-ink: hsl(240, 50%, 20%);
+	/* Console messages */
+	--warning-paper: hsl(60, 100%, 97%);
+	--warning-ink: hsl(44, 80%, 20%);
+	--error-paper: hsl(345, 80%, 98%);
+	--error-ink: hsl(345, 80%, 32%);
+}
+
+/* Dark theme */
+/* @media (prefers-color-scheme: dark) {
+	:root {
+		--paper: hsl(0, 0%, 8%);
+		--hover: hsl(0, 0%, 12%);
+		--track: hsl(0, 0%, 18%);
+		--ink: hsl(0, 0%, 100%);
+		--faded: hsl(0, 0%, 60%);
+		--dimmed: hsla(0, 0%, 0%, 0.5);
+		--focus: hsl(56, 100%, 70%);
+		--border-color: hsla(27, 100%, 100%, 0.2);
+		--border-hover: hsla(27, 100%, 100%, 0.4);
+		--border-press: hsla(27, 100%, 100%, 0.6);
+		--sunny-paper: hsl(60, 90%, 90%);
+		--sunny-hover: hsl(60, 90%, 86%);
+		--sunny-press: hsl(60, 90%, 82%);
+		--sunny-ink: hsl(44, 20%, 20%);
+		--yummy-paper: hsl(345, 100%, 90%);
+		--yummy-hover: hsl(345, 100%, 85%);
+		--yummy-press: hsl(345, 100%, 80%);
+		--yummy-ink: hsl(345, 20%, 20%);
+		--happy-paper: hsl(180, 100%, 85%);
+		--happy-hover: hsl(180, 100%, 75%);
+		--happy-press: hsl(180, 100%, 60%);
+		--happy-ink: hsl(180, 50%, 10%);
+		--selection-ink: hsl(240, 100%, 88%);
+		--selection-press: hsl(240, 10%, 24%);
+		--selection-hover: hsl(240, 6%, 18%);
+		--selection-paper: hsl(240, 6%, 15%);
+		--warning-paper: hsl(50, 26%, 20%);
+		--warning-ink: hsl(50, 93%, 82%);
+		--error-paper: hsl(345, 21%, 25%);
+		--error-ink: hsl(345, 70%, 91%);
+	}
+} */
+
+body {
+	font-family: var(--font-body);
+	color: var(--ink);
+	line-height: 1.6;
+	background: var(--track);
+	min-height: 100vh;
+}
+
+img {
+	display: block;
+	width: 100%;
+}
+
+inline-svg {
+	display: block;
+	width: 24px;
+	height: 24px;
+}
+
+hr {
+	display: block;
+	height: var(--thickness);
+	border: unset;
+	border-top: var(--border);
+	width: 100%;
+}
+
+.full-layout {
+	width: 100vw;
+	height: 100vh;
+}
+
+header {
+	display: flex;
+	flex-flow: column nowrap;
+	gap: 2rem;
+	/* align-items: center; */
+	/* justify-content: center; */
+	padding: 4rem 2rem 2rem;
+	/* margin: 0 auto; */
+	border-bottom: var(--border);
+}
+
+iframe {
+	display: block;
+	width: 100%;
+	height: 100%;
+	border: none;
+}
+
+@layer substrate {
+	a {
+		color: unset;
+	}
+}

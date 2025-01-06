@@ -1,0 +1,19 @@
+{
+	"name": "@alef/common",
+	"private": true,
+	"type": "module",
+	"version": "1.0.0",
+	"description": "",
+	"exports": {
+		".": {
+			"development": "./src/index.ts",
+			"workerd": "./src/index.ts",
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"scripts": {
+		"build": "tsc --customConditions production"
+	},
+	"dependencies": {}
+}

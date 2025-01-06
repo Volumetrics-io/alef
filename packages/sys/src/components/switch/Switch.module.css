@@ -1,0 +1,39 @@
+@layer components {
+	.root {
+		width: var(--width);
+		height: var(--height);
+		background-color: var(--paper);
+		border-radius: 9999px;
+		position: relative;
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+		box-shadow: var(--border-shadow);
+		border-width: 0;
+
+		--width: 3rem;
+		--height: 2rem;
+		--padding: 0.25rem;
+		--inner-size: calc(var(--height) - var(--padding) * 2);
+	}
+
+	.root[data-state='checked'] {
+		background-color: var(--focus);
+	}
+
+	.thumb {
+		display: block;
+		width: var(--inner-size);
+		height: var(--inner-size);
+		background-color: var(--track);
+		border-radius: 9999px;
+		box-shadow: var(--border-shadow);
+		transition: transform 0.2s ease;
+		position: absolute;
+		top: var(--padding);
+		left: var(--padding);
+	}
+
+	.root[data-state='checked'] .thumb {
+		transform: translateX(calc(var(--width) - var(--inner-size) - var(--padding) * 2));
+	}
+}

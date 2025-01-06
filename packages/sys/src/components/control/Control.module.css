@@ -1,0 +1,67 @@
+@layer substrate {
+	.control {
+		/* Controls contains the base for all the UI elements */
+		/* — buttons, input, textarea, select, and more */
+		--controls-gap: 0.75rem;
+		--controls-radius: 0.5rem;
+
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		appearance: none;
+		text-decoration: none;
+		display: flex;
+		flex-flow: row nowrap;
+		height: fit-content;
+		align-items: center;
+		justify-content: start;
+		gap: var(--controls-gap);
+		font-family: var(--font-body);
+		font-size: 1rem;
+		font-weight: var(--weight-medium);
+		color: var(--ink);
+		line-height: 1.5;
+		white-space: nowrap;
+		background-color: var(--color-background);
+		color: var(--color-text);
+		border: var(--thickness) solid var(--color-border, transparent);
+		outline-offset: 2px;
+		border-radius: var(--controls-radius);
+	}
+
+	.control img,
+	.control svg {
+		display: block;
+		width: 1.5rem;
+		height: 1.5rem;
+	}
+
+	.control:hover {
+		border-color: var(--color-border-hover, var(--color-border));
+		background-color: var(--color-background-hover, var(--color-background));
+		color: var(--color-text-hover, var(--color-text));
+	}
+
+	.control:active {
+		border-color: var(--color-border-press, var(--color-border));
+		background-color: var(--color-background-press, var(--color-background));
+		color: var(--color-text-press, var(--color-text));
+	}
+
+	.control:disabled,
+	.control[data-disabled='true'] {
+		background-color: transparent;
+		color: var(--faded);
+	}
+
+	.control:focus-visible,
+	.focusWithin:focus-within {
+		outline: 2px solid var(--focus);
+		border-color: var(--color-border-focus, var(--color-border));
+		background-color: var(--color-background-focus, var(--color-background));
+		color: var(--color-text-focus, var(--color-text));
+	}
+
+	.control::placeholder {
+		color: var(--faded);
+	}
+}

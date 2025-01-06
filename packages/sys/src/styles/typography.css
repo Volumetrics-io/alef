@@ -1,0 +1,49 @@
+@font-face {
+	font-family: 'Bricolage';
+	src: url('./fonts/bricolage-vf.woff2') format('woff2');
+	font-weight: 200 900;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: 'IBM Plex';
+	src: url('./fonts/ibm-plex-vf.woff2') format('woff2');
+	font-weight: 200 900;
+	font-style: normal;
+	font-feature-settings: 'ss02', 'ss03', 'zero';
+	/* ss02 is needed for alternate g */
+	/* ss03 and zero for slashed zero */
+	/* https://wakamaifondue.com/ */
+}
+
+@font-face {
+	font-family: 'IBM Plex';
+	src: url('./fonts/ibm-plex-vf-italic.woff2') format('woff2');
+	font-weight: 200 900;
+	font-style: italic;
+	font-feature-settings: 'ss02', 'ss03', 'zero';
+	/* ss02 is needed for alternate g */
+	/* ss03 and zero for slashed zero */
+	/* https://wakamaifondue.com/ */
+}
+
+@font-face {
+	font-family: 'JetBrains Mono';
+	src: url('./fonts/jetbrainsmono.ttf') format('ttf');
+	font-weight: 200 900;
+	font-style: normal;
+}
+
+:root {
+	/* BASE REM */
+	font-size: 16px;
+	/* WEIGHTS */
+	--weight-normal: 400;
+	--weight-medium: 500;
+	--weight-bold: 600;
+	--weight-black: 900;
+	/* FONTS */
+	--font-head: 'Bricolage', system-ui, sans-serif;
+	--font-body: 'IBM Plex', system-ui, sans-serif;
+	--font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}

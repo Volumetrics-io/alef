@@ -1,0 +1,8 @@
+@layer substrate {
+	.frame {
+		position: relative;
+		border-radius: 1rem;
+		border: var(--border);
+		background-color: var(--track);
+	}
+}

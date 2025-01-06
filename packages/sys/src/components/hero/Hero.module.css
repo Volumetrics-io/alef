@@ -1,0 +1,79 @@
+@layer components {
+	.root {
+		position: relative;
+		overflow: hidden;
+		width: 100%;
+		margin-top: calc(var(--nav-height, 0) * -1);
+		padding: var(--nav-height, 4rem) 2rem 4rem 2rem;
+		gap: 2rem;
+		min-height: 20vh;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.noPadding {
+		padding: 0;
+	}
+
+	.big {
+		min-height: 65vh;
+	}
+
+	.backdrop {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: -2;
+	}
+
+	.backdrop > video,
+	.backdrop > img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.dimmer {
+		position: absolute;
+		inset: 0;
+		z-index: -1;
+		--start-color: color-mix(in hsl, var(--track), transparent 30%);
+		--middle-color: color-mix(in hsl, var(--track), transparent 50%);
+		--end-color: color-mix(in hsl, var(--track), transparent 0%);
+		background: linear-gradient(var(--start-color) 0%, var(--middle-color) 50%, var(--end-color) 90%, var(--end-color) 100%);
+	}
+}
+@layer variants {
+	.title {
+		font-family: var(--font-head);
+
+		line-height: 0.9;
+		text-wrap: balance;
+		max-width: var(--max-width-content);
+		text-align: center;
+		align-self: center;
+	}
+
+	.big .title {
+		font-size: calc(min(6vw, 5rem) + 1.5rem);
+		font-weight: var(--weight-black);
+		font-variation-settings:
+			'wdth' 85,
+			'wght' var(--weight-black),
+			'opsz' 90;
+	}
+
+	.tagline {
+		font-weight: var(--weight-medium);
+		font-size: calc(min(3vw, 1rem) + 0.5rem);
+		line-height: 1.4;
+		text-wrap: balance;
+		max-width: 40rem;
+		text-align: center;
+		align-self: center;
+	}
+}

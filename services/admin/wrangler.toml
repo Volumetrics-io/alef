@@ -1,0 +1,10 @@
+name = "public-api-service"
+compatibility_date = "2025-01-01"
+main = "./src/index.tsx"
+
+compatibility_flags = []
+
+[[services]]
+binding = "ADMIN_STORE"
+service = "db-service"
+entrypoint = "AdminStore"

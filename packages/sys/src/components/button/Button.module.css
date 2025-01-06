@@ -1,0 +1,89 @@
+@layer components {
+	.button {
+		cursor: pointer;
+		padding: 0.75rem 1rem;
+		border-radius: var(--controls-radius);
+		align-items: center;
+		justify-content: center;
+		font-weight: var(--weight-medium);
+	}
+
+	.default {
+		/* Control config */
+		--color-border: var(--border-color);
+		--color-text: var(--ink);
+		--color-background: var(--track);
+		--color-background-hover: var(--hover);
+		--color-background-press: var(--paper);
+		--color-text-focus: var(--focus);
+	}
+
+	.suggested {
+		/* Control config */
+		--color-border: var(--border-color);
+		--color-text: var(--happy-ink);
+		--color-background: var(--happy-paper);
+		--color-background-hover: var(--happy-hover);
+		--color-background-press: var(--happy-press);
+		--color-background-focus: var(--focus);
+		--color-text-focus: var(--paper);
+	}
+
+	.destructive {
+		/* Control config */
+		--color-border: var(--border-color);
+		--color-text: var(--yummy-ink);
+		--color-background: var(--yummy-paper);
+		--color-background-hover: var(--yummy-hover);
+		--color-background-press: var(--yummy-press);
+		--color-background-focus: var(--focus);
+		--color-text-focus: var(--paper);
+	}
+
+	.ghost {
+		--color-border: transparent;
+		--color-text: var(--ink);
+		--color-background: transparent;
+		--color-background-hover: var(--hover);
+		--color-background-press: var(--paper);
+		--color-border-hover: var(--border-color);
+		--color-text-focus: var(--focus);
+	}
+
+	.icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.button[data-has-icon='true'][data-has-label='true'] {
+		padding: 0.75rem 1.25rem 0.75rem 0.75rem;
+	}
+
+	.button[data-has-icon='true']:not([data-has-label='true']) {
+		padding: 0.75rem;
+	}
+
+	.action {
+		border-radius: 99999px;
+		padding: 0.75rem;
+	}
+
+	/* container with fallback for screen size */
+	@media (max-width: 720px) {
+		.button[data-has-label='true'][data-has-icon='true']:has(.responsiveLabel) {
+			padding: 0.75rem;
+		}
+		.button .responsiveLabel {
+			display: none;
+		}
+	}
+	@container (width < 20rem) {
+		.button[data-has-label='true'][data-has-icon='true']:has(.responsiveLabel) {
+			padding: 0.75rem;
+		}
+		.button .responsiveLabel {
+			display: none;
+		}
+	}
+}

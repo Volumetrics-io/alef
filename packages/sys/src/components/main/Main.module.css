@@ -1,0 +1,16 @@
+@layer components {
+	.root {
+		gap: calc(4vw + 2rem);
+		flex: 1 0 auto;
+		/*
+			Main content naturally takes up the full page height available,
+			minus any hero or nav height, and a little extra padding.
+
+			This makes it so the footer is always below the fold.
+
+			hero height will include nav height if hero is present -- so we
+			fallback from hero to nav, to nothing.
+		*/
+		flex-basis: calc(100dvh - var(--hero-height, var(--nav-height, 0)) - 1rem);
+	}
+}

@@ -1,0 +1,54 @@
+@layer components {
+	.root {
+		border-right: var(--border);
+		flex-shrink: 0;
+	}
+
+	.item {
+		padding: 1rem;
+		border-radius: 0;
+		border: 0;
+		cursor: pointer;
+		appearance: none;
+		align-items: center;
+		justify-content: center;
+		text-overflow: ellipsis;
+		text-wrap: nowrap;
+		overflow: hidden;
+
+		--color-background: transparent;
+		--color-background-hover: var(--track);
+
+		&:focus-visible {
+			outline: none;
+		}
+
+		&[data-active='true'] {
+			--color-background: var(--selection-paper);
+			--color-background-hover: var(--selection-hover);
+		}
+	}
+
+	.label {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		display: none;
+	}
+
+	@media (min-width: 720px) {
+		.label {
+			display: inline-block;
+		}
+		.item {
+			justify-content: start;
+		}
+
+		.root[data-collapsed='true'] .item {
+			justify-content: center;
+		}
+		.root[data-collapsed='true'] .label {
+			display: none;
+		}
+	}
+}

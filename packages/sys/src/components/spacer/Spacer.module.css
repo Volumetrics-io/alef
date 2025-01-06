@@ -1,0 +1,5 @@
+@layer components {
+	.root {
+		flex: 1 0 0;
+	}
+}

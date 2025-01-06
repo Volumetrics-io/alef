@@ -1,0 +1,63 @@
+@layer components {
+	.root {
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+	}
+
+	.inner {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		width: 100%;
+	}
+
+	.main {
+		min-height: 10rem;
+		flex: 1;
+	}
+
+	.title {
+		overflow: hidden;
+		display: -webkit-box;
+		-webkit-line-clamp: 1;
+		line-clamp: 1;
+		-webkit-box-orient: vertical;
+		text-overflow: ellipsis;
+	}
+
+	.details {
+		background: var(--track);
+		align-items: center;
+		padding: 0 1rem;
+	}
+
+	.image {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(min(24rem, 100%), 1fr));
+		gap: 1rem;
+	}
+
+	@container (width > 1024px) {
+		.inner {
+			flex-direction: row;
+			align-items: stretch;
+		}
+
+		.main {
+			height: unset;
+			flex: 1 0 auto;
+		}
+
+		.details {
+			flex: 0 0 auto;
+			height: unset;
+		}
+	}
+}

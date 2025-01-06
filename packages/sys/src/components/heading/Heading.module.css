@@ -1,0 +1,33 @@
+@layer components {
+	.root {
+		font-weight: var(--weight-bold);
+		line-height: 1.1;
+	}
+
+	.level1 {
+		font-family: var(--font-head);
+		font-size: calc(min(3vw, 3rem) + 2rem);
+		font-variation-settings:
+			'wdth' 90,
+			'wght' var(--weight-bold),
+			'opsz' 90;
+		line-height: 0.9;
+		text-wrap: balance;
+	}
+
+	.level2 {
+		font-size: 2rem;
+	}
+
+	.level3 {
+		font-size: 1.4rem;
+	}
+
+	.level4 {
+		font-size: 1.2rem;
+	}
+
+	.level5 {
+		font-size: 1.15rem;
+	}
+}

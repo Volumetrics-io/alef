@@ -1,0 +1,54 @@
+@layer components {
+	.root {
+		display: inline-flex;
+		width: var(--size);
+		height: var(--size);
+		cursor: pointer;
+		position: relative;
+		flex-shrink: 0;
+
+		--color-border: var(--border-color);
+		--color-background: var(--track);
+		--size: 1.65rem;
+
+		&[data-state='checked'] {
+			--color-background: var(--focus);
+		}
+	}
+
+	.indicator {
+		overflow: hidden;
+		display: block;
+		width: var(--size);
+		height: var(--size);
+
+		&[data-state='checked'] {
+			animation: appear 0.25s;
+		}
+	}
+
+	.icon {
+		overflow: hidden;
+		&::after {
+			content: '';
+			mask: url('./small-check.svg') no-repeat 50% 50%;
+			mask-size: 1rem 1rem;
+			display: block;
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: var(--size);
+			height: var(--size);
+			background-color: var(--track);
+		}
+	}
+}
+
+@keyframes appear {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
+}

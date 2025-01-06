@@ -1,0 +1,156 @@
+@layer components {
+	.trigger {
+		border: var(--border);
+		cursor: pointer;
+		padding: 0.75rem 1rem;
+		display: flex;
+		flex-direction: row;
+		gap: 0.5rem;
+		justify-content: space-between;
+
+		&[data-state='open'] > .icon {
+			transform: rotate(180deg);
+		}
+	}
+
+	.content {
+		min-width: 220px;
+		background-color: var(--paper);
+		display: flex;
+		flex-flow: column nowrap;
+		border-radius: 1rem;
+		border: var(--border);
+		box-shadow: var(--shadow);
+		overflow: auto;
+		max-height: 300px;
+		width: var(--radix-popper-anchor-width);
+		z-index: 10000;
+
+		&[data-side='top'] {
+			animation-name: slideDownAndFade;
+		}
+		&[data-side='bottom'] {
+			animation-name: slideUpAndFade;
+		}
+		&[data-side='left'] {
+			animation-name: slideRightAndFade;
+		}
+		&[data-side='right'] {
+			animation-name: slideLeftAndFade;
+		}
+	}
+
+	.item {
+		padding: 1rem;
+		flex: 1 0 auto;
+		justify-content: start;
+		border-radius: 0;
+		border: 0;
+		cursor: pointer;
+
+		--color-text: var(--ink);
+		--color-background: var(--paper);
+
+		&[data-highlighted] {
+			background-color: var(--track);
+			--color-border: var(--focus);
+			z-index: 1;
+			outline-offset: -2px;
+		}
+
+		&:first-child {
+			border-top-left-radius: 1rem;
+			border-top-right-radius: 1rem;
+		}
+		&:last-child {
+			border-bottom-left-radius: 1rem;
+			border-bottom-right-radius: 1rem;
+		}
+
+		&[data-disabled] {
+			opacity: 0.5;
+
+			& > .indicator {
+				display: none;
+			}
+		}
+	}
+
+	.indicator {
+		position: absolute;
+		right: 1rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.arrow {
+		fill: var(--paper);
+	}
+
+	.icon {
+		transition: transform 0.2s ease;
+	}
+
+	.scrollButton {
+		padding: 0.25rem 1rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 0;
+	}
+
+	.scrollUpButton {
+		border-top-left-radius: 1rem;
+		border-top-right-radius: 1rem;
+	}
+
+	.scrollDownButton {
+		border-bottom-left-radius: 1rem;
+		border-bottom-right-radius: 1rem;
+	}
+}
+
+@keyframes slideUpAndFade {
+	from {
+		opacity: 0;
+		transform: translateY(2px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes slideRightAndFade {
+	from {
+		opacity: 0;
+		transform: translateX(-2px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+@keyframes slideDownAndFade {
+	from {
+		opacity: 0;
+		transform: translateY(-2px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes slideLeftAndFade {
+	from {
+		opacity: 0;
+		transform: translateX(2px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}

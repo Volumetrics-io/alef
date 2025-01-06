@@ -1,0 +1,25 @@
+@layer components {
+	.root {
+		cursor: pointer;
+		text-decoration: none;
+	}
+	.text {
+		color: var(--focus);
+		font-weight: var(--weight-bold);
+		text-decoration: underline;
+		text-decoration-style: dotted;
+	}
+	.text:hover {
+		color: var(--ink);
+	}
+
+	.text.external::after {
+		content: '↗';
+		font-size: 80%;
+		text-decoration: unset;
+		display: inline-block;
+		margin-left: 0.125rem;
+		position: relative;
+		top: -0.125rem;
+	}
+}

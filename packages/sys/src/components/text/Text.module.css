@@ -1,0 +1,32 @@
+@layer components {
+	.root {
+		line-height: 1.6;
+	}
+
+	.strong {
+		font-weight: var(--weight-bold);
+	}
+
+	.faded {
+		color: var(--faded);
+	}
+
+	.tall {
+		font-size: 115%;
+	}
+
+	.twoColumns {
+		column-count: 2;
+		column-gap: 1rem;
+	}
+
+	.pre {
+		white-space: pre-wrap;
+	}
+
+	@media (max-width: 720px) {
+		.textTwoColumns {
+			column-count: 1;
+		}
+	}
+}

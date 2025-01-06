@@ -1,0 +1,190 @@
+@layer substrate {
+	.box {
+		position: relative;
+		display: flex;
+		flex-flow: row nowrap;
+	}
+}
+
+@layer variants {
+	.full {
+		width: 100%;
+		height: 100%;
+	}
+
+	.padded {
+		padding: 1.5rem;
+	}
+	.paddedSqueeze {
+		padding: 0 0.75rem;
+	}
+
+	.gapped {
+		gap: 0.75rem;
+	}
+
+	.reverse {
+		flex-direction: row-reverse;
+	}
+
+	.stack,
+	.stackMobile {
+		display: flex;
+		flex-flow: column nowrap;
+
+		&.gapped {
+			gap: 0.75rem;
+		}
+
+		&.reverse,
+		&.reverseMobile {
+			flex-direction: column-reverse;
+		}
+	}
+
+	.spread {
+		justify-content: space-between;
+	}
+
+	.stretched {
+		flex: 1;
+		align-items: stretch;
+	}
+
+	.grow {
+		flex: 1 0 auto;
+	}
+
+	.alignCenter {
+		align-items: center;
+	}
+	.alignStart {
+		align-items: flex-start;
+	}
+	.alignStretch {
+		align-items: stretch;
+	}
+
+	.justifyCenter {
+		justify-content: center;
+	}
+	.justifyStart {
+		justify-content: flex-start;
+	}
+	.justifyStretch {
+		justify-content: stretch;
+	}
+	.justifyBetween {
+		justify-content: space-between;
+	}
+
+	.constrained {
+		width: 100%;
+		max-width: var(--max-width);
+		margin: 0 auto;
+	}
+
+	.constrainedLarge {
+		width: 100%;
+		max-width: 1280px;
+		margin: 0 auto;
+	}
+
+	.clipped {
+		overflow: hidden;
+	}
+
+	.elevated {
+		box-shadow: var(--shadow);
+	}
+
+	.rounded {
+		border-radius: 1rem;
+	}
+
+	.roundedFull {
+		border-radius: 9999px;
+	}
+
+	.backgroundPaper {
+		background-color: var(--paper);
+	}
+
+	.float {
+		position: absolute;
+		z-index: 10;
+		&[data-float='top-right'] {
+			top: 0.75rem;
+			right: 0.75rem;
+		}
+		&[data-float='top-left'] {
+			top: 0.75rem;
+			left: 0.75rem;
+		}
+	}
+
+	.wrap {
+		flex-wrap: wrap;
+	}
+
+	.container {
+		container-type: inline-size;
+	}
+
+	.mobileHidden {
+		display: none;
+	}
+
+	.separated {
+		& > * + * {
+			border-left: var(--border);
+		}
+		&.stack,
+		&.stackMobile {
+			& > * + * {
+				border-left: 0;
+				border-top: var(--border);
+			}
+		}
+	}
+
+	@media (min-width: 720px) {
+		.padded {
+			padding: 2rem;
+		}
+
+		.mobileHidden {
+			display: flex;
+		}
+
+		.stack.gapped {
+			gap: 1rem;
+		}
+
+		.stackMobile {
+			flex-direction: row;
+
+			&.gapped {
+				gap: 0.75rem;
+			}
+			&.reverse {
+				flex-direction: row-reverse;
+			}
+			&.separated {
+				& > * + * {
+					border-left: var(--border);
+					border-top: 0;
+				}
+			}
+		}
+
+		.reverseMobile {
+			&.stack {
+				flex-direction: column;
+			}
+			&.stackMobile {
+				flex-direction: row;
+			}
+		}
+	}
+}

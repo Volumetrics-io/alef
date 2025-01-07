@@ -1,5 +1,5 @@
 import { AuthAccount, AuthUser, AuthVerificationCode } from '@a-type/auth';
-import { AlefError, PrefixedId, assertPrefixedId, assertTagKey, formatTag, id, isTagKey, tagKeys } from '@alef/common';
+import { PrefixedId, assertAttributeKey, assertPrefixedId, id } from '@alef/common';
 import { WorkerEntrypoint } from 'cloudflare:workers';
 import { Env } from './env.js';
 import { DB, comparePassword, getDatabase, hashPassword } from './kysely/index.js';
@@ -149,30 +149,25 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 		await this.env.FURNITURE_MODELS_BUCKET.delete(id);
 	}
 
-	async createTag(key: string, value: string) {
-		if (!isTagKey(key)) {
-			throw new AlefError(AlefError.Code.BadRequest, `Invalid tag key: ${key}. Supported keys: ${tagKeys.join(', ')}`);
-		}
-		const tagId = id('t');
-		await this.#db
-			.insertInto('Tag')
+	async addFurnitureAttribute(furnitureId: string, key: string, value: string) {
+		assertPrefixedId(furnitureId, 'f');
+		assertAttributeKey(key);
+		const { id: attributeId } = await this.#db
+			.insertInto('Attribute')
 			.values({
-				id: tagId,
-				name: formatTag(key, value),
+				id: id('at'),
+				key,
+				value,
 			})
+			.onConflict((cb) => cb.columns(['key', 'value']).doNothing())
+			.returning('id')
 			.executeTakeFirstOrThrow();
-
-		return tagId;
+		await this.#db
+			.insertInto('FurnitureAttribute')
+			.values({
+				furnitureId,
+				attributeId,
+			})
+			.execute();
 	}
-
-	async listAllTags() {
-		return this.#db.selectFrom('Tag').selectAll().execute();
-	}
-
-	async listTagsByKey(key: string) {
-		assertTagKey(key);
-		return this.#db.selectFrom('Tag').where('name', 'like', `${key}:%`).selectAll().execute();
-	}
-
-	async addFurnitureTag(furnitureId: string, tagId: string) {}
 }

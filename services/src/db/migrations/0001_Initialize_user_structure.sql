@@ -16,7 +16,7 @@ create table Account (
 	id text primary key,
 	createdAt datetime default CURRENT_TIMESTAMP not null,
 	updatedAt datetime default CURRENT_TIMESTAMP not null,
-	userId text not null,
+	userId text not null references User(id) on delete cascade,
 	type text not null,
 	provider text not null,
 	providerAccountId text not null,
@@ -25,9 +25,7 @@ create table Account (
 	tokenType text,
 	accessTokenExpiresAt datetime,
 	scope text,
-	idToken text,
-
-	foreign key (userId) references User(id)
+	idToken text
 );
 
 create table VerificationCode (

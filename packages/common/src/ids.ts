@@ -5,7 +5,7 @@ export const resourceIdTypes = {
 	a: 'Account',
 	vc: 'VerificationCode',
 	f: 'Furniture',
-	t: 'Tag',
+	at: 'Attribute',
 } as const;
 export type ResourceIdPrefix = keyof typeof resourceIdTypes;
 export type ResourceTypeName = (typeof resourceIdTypes)[ResourceIdPrefix];

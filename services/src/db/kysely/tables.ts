@@ -1,4 +1,4 @@
-import { PrefixedId } from '@alef/common';
+import { AttributeKey, PrefixedId } from '@alef/common';
 import { ColumnType, Generated, Insertable, Selectable, Updateable } from 'kysely';
 
 export interface Database {
@@ -6,8 +6,8 @@ export interface Database {
 	Account: AccountTable;
 	VerificationCode: VerificationCodeTable;
 	Furniture: FurnitureTable;
-	Tag: TagTable;
-	FurnitureTag: FurnitureTagTable;
+	Attribute: AttributeTable;
+	FurnitureAttribute: FurnitureAttributeTable;
 }
 
 type CreatedAt = Generated<Date>;
@@ -78,21 +78,22 @@ export type Furniture = Selectable<FurnitureTable>;
 export type NewFurniture = Insertable<FurnitureTable>;
 export type FurnitureUpdate = Updateable<FurnitureTable>;
 
-export interface TagTable {
-	id: PrefixedId<'t'>;
+export interface AttributeTable {
+	id: PrefixedId<'at'>;
 	createdAt: CreatedAt;
 	updatedAt: UpdatedAt;
 
-	name: string;
+	key: AttributeKey;
+	value: string;
 }
-export type Tag = Selectable<TagTable>;
-export type NewTag = Insertable<TagTable>;
-export type TagUpdate = Updateable<TagTable>;
+export type Attribute = Selectable<AttributeTable>;
+export type NewAttribute = Insertable<AttributeTable>;
+export type AttributeUpdate = Updateable<AttributeTable>;
 
-export interface FurnitureTagTable {
+export interface FurnitureAttributeTable {
 	createdAt: CreatedAt;
 	updatedAt: UpdatedAt;
 
 	furnitureId: string;
-	tagId: string;
+	attributeId: string;
 }

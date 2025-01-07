@@ -3,7 +3,7 @@ import { Hono } from 'hono';
 import type { FC } from 'hono/jsx';
 import { jsxRenderer } from 'hono/jsx-renderer';
 import { z } from 'zod';
-import type { AdminStore } from '../../db/src/index.js';
+import type { AdminStore } from '../db/index.js';
 
 interface Env {
 	ADMIN_STORE: Service<AdminStore>;

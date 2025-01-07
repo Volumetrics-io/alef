@@ -1,7 +1,6 @@
 name = "db-service"
 compatibility_date = "2025-01-01"
 main = "src/index.ts"
-node_compat = true
 
 [[d1_databases]]
 binding = "D1"
@@ -13,3 +12,12 @@ migrations_dir = './migrations'
 binding = "STORE"
 service = "db-service"
 entrypoint = "AdminStore"
+
+[[services]]
+binding = "FURNITURE_STORE"
+service = "furniture-service"
+entrypoint = "FurnitureStore"
+
+[[r2_buckets]]
+bucket_name = "prod-alef-furniture-models"
+binding = "MODELS_BUCKET"

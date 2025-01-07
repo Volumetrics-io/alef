@@ -4,25 +4,20 @@
 	"type": "module",
 	"exports": {
 		"./public-api": {
-			"development": "./public-api/src/index.ts",
-			"workerd": "./public-api/src/index.ts",
-			"import": "./public-api/src/index.ts",
-			"types": "./public-api/src/index.ts"
-		},
-		"./game-session": {
-			"development": "./game-session/src/index.ts",
-			"workerd": "./public-api/src/index.ts",
-			"import": "./game-session/src/index.ts",
-			"types": "./game-session/src/index.ts"
+			"import": "./dist/public-api/hc.js",
+			"types": "./dist/public-api/hc.d.ts"
 		}
 	},
 	"scripts": {
 		"dev": "pnpm run --filter @alef/services --parallel \"/^dev:.*/\"",
-		"dev:db": "wrangler dev -c db/wrangler.toml --port 4211",
-		"dev:public-api": "sleep 2 && wrangler dev -c public-api/wrangler.toml --port 4201",
-		"dev:admin": "sleep 4 && wrangler dev -c admin/wrangler.toml --port 4202",
-		"migrations:apply:local": "CI=true wrangler d1 migrations apply prod-alef-core-d1 --local -c db/wrangler.toml",
-		"migrations:apply:remote": "CI=true wrangler d1 migrations apply prod-alef-core-d1 --remote -c db/wrangler.toml"
+		"dev:client": "pnpm run build:client --watch --preserveWatchOutput",
+		"dev:db": "wrangler dev -c src/db/wrangler.toml --port 4211",
+		"dev:public-api": "sleep 2 && wrangler dev -c src/public-api/wrangler.toml --port 4201",
+		"dev:admin": "sleep 4 && wrangler dev -c src/admin/wrangler.toml --port 4202",
+		"migrations:apply:local": "CI=true wrangler d1 migrations apply prod-alef-core-d1 --local -c src/db/wrangler.toml",
+		"migrations:apply:remote": "CI=true wrangler d1 migrations apply prod-alef-core-d1 --remote -c src/db/wrangler.toml",
+		"migrations:create": "wrangler d1 migrations create prod-alef-core-d1 -c src/db/wrangler.toml",
+		"build:client": "tsc"
 	},
 	"dependencies": {
 		"hono": "catalog:",
@@ -31,6 +26,11 @@
 		"@a-type/auth": "catalog:",
 		"@a-type/utils": "catalog:",
 		"zod": "catalog:",
-		"@hono/zod-validator": "catalog:"
+		"@hono/zod-validator": "catalog:",
+		"@a-type/kysely": "1.1.1",
+		"@paralleldrive/cuid2": "2.2.2",
+		"kysely": "^0.27.5",
+		"kysely-d1": "0.3.0",
+		"kysely-plugin-serialize": "0.7.0"
 	}
 }

@@ -15,5 +15,7 @@
 	"scripts": {
 		"build": "tsc --customConditions production"
 	},
-	"dependencies": {}
+	"dependencies": {
+		"@paralleldrive/cuid2": "2.2.2"
+	}
 }

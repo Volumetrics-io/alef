@@ -2,9 +2,9 @@ import { Session } from '@a-type/auth';
 import { AlefError } from '@alef/common';
 import { assertPrefixedId, PrefixedId } from '@alef/db';
 import { createMiddleware } from 'hono/factory';
-import type { AuthedStore } from '../../db/src/index.js';
-import { sessions } from '../../public-api/src/auth/session.js';
-import { Env } from '../../public-api/src/config/ctx.js';
+import type { AuthedStore } from '../db/index.js';
+import { sessions } from '../public-api/auth/session.js';
+import { Env } from '../public-api/config/ctx.js';
 
 export type SessionWithPrefixedIds = Omit<Session, 'userId'> & {
 	userId: PrefixedId<'u'>;

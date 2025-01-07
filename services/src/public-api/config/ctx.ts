@@ -1,6 +1,6 @@
 import { Service } from '@cloudflare/workers-types';
-import { SessionWithPrefixedIds } from '../../../common/middleware/session.js';
-import type { AdminStore, PublicStore } from '../../../db/src/index.js';
+import type { AdminStore, PublicStore } from '../../db/index.js';
+import { SessionWithPrefixedIds } from '../../middleware/session.js';
 
 export interface Bindings {
 	// env

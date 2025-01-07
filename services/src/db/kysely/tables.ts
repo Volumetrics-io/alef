@@ -1,10 +1,13 @@
+import { PrefixedId } from '@alef/common';
 import { ColumnType, Generated, Insertable, Selectable, Updateable } from 'kysely';
-import { PrefixedId } from './utils.js';
 
 export interface Database {
 	User: UserTable;
 	Account: AccountTable;
 	VerificationCode: VerificationCodeTable;
+	Furniture: FurnitureTable;
+	Tag: TagTable;
+	FurnitureTag: FurnitureTagTable;
 }
 
 type CreatedAt = Generated<Date>;
@@ -63,3 +66,33 @@ export interface VerificationCodeTable {
 export type VerificationCode = Selectable<VerificationCodeTable>;
 export type NewVerificationCode = Insertable<VerificationCodeTable>;
 export type VerificationCodeUpdate = Updateable<VerificationCodeTable>;
+
+export interface FurnitureTable {
+	id: PrefixedId<'f'>;
+	createdAt: CreatedAt;
+	updatedAt: UpdatedAt;
+
+	name: string;
+}
+export type Furniture = Selectable<FurnitureTable>;
+export type NewFurniture = Insertable<FurnitureTable>;
+export type FurnitureUpdate = Updateable<FurnitureTable>;
+
+export interface TagTable {
+	id: PrefixedId<'t'>;
+	createdAt: CreatedAt;
+	updatedAt: UpdatedAt;
+
+	name: string;
+}
+export type Tag = Selectable<TagTable>;
+export type NewTag = Insertable<TagTable>;
+export type TagUpdate = Updateable<TagTable>;
+
+export interface FurnitureTagTable {
+	createdAt: CreatedAt;
+	updatedAt: UpdatedAt;
+
+	furnitureId: string;
+	tagId: string;
+}

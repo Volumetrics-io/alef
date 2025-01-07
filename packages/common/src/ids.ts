@@ -1,10 +1,11 @@
 import { createId } from '@paralleldrive/cuid2';
-import { sql } from 'kysely';
 
 export const resourceIdTypes = {
 	u: 'User',
 	a: 'Account',
 	vc: 'VerificationCode',
+	f: 'Furniture',
+	t: 'Tag',
 } as const;
 export type ResourceIdPrefix = keyof typeof resourceIdTypes;
 export type ResourceTypeName = (typeof resourceIdTypes)[ResourceIdPrefix];
@@ -35,6 +36,3 @@ export function assertPrefixedId<Prefix extends ResourceIdPrefix = ResourceIdPre
 		throw new Error(`Invalid id: ${id}`);
 	}
 }
-
-/** Selects the user name - prefers friendlyName, falls back to fullName */
-export const userNameSelector = sql<string>`COALESCE(User.friendlyName, User.fullName)`.as('name');

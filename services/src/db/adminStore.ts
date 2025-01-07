@@ -1,41 +1,8 @@
 import { AuthAccount, AuthUser, AuthVerificationCode } from '@a-type/auth';
-import { DB, PrefixedId, assertPrefixedId, comparePassword, getDatabase, hashPassword, id, userNameSelector } from '@alef/db';
-import { RpcTarget, WorkerEntrypoint } from 'cloudflare:workers';
-
-interface Env {
-	D1: D1Database;
-	STORE: Service<AdminStore>;
-}
-
-export class AuthedStore extends RpcTarget {
-	#userId: PrefixedId<'u'>;
-	#db: DB;
-
-	constructor(userId: PrefixedId<'u'>, db: DB) {
-		super();
-		this.#userId = userId;
-		this.#db = db;
-	}
-
-	async getSession() {
-		return this.#db.selectFrom('User').where('id', '=', this.#userId).select(['id', userNameSelector]).executeTakeFirst();
-	}
-
-	// any authorized user-scoped operations go here
-}
-
-export class PublicStore extends WorkerEntrypoint<Env> {
-	#db: DB;
-
-	constructor(ctx: ExecutionContext, env: Env) {
-		super(ctx, env);
-		this.#db = getDatabase({ DB: env.D1 });
-	}
-
-	async getStoreForUser(userId: PrefixedId<'u'>) {
-		return new AuthedStore(userId, this.#db);
-	}
-}
+import { AlefError, PrefixedId, assertPrefixedId, assertTagKey, formatTag, id, isTagKey, tagKeys } from '@alef/common';
+import { WorkerEntrypoint } from 'cloudflare:workers';
+import { Env } from './env.js';
+import { DB, comparePassword, getDatabase, hashPassword } from './kysely/index.js';
 
 export class AdminStore extends WorkerEntrypoint<Env> {
 	#db: DB;
@@ -162,14 +129,50 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 			.where('id', '=', id)
 			.execute();
 	}
-}
 
-// default service API just provides a healthcheck for the database connection
-export default class extends WorkerEntrypoint<Env> {
-	async fetch() {
-		const ok = await this.env.STORE.healthCheck();
-		return new Response(ok ? 'OK' : 'NOT OK', {
-			status: ok ? 200 : 500,
-		});
+	async addFurniture(data: { modelFile: File; name: string }) {
+		const furnitureId = id('f');
+		await this.#db
+			.insertInto('Furniture')
+			.values({
+				id: furnitureId,
+				name: data.name,
+			})
+			.executeTakeFirstOrThrow();
+
+		await this.env.FURNITURE_MODELS_BUCKET.put(furnitureId, data.modelFile);
 	}
+
+	async deleteFurniture(id: string) {
+		assertPrefixedId(id, 'f');
+		await this.#db.deleteFrom('Furniture').where('id', '=', id).execute();
+		await this.env.FURNITURE_MODELS_BUCKET.delete(id);
+	}
+
+	async createTag(key: string, value: string) {
+		if (!isTagKey(key)) {
+			throw new AlefError(AlefError.Code.BadRequest, `Invalid tag key: ${key}. Supported keys: ${tagKeys.join(', ')}`);
+		}
+		const tagId = id('t');
+		await this.#db
+			.insertInto('Tag')
+			.values({
+				id: tagId,
+				name: formatTag(key, value),
+			})
+			.executeTakeFirstOrThrow();
+
+		return tagId;
+	}
+
+	async listAllTags() {
+		return this.#db.selectFrom('Tag').selectAll().execute();
+	}
+
+	async listTagsByKey(key: string) {
+		assertTagKey(key);
+		return this.#db.selectFrom('Tag').where('name', 'like', `${key}:%`).selectAll().execute();
+	}
+
+	async addFurnitureTag(furnitureId: string, tagId: string) {}
 }

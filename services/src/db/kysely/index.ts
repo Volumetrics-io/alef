@@ -24,4 +24,4 @@ export function getDatabase(env: { DB: D1Database }): DB {
 }
 
 export { compareDates, comparePassword, dateTime, hashPassword, sqliteNow } from '@a-type/kysely';
-export * from './utils.js';
+export * from './selectors.js';

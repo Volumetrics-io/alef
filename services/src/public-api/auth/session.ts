@@ -1,6 +1,5 @@
 import { SessionManager } from '@a-type/auth';
-import { AlefError } from '@alef/common';
-import { assertPrefixedId } from '@alef/db';
+import { AlefError, assertPrefixedId } from '@alef/common';
 import { Context } from 'hono';
 import { Env } from '../config/ctx.js';
 

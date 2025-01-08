@@ -10,12 +10,12 @@ export const furnitureRouter = new Hono<Env>()
 		zValidator(
 			'query',
 			z.object({
-				attribute: z.array(z.string()).optional(),
+				attribute: z.union([z.string(), z.string().array()]).optional(),
 			})
 		),
 		async (ctx) => {
-			const attribute = ctx.req.valid('query').attribute;
-			if (attribute) {
+			const attribute = ctx.req.queries('attribute') || [];
+			if (attribute.length) {
 				const keyValues = Object.fromEntries(attribute.map((attr) => attr.split(':')));
 				const filteredFurniture = await ctx.env.PUBLIC_STORE.listFurnitureByAttributes(keyValues);
 				return ctx.json(filteredFurniture);
@@ -33,7 +33,7 @@ export const furnitureRouter = new Hono<Env>()
 			})
 		),
 		async (ctx) => {
-			const furniture = ctx.env.PUBLIC_STORE.getFurniture(ctx.req.valid('param').id);
+			const furniture = await ctx.env.PUBLIC_STORE.getFurniture(ctx.req.valid('param').id);
 			return ctx.json(furniture);
 		}
 	);

@@ -3,7 +3,7 @@ create table Furniture (
 	id text not null primary key,
 	createdAt datetime default CURRENT_TIMESTAMP not null,
 	updatedAt datetime default CURRENT_TIMESTAMP not null,
-	name text not null,
+	name text not null
 );
 
 create table Attribute (
@@ -13,7 +13,7 @@ create table Attribute (
 	key text not null,
 	value text not null,
 
-	constraint Attribute_unique_key_value unique (key, value),
+	constraint Attribute_unique_key_value unique (key, value)
 );
 
 create table FurnitureAttribute (
@@ -21,5 +21,5 @@ create table FurnitureAttribute (
 	updatedAt datetime default CURRENT_TIMESTAMP not null,
 
 	furnitureId text not null references Furniture(id) on delete cascade,
-	attributeId text not null references Attribute(id) on delete cascade,
+	attributeId text not null references Attribute(id) on delete cascade
 );

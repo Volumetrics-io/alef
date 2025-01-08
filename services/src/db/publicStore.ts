@@ -1,5 +1,6 @@
 import { PrefixedId, assertAttributeKey, assertPrefixedId, attributeKeys } from '@alef/common';
 import { WorkerEntrypoint } from 'cloudflare:workers';
+import { jsonArrayFrom } from 'kysely/helpers/sqlite';
 import { AuthedStore } from './authedStore.js';
 import { Env } from './env.js';
 import { DB, getDatabase } from './kysely/index.js';
@@ -24,7 +25,20 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 	}
 
 	async listFurniture() {
-		return this.#db.selectFrom('Furniture').selectAll().execute();
+		return this.#db
+			.selectFrom('Furniture')
+			.select((eb) => [
+				'id',
+				'name',
+				jsonArrayFrom(
+					eb
+						.selectFrom('FurnitureAttribute')
+						.leftJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id')
+						.where('FurnitureAttribute.furnitureId', '=', 'Furniture.id')
+						.select(['Attribute.key', 'Attribute.value'])
+				).as('attributes'),
+			])
+			.execute();
 	}
 
 	async getAttributeKeys() {
@@ -38,13 +52,25 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 
 	async listFurnitureByAttributes(attributes: Record<string, string>) {
 		let builder = this.#db
-			.selectFrom('FurnitureAttribute')
-			.leftJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id')
-			.leftJoin('Furniture', 'FurnitureAttribute.furnitureId', 'Furniture.id');
+			.selectFrom('Furniture')
+			.leftJoin('FurnitureAttribute', 'FurnitureAttribute.furnitureId', 'Furniture.id')
+			.leftJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id');
 		for (const [key, value] of Object.entries(attributes)) {
 			assertAttributeKey(key);
-			builder = builder.where('key', '=', key).where('value', '=', value);
+			builder = builder.where('Attribute.key', '=', key).where('Attribute.value', '=', value);
 		}
-		return builder.selectAll('Furniture').execute();
+		return builder
+			.select((eb) => [
+				'Furniture.id',
+				'Furniture.name',
+				jsonArrayFrom(
+					eb
+						.selectFrom('FurnitureAttribute')
+						.leftJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id')
+						.where('FurnitureAttribute.furnitureId', '=', 'Furniture.id')
+						.select(['Attribute.key', 'Attribute.value'])
+				).as('attributes'),
+			])
+			.execute();
 	}
 }

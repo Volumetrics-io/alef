@@ -1,7 +1,8 @@
 {
 	"name": "alef",
 	"scripts": {
-		"dev": "turbo dev"
+		"dev": "turbo dev",
+		"build": "turbo build"
 	},
 	"dependencies": {
 		"wrangler": "catalog:",

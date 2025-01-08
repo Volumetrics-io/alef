@@ -2,7 +2,7 @@ import { Box, Checkbox, CheckboxProps, Label, Text } from '@alef/sys';
 import * as Form from '@radix-ui/react-form';
 import { ErrorMessage, useField } from 'formik';
 import { ReactNode } from 'react';
-import { FormDefaultErrors } from './FormDefaultErrors.tsx';
+import { FormDefaultErrors } from './FormDefaultErrors.jsx';
 
 export interface FormCheckboxFieldProps extends Omit<CheckboxProps, 'onChange' | 'onFocus' | 'onBlur' | 'checked' | 'defaultChecked'> {
 	name: string;

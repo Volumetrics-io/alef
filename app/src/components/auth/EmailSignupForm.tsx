@@ -1,7 +1,6 @@
 import { fetch } from '@/services/fetch';
-import { Box, Text } from '@alef/sys';
+import { Box, Form, Text } from '@alef/sys';
 import { useState } from 'react';
-import { Form } from '../forms/forms';
 
 export interface EmailSignupFormProps {
 	returnTo?: string | null;

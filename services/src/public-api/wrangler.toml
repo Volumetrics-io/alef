@@ -1,6 +1,6 @@
 name = "public-api-service"
 compatibility_date = "2025-01-01"
-main = "./src/index.ts"
+main = "index.ts"
 
 compatibility_flags = ["nodejs_compat"]
 

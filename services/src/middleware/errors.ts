@@ -1,3 +1,4 @@
+import { AuthError } from '@a-type/auth';
 import { AlefError } from '@alef/common';
 import { ZodError } from 'zod';
 
@@ -11,6 +12,15 @@ export function handleError(reason: unknown): Response {
 			headers: {
 				'Content-Type': 'application/json',
 				...reason.headers,
+			},
+		});
+	}
+
+	if (reason instanceof AuthError) {
+		return new Response(reason.message, {
+			status: reason.statusCode,
+			headers: {
+				'Content-Type': 'text/plain',
 			},
 		});
 	}

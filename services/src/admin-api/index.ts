@@ -5,11 +5,10 @@ import { requestId } from 'hono/request-id';
 import { handleError } from '../middleware/errors.js';
 import { sessionMiddleware } from '../middleware/session.js';
 import { Env } from './config/ctx.js';
-import { authRouter } from './routers/auth.js';
 import { furnitureRouter } from './routers/furniture.js';
 import { usersRouter } from './routers/users.js';
 
-const app = new Hono<Env>()
+const adminApp = new Hono<Env>()
 	.onError(handleError)
 	.use(requestId())
 	.use(
@@ -27,11 +26,7 @@ const app = new Hono<Env>()
 	)
 	.use(logger())
 	.use(sessionMiddleware)
-	.get('/', (ctx) => ctx.text('Hello, world!'))
 	.route('/users', usersRouter)
 	.route('/furniture', furnitureRouter);
 
-// no need to include these routes in typings
-app.route('/auth', authRouter);
-
-export default app;
+export default adminApp;

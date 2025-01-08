@@ -6,6 +6,10 @@
 		"./public-api": {
 			"import": "./dist/public-api/hc.js",
 			"types": "./dist/public-api/hc.d.ts"
+		},
+		"./admin-api": {
+			"import": "./dist/admin-api/hc.js",
+			"types": "./dist/admin-api/hc.d.ts"
 		}
 	},
 	"scripts": {
@@ -13,15 +17,15 @@
 		"dev:client": "pnpm run build:client --watch --preserveWatchOutput",
 		"dev:db": "wrangler dev -c src/db/wrangler.toml --port 4211",
 		"dev:public-api": "sleep 2 && wrangler dev -c src/public-api/wrangler.toml --port 4201",
-		"dev:admin": "sleep 4 && wrangler dev -c src/admin/wrangler.toml --port 4202",
+		"dev:admin-api": "sleep 4 && wrangler dev -c src/admin-api/wrangler.toml --port 4202",
 		"migrations:apply:local": "CI=true wrangler d1 migrations apply prod-alef-core-d1 --local -c src/db/wrangler.toml",
 		"migrations:apply:remote": "CI=true wrangler d1 migrations apply prod-alef-core-d1 --remote -c src/db/wrangler.toml",
 		"migrations:create": "wrangler d1 migrations create prod-alef-core-d1 -c src/db/wrangler.toml",
-		"build:client": "tsc"
+		"build": "pnpm run --filter @alef/services --parallel \"/^build:.*/\"",
+		"build:client": "tsc -p tsconfig.client.json"
 	},
 	"dependencies": {
 		"hono": "catalog:",
-		"@alef/db": "workspace:*",
 		"@alef/common": "workspace:*",
 		"@a-type/auth": "catalog:",
 		"@a-type/utils": "catalog:",

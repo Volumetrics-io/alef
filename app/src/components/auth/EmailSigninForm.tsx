@@ -1,8 +1,7 @@
 import { fetch } from '@/services/fetch';
-import { Box, Button, Dialog, Input, Label } from '@alef/sys';
+import { Box, Button, Dialog, Form, Input, Label } from '@alef/sys';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { Form } from '../forms/forms';
 
 export interface EmailSigninFormProps {
 	returnTo?: string;

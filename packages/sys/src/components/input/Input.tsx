@@ -1,8 +1,8 @@
 import clsx from 'clsx';
-import { Control, ControlProps } from '../control/Control.js';
-import cls from './Input.module.css';
 import { forwardRef, InputHTMLAttributes, TextareaHTMLAttributes } from 'react';
 import { Box, BoxProps } from '../box/Box.js';
+import { Control, ControlProps } from '../control/Control.js';
+import cls from './Input.module.css';
 
 export type InputVariant = 'default' | 'error';
 
@@ -10,13 +10,20 @@ export type InputProps = (InputFieldProps & InputTextareaFieldProps) & {
 	variant?: InputVariant;
 	multiline?: boolean;
 	disabled?: boolean;
+	onValueChange?: (value: string) => void;
 };
 
-function InputBase({ className, multiline, variant, disabled, ...props }: InputProps) {
+function InputBase({ className, multiline, variant, disabled, onChange, onValueChange, ...props }: InputProps) {
 	const Field = multiline ? InputTextareaField : InputField;
+
+	const handleChange = (event: React.ChangeEvent<any>) => {
+		onChange?.(event);
+		onValueChange?.(event.target.value);
+	};
+
 	return (
 		<InputRoot className={className} variant={variant} disabled={disabled}>
-			<Field {...props} disabled={disabled} />
+			<Field {...props} disabled={disabled} onChange={handleChange} />
 		</InputRoot>
 	);
 }

@@ -1,6 +1,6 @@
 name = "db-service"
 compatibility_date = "2025-01-01"
-main = "src/index.ts"
+main = "index.ts"
 
 [[d1_databases]]
 binding = "D1"

@@ -20,7 +20,7 @@ export const sessions = new SessionManager<Context<Env>>({
 			expiration: ctx.env.NODE_ENV === 'production' ? '1d' : '1m',
 			async createSession(userId) {
 				assertPrefixedId(userId, 'u');
-				const user = await ctx.env.PUBLIC_STORE.getStoreForUser(userId).getSession();
+				const user = await (await ctx.env.PUBLIC_STORE.getStoreForUser(userId)).getSession();
 
 				if (!user) {
 					throw new AlefError(AlefError.Code.BadRequest, `Invalid session. User with ID ${userId} not found.`);

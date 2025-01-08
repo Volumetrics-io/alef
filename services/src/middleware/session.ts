@@ -1,6 +1,5 @@
-import { Session } from '@a-type/auth';
-import { AlefError } from '@alef/common';
-import { assertPrefixedId, PrefixedId } from '@alef/db';
+import { AuthError, Session } from '@a-type/auth';
+import { AlefError, assertPrefixedId, PrefixedId } from '@alef/common';
 import { createMiddleware } from 'hono/factory';
 import type { AuthedStore } from '../db/index.js';
 import { sessions } from '../public-api/auth/session.js';
@@ -15,8 +14,8 @@ export const sessionMiddleware = createMiddleware<Env>(async (ctx, next) => {
 	try {
 		session = await sessions.getSession(ctx);
 	} catch (err) {
-		if (err instanceof AlefError) {
-			if (err.code !== AlefError.Code.Unauthorized) {
+		if (err instanceof AuthError) {
+			if (err.statusCode !== 401) {
 				console.error(err);
 			}
 		} else {

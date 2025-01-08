@@ -1,8 +1,8 @@
-name = "public-api-service"
+name = "admin-api-service"
 compatibility_date = "2025-01-01"
-main = "./src/index.tsx"
+main = "index.ts"
 
-compatibility_flags = []
+compatibility_flags = ['nodejs_compat']
 
 [[services]]
 binding = "ADMIN_STORE"

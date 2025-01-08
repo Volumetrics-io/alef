@@ -26,9 +26,9 @@ export class AlefError extends Error {
 	constructor(
 		public code: AlefErrorCode,
 		message: string = `AlefError ${code}`,
-		cause?: unknown
+		public cause?: unknown
 	) {
-		super(message, { cause });
+		super(message);
 	}
 
 	get statusCode() {

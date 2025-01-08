@@ -34,7 +34,7 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 					eb
 						.selectFrom('FurnitureAttribute')
 						.leftJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id')
-						.where('FurnitureAttribute.furnitureId', '=', 'Furniture.id')
+						.whereRef('FurnitureAttribute.furnitureId', '=', 'Furniture.id')
 						.select(['Attribute.key', 'Attribute.value'])
 				).as('attributes'),
 			])
@@ -67,7 +67,7 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 					eb
 						.selectFrom('FurnitureAttribute')
 						.leftJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id')
-						.where('FurnitureAttribute.furnitureId', '=', 'Furniture.id')
+						.whereRef('FurnitureAttribute.furnitureId', '=', 'Furniture.id')
 						.select(['Attribute.key', 'Attribute.value'])
 				).as('attributes'),
 			])

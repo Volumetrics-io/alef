@@ -3,7 +3,7 @@ import { Box, Button, Input, Select } from '@alef/sys';
 import { useState } from 'react';
 
 export interface AttributePickerProps {
-	onSubmit: (attribute: string) => void;
+	onSubmit: (attribute: { key: string; value: string }) => void;
 }
 
 export function AttributePicker({ onSubmit }: AttributePickerProps) {
@@ -14,7 +14,7 @@ export function AttributePicker({ onSubmit }: AttributePickerProps) {
 		<Box>
 			<AttributeKeySelect value={selectedKey} onValueChange={setSelectedKey} />
 			<Input value={selectedValue} onValueChange={setSelectedValue} />
-			<Button onClick={() => onSubmit(`${selectedKey}:${selectedValue}`)}>Ok</Button>
+			<Button onClick={() => onSubmit({ key: selectedKey, value: selectedValue })}>Ok</Button>
 		</Box>
 	);
 }

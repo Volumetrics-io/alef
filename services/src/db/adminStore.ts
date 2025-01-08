@@ -130,7 +130,7 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 			.execute();
 	}
 
-	async addFurniture(data: { modelFile: File; name: string }) {
+	async insertFurniture(data: { name: string; attributes?: { key: string; value: string }[] }) {
 		const furnitureId = id('f');
 		await this.#db
 			.insertInto('Furniture')
@@ -140,7 +140,18 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 			})
 			.executeTakeFirstOrThrow();
 
-		await this.env.FURNITURE_MODELS_BUCKET.put(furnitureId, data.modelFile);
+		if (data.attributes) {
+			for (const { key, value } of data.attributes) {
+				await this.addFurnitureAttribute(furnitureId, key, value);
+			}
+		}
+
+		return { id: furnitureId };
+	}
+
+	async uploadFurnitureModel(id: string, modelFile: File) {
+		assertPrefixedId(id, 'f');
+		await this.env.FURNITURE_MODELS_BUCKET.put(id, modelFile);
 	}
 
 	async deleteFurniture(id: string) {
@@ -169,5 +180,17 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 				attributeId,
 			})
 			.execute();
+	}
+
+	async deleteFurnitureAttribute(furnitureId: string, key: string, value: string) {
+		assertPrefixedId(furnitureId, 'f');
+		assertAttributeKey(key);
+		const attr = await this.#db.selectFrom('Attribute').where('key', '=', key).where('value', '=', value).select('id').executeTakeFirst();
+		if (!attr) {
+			// that's fine, nothing to do
+			return;
+		}
+		const attributeId = attr.id;
+		await this.#db.deleteFrom('FurnitureAttribute').where('furnitureId', '=', furnitureId).where('attributeId', '=', attributeId).execute();
 	}
 }

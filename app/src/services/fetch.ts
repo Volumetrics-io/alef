@@ -1,4 +1,4 @@
-import { createFetch } from '@a-type/auth-client';
+import { createFetch } from '@a-type/auth-fetch';
 import { AlefError } from '@alef/common';
 
 export const fetch = createFetch({
@@ -9,8 +9,5 @@ export const fetch = createFetch({
 			return asAlefError.code === AlefError.Code.SessionExpired;
 		}
 		return false;
-	},
-	headers: {
-		'x-csrf-token': 'csrf',
 	},
 });

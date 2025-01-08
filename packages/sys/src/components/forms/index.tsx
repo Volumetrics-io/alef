@@ -1,3 +1,4 @@
+import { FieldArray, useField, useFormikContext } from 'formik';
 import { withProps } from '../../hocs/withProps.jsx';
 import { FormActions } from './FormActions.js';
 import { FormCheckboxField } from './FormCheckboxField.js';
@@ -14,4 +15,7 @@ export const Form = Object.assign(FormRoot, {
 	TextArea: withProps(FormTextField, { multiline: true }),
 	CheckboxField: FormCheckboxField,
 	Actions: FormActions,
+	useField,
+	useForm: useFormikContext,
+	FieldArray,
 });

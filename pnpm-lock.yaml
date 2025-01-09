@@ -165,6 +165,12 @@ importers:
       '@alef/sys':
         specifier: workspace:*
         version: link:../packages/sys
+      '@react-three/drei':
+        specifier: 'catalog:'
+        version: 9.120.6(@react-three/fiber@9.0.0-rc.1(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(three@0.172.0))(@types/react@19.0.2)(@types/three@0.172.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(three@0.172.0)(use-sync-external-store@1.4.0(react@19.0.0))
+      '@react-three/fiber':
+        specifier: 'catalog:'
+        version: 9.0.0-rc.1(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(three@0.172.0)
       '@tanstack/react-query':
         specifier: 5.62.15
         version: 5.62.15(react@19.0.0)

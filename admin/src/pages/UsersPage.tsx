@@ -1,11 +1,19 @@
 import { adminApiClient } from '@/services/adminApi';
-import { Box, Form, Frame, Heading } from '@alef/sys';
+import { Box, Button, Form, Frame, Heading, Icon } from '@alef/sys';
+import { Link } from '@verdant-web/react-router';
 import toast from 'react-hot-toast';
 
 const UsersPage = () => {
 	return (
-		<Box stacked>
-			<Heading>Users</Heading>
+		<Box stacked full align="start" gapped>
+			<Box gapped align="center">
+				<Button asChild color="ghost">
+					<Link to="/">
+						<Icon name="arrow-left" />
+					</Link>
+				</Button>
+				<Heading>Users</Heading>
+			</Box>
 			<Frame p stacked gapped>
 				<Heading level={2}>New User</Heading>
 				<Form

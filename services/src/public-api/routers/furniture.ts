@@ -4,16 +4,20 @@ import { Hono } from 'hono';
 import { z } from 'zod';
 import { Env } from '../config/ctx';
 
+const formattedAttrSchema = z.string().regex(/^[^:]+:[^:]+$/);
+
 export const furnitureRouter = new Hono<Env>()
 	.get(
 		'/',
 		zValidator(
 			'query',
 			z.object({
-				attribute: z.union([z.string(), z.string().array()]).optional(),
+				attribute: z.union([formattedAttrSchema, formattedAttrSchema.array()]).optional(),
 			})
 		),
 		async (ctx) => {
+			// not using validated version here because .queries gives the coerced array version,
+			// easier to work with...
 			const attribute = ctx.req.queries('attribute') || [];
 			if (attribute.length) {
 				const keyValues = Object.fromEntries(attribute.map((attr) => attr.split(':')));

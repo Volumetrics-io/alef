@@ -18,3 +18,7 @@ export function assertAttributeKeyValues(map: Record<string, string>): map is Re
 	}
 	return true;
 }
+
+export function formatAttribute(attribute: { key: string; value: string }) {
+	return `${attribute.key}:${attribute.value}`;
+}

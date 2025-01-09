@@ -1,50 +1,22 @@
-# React + TypeScript + Vite
+# Alef App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The web app that users will interact with.
 
-Currently, two official plugins are available:
+## Interacting with the API
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+API param, body, and response types are inferred from Hono (the server framework) using the `hcWithType` client factory exported from the API service. This is just some Typescript magic which will give us type checking on API usage without extra work (as long as it doesn't break).
 
-## Expanding the ESLint configuration
+For API typechecking to update, the API needs to be built. That can be done ad-hoc by running `pnpm build` in `/services`, or in watch mode as part of the normal `pnpm dev` task (recommended).
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+API React integration is powered by `@tanstack/react-query`. No defaults are currently applied to the QueryClient; all configuration happens inside the query functions themselves, which delegate to the typed API client.
 
-- Configure the top-level `parserOptions` property like this:
+The API client is located in the local `./src/services` directory. It also contains some premade React hooks to make interaction easier. It's recommended to add these hooks and coordinate cache usage, rather than do ad-hoc query hooks elsewhere.
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+All hooks use `useSuspenseQuery`, which means you should wrap usages with `<Suspense>` boundaries as desirable, or loading will propagate upward.
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### Some basic documented functionality
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+While there will probably be much more added as we go, here's some things you can do at time of writing:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+`useMe` - Fetches the current user session.
+`useAllFurniture({ attributeFilter?: { key: string; value: string; }[] })` - Lists furniture metadata, accepts an optional filter for key=value attributes (filters are AND-ed together).

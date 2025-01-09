@@ -25,7 +25,9 @@ export function EmailSigninForm({ returnTo, className, appState, ...rest }: Emai
 				<Input type="email" name="email" id="email" required />
 				<Label htmlFor="password">Password</Label>
 				<Input autoComplete="current-password" type="password" name="password" id="password" required />
-				<Button type="submit">Sign In</Button>
+				<Button type="submit" color="suggested">
+					Sign In
+				</Button>
 				<ForgotPassword />
 			</form>
 		</Box>

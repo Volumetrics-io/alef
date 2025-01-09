@@ -2,11 +2,13 @@ import { isPrefixedId } from '@alef/common';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { z } from 'zod';
+import { loggedInMiddleware } from '../../middleware/session';
 import { Env } from '../config/ctx';
 
 const formattedAttrSchema = z.string().regex(/^[^:]+:[^:]+$/);
 
 export const furnitureRouter = new Hono<Env>()
+	.use(loggedInMiddleware)
 	.get(
 		'/',
 		zValidator(

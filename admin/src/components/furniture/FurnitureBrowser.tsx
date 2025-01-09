@@ -26,20 +26,20 @@ export function FurnitureBrowser() {
 	});
 
 	return (
-		<Box stacked>
-			{/* Selected attributes */}
+		<Box stacked gapped full>
+			{/* Filter attributes */}
+			<AttributePicker onSubmit={(attr) => setSelectedAttributes([...selectedAttributes, `${attr.key}:${attr.value}`])} />
 			<Box>
 				{selectedAttributes.map((attr) => {
 					const [key, value] = attr.split(':');
 					return <AttributePill key={attr} attribute={{ key, value }} onRemove={() => setSelectedAttributes((v) => v.filter((a) => a !== attr))} />;
 				})}
 			</Box>
-			<AttributePicker onSubmit={(attr) => setSelectedAttributes([...selectedAttributes, `${attr.key}:${attr.value}`])} />
-			<Card.Grid>
+			<Card.Grid full>
 				{data?.map((furniture) => (
 					<Card key={furniture.id}>
 						<Card.Main>
-							<FurniturePreview furnitureId={furniture.id} />
+							<FurniturePreview furnitureId={furniture.id} nonce={furniture.modelUpdatedAt} />
 							<Box float="top-left" gapped>
 								{furniture.attributes.map((attr) => (
 									<Frame key={attr.key} p="squeeze">

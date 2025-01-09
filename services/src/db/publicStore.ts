@@ -1,9 +1,11 @@
-import { AlefError, PrefixedId, assertAttributeKey, assertPrefixedId, getFurniturePrimaryModelPath } from '@alef/common';
+import { AlefError, assertAttributeKey, assertPrefixedId, getFurniturePrimaryModelPath, PrefixedId } from '@alef/common';
 import { WorkerEntrypoint } from 'cloudflare:workers';
+import { ExpressionBuilder } from 'kysely';
 import { jsonArrayFrom } from 'kysely/helpers/sqlite';
 import { AuthedStore } from './authedStore.js';
 import { Env } from './env.js';
 import { DB, getDatabase } from './kysely/index.js';
+import { Database } from './kysely/tables.js';
 
 export class PublicStore extends WorkerEntrypoint<Env> {
 	#db: DB;
@@ -20,7 +22,11 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 	// Furniture APIs
 	async getFurniture(id: PrefixedId<'f'>) {
 		assertPrefixedId(id, 'f');
-		return this.#db.selectFrom('Furniture').where('id', '=', id).selectAll().executeTakeFirst();
+		return this.#db
+			.selectFrom('Furniture')
+			.where('id', '=', id)
+			.select((eb) => ['id', 'name', 'modelUpdatedAt', this.selectFurnitureAttributes(eb)])
+			.executeTakeFirst();
 	}
 
 	async getFurnitureModelResponse(id: PrefixedId<'f'>) {
@@ -34,20 +40,20 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 		return new Response(object.body, { headers });
 	}
 
+	private selectFurnitureAttributes(eb: ExpressionBuilder<Database, 'Furniture'>) {
+		return jsonArrayFrom(
+			eb
+				.selectFrom('FurnitureAttribute')
+				.leftJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id')
+				.whereRef('FurnitureAttribute.furnitureId', '=', 'Furniture.id')
+				.select(['Attribute.key', 'Attribute.value'])
+		).as('attributes');
+	}
+
 	async listFurniture() {
 		return this.#db
 			.selectFrom('Furniture')
-			.select((eb) => [
-				'id',
-				'name',
-				jsonArrayFrom(
-					eb
-						.selectFrom('FurnitureAttribute')
-						.leftJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id')
-						.whereRef('FurnitureAttribute.furnitureId', '=', 'Furniture.id')
-						.select(['Attribute.key', 'Attribute.value'])
-				).as('attributes'),
-			])
+			.select((eb) => ['id', 'name', 'modelUpdatedAt', this.selectFurnitureAttributes(eb)])
 			.execute();
 	}
 
@@ -65,18 +71,6 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 			assertAttributeKey(key);
 			builder = builder.where('Attribute.key', '=', key).where('Attribute.value', '=', value);
 		}
-		return builder
-			.select((eb) => [
-				'Furniture.id',
-				'Furniture.name',
-				jsonArrayFrom(
-					eb
-						.selectFrom('FurnitureAttribute')
-						.leftJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id')
-						.whereRef('FurnitureAttribute.furnitureId', '=', 'Furniture.id')
-						.select(['Attribute.key', 'Attribute.value'])
-				).as('attributes'),
-			])
-			.execute();
+		return builder.select((eb) => ['Furniture.id', 'Furniture.name', 'Furniture.modelUpdatedAt', this.selectFurnitureAttributes(eb)]).execute();
 	}
 }

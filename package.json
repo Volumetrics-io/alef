@@ -2,13 +2,19 @@
 	"name": "alef",
 	"scripts": {
 		"dev": "turbo dev",
-		"build": "turbo build"
+		"build": "turbo build",
+		"initialize": "node ./scripts/initialize.mjs",
+		"makeLocalAdmin": "node ./scripts/makeLocalAdmin.mjs"
 	},
 	"dependencies": {
-		"wrangler": "catalog:",
-		"typescript": "catalog:",
+		"@clack/prompts": "^0.9.1",
 		"@cloudflare/workers-types": "catalog:",
-		"turbo": "2.3.3"
+		"turbo": "2.3.3",
+		"typescript": "catalog:",
+		"wrangler": "catalog:"
 	},
-	"packageManager": "pnpm@9.15.2"
+	"packageManager": "pnpm@9.15.2",
+	"volta": {
+		"node": "22.13.0"
+	}
 }

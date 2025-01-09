@@ -24,6 +24,8 @@ export interface UserTable {
 	emailVerifiedAt: Date | null;
 	imageUrl: string | null;
 
+	isProductAdmin: ColumnType<boolean, boolean | undefined, boolean | undefined>;
+
 	password: string | null;
 
 	acceptedTosAt: ColumnType<Date, Date | undefined, Date | undefined> | null;
@@ -73,6 +75,8 @@ export interface FurnitureTable {
 	updatedAt: UpdatedAt;
 
 	name: string;
+
+	modelUpdatedAt: Date | null;
 }
 export type Furniture = Selectable<FurnitureTable>;
 export type NewFurniture = Insertable<FurnitureTable>;

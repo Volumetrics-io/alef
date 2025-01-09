@@ -1,5 +1,6 @@
 import { adminApiClient } from '@/services/adminApi';
 import { Button, Icon } from '@alef/sys';
+import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 
 export interface FurnitureModelUploadProps {
@@ -7,6 +8,7 @@ export interface FurnitureModelUploadProps {
 }
 
 export function FurnitureModelUpload({ furnitureId }: FurnitureModelUploadProps) {
+	const queryClient = useQueryClient();
 	return (
 		<div>
 			<input
@@ -28,6 +30,7 @@ export function FurnitureModelUpload({ furnitureId }: FurnitureModelUploadProps)
 								file,
 							},
 						});
+						queryClient.invalidateQueries({ queryKey: ['furniture'] });
 					} catch (err) {
 						console.error(err);
 						toast.error('Error uploading model, check console');

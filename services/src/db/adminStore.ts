@@ -152,6 +152,7 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 	async uploadFurnitureModel(id: string, modelStream: ReadableStream) {
 		assertPrefixedId(id, 'f');
 		await this.env.FURNITURE_MODELS_BUCKET.put(getFurniturePrimaryModelPath(id), modelStream);
+		await this.#db.updateTable('Furniture').set({ modelUpdatedAt: new Date() }).where('id', '=', id).execute();
 	}
 
 	async deleteFurniture(id: string) {

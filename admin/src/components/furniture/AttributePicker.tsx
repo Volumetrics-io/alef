@@ -4,17 +4,18 @@ import { useState } from 'react';
 
 export interface AttributePickerProps {
 	onSubmit: (attribute: { key: string; value: string }) => void;
+	actionText?: string;
 }
 
-export function AttributePicker({ onSubmit }: AttributePickerProps) {
+export function AttributePicker({ onSubmit, actionText = 'Ok' }: AttributePickerProps) {
 	const [selectedKey, setSelectedKey] = useState<AttributeKey>(attributeKeys[0]);
 	const [selectedValue, setSelectedValue] = useState('');
 
 	return (
-		<Box>
+		<Box gapped>
 			<AttributeKeySelect value={selectedKey} onValueChange={setSelectedKey} />
 			<Input value={selectedValue} onValueChange={setSelectedValue} />
-			<Button onClick={() => onSubmit({ key: selectedKey, value: selectedValue })}>Ok</Button>
+			<Button onClick={() => onSubmit({ key: selectedKey, value: selectedValue })}>{actionText}</Button>
 		</Box>
 	);
 }

@@ -1,4 +1,4 @@
-import { Box, Form } from '@alef/sys';
+import { Box, Form, Label } from '@alef/sys';
 import { AttributePicker } from './AttributePicker';
 import { AttributePill } from './AttributePill';
 
@@ -12,12 +12,13 @@ export function AttributesField({ name }: AttributesFieldProps) {
 		<Form.FieldArray name={name}>
 			{(helpers) => (
 				<Box gapped stacked>
+					<Label>Attributes</Label>
+					<AttributePicker onSubmit={(attr) => helpers.push(attr)} actionText="Add" />
 					<Box gapped>
 						{field.value.map((attr, idx) => (
 							<AttributePill attribute={attr} key={`${attr.key}:${attr.value}`} onRemove={() => helpers.remove(idx)} />
 						))}
 					</Box>
-					<AttributePicker onSubmit={(attr) => helpers.push(attr)} />
 				</Box>
 			)}
 		</Form.FieldArray>

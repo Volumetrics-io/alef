@@ -1,3 +1,4 @@
+import { Box } from '@alef/sys';
 import { makeRoutes, Outlet, Router } from '@verdant-web/react-router';
 import { lazy } from 'react';
 import HomePage from './HomePage.jsx';
@@ -24,6 +25,8 @@ const routes = makeRoutes([
 
 export const Pages = () => (
 	<Router routes={routes}>
-		<Outlet />
+		<Box p full>
+			<Outlet />
+		</Box>
 	</Router>
 );

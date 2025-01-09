@@ -2,8 +2,8 @@
 
 create table User (
 	id text primary key,
-	createdAt datetime default CURRENT_TIMESTAMP not null,
-	updatedAt datetime default CURRENT_TIMESTAMP not null,
+	createdAt datetime default (strftime('%FT%R:%fZ')) not null,
+	updatedAt datetime default (strftime('%FT%R:%fZ')) not null,
 	fullName text not null,
 	friendlyName text not null,
 	email text not null unique,
@@ -14,8 +14,8 @@ create table User (
 
 create table Account (
 	id text primary key,
-	createdAt datetime default CURRENT_TIMESTAMP not null,
-	updatedAt datetime default CURRENT_TIMESTAMP not null,
+	createdAt datetime default (strftime('%FT%R:%fZ')) not null,
+	updatedAt datetime default (strftime('%FT%R:%fZ')) not null,
 	userId text not null references User(id) on delete cascade,
 	type text not null,
 	provider text not null,
@@ -30,8 +30,8 @@ create table Account (
 
 create table VerificationCode (
 	id text primary key,
-	createdAt datetime default CURRENT_TIMESTAMP not null,
-	updatedAt datetime default CURRENT_TIMESTAMP not null,
+	createdAt datetime default (strftime('%FT%R:%fZ')) not null,
+	updatedAt datetime default (strftime('%FT%R:%fZ')) not null,
 	email text not null,
 	code text not null,
 	name text not null,

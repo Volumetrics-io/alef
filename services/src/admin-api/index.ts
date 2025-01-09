@@ -1,3 +1,4 @@
+import { AlefError } from '@alef/common';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
@@ -28,7 +29,10 @@ const adminApp = new Hono<Env>()
 	.use(loggedInMiddleware)
 	// enforce admin permissions
 	.use(async (ctx, next) => {
-		// TODO:
+		const session = ctx.get('session');
+		if (!session.isProductAdmin) {
+			throw new AlefError(AlefError.Code.Forbidden, 'You do not have permission to access this functionality.');
+		}
 		await next();
 	})
 	.route('/users', usersRouter)

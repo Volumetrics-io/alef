@@ -36,4 +36,16 @@ export const furnitureRouter = new Hono<Env>()
 			const furniture = await ctx.env.PUBLIC_STORE.getFurniture(ctx.req.valid('param').id);
 			return ctx.json(furniture);
 		}
+	)
+	.get(
+		'/:id/model',
+		zValidator(
+			'param',
+			z.object({
+				id: z.custom((val) => isPrefixedId(val, 'f')),
+			})
+		),
+		async (ctx) => {
+			return ctx.env.PUBLIC_STORE.getFurnitureModelResponse(ctx.req.valid('param').id);
+		}
 	);

@@ -4,6 +4,8 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { AttributePicker } from './AttributePicker';
 import { AttributePill } from './AttributePill';
+import { FurnitureModelUpload } from './FurnitureModelUpload';
+import { FurniturePreview } from './FurniturePreview';
 
 export function FurnitureBrowser() {
 	const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
@@ -29,7 +31,7 @@ export function FurnitureBrowser() {
 			<Box>
 				{selectedAttributes.map((attr) => {
 					const [key, value] = attr.split(':');
-					return <AttributePill key={key} attribute={{ key, value }} onRemove={() => setSelectedAttributes((v) => v.filter((a) => a !== attr))} />;
+					return <AttributePill key={attr} attribute={{ key, value }} onRemove={() => setSelectedAttributes((v) => v.filter((a) => a !== attr))} />;
 				})}
 			</Box>
 			<AttributePicker onSubmit={(attr) => setSelectedAttributes([...selectedAttributes, `${attr.key}:${attr.value}`])} />
@@ -37,16 +39,18 @@ export function FurnitureBrowser() {
 				{data?.map((furniture) => (
 					<Card key={furniture.id}>
 						<Card.Main>
-							<Box>
+							<FurniturePreview furnitureId={furniture.id} />
+							<Box float="top-left" gapped>
 								{furniture.attributes.map((attr) => (
-									<Frame>
+									<Frame key={attr.key} p="squeeze">
 										{attr.key}: {attr.value}
 									</Frame>
 								))}
 							</Box>
 						</Card.Main>
-						<Card.Details>
+						<Card.Details justify="between">
 							<Text strong>{furniture.name}</Text>
+							<FurnitureModelUpload furnitureId={furniture.id} />
 						</Card.Details>
 					</Card>
 				))}

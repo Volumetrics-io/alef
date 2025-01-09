@@ -20,4 +20,4 @@ entrypoint = "FurnitureStore"
 
 [[r2_buckets]]
 bucket_name = "prod-alef-furniture-models"
-binding = "MODELS_BUCKET"
+binding = "FURNITURE_MODELS_BUCKET"

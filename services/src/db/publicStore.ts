@@ -1,4 +1,4 @@
-import { PrefixedId, assertAttributeKey, assertPrefixedId, attributeKeys } from '@alef/common';
+import { AlefError, PrefixedId, assertAttributeKey, assertPrefixedId, getFurniturePrimaryModelPath } from '@alef/common';
 import { WorkerEntrypoint } from 'cloudflare:workers';
 import { jsonArrayFrom } from 'kysely/helpers/sqlite';
 import { AuthedStore } from './authedStore.js';
@@ -18,10 +18,20 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 	}
 
 	// Furniture APIs
-
 	async getFurniture(id: PrefixedId<'f'>) {
 		assertPrefixedId(id, 'f');
 		return this.#db.selectFrom('Furniture').where('id', '=', id).selectAll().executeTakeFirst();
+	}
+
+	async getFurnitureModelResponse(id: PrefixedId<'f'>) {
+		const object = await this.env.FURNITURE_MODELS_BUCKET.get(getFurniturePrimaryModelPath(id));
+		if (!object) {
+			return new AlefError(AlefError.Code.NotFound, 'Model not found').toResponse();
+		}
+		const headers = new Headers();
+		object.writeHttpMetadata(headers);
+		headers.set('etag', object.httpEtag);
+		return new Response(object.body, { headers });
 	}
 
 	async listFurniture() {
@@ -39,10 +49,6 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 				).as('attributes'),
 			])
 			.execute();
-	}
-
-	async getAttributeKeys() {
-		return attributeKeys;
 	}
 
 	async getAttributeValues(key: string) {

@@ -19,7 +19,9 @@
 		"hono": "catalog:",
 		"react": "catalog:",
 		"react-dom": "catalog:",
-		"react-hot-toast": "2.5.1"
+		"react-hot-toast": "2.5.1",
+		"@react-three/fiber": "catalog:",
+		"@react-three/drei": "catalog:"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.15.0",

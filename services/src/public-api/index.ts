@@ -3,7 +3,6 @@ import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { requestId } from 'hono/request-id';
 import { handleError } from '../middleware/errors.js';
-import { sessionMiddleware } from '../middleware/session.js';
 import { Env } from './config/ctx.js';
 import { authRouter } from './routers/auth.js';
 import { furnitureRouter } from './routers/furniture.js';
@@ -26,7 +25,6 @@ const app = new Hono<Env>()
 		})
 	)
 	.use(logger())
-	.use(sessionMiddleware)
 	.get('/', (ctx) => ctx.text('Hello, world!'))
 	.route('/users', usersRouter)
 	.route('/furniture', furnitureRouter);

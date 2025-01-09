@@ -1,5 +1,4 @@
 import type { AdminStore, PublicStore } from '../../db/index.js';
-import { SessionWithPrefixedIds } from '../../middleware/session.js';
 
 export interface Bindings {
 	// env
@@ -20,11 +19,7 @@ export interface Bindings {
 	ADMIN_STORE: AdminStore;
 }
 
-export interface CtxVars {
-	requestId: string;
-	session: SessionWithPrefixedIds | null;
-	gameSessionId: string;
-}
+export interface CtxVars {}
 
 export interface Env {
 	Variables: CtxVars;

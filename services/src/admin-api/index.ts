@@ -3,7 +3,7 @@ import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { requestId } from 'hono/request-id';
 import { handleError } from '../middleware/errors.js';
-import { sessionMiddleware } from '../middleware/session.js';
+import { loggedInMiddleware } from '../middleware/session.js';
 import { Env } from './config/ctx.js';
 import { furnitureRouter } from './routers/furniture.js';
 import { usersRouter } from './routers/users.js';
@@ -25,7 +25,12 @@ const adminApp = new Hono<Env>()
 		})
 	)
 	.use(logger())
-	.use(sessionMiddleware)
+	.use(loggedInMiddleware)
+	// enforce admin permissions
+	.use(async (ctx, next) => {
+		// TODO:
+		await next();
+	})
 	.route('/users', usersRouter)
 	.route('/furniture', furnitureRouter);
 

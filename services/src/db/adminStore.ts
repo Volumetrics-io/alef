@@ -1,5 +1,5 @@
 import { AuthAccount, AuthUser, AuthVerificationCode } from '@a-type/auth';
-import { PrefixedId, assertAttributeKey, assertPrefixedId, id } from '@alef/common';
+import { PrefixedId, assertAttributeKey, assertPrefixedId, getFurniturePrimaryModelPath, id } from '@alef/common';
 import { WorkerEntrypoint } from 'cloudflare:workers';
 import { Env } from './env.js';
 import { DB, comparePassword, getDatabase, hashPassword } from './kysely/index.js';
@@ -149,9 +149,9 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 		return { id: furnitureId };
 	}
 
-	async uploadFurnitureModel(id: string, modelFile: File) {
+	async uploadFurnitureModel(id: string, modelStream: ReadableStream) {
 		assertPrefixedId(id, 'f');
-		await this.env.FURNITURE_MODELS_BUCKET.put(id, modelFile);
+		await this.env.FURNITURE_MODELS_BUCKET.put(getFurniturePrimaryModelPath(id), modelStream);
 	}
 
 	async deleteFurniture(id: string) {

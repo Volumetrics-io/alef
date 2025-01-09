@@ -47,7 +47,8 @@ export const furnitureRouter = new Hono<Env>()
 		async (ctx) => {
 			const { id } = ctx.req.valid('param');
 			const { file } = ctx.req.valid('form');
-			await ctx.env.ADMIN_STORE.uploadFurnitureModel(id, file);
+			const fileStream = file.stream();
+			await ctx.env.ADMIN_STORE.uploadFurnitureModel(id, fileStream);
 			return ctx.json({ ok: true });
 		}
 	)

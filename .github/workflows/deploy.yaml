@@ -16,19 +16,19 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
-          workingDirectory: ./services/db
+          workingDirectory: ./services/src/db
       - name: Deploy Public API
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
-          workingDirectory: ./services/public-api
+          workingDirectory: ./services/src/public-api
       - name: Deploy Admin API
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
-          workingDirectory: ./services/admin-api
+          workingDirectory: ./services/src/admin-api
       - name: Deploy Public App
         uses: cloudflare/wrangler-action@v3
         with:

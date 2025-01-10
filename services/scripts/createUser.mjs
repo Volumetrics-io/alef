@@ -6,11 +6,11 @@ import { join } from 'node:path';
 const argv = process.argv.slice(2);
 
 if (argv.length < 3) {
-	console.error('Usage: createUser.mjs <email> <password> <name> (<admin>)');
+	console.error('Usage: createUser.mjs <email> <password> <name> (<admin>) (<remote>)');
 	process.exit(1);
 }
 
-let [email, password, name, adminInput] = argv;
+let [email, password, name, adminInput, remoteInput] = argv;
 
 if (!email || !password) {
 	console.error('Usage: createUser.mjs <email> <password> <name>');
@@ -27,13 +27,14 @@ if (password.length < 4) {
 }
 
 const hashedPassword = await hashPassword(password);
-const isProductAdmin = adminInput === 'true' ? 1 : 0;
+const isProductAdmin = adminInput === 'true' || adminInput === '"true"' ? 1 : 0;
+const remote = remoteInput === 'true' ? true : false;
 
 const sql = `insert into User (id, email, password, fullName, friendlyName, isProductAdmin)
 	values ('${id('u')}', '${email}', '${hashedPassword}', '${name}', '${name}', ${isProductAdmin});`;
 console.log('Running', sql);
 
-spawnSync('pnpx', ['wrangler', 'd1', 'execute', 'prod-alef-core-d1', '--local', '--command', sql], {
+spawnSync('pnpx', ['wrangler', 'd1', 'execute', 'prod-alef-core-d1', remote ? '--remote' : '--local', '--command', sql], {
 	stdio: 'inherit',
 	cwd: join(process.cwd(), 'src/db'),
 });

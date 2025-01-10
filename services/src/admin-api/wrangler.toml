@@ -5,6 +5,9 @@ account_id = "ad8af7aeb571031ffc236c411f39afe7"
 
 compatibility_flags = ['nodejs_compat']
 
+[vars]
+ADMIN_UI_ORIGIN = "https://admin.alef.io"
+
 [[services]]
 binding = "ADMIN_STORE"
 service = "db-service"

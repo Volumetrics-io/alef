@@ -1,7 +1,7 @@
 import { Box } from '@alef/sys';
 import { makeRoutes, Outlet, Router } from '@verdant-web/react-router';
 import { lazy } from 'react';
-import HomePage from './HomePage.jsx';
+import HomePage from './HomePage.js';
 
 const routes = makeRoutes([
 	{
@@ -11,15 +11,15 @@ const routes = makeRoutes([
 	},
 	{
 		path: '/users',
-		component: lazy(() => import('./UsersPage.jsx')),
+		component: lazy(() => import('./UsersPage.js')),
 	},
 	{
 		path: '/furniture',
-		component: lazy(() => import('./FurniturePage.jsx')),
+		component: lazy(() => import('./FurniturePage.js')),
 	},
 	{
 		path: '*',
-		component: lazy(() => import('./NotFoundPage.jsx')),
+		component: lazy(() => import('./NotFoundPage.js')),
 	},
 ]);
 

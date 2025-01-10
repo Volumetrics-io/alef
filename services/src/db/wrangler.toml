@@ -14,11 +14,6 @@ binding = "STORE"
 service = "db-service"
 entrypoint = "AdminStore"
 
-[[services]]
-binding = "FURNITURE_STORE"
-service = "furniture-service"
-entrypoint = "FurnitureStore"
-
 [[r2_buckets]]
 bucket_name = "prod-alef-furniture-models"
 binding = "FURNITURE_MODELS_BUCKET"

@@ -1,5 +1,6 @@
-import { FieldArray, useField, useFormikContext } from 'formik';
-import { withProps } from '../../hocs/withProps.jsx';
+import { FieldArray, FieldArrayConfig, useField, useFormikContext } from 'formik';
+import { FC } from 'react';
+import { withProps } from '../../hocs/withProps.js';
 import { FormActions } from './FormActions.js';
 import { FormCheckboxField } from './FormCheckboxField.js';
 import { FormRoot } from './FormRoot.js';
@@ -17,5 +18,5 @@ export const Form = Object.assign(FormRoot, {
 	Actions: FormActions,
 	useField,
 	useForm: useFormikContext,
-	FieldArray,
+	FieldArray: FieldArray as FC<FieldArrayConfig>,
 });

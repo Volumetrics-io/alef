@@ -2,8 +2,8 @@ import { Box, Input, InputProps, Label, Text } from '@alef/sys';
 import * as Form from '@radix-ui/react-form';
 import { ErrorMessage, useField } from 'formik';
 import { ReactNode } from 'react';
-import { FieldHelpText } from './FieldHelpText.jsx';
-import { FormDefaultErrors } from './FormDefaultErrors.jsx';
+import { FieldHelpText } from './FieldHelpText.js';
+import { FormDefaultErrors } from './FormDefaultErrors.js';
 
 export interface FormTextFieldProps extends Omit<InputProps, 'value' | 'defaultValue' | 'slot' | 'children'> {
 	name: string;

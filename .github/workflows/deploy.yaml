@@ -13,6 +13,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install Volta to manage Node.js versions
         uses: volta-cli/action@v4
+      - name: Install node
+        run: volta install node
       - name: Install pnpm
         run: volta install pnpm
       - name: Deploy DB

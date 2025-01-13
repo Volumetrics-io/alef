@@ -90,9 +90,8 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 		return this.#db.selectFrom('VerificationCode').where('code', '=', code).where('email', '=', email).selectAll().executeTakeFirst();
 	}
 
-	async consumeVerificationCode(id: string) {
-		assertPrefixedId(id, 'vc');
-		await this.#db.deleteFrom('VerificationCode').where('id', '=', id).execute();
+	async consumeVerificationCode(email: string, code: string) {
+		await this.#db.deleteFrom('VerificationCode').where('code', '=', code).where('email', '=', email).execute();
 	}
 
 	async getUserByEmailAndPassword(email: string, plaintextPassword: string) {

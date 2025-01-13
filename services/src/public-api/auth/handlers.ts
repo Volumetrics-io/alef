@@ -56,8 +56,8 @@ export const authHandlers = createHandlers<Context<Env>>({
 		updateUser(userId, user) {
 			return ctx.env.ADMIN_STORE.updateUser(userId, user);
 		},
-		consumeVerificationCode(code) {
-			return ctx.env.ADMIN_STORE.consumeVerificationCode(code);
+		consumeVerificationCode(email, code) {
+			return ctx.env.ADMIN_STORE.consumeVerificationCode(email, code);
 		},
 		async getUserByEmailAndPassword(email, password) {
 			const value = await ctx.env.ADMIN_STORE.getUserByEmailAndPassword(email, password);
@@ -70,6 +70,9 @@ export const authHandlers = createHandlers<Context<Env>>({
 		},
 		insertVerificationCode(data) {
 			return ctx.env.ADMIN_STORE.insertVerificationCode(data);
+		},
+		getVerificationCode(email, code) {
+			return ctx.env.ADMIN_STORE.getVerificationCode(email, code);
 		},
 	}),
 });

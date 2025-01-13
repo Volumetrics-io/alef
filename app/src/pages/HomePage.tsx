@@ -37,7 +37,7 @@ const HomePage = () => {
 						state.gl.setClearColor(0xefffff);
 						state.gl.localClippingEnabled = true;
 						state.gl.setTransparentSort(reversePainterSortStable);
-						state.gl.shadowMap.type = PCFSoftShadowMap;
+						// state.gl.shadowMap.type = PCFSoftShadowMap;
 					}}
 					shadows={true}
 					>

@@ -10,7 +10,7 @@ export const Bedroom = forwardRef(() => {
                     <Gltf src="./assets/bedroom/rug.glb" receiveShadow  position={[0, 0.0, 0]}/>
 
                 <SnapAnchor label="wall" padding={1}>
-                    <Gltf src="./assets/bedroom/dresser.glb" position={[0, 0, -0.01]} castShadow receiveShadow rotation={[0, Math.PI, 0]} />
+                    <Gltf src="./assets/bedroom/dresser.glb" position={[0, 0, -0.1]} castShadow receiveShadow rotation={[0, Math.PI, 0]} />
                 </SnapAnchor>
 
                 <SnapAnchor label="wall" padding={1}> */}

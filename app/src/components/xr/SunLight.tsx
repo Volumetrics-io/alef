@@ -166,14 +166,14 @@ const SunLight: React.FC = () => {
         ...prev.directional,
         position: [
           avgPos[0] + prev.directional.position[0] * 0.5,
-          avgPos[1] + prev.directional.position[1] * 0.5,
+          avgPos[1] + prev.directional.position[1] * 0.3,
           avgPos[2] + prev.directional.position[2] * 0.5,
         ],
-        intensity: Math.min(1,  count * 0.7),
+        intensity: Math.min(0.75,  count * 0.5),
       },
       ambient: {
         ...prev.ambient,
-        intensity: Math.min(1, count * 0.1),
+        intensity: Math.min(1, count * 0.2),
       },
     }));
   }, [
@@ -192,13 +192,14 @@ const SunLight: React.FC = () => {
         intensity={lightData.directional.intensity}
         castShadow
         target={lightTarget.current}
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-far={10}
-        shadow-camera-left={-50}
-        shadow-camera-right={50}
-        shadow-camera-top={50}
-        shadow-camera-bottom={-50}
+        shadow-mapSize-width={4096}
+        shadow-mapSize-height={4096}
+        shadow-camera-far={500}
+        // shadow-camera-left={-50}
+        // shadow-camera-right={50}
+        // shadow-camera-top={50}
+        // shadow-camera-bottom={-50}
+        shadow-bias={0.000008}
       />
       <ambientLight
         intensity={lightData.ambient.intensity}

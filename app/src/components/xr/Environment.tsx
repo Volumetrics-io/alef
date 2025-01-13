@@ -27,24 +27,26 @@ export const Environment = ({ children }: { children: React.ReactNode }) => {
                     
                     return (
                         <XRSpace key={label + index} space={plane.planeSpace}>
+                            {/* { plane.semanticLabel === 'floor' && ( */}
                             <XRPlaneModel 
                                 renderOrder={ -1 }
-                                ref={(mesh: Mesh | null) => {
-                                    if (mesh) {                                        
-                                        planeMeshes[label].push(mesh);
-                                    }
-                                }}
                                 plane={plane}
                                 receiveShadow={true}
                             >
                                 <shadowMaterial 
                                 side={DoubleSide} 
-                                shadowSide={FrontSide}
+                                shadowSide={DoubleSide}
                                 transparent={true}
-                                opacity={0.6}
-                                />
-                            </XRPlaneModel>
+                                opacity={0.8}
+                                    />
+                                </XRPlaneModel>
+                            {/* )} */}
                             <XRPlaneModel 
+                            ref={(mesh: Mesh | null) => {
+                                if (mesh) {                                        
+                                    planeMeshes[label].push(mesh);
+                                }
+                            }}
                                 renderOrder={ -1 }
                                 plane={plane}
                                 position={[0, 0.01, 0]}

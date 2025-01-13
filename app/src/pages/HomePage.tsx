@@ -41,21 +41,6 @@ const HomePage = () => {
 					}}
 					shadows={true}
 					>
-					<ambientLight intensity={0.5} color="#fff8f0" />
-					{/* <directionalLight
-						position={[2, 1, -0.2]}
-						rotation={[0, 0, 0]}
-						intensity={1}
-						color="#ffd9b3"
-						castShadow
-						shadow-mapSize-width={4096}
-						shadow-mapSize-height={4096}
-					/> */}
-					<hemisphereLight
-						intensity={0.3}
-						groundColor="#d4c4b5"
-						color="#fffaf0"
-					/>
 
 					<PointerEvents />
 					<XR store={xrStore}>

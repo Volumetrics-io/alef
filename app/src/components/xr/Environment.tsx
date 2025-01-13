@@ -41,12 +41,13 @@ export const Environment = ({ children }: { children: React.ReactNode }) => {
                                 side={DoubleSide} 
                                 shadowSide={FrontSide}
                                 transparent={true}
-                                opacity={0.5}
+                                opacity={0.6}
                                 />
                             </XRPlaneModel>
                             <XRPlaneModel 
                                 renderOrder={ -1 }
                                 plane={plane}
+                                position={[0, 0.01, 0]}
                             >
                                 <meshBasicMaterial 
                                 colorWrite={false} 

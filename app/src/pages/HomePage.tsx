@@ -51,7 +51,6 @@ const HomePage = () => {
 						shadow-mapSize-width={4096}
 						shadow-mapSize-height={4096}
 					/> */}
-					<SunLight />
 					<hemisphereLight
 						intensity={0.3}
 						groundColor="#d4c4b5"
@@ -76,6 +75,7 @@ const HomePage = () => {
 							</Toggle> */}
 						</ControlCenter>
 						<Environment>
+							<SunLight />
 							<Bedroom />
 						</Environment>
 					</XR>

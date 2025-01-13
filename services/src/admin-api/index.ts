@@ -1,0 +1,41 @@
+import { AlefError } from '@alef/common';
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { logger } from 'hono/logger';
+import { requestId } from 'hono/request-id';
+import { handleError } from '../middleware/errors.js';
+import { loggedInMiddleware } from '../middleware/session.js';
+import { Env } from './config/ctx.js';
+import { furnitureRouter } from './routers/furniture.js';
+import { usersRouter } from './routers/users.js';
+
+const adminApp = new Hono<Env>()
+	.onError(handleError)
+	.use(requestId())
+	.use(
+		cors({
+			origin: (origin, ctx) => {
+				if (origin === ctx.env.UI_ORIGIN || origin === ctx.env.ADMIN_UI_ORIGIN) {
+					return origin;
+				}
+				return null;
+			},
+			credentials: true,
+			allowHeaders: ['Authorization', 'Content-Type', 'X-Request-Id', 'X-Csrf-Token'],
+			exposeHeaders: ['Content-Type', 'Content-Length', 'X-Request-Id', 'Set-Cookie', 'X-Alef-Error', 'X-Alef-Message', 'X-Csrf-Token'],
+		})
+	)
+	.use(logger())
+	.use(loggedInMiddleware)
+	// enforce admin permissions
+	.use(async (ctx, next) => {
+		const session = ctx.get('session');
+		if (!session.isProductAdmin) {
+			throw new AlefError(AlefError.Code.Forbidden, 'You do not have permission to access this functionality.');
+		}
+		await next();
+	})
+	.route('/users', usersRouter)
+	.route('/furniture', furnitureRouter);
+
+export default adminApp;

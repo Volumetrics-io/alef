@@ -1,8 +1,7 @@
 import { fetch } from '@/services/fetch';
-import { Box, Button, Dialog, Input, Label } from '@alef/sys';
+import { Box, Button, Dialog, Form, Input, Label } from '@alef/sys';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { Form } from '../forms/forms';
 
 export interface EmailSigninFormProps {
 	returnTo?: string;
@@ -26,7 +25,9 @@ export function EmailSigninForm({ returnTo, className, appState, ...rest }: Emai
 				<Input type="email" name="email" id="email" required />
 				<Label htmlFor="password">Password</Label>
 				<Input autoComplete="current-password" type="password" name="password" id="password" required />
-				<Button type="submit">Sign In</Button>
+				<Button type="submit" color="suggested">
+					Sign In
+				</Button>
 				<ForgotPassword />
 			</form>
 		</Box>

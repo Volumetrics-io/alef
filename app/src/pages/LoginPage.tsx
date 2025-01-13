@@ -1,5 +1,5 @@
 import { EmailSigninForm } from '@/components/auth/EmailSigninForm';
-import { Box, Heading } from '@alef/sys';
+import { Box, Frame, Heading } from '@alef/sys';
 import { useSearchParams } from '@verdant-web/react-router';
 
 const LoginPage = () => {
@@ -7,9 +7,11 @@ const LoginPage = () => {
 	const returnTo = searchParams.get('returnTo') ?? undefined;
 
 	return (
-		<Box>
-			<Heading level={1}>Login</Heading>
-			<EmailSigninForm returnTo={returnTo} />
+		<Box full align="center" justify="center" p>
+			<Frame gapped stacked p constrained>
+				<Heading level={1}>Login</Heading>
+				<EmailSigninForm returnTo={returnTo} />
+			</Frame>
 		</Box>
 	);
 };

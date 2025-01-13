@@ -23,12 +23,17 @@ export class AlefError extends Error {
 		return new AlefError(code, message);
 	};
 
+	static throwIfFailed = (res: Response): void => {
+		const error = AlefError.fromResponse(res);
+		if (error) throw error;
+	};
+
 	constructor(
 		public code: AlefErrorCode,
 		message: string = `AlefError ${code}`,
-		cause?: unknown
+		public cause?: unknown
 	) {
-		super(message, { cause });
+		super(message);
 	}
 
 	get statusCode() {

@@ -1,10 +1,10 @@
 import { Slot } from '@radix-ui/react-slot';
 import clsx from 'clsx';
 import { ButtonHTMLAttributes, forwardRef, HTMLAttributes, useCallback, useState } from 'react';
-import cls from './Button.module.css';
-import { Control, ControlProps } from '../control/Control.js';
-import { useMergedRef } from '../../hooks/useMergedRef.js';
 import { withClassName } from '../../hocs/withClassName.js';
+import { useMergedRef } from '../../hooks/useMergedRef.js';
+import { Control, ControlProps } from '../control/Control.js';
+import cls from './Button.module.css';
 import { ButtonContext } from './ButtonContext.js';
 
 export type ButtonColor = 'default' | 'suggested' | 'destructive' | 'ghost';
@@ -60,6 +60,7 @@ export const ButtonRoot = forwardRef<HTMLButtonElement, ButtonProps>(function Bu
 					className
 				)}
 				disabled={rest.disabled || loading}
+				type="button"
 				{...rest}
 			>
 				<Comp ref={mergedRef}>{children}</Comp>

@@ -1,5 +1,6 @@
 packages:
   - app
+  - admin
   - packages/*
   - services
 
@@ -9,10 +10,13 @@ catalog:
   react-dom: 19.0.0
   '@types/react': ^19.0.0
   '@types/react-dom': ^19.0.0
-  wrangler: ^3.99.0
+  wrangler: ^3.100.0
   typescript: ^5.7.2
   '@cloudflare/workers-types': ^4.20241230.0
   zod: ^3.24.0
   '@a-type/auth': 1.2.3
   '@a-type/utils': 1.1.4
   '@hono/zod-validator': ^0.4.2
+  '@a-type/auth-fetch': ^1.0.1
+  '@react-three/fiber': 9.0.0-rc.1
+  '@react-three/drei': ^9.120.6

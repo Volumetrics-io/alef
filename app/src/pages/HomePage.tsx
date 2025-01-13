@@ -1,5 +1,5 @@
 import { publicApiClient } from '@/services/publicApi';
-import { Main, Button, ButtonRoot } from '@alef/sys';
+import { Main } from '@alef/sys';
 import { useSuspenseQuery } from '@tanstack/react-query';
 
 import { Canvas } from '@react-three/fiber';
@@ -8,13 +8,12 @@ import { IfInSessionMode, noEvents, PointerEvents, XR } from '@react-three/xr';
 import { ControlCenter } from '@/components/xr/ControlCenter.tsx';
 import { xrStore } from '@/stores/xrStore.ts';
 import { NavBar } from '@/components/NavBar';
-import { Baby, Bed, LampDesk, Sofa } from '@react-three/uikit-lucide';
+import { Baby, Bed, LampDesk } from '@react-three/uikit-lucide';
 import { colors, Toggle } from '@react-three/uikit-default'
 import { Bedroom } from '@/spaces/bedroom';
 import { Environment } from '@/components/xr/Environment';
-import { AxesHelper } from 'three';
-import { Helper } from '@react-three/drei';
-import { DepthShader } from '@/components/xr/DepthShader';
+import { DepthShader } from '@/components/xr/shaders/DepthShader';
+import { PCFSoftShadowMap, BasicShadowMap } from 'three';
 
 const HomePage = () => {
 	// const {
@@ -37,16 +36,19 @@ const HomePage = () => {
 						state.gl.setClearColor(0xefffff);
 						state.gl.localClippingEnabled = true;
 						state.gl.setTransparentSort(reversePainterSortStable);
+						state.gl.shadowMap.type = PCFSoftShadowMap;
 					}}
+					shadows={true}
 					>
-					<ambientLight intensity={0.4} color="#fff8f0" />
+					<ambientLight intensity={0.5} color="#fff8f0" />
 					<directionalLight
-						position={[5, 5, 5]}
-						intensity={0.7}
+						position={[2, 1, -0.2]}
+						rotation={[0, 0, 0]}
+						intensity={1}
 						color="#ffd9b3"
 						castShadow
-						shadow-mapSize-width={2048}
-						shadow-mapSize-height={2048}
+						shadow-mapSize-width={4096}
+						shadow-mapSize-height={4096}
 					/>
 					<hemisphereLight
 						intensity={0.3}

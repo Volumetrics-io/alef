@@ -1,6 +1,6 @@
 import { useXRPlanes, XRSpace, XRPlaneModel } from "@react-three/xr";
 import { createContext, useContext } from "react";
-import { DoubleSide, Mesh } from "three";
+import { DoubleSide, FrontSide, Mesh } from "three";
 
 type PlaneMeshes = {
     [label: string]: Mesh[]
@@ -28,15 +28,30 @@ export const Environment = ({ children }: { children: React.ReactNode }) => {
                     return (
                         <XRSpace key={label + index} space={plane.planeSpace}>
                             <XRPlaneModel 
-                                renderOrder={ plane.semanticLabel !== 'floor' ? 0 : undefined }
+                                renderOrder={ -1 }
                                 ref={(mesh: Mesh | null) => {
                                     if (mesh) {                                        
                                         planeMeshes[label].push(mesh);
                                     }
                                 }}
                                 plane={plane}
+                                receiveShadow={true}
                             >
-                                <meshBasicMaterial transparent={plane.semanticLabel !== 'floor' ? false : true } opacity={plane.semanticLabel !== 'floor' ? 1 : 0} colorWrite={false} side={DoubleSide} />
+                                <shadowMaterial 
+                                side={DoubleSide} 
+                                shadowSide={FrontSide}
+                                transparent={true}
+                                opacity={0.5}
+                                />
+                            </XRPlaneModel>
+                            <XRPlaneModel 
+                                renderOrder={ -1 }
+                                plane={plane}
+                            >
+                                <meshBasicMaterial 
+                                colorWrite={false} 
+                                side={DoubleSide} 
+                                />
                             </XRPlaneModel>
                         </XRSpace>
                     );

@@ -7,15 +7,15 @@ export const Bedroom = forwardRef(() => {
 	return (
         <>
             <PlaneAnchor label="floor">
-                    <Gltf src="./assets/bedroom/rug.glb" position={[0, 0.01, 0]}/>
-
-                <SnapAnchor label="wall" padding={0}>
-                    <Gltf src="./assets/bedroom/dresser.glb" rotation={[0, Math.PI, 0]} />
-                </SnapAnchor>
+                    <Gltf src="./assets/bedroom/rug.glb" castShadow receiveShadow position={[0, 0.0, 0]}/>
 
                 <SnapAnchor label="wall" padding={1}>
-                    <Gltf src="./assets/bedroom/bed.glb"/>
-                    {/* <mesh>
+                    <Gltf src="./assets/bedroom/dresser.glb" castShadow receiveShadow rotation={[0, Math.PI, 0]} />
+                </SnapAnchor>
+
+                <SnapAnchor label="wall" padding={1}> */}
+                    {/* <Gltf castShadow receiveShadow src="./assets/bedroom/bed.glb"/> */}
+                    {/* {<mesh position={[0, 0.5, 0]} castShadow receiveShadow>
                         <boxGeometry args={[0.7, 0.3, 0.3]} />
                         <meshBasicMaterial color="red" />
                     </mesh> */}

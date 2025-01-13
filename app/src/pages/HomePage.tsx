@@ -14,6 +14,7 @@ import { Bedroom } from '@/spaces/bedroom';
 import { Environment } from '@/components/xr/Environment';
 import { DepthShader } from '@/components/xr/shaders/DepthShader';
 import { PCFSoftShadowMap, BasicShadowMap } from 'three';
+import SunLight from '@/components/xr/SunLight';
 
 const HomePage = () => {
 	// const {
@@ -41,7 +42,7 @@ const HomePage = () => {
 					shadows={true}
 					>
 					<ambientLight intensity={0.5} color="#fff8f0" />
-					<directionalLight
+					{/* <directionalLight
 						position={[2, 1, -0.2]}
 						rotation={[0, 0, 0]}
 						intensity={1}
@@ -49,7 +50,8 @@ const HomePage = () => {
 						castShadow
 						shadow-mapSize-width={4096}
 						shadow-mapSize-height={4096}
-					/>
+					/> */}
+					<SunLight />
 					<hemisphereLight
 						intensity={0.3}
 						groundColor="#d4c4b5"

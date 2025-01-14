@@ -1,22 +1,15 @@
-import { Vector3, Group } from 'three';
-import React, { useState, createContext, useContext, useCallback } from 'react';
+import { Vector3, Group, Object3D } from 'three';
+import React, { useState,  useContext, useCallback } from 'react';
 import { ThreeEvent } from '@react-three/fiber';
 import { useRef } from 'react';
-import { Container } from '@react-three/uikit';
 
-// Create a context for the drag controls
-export interface DragContextType {
-	isDragging: boolean;
-	setIsDragging: (dragging: boolean) => void;
-	setInitialPosition: (position: Vector3) => void;
-}
+import { DragContext, DragContextType } from './Draggable';
 
-export const DragContext = createContext<DragContextType | null>(null);
-
-export function Draggable({ fixed, children }: { fixed: boolean, children: React.ReactNode }) {
+export function MeshDraggable({ fixed, children }: { fixed: boolean, children: React.ReactNode }) {
 	const groupRef = useRef<Group>(null);
 	const [isDragging, setIsDragging] = useState(false);
 	const lastPointerPosition = useRef<Vector3>(new Vector3());
+    const worldPosition = useRef<Vector3>(new Vector3());
 
 	const currentPointerPosition = new Vector3();
 	const delta = new Vector3();
@@ -27,24 +20,30 @@ export function Draggable({ fixed, children }: { fixed: boolean, children: React
 	const handlePointerMove = useCallback(
 		(event: ThreeEvent<PointerEvent>) => {
 			if (isDragging && lastPointerPosition.current) {
-				if (!groupRef.current) return;
+				if (!groupRef.current || !groupRef.current.parent) return;
 				// @ts-ignore NOTE: This does exist on the event object
 				currentPointerPosition.copy(event.pointerPosition);
 				delta.subVectors(currentPointerPosition, lastPointerPosition.current);
 				lastPointerPosition.current.copy(currentPointerPosition);
 
 				// Calculate distance from initial position
-				distanceFromStart = groupRef.current.position.distanceTo(currentPointerPosition);
+				distanceFromStart = Math.abs(groupRef.current.position.distanceTo(currentPointerPosition));
 
 				// Scale factor increases with distance (adjust multiplier as needed)
-				scaleFactor = 1 + distanceFromStart * 2;
+				scaleFactor = 1 + distanceFromStart * 5;
 				delta.multiplyScalar(scaleFactor);
+                
+                groupRef.current.getWorldPosition(worldPosition.current);
+
+                worldPosition.current.add(delta);
+
+                groupRef.current.parent?.worldToLocal(worldPosition.current);
 
                 if (fixed) {
-                    delta.setY(0);
+                    worldPosition.current.setY(0);
                 }
 
-				groupRef.current.position.add(delta);
+				groupRef.current.position.copy(worldPosition.current);
 			}
 		},
 		[isDragging]
@@ -75,7 +74,7 @@ export function Draggable({ fixed, children }: { fixed: boolean, children: React
 	);
 }
 
-export function DragController({ children }: { children: React.ReactNode }) {
+export function MeshDragController({ children }: { children: React.ReactNode }) {
 	const context = useContext(DragContext);
 
 	if (!context) {
@@ -89,8 +88,8 @@ export function DragController({ children }: { children: React.ReactNode }) {
 	};
 
 	return (
-		<Container onPointerDown={handlePointerDown} padding={10} paddingBottom={30} width="100%" justifyContent="center" alignItems="center">
+		<group onPointerDown={handlePointerDown}>
 			{children}
-		</Container>
+		</group>
 	);
 }

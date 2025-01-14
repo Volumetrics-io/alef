@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
 import SunCalc from 'suncalc';
-import { useEnvironmentContext } from './Environment';
+import { useEnvironmentContext } from '../Environment';
 import { Object3D, Vector3, Quaternion } from 'three';
 
 // Define the LightData type

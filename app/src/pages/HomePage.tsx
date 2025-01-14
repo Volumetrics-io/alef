@@ -11,7 +11,7 @@ import { colors, Toggle } from '@react-three/uikit-default'
 import { Bedroom } from '@/spaces/bedroom';
 import { Environment } from '@/components/xr/Environment';
 import { DepthShader } from '@/components/xr/shaders/DepthShader';
-import SunLight from '@/components/xr/SunLight';
+import SunLight from '@/components/xr/lighting/SunLight.tsx';
 
 import { useMe } from '@/services/publicApi/userHooks';
 

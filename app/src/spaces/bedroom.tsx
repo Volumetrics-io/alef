@@ -1,5 +1,6 @@
 import { PlaneAnchor } from "@/components/xr/anchors"
 import { SnapAnchor } from "@/components/xr/anchors/SnapAnchor";
+import { MeshDraggable, MeshDragController } from "@/components/xr/controls/MeshDragControls";
 import { Gltf } from "@react-three/drei"
 import { forwardRef } from 'react';
 
@@ -7,10 +8,18 @@ export const Bedroom = forwardRef(() => {
 	return (
         <>
             <PlaneAnchor label="floor">
-                    <Gltf src="./assets/bedroom/rug.glb" receiveShadow  position={[0, 0.0, 0]}/>
+                    <MeshDraggable fixed={true}>
+                        <MeshDragController>
+                            <Gltf src="./assets/bedroom/rug.glb" receiveShadow  position={[0, 0.0, 0]}/>
+                        </MeshDragController>
+                    </MeshDraggable>
 
                 <SnapAnchor label="wall" padding={1}>
-                    <Gltf src="./assets/bedroom/dresser.glb" position={[0, 0, -0.1]} castShadow receiveShadow rotation={[0, Math.PI, 0]} />
+                    <MeshDraggable fixed={true}>
+                        <MeshDragController>
+                            <Gltf src="./assets/bedroom/dresser.glb" position={[0, 0, -0.1]} castShadow receiveShadow rotation={[0, Math.PI, 0]} />
+                        </MeshDragController>
+                    </MeshDraggable>
                 </SnapAnchor>
 
                 {/* <SnapAnchor label="wall" padding={1}> */}

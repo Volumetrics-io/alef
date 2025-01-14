@@ -2,6 +2,7 @@ import { publicApiOrigin } from '@/env';
 import { AlefError, AttributeKey, formatAttribute } from '@alef/common';
 import { useGLTF } from '@react-three/drei';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import type { InferResponseType } from 'hono/client';
 import { publicApiClient } from './client';
 
 export function useAllFurniture(
@@ -23,7 +24,11 @@ export function useAllFurniture(
 	});
 }
 
-export function useFurnitureModelSrc(furnitureId: string) {
+export function useFurnitureModel(furnitureId: string) {
 	const src = `${publicApiOrigin}/furniture/${furnitureId}/model`;
-	return useGLTF(src);
+	return useGLTF(src, true, true, (loader) => {
+		loader.setWithCredentials(true);
+	});
 }
+
+export type FurnitureItem = InferResponseType<typeof publicApiClient.furniture.$get>[0];

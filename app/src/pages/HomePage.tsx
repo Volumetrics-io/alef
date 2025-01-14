@@ -5,7 +5,6 @@ import { ControlCenter } from '@/components/xr/ControlCenter.tsx';
 import { Environment } from '@/components/xr/Environment';
 import { DepthShader } from '@/components/xr/shaders/DepthShader';
 import SunLight from '@/components/xr/SunLight';
-import { Bedroom } from '@/spaces/bedroom';
 import { xrStore } from '@/stores/xrStore.ts';
 import { reversePainterSortStable } from '@pmndrs/uikit';
 import { Canvas } from '@react-three/fiber';
@@ -59,7 +58,7 @@ const HomePage = () => {
 							</ControlCenter>
 							<Environment>
 								<SunLight />
-								<Bedroom />
+								{/* <Bedroom /> */}
 							</Environment>
 						</XR>
 					</Canvas>

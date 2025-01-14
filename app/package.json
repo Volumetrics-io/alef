@@ -26,11 +26,13 @@
 		"@verdant-web/react-router": "^0.7.1",
 		"clsx": "2.1.1",
 		"hono": "catalog:",
+		"optics-ts": "^2.4.1",
 		"react": "catalog:",
 		"react-dom": "catalog:",
 		"react-hot-toast": "2.5.1",
 		"suncalc": "^1.9.0",
-		"three": "catalog:"
+		"three": "catalog:",
+		"zustand": "^5.0.3"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.15.0",

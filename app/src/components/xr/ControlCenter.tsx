@@ -5,9 +5,11 @@ import { useState } from 'react';
 
 import { colors } from '@react-three/uikit-default';
 import { BodyAnchor } from './anchors/BodyAnchor.js';
+import { FurnitureSelectionPane } from './furnitureUi/FurnitureSelectionPane.js';
 
 export function ControlCenter({ onToggle, children }: { onToggle?: () => void; children?: React.ReactNode }) {
 	const [isOpen, setIsOpen] = useState(false);
+
 	return (
 		<BodyAnchor follow={true} position={[0, isOpen ? 0.1 : 0.1, isOpen ? -0.8 : -1]} lockY={true} distance={0.15}>
 			<Root pixelSize={0.001} flexDirection="column" gap={10}>
@@ -41,6 +43,7 @@ export function ControlCenter({ onToggle, children }: { onToggle?: () => void; c
 					</Container>
 				</Container>
 				{/* </FontFamilyProvider> */}
+				{isOpen && <FurnitureSelectionPane />}
 			</Root>
 		</BodyAnchor>
 	);

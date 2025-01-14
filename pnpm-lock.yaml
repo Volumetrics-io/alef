@@ -210,6 +210,9 @@ importers:
       hono:
         specifier: 'catalog:'
         version: 4.6.15
+      optics-ts:
+        specifier: ^2.4.1
+        version: 2.4.1
       react:
         specifier: 'catalog:'
         version: 19.0.0
@@ -225,6 +228,9 @@ importers:
       three:
         specifier: 'catalog:'
         version: 0.172.0
+      zustand:
+        specifier: ^5.0.3
+        version: 5.0.3(@types/react@19.0.2)(react@19.0.0)(use-sync-external-store@1.4.0(react@19.0.0))
     devDependencies:
       '@eslint/js':
         specifier: ^9.15.0
@@ -3847,6 +3853,9 @@ packages:
   open@8.4.2:
     resolution: {integrity: sha512-7x81NCL719oNbsq/3mh+hVrAWmFuEYUqrq/Iw3kUzH8ReypT9QQ0BLoJS7/G9k6N81XjW4qHWtjWwe/9eLy1EQ==}
     engines: {node: '>=12'}
+
+  optics-ts@2.4.1:
+    resolution: {integrity: sha512-HaYzMHvC80r7U/LqAd4hQyopDezC60PO2qF5GuIwALut2cl5rK1VWHsqTp0oqoJJWjiv6uXKqsO+Q2OO0C3MmQ==}
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -8819,6 +8828,8 @@ snapshots:
       define-lazy-prop: 2.0.0
       is-docker: 2.2.1
       is-wsl: 2.2.0
+
+  optics-ts@2.4.1: {}
 
   optionator@0.9.4:
     dependencies:

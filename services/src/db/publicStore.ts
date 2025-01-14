@@ -44,7 +44,7 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 		return jsonArrayFrom(
 			eb
 				.selectFrom('FurnitureAttribute')
-				.leftJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id')
+				.innerJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id')
 				.whereRef('FurnitureAttribute.furnitureId', '=', 'Furniture.id')
 				.select(['Attribute.key', 'Attribute.value'])
 		).as('attributes');
@@ -65,8 +65,8 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 	async listFurnitureByAttributes(attributes: Record<string, string>) {
 		let builder = this.#db
 			.selectFrom('Furniture')
-			.leftJoin('FurnitureAttribute', 'FurnitureAttribute.furnitureId', 'Furniture.id')
-			.leftJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id');
+			.innerJoin('FurnitureAttribute', 'FurnitureAttribute.furnitureId', 'Furniture.id')
+			.innerJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id');
 		for (const [key, value] of Object.entries(attributes)) {
 			assertAttributeKey(key);
 			builder = builder.where('Attribute.key', '=', key).where('Attribute.value', '=', value);

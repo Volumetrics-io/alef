@@ -215,10 +215,6 @@ const SunLight: React.FC = () => {
       }
     };
 
-    // Initial update
-    // updateSunAndLight();
-    console.log('updateSunAndLight');
-
     // Set up interval to update sun data every minute
     const interval = setInterval(() => {
       updateSunAndLight();

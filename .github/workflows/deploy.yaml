@@ -54,11 +54,11 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
           workingDirectory: ./app
-          command: pages deploy dist --project-name=alef-app
+          command: pages deploy dist --project-name=app
       - name: Deploy Admin App
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
           workingDirectory: ./admin
-          command: pages deploy dist --project-name=alef-admin
+          command: pages deploy dist --project-name=admin

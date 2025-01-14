@@ -1,4 +1,4 @@
-import { Container, FontFamilyProvider, Root } from '@react-three/uikit';
+import { Container, Root } from '@react-three/uikit';
 import { Toggle } from '@react-three/uikit-default';
 import { Menu, X } from '@react-three/uikit-lucide';
 import { useState } from 'react';
@@ -16,30 +16,30 @@ export function ControlCenter({ onToggle, children }: { onToggle?: () => void; c
 						normal: 'https://cdn.volu.dev/fonts/fixed-jetbrainsmono.json',
 					}}
 				> */}
-					<Container
-						backgroundColor={colors.background}
-						borderColor={colors.border}
-						borderWidth={1}
-						borderRadius={10}
-						padding={5}
-						flexGrow={0}
-						flexShrink={0}
-						marginX="auto"
-						flexDirection="row"
-						gap={5}
+				<Container
+					backgroundColor={colors.background}
+					borderColor={colors.border}
+					borderWidth={1}
+					borderRadius={10}
+					padding={5}
+					flexGrow={0}
+					flexShrink={0}
+					marginX="auto"
+					flexDirection="row"
+					gap={5}
+				>
+					<Toggle
+						onClick={() => {
+							setIsOpen(!isOpen);
+							onToggle?.();
+						}}
 					>
-						<Toggle
-							onClick={() => {
-								setIsOpen(!isOpen);
-								onToggle?.();
-							}}
-						>
-							{isOpen ? <X color={colors.primary} /> : <Menu color={colors.primary} />}
-						</Toggle>
-						<Container display={isOpen ? 'flex' : 'none'} flexDirection="row" alignItems={'center'} gap={10}>
-							{children}
-						</Container>
+						{isOpen ? <X color={colors.primary} /> : <Menu color={colors.primary} />}
+					</Toggle>
+					<Container display={isOpen ? 'flex' : 'none'} flexDirection="row" alignItems={'center'} gap={10}>
+						{children}
 					</Container>
+				</Container>
 				{/* </FontFamilyProvider> */}
 			</Root>
 		</BodyAnchor>

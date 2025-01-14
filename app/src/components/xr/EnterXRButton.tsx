@@ -1,5 +1,5 @@
+import { xrStore } from '@/stores/xrStore.js';
 import { useSessionModeSupported } from '@react-three/xr';
-import { xrStore } from '../stores/xrStore.js';
 import { useSyncExternalStore } from 'react';
 
 export function EnterXRButton() {
@@ -22,7 +22,7 @@ export function EnterXRButton() {
 		if (!mode) return;
 
 		const session = xrStore.getState().session;
-		if (!!session) {
+		if (session) {
 			session.end();
 		} else {
 			xrStore.enterXR(mode);

@@ -115,7 +115,7 @@ const fetchGeolocation = (): Promise<LightData> => {
 
 const SunLight: React.FC = () => {
   const { scene } = useThree();
-  const environment = useEnvironmentContext();
+  const { planeMeshes } = useEnvironmentContext();
   const lightTarget = useRef<Object3D>(new Object3D());
 
   // Initialize lightData with the LightData type
@@ -131,6 +131,9 @@ const SunLight: React.FC = () => {
     },
   });
 
+  // Access the function to update sunlightIntensity from context
+  const { setSunlightIntensity } = useEnvironmentContext();
+
   useEffect(() => {
     let isMounted = true; // To prevent state updates if component is unmounted
 
@@ -139,10 +142,11 @@ const SunLight: React.FC = () => {
       const sunData = await fetchGeolocation();
       if (isMounted) {
         setLightData(sunData);
+        setSunlightIntensity(sunData.directional.intensity);
       }
 
-      if (environment && environment['window'] && environment['window'].length > 0) {
-        const windows = environment['window'];
+      if (planeMeshes && planeMeshes['window'] && planeMeshes['window'].length > 0) {
+        const windows = planeMeshes['window'];
         const meshWorldPosition = new Vector3();
         const meshWorldQuaternion = new Quaternion();
         const forward = new Vector3(0, 0, 1); // Assuming forward is along Z axis
@@ -176,7 +180,7 @@ const SunLight: React.FC = () => {
           ];
 
           const newDirectionalIntensity = Math.min(0.75, count * 0.5);
-          const newAmbientIntensity = Math.min(1, count * 0.1);
+          const newAmbientIntensity = Math.min(1, count * 0.2);
 
           // Check if there's an actual change to prevent unnecessary state updates
           const isDirectionalPositionChanged = !newDirectionalPosition.every(
@@ -212,7 +216,8 @@ const SunLight: React.FC = () => {
     };
 
     // Initial update
-    updateSunAndLight();
+    // updateSunAndLight();
+    console.log('updateSunAndLight');
 
     // Set up interval to update sun data every minute
     const interval = setInterval(() => {
@@ -223,7 +228,7 @@ const SunLight: React.FC = () => {
       isMounted = false; // Cleanup flag
       clearInterval(interval);
     };
-  }, [environment, scene]);
+  }, [planeMeshes, scene, setSunlightIntensity]);
 
   return (
     <>
@@ -236,10 +241,6 @@ const SunLight: React.FC = () => {
         shadow-mapSize-width={4096}
         shadow-mapSize-height={4096}
         shadow-camera-far={500}
-        // shadow-camera-left={-50}
-        // shadow-camera-right={50}
-        // shadow-camera-top={50}
-        // shadow-camera-bottom={-50}
         shadow-bias={0.000008}
       />
       <ambientLight

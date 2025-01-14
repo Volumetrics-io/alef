@@ -51,7 +51,8 @@ const checkFit = (targetSize: Vector3, planes: Mesh[], padding: number): Mesh | 
 
 export const SnapAnchor = ({ label, children, padding = 0 }: { label: PlaneLabel; children: React.ReactNode; padding: number }) => {
     const targetRef = useRef<Group>(null);
-    const planes = useEnvironmentContext()?.[label];
+    const { planeMeshes } = useEnvironmentContext();
+    const planes = planeMeshes[label];
     const planeQuaternion = new Quaternion();
     const targetQuaternion = new Quaternion();
     const parentWorldQuaternion = new Quaternion();

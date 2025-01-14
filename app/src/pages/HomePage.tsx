@@ -1,3 +1,4 @@
+import { LogoutButton } from '@/components/auth/LogoutButton';
 import { useMe } from '@/services/publicApi/userHooks';
 import { Box, Heading } from '@alef/sys';
 import { Link, useNavigate } from '@verdant-web/react-router';
@@ -16,7 +17,12 @@ const HomePage = () => {
 		<Box stacked>
 			<Heading level={1}>Home</Heading>
 			<Link to="/login">Login</Link>
-			{session && <div>Hi, {session.name}</div>}
+			{session && (
+				<div>
+					Hi, {session.name}
+					<LogoutButton />
+				</div>
+			)}
 		</Box>
 	);
 };

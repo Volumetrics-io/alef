@@ -29,7 +29,7 @@
 		"hono": "catalog:",
 		"@alef/common": "workspace:*",
 		"@a-type/auth": "catalog:",
-		"@a-type/auth-email-ses": "2.1.0",
+		"@a-type/auth-email-ses": "2.1.4",
 		"@a-type/utils": "catalog:",
 		"zod": "catalog:",
 		"@hono/zod-validator": "catalog:",

@@ -11,12 +11,10 @@ jobs:
     name: Deploy
     steps:
       - uses: actions/checkout@v4
-      - name: Install Volta to manage Node.js versions
-        uses: volta-cli/action@v4
-      - name: Install node
-        run: volta install node
-      - name: Install pnpm
-        run: volta install pnpm
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          cache: 'pnpm'
       - name: Install deps
         run: pnpm install
       - name: Build everything

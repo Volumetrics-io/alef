@@ -35,7 +35,7 @@ export function FurnitureSelectionPane() {
 
 function FurnitureSelectItem({ onClick, furnitureItem }: { onClick: (item: FurnitureItem) => void; furnitureItem: FurnitureItem }) {
 	return (
-		<Container flexDirection="column" borderWidth={1} borderColor={colors.border} borderRadius={10} padding={5} onClick={() => onClick(furnitureItem)}>
+		<Container flexDirection="column" borderWidth={1} borderColor={colors.border} borderRadius={10} padding={5} gap={5} onClick={() => onClick(furnitureItem)}>
 			<Text fontSize={18} fontWeight="black">
 				{furnitureItem.name}
 			</Text>

@@ -20,6 +20,12 @@ jobs:
       - name: Install deps
         run: pnpm install
 
+      - name: Verify cloudflare token
+        run: |
+          curl -X GET "https://api.cloudflare.com/client/v4/user/tokens/verify" \
+          -H "Authorization: Bearer ${{secrets.CLOUDFLARE_API_TOKEN}}" \
+          -H "Content-Type:application/json"
+
       - name: Deploy DB
         uses: cloudflare/wrangler-action@v3
         with:

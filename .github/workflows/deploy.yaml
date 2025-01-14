@@ -26,21 +26,21 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
           workingDirectory: ./services/src/db
-          command: deploy ./wrangler.toml || pwd
+          command: deploy -c ./wrangler.toml
       - name: Deploy Public API
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
           workingDirectory: ./services/src/public-api
-          command: deploy ./wrangler.toml
+          command: deploy -c ./wrangler.toml
       - name: Deploy Admin API
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
           workingDirectory: ./services/src/admin-api
-          command: deploy ./wrangler.toml
+          command: deploy -c ./wrangler.toml
 
       - name: Build Public App
         run: pnpm run build

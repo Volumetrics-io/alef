@@ -19,25 +19,28 @@ jobs:
         run: volta install pnpm
       - name: Install deps
         run: pnpm install
+
       - name: Deploy DB
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
           workingDirectory: ./services/src/db
-          preCommands: pwd && ls && cat wrangler.toml
+          command: deploy ./wrangler.toml
       - name: Deploy Public API
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
           workingDirectory: ./services/src/public-api
+          command: deploy ./wrangler.toml
       - name: Deploy Admin API
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
           workingDirectory: ./services/src/admin-api
+          command: deploy ./wrangler.toml
 
       - name: Build Public App
         run: pnpm run build

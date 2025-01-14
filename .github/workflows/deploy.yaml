@@ -23,7 +23,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
           workingDirectory: ./services/src/db
-          preCommands: pwd
+          preCommands: pwd && ls && cat wrangler.toml
       - name: Deploy Public API
         uses: cloudflare/wrangler-action@v3
         with:

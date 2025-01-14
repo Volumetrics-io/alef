@@ -6,8 +6,10 @@ export interface Bindings {
 	GOOGLE_AUTH_CLIENT_SECRET: string;
 	UI_ORIGIN: string;
 	API_ORIGIN: string;
-	EMAIL_USER: string;
-	EMAIL_PASS: string;
+	AWS_ACCESS_KEY_ID: string;
+	AWS_SECRET_ACCESS_KEY: string;
+	AWS_REGION: string;
+	EMAIL_FROM: string;
 	NODE_ENV: string;
 	SESSION_SECRET: string;
 	ADMIN_UI_ORIGIN: string;

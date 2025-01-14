@@ -21,6 +21,10 @@ const routes = makeRoutes([
 		component: lazy(() => import('./ResetPasswordPage.js')),
 	},
 	{
+		path: '/complete-signup',
+		component: lazy(() => import('./CompleteSignupPage.js')),
+	},
+	{
 		path: '*',
 		component: lazy(() => import('./NotFoundPage.js')),
 	},

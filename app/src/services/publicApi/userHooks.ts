@@ -8,9 +8,17 @@ export function useMe() {
 		queryFn: async () => {
 			const response = await publicApiClient.users.me.$get();
 			const asAlefError = AlefError.fromResponse(response);
-			// return null if the user is not logged in
+			// our whole app is authorized, so this should always redirect to login
 			if (asAlefError && asAlefError.code === AlefError.Code.Unauthorized) {
-				return null;
+				if (typeof window === 'undefined') {
+					throw asAlefError;
+				}
+				if (window.location.pathname !== '/login') {
+					window.location.href = '/login';
+					throw asAlefError;
+				} else {
+					throw asAlefError;
+				}
 			} else if (asAlefError) {
 				throw asAlefError;
 			}

@@ -6,6 +6,8 @@ account_id = "ad8af7aeb571031ffc236c411f39afe7"
 compatibility_flags = ["nodejs_compat"]
 
 [vars]
+AWS_REGION = "us-east-2"
+EMAIL_FROM = "noreply@volumetrics.io"
 UI_ORIGIN = "https://app.alef.io"
 ADMIN_UI_ORIGIN = "https://admin.alef.io"
 

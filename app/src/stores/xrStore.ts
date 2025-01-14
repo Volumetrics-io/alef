@@ -3,6 +3,7 @@ import { colors } from '@react-three/uikit-default';
 
 export const xrStore: XRStore = createXRStore({
 	depthSensing: true,
+	bounded: false,
 	hand: {
 		touchPointer: false,
 		grabPointer: false,

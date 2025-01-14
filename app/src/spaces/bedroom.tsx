@@ -13,13 +13,13 @@ export const Bedroom = forwardRef(() => {
                     <Gltf src="./assets/bedroom/dresser.glb" position={[0, 0, -0.1]} castShadow receiveShadow rotation={[0, Math.PI, 0]} />
                 </SnapAnchor>
 
-                <SnapAnchor label="wall" padding={1}> */}
+                {/* <SnapAnchor label="wall" padding={1}> */}
                     {/* <Gltf castShadow receiveShadow src="./assets/bedroom/bed.glb"/> */}
                     {/* {<mesh position={[0, 0.5, 0]} castShadow receiveShadow>
                         <boxGeometry args={[0.7, 0.3, 0.3]} />
                         <meshBasicMaterial color="red" />
                     </mesh> */}
-                </SnapAnchor>
+                {/* </SnapAnchor> */}
             </PlaneAnchor>
         </>
     )

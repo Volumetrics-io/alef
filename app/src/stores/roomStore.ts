@@ -1,10 +1,12 @@
+import { PlaneLabel } from '@/components/xr/anchors';
 import { id, PrefixedId } from '@alef/common';
 import * as O from 'optics-ts';
 import { create } from 'zustand';
 
 export interface FurniturePlacement {
 	furnitureId: PrefixedId<'f'>;
-	anchorPlane: string;
+	anchorLabel: PlaneLabel;
+	padding: number;
 }
 
 export type RoomStoreState = {
@@ -24,7 +26,7 @@ export const useRoomStore = create<RoomStoreState>((set) => {
 });
 
 export function useFurniturePlacementIds() {
-	return useRoomStore((s) => Object.keys(s.furniture));
+	return useRoomStore((s) => Object.keys(s.furniture) as PrefixedId<'fp'>[]);
 }
 
 export function useFurniturePlacement(id: PrefixedId<'fp'>) {

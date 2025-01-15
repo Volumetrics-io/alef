@@ -19,6 +19,11 @@ jobs:
         run: pnpm install
       - name: Build everything
         run: pnpm run build
+        env:
+          VITE_PUBLIC_API_ORIGIN: ${{ vars.PUBLIC_API_ORIGIN }}
+          VITE_ADMIN_API_ORIGIN: ${{ vars.ADMIN_API_ORIGIN }}
+          VITE_MAIN_UI_ORIGIN: ${{ vars.APP_ORIGIN }}
+          VITE_ADMIN_UI_ORIGIN: ${{ vars.ADMIN_APP_ORIGIN }}
 
       - name: Verify cloudflare token
         run: |

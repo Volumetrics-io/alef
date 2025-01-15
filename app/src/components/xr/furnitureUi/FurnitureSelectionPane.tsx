@@ -1,7 +1,9 @@
 import { FurnitureItem, useAllFurniture } from '@/services/publicApi/furnitureHooks';
+import { useAddFurniture } from '@/stores/roomStore';
 import { formatAttribute } from '@alef/common';
 import { Container, Content, Text } from '@react-three/uikit';
 import { colors } from '@react-three/uikit-default';
+import { Vector3 } from 'three';
 import { FurnitureModel } from '../furniture/FurnitureModel';
 import { FurnitureAttributeTag } from './FurnitureAttributeTag';
 
@@ -21,21 +23,29 @@ export function FurnitureSelectionPane() {
 			maxWidth={1200}
 		>
 			{furniture.map((furnitureItem) => (
-				<FurnitureSelectItem
-					key={furnitureItem.id}
-					furnitureItem={furnitureItem}
-					onClick={() => {
-						console.log('STUB: add', furnitureItem.id);
-					}}
-				/>
+				<FurnitureSelectItem key={furnitureItem.id} furnitureItem={furnitureItem} />
 			))}
 		</Container>
 	);
 }
 
-function FurnitureSelectItem({ onClick, furnitureItem }: { onClick: (item: FurnitureItem) => void; furnitureItem: FurnitureItem }) {
+function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }) {
+	const addFurniture = useAddFurniture();
 	return (
-		<Container flexDirection="column" borderWidth={1} borderColor={colors.border} borderRadius={10} padding={5} gap={5} onClick={() => onClick(furnitureItem)}>
+		<Container
+			flexDirection="column"
+			borderWidth={1}
+			borderColor={colors.border}
+			borderRadius={10}
+			padding={5}
+			gap={5}
+			onClick={() =>
+				addFurniture({
+					furnitureId: furnitureItem.id,
+					worldPosition: new Vector3(),
+				})
+			}
+		>
 			<Text fontSize={18} fontWeight="black">
 				{furnitureItem.name}
 			</Text>

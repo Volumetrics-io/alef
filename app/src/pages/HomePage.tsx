@@ -12,8 +12,8 @@ import { colors, Toggle } from '@react-three/uikit-default';
 import { Baby, Bed, LampDesk } from '@react-three/uikit-lucide';
 import { noEvents, PointerEvents, XR } from '@react-three/xr';
 
+import { RoomRenderer } from '@/components/xr/room/RoomRenderer';
 import { useMe } from '@/services/publicApi/userHooks';
-import { Bedroom } from '@/spaces/bedroom';
 import { useNavigate } from '@verdant-web/react-router';
 import { useEffect } from 'react';
 
@@ -59,8 +59,8 @@ const HomePage = () => {
 							</ControlCenter>
 							<Environment>
 								<SunLight />
-								<Bedroom />
-								{/* <RoomRenderer /> */}
+								{/* <Bedroom /> */}
+								<RoomRenderer />
 							</Environment>
 						</XR>
 					</Canvas>

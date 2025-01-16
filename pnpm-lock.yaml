@@ -7,8 +7,8 @@ settings:
 catalogs:
   default:
     '@a-type/auth':
-      specifier: 1.3.6
-      version: 1.3.6
+      specifier: 1.3.7
+      version: 1.3.7
     '@a-type/auth-fetch':
       specifier: ^1.0.1
       version: 1.0.1
@@ -391,10 +391,10 @@ importers:
     dependencies:
       '@a-type/auth':
         specifier: 'catalog:'
-        version: 1.3.6
+        version: 1.3.7
       '@a-type/auth-email-ses':
         specifier: 2.1.4
-        version: 2.1.4(@a-type/auth@1.3.6)
+        version: 2.1.4(@a-type/auth@1.3.7)
       '@a-type/kysely':
         specifier: 1.1.1
         version: 1.1.1(kysely@0.27.5)
@@ -436,8 +436,8 @@ packages:
   '@a-type/auth-fetch@1.0.1':
     resolution: {integrity: sha512-O9QQ2t51NyBb7egDogRmcikXxQkoKzUwNMSJ1oXdfVFkAwvvbtqXi11PvUUnn4BxWSRD2V6Jtt3SmKHW8PrzAw==}
 
-  '@a-type/auth@1.3.6':
-    resolution: {integrity: sha512-ZztINfQT8cBXE7dYvZQb9nqd/mgbNwP+SM+yT3/AdOKhG6ydsbNpAGGLjPIzCu+loSI3idi1aoCV7tkbw2clGw==}
+  '@a-type/auth@1.3.7':
+    resolution: {integrity: sha512-f9MdXf/8rhDV1YcAa77L8BObqgmC7v+jy54e+lEPFyAN2YTtEVXYU77ywS6OQikOyiPTLejtJ6cJGMhVlCd/8Q==}
 
   '@a-type/kysely@1.1.1':
     resolution: {integrity: sha512-JOCyXi09IEmhscHAoU/lLy7/prkPRtFLgTrWs5uK7q0nLL2zN6soFwtafOWsRh3iJsM/km47aXohyGx5mHRmnQ==}
@@ -4869,16 +4869,16 @@ packages:
 
 snapshots:
 
-  '@a-type/auth-email-ses@2.1.4(@a-type/auth@1.3.6)':
+  '@a-type/auth-email-ses@2.1.4(@a-type/auth@1.3.7)':
     dependencies:
-      '@a-type/auth': 1.3.6
+      '@a-type/auth': 1.3.7
       '@aws-sdk/client-sesv2': 3.726.1
     transitivePeerDependencies:
       - aws-crt
 
   '@a-type/auth-fetch@1.0.1': {}
 
-  '@a-type/auth@1.3.6':
+  '@a-type/auth@1.3.7':
     dependencies:
       cookie: 0.6.0
       discord-oauth2: 2.12.1

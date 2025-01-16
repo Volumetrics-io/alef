@@ -11,6 +11,7 @@ head_sampling_rate = 1 # optional. default = 1.
 
 [vars]
 ADMIN_UI_ORIGIN = "https://admin.alef.io"
+API_ORIGIN = "https://api.alef.io"
 
 [[services]]
 binding = "ADMIN_STORE"

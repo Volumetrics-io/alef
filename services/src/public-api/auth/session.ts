@@ -14,6 +14,12 @@ declare module '@a-type/auth' {
 export const sessions = new SessionManager<Context<Env>>({
 	getSessionConfig(ctx) {
 		const apiUrl = new URL(ctx.env.API_ORIGIN);
+		const apiDomain = apiUrl.hostname;
+		// remove subdomains
+		const domainParts = apiDomain.split('.');
+		if (domainParts.length > 2) {
+			apiUrl.hostname = domainParts.slice(1).join('.');
+		}
 		return {
 			cookieName: 'alef-session',
 			cookieOptions: {

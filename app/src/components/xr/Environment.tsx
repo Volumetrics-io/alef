@@ -47,7 +47,7 @@ export const Environment = ({ children }: { children: React.ReactNode }) => {
                                     side={DoubleSide} 
                                     shadowSide={DoubleSide}
                                     transparent={true}
-                                    opacity={0.6 * sunlightIntensity}
+                                    opacity={0.2 * sunlightIntensity}
                                 />
                             </XRPlaneModel>
                             <XRPlaneModel 

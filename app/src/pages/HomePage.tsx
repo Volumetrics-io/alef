@@ -12,10 +12,13 @@ import { Bedroom } from '@/spaces/bedroom';
 import { Environment } from '@/components/xr/Environment';
 import { DepthShader } from '@/components/xr/shaders/DepthShader';
 import SunLight from '@/components/xr/lighting/SunLight.tsx';
+import { useGeoStore } from '@/stores/geoStore.ts';
 
 import { useMe } from '@/services/publicApi/userHooks';
-
+import { RoomLighting } from '@/components/xr/lighting/RoomLighting';
+import { PCFSoftShadowMap } from 'three';
 const HomePage = () => {
+	const geoStore = useGeoStore();
 	// const { data: session } = useMe();
 	return (
 		<>
@@ -27,7 +30,8 @@ const HomePage = () => {
 						state.gl.setClearColor(0xefffff);
 						state.gl.localClippingEnabled = true;
 						state.gl.setTransparentSort(reversePainterSortStable);
-						// state.gl.shadowMap.type = PCFSoftShadowMap;
+						state.gl.shadowMap.autoUpdate = false;
+						state.gl.shadowMap.type = PCFSoftShadowMap;
 					}}
 					shadows={true}
 					>
@@ -50,7 +54,9 @@ const HomePage = () => {
 							</Toggle> */}
 						</ControlCenter>
 						<Environment>
-							<SunLight />
+							<RoomLighting />
+							{/* TODO: sun light needs refinement */}
+							{/* <SunLight /> */}
 							<Bedroom />
 						</Environment>
 					</XR>
@@ -72,7 +78,10 @@ const HomePage = () => {
 					fontSize: '1.5rem',
 					boxShadow: '0px 0px 20px rgba(0,0,0,1)',
 				}}
-				onClick={() => xrStore.enterAR()}
+				onClick={() => {
+					xrStore.enterAR();
+					geoStore.fetchLocation();
+				}}
 				>
 				Enter AR
 				</button>

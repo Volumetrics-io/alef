@@ -9,7 +9,7 @@ import { BodyAnchor } from './anchors/BodyAnchor.js';
 export function ControlCenter({ onToggle, children }: { onToggle?: () => void; children?: React.ReactNode }) {
 	const [isOpen, setIsOpen] = useState(false);
 	return (
-		<BodyAnchor follow={true} position={[0, isOpen ? 0.1 : 0.1, isOpen ? -0.8 : -1]} lockY={true} distance={0.15}>
+		<BodyAnchor follow={true} position={[0, isOpen ? 0.1 : 0.3, isOpen ? -0.8 : -1]} lockY={true} distance={0.15}>
 			<Root pixelSize={0.001} flexDirection="column" gap={10}>
 				{/* <FontFamilyProvider
 					jetbrainsmono={{

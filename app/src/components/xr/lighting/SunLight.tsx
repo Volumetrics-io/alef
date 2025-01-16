@@ -1,8 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { useThree } from '@react-three/fiber';
+import React, { useRef, useEffect } from 'react';
+import { useFrame, useThree } from '@react-three/fiber';
 import SunCalc from 'suncalc';
 import { useEnvironmentContext } from '../Environment';
-import { Object3D, Vector3, Quaternion } from 'three';
+import { Object3D, Vector3, Quaternion, DirectionalLight, AmbientLight } from 'three';
+import { useGeoStore } from '../../../stores/geoStore';
 
 // Define the LightData type
 interface LightData {
@@ -17,7 +18,8 @@ interface LightData {
   };
 }
 
-const updateSunData = (latitude: number, longitude: number): LightData => {
+// Function to calculate sun data based on latitude and longitude
+const calculateSunData = (latitude: number, longitude: number): LightData => {
   const now = new Date();
   const sunPosition = SunCalc.getPosition(now, latitude, longitude);
 
@@ -38,14 +40,14 @@ const updateSunData = (latitude: number, longitude: number): LightData => {
   }
 
   // Convert spherical coordinates to Cartesian coordinates
-  const radius = 100; // Distance from the origin (adjust as needed)
+  const radius = 10; // Distance from the origin (adjust as needed)
   const x = radius * Math.cos(altitude) * Math.sin(azimuth);
   const y = radius * Math.sin(altitude);
-  const z = radius * Math.cos(altitude) * Math.cos(azimuth);
+  const z = -radius * Math.cos(altitude) * Math.cos(azimuth);
 
   // Calculate light intensity based on altitude
   const normalizedAltitude = (altitude + Math.PI / 2) / Math.PI; // Normalize between 0 and 1
-  const directionalIntensity = Math.max(0.2, normalizedAltitude); // Ensure a minimum intensity
+  const directionalIntensity = Math.max(0.5, normalizedAltitude); // Ensure a minimum intensity
 
   // Calculate light color based on altitude
   let directionalColor = '#ffffff'; // Default color
@@ -88,160 +90,124 @@ const updateSunData = (latitude: number, longitude: number): LightData => {
   };
 };
 
-const fetchGeolocation = (): Promise<LightData> => {
-  return new Promise((resolve) => {
-    let sunData = updateSunData(0, 0);
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          sunData = updateSunData(latitude, longitude);
-          resolve(sunData);
-        },
-        (error) => {
-          console.error('Error fetching geolocation:', error);
-          // Default to a preset location if geolocation fails
-          sunData = updateSunData(0, 0);
-          resolve(sunData);
-        }
-      );
-    } else {
-      console.error('Geolocation is not supported by this browser.');
-      // Default to a preset location if geolocation is unavailable
-      resolve(sunData);
-    }
-  });
-};
-
 const SunLight: React.FC = () => {
-  const { scene } = useThree();
+  const { scene, gl } = useThree();
   const { planeMeshes } = useEnvironmentContext();
   const lightTarget = useRef<Object3D>(new Object3D());
+  const {
+    position: { latitude, longitude },
+    error,
+  } = useGeoStore();
 
-  // Initialize lightData with the LightData type
-  const [lightData, setLightData] = useState<LightData>({
-    directional: {
-      position: [0, 100, 0], // Initial position above the scene
-      color: '#ffffff',
-      intensity: 1,
-    },
-    ambient: {
-      color: '#ffffff',
-      intensity: 0.3,
-    },
-  });
+  // Refs for light objects
+  const directionalLightRef = useRef<DirectionalLight>(null);
+  const ambientLightRef = useRef<AmbientLight>(null);
+
+  // Ref to track elapsed time
+  const elapsedTimeRef = useRef<number>(0);
 
   // Access the function to update sunlightIntensity from context
   const { setSunlightIntensity } = useEnvironmentContext();
 
+  // Initialize the target object in the scene
   useEffect(() => {
-    let isMounted = true; // To prevent state updates if component is unmounted
-
-    // Function to update sun data
-    const updateSunAndLight = async () => {
-      const sunData = await fetchGeolocation();
-      if (isMounted) {
-        setLightData(sunData);
-        setSunlightIntensity(sunData.directional.intensity);
-      }
-
-      if (planeMeshes && planeMeshes['window'] && planeMeshes['window'].length > 0) {
-        const windows = planeMeshes['window'];
-        const meshWorldPosition = new Vector3();
-        const meshWorldQuaternion = new Quaternion();
-        const forward = new Vector3(0, 0, 1); // Assuming forward is along Z axis
-
-        let sumDirection = new Vector3(0, 0, 0);
-        let sumPosition = new Vector3(0, 0, 0);
-
-        // Calculate the sum of all window directions and positions
-        windows.forEach((mesh) => {
-          mesh.getWorldPosition(meshWorldPosition);
-          mesh.getWorldQuaternion(meshWorldQuaternion);
-          const direction = forward.clone().applyQuaternion(meshWorldQuaternion).normalize();
-          sumDirection.add(direction);
-          sumPosition.add(meshWorldPosition);
-        });
-
-        const count = windows.length;
-        const avgDirection = sumDirection.divideScalar(count).normalize();
-        const avgPos = sumPosition.divideScalar(count);
-
-        const targetDistance = 50; // Adjust based on your scene scale
-        lightTarget.current.position.copy(avgPos).add(avgDirection.multiplyScalar(targetDistance));
-        scene.add(lightTarget.current);
-
-        // Prioritize window positions by adjusting light data
-        setLightData((prev) => {
-          const newDirectionalPosition: [number, number, number] = [
-            avgPos.x + prev.directional.position[0] * 0.2,
-            avgPos.y + prev.directional.position[1] * 0.7,
-            avgPos.z + prev.directional.position[2] * 0.2,
-          ];
-
-          const newDirectionalIntensity = Math.min(0.75, count * 0.5);
-          const newAmbientIntensity = Math.min(1, count * 0.2);
-
-          // Check if there's an actual change to prevent unnecessary state updates
-          const isDirectionalPositionChanged = !newDirectionalPosition.every(
-            (value, index) => value === prev.directional.position[index]
-          );
-
-          const isDirectionalIntensityChanged =
-            newDirectionalIntensity !== prev.directional.intensity;
-          const isAmbientIntensityChanged =
-            newAmbientIntensity !== prev.ambient.intensity;
-
-          if (
-            !isDirectionalPositionChanged &&
-            !isDirectionalIntensityChanged &&
-            !isAmbientIntensityChanged
-          ) {
-            return prev; // No changes needed
-          }
-
-          return {
-            directional: {
-              ...prev.directional,
-              position: newDirectionalPosition,
-              intensity: newDirectionalIntensity,
-            },
-            ambient: {
-              ...prev.ambient,
-              intensity: newAmbientIntensity,
-            },
-          };
-        });
-      }
-    };
-
-    // Set up interval to update sun data every minute
-    const interval = setInterval(() => {
-      updateSunAndLight();
-    }, 60000); // Update every minute
-
+    scene.add(lightTarget.current);
     return () => {
-      isMounted = false; // Cleanup flag
-      clearInterval(interval);
+      scene.remove(lightTarget.current);
     };
-  }, [planeMeshes, scene, setSunlightIntensity]);
+  }, [scene]);
+
+  useFrame((state, delta) => {
+    // Accumulate elapsed time
+    elapsedTimeRef.current += delta;
+
+    // Check if 60 seconds have passed
+    if (elapsedTimeRef.current < 10) {
+      return; // Exit early if not enough time has passed
+    }
+
+    // Reset elapsed time
+    elapsedTimeRef.current = 0;
+
+    if (error) {
+      console.warn('Geolocation error:', error);
+      return;
+    }
+
+    if (!latitude || !longitude) {
+      console.warn('Latitude or Longitude is missing.');
+      return;
+    }
+
+    const sunData = calculateSunData(latitude, longitude);
+
+    if (planeMeshes && planeMeshes['window'] && planeMeshes['window'].length > 0) {
+      const windows = planeMeshes['window'];
+      const meshWorldPosition = new Vector3();
+      const meshWorldQuaternion = new Quaternion();
+      const forward = new Vector3(0, 0, 1); // Assuming forward is along Z axis
+
+      let sumDirection = new Vector3(0, 0, 0);
+      let sumPosition = new Vector3(0, 0, 0);
+
+      // Calculate the sum of all window directions and positions
+      windows.forEach((mesh) => {
+        mesh.getWorldPosition(meshWorldPosition);
+        mesh.getWorldQuaternion(meshWorldQuaternion);
+        const direction = forward.clone().applyQuaternion(meshWorldQuaternion).normalize();
+        sumDirection.add(direction);
+        sumPosition.add(meshWorldPosition);
+      });
+
+      const count = windows.length;
+      const avgPos = sumPosition.divideScalar(count);
+
+      // Compute direction vector based on sun position and average window position
+      const sunPos = new Vector3(...sunData.directional.position);
+      const directionVector = new Vector3().subVectors(sunPos, avgPos).normalize();
+
+      const targetDistance = 50; // Adjust based on your scene scale
+      lightTarget.current.position.copy(avgPos).add(directionVector.multiplyScalar(targetDistance));
+
+      // Update directional light properties
+      if (directionalLightRef.current) {
+        directionalLightRef.current.position.set(...sunData.directional.position);
+        directionalLightRef.current.color.set(sunData.directional.color);
+        directionalLightRef.current.intensity = sunData.directional.intensity;
+      }
+
+      // Update ambient light properties
+      if (ambientLightRef.current) {
+        ambientLightRef.current.color.set(sunData.ambient.color);
+        ambientLightRef.current.intensity = sunData.ambient.intensity;
+      }
+
+      // Update sunlight intensity in the context
+      setSunlightIntensity(sunData.directional.intensity);
+
+      // Ensure shadow map updates
+      gl.shadowMap.needsUpdate = true;
+    }
+  });
 
   return (
     <>
       <directionalLight
-        position={lightData.directional.position}
-        color={lightData.directional.color}
-        intensity={lightData.directional.intensity}
+        ref={directionalLightRef}
+        position={[0, 100, 0]} // Initial position; will be updated by useFrame
+        color="#ffffff" // Initial color
+        intensity={1} // Initial intensity
         castShadow
         target={lightTarget.current}
-        shadow-mapSize-width={4096}
-        shadow-mapSize-height={4096}
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
         shadow-camera-far={500}
         shadow-bias={0.000008}
       />
       <ambientLight
-        intensity={lightData.ambient.intensity}
-        color={lightData.ambient.color}
+        ref={ambientLightRef}
+        intensity={0.3} // Initial intensity
+        color="#ffffff" // Initial color
       />
     </>
   );

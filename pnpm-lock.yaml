@@ -171,6 +171,9 @@ importers:
       '@alef/sys':
         specifier: workspace:*
         version: link:../packages/sys
+      '@dimforge/rapier3d-compat':
+        specifier: ^0.14.0
+        version: 0.14.0
       '@pmndrs/uikit':
         specifier: ^0.8.5
         version: 0.8.5(three@0.172.0)
@@ -186,6 +189,9 @@ importers:
       '@react-three/fiber':
         specifier: 'catalog:'
         version: 9.0.0-rc.3(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(three@0.172.0)
+      '@react-three/rapier':
+        specifier: ^1.5.0
+        version: 1.5.0(@react-three/fiber@9.0.0-rc.3(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(three@0.172.0))(react@19.0.0)(three@0.172.0)
       '@react-three/uikit':
         specifier: ^0.8.5
         version: 0.8.5(@react-three/fiber@9.0.0-rc.3(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(three@0.172.0))(@types/react@19.0.2)(react@19.0.0)(three@0.172.0)
@@ -747,6 +753,9 @@ packages:
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
     engines: {node: '>=12'}
+
+  '@dimforge/rapier3d-compat@0.14.0':
+    resolution: {integrity: sha512-/uHrUzS+CRQ+NQrrJCEDUkhwHlNsAAexbNXgbN9sHY+GwR+SFFAFrxRr8Llf5/AJZzqiLANdQIfJ63Cw4gJVqw==}
 
   '@emotion/is-prop-valid@1.2.2':
     resolution: {integrity: sha512-uNsoYd37AFmaCdXlg6EYD1KaPOaRWRByMCYzbKUX4+hhMfrxdVSelShywL4JVaAeM/eHUOSprYBQls+/neX3pw==}
@@ -1803,6 +1812,13 @@ packages:
         optional: true
       react-native:
         optional: true
+
+  '@react-three/rapier@1.5.0':
+    resolution: {integrity: sha512-gylk2KyCer9EoymFyTyc+g2IqyAq4mTbZgaHoSJi6gHoXlJsC2LVeN4jedvegvjUsXPExdE60wHjCPa+DS4iXw==}
+    peerDependencies:
+      '@react-three/fiber': '>=8.9.0'
+      react: '>=18.0.0'
+      three: '>=0.139.0'
 
   '@react-three/uikit-default@0.8.5':
     resolution: {integrity: sha512-ytkYNJtJg/VaVvIf+wZROApLdiP6Jq2I3KWMl4GetjAi0BJL5y6y9nAFc1HBnFxoFnlwEKhMt/3IhaUijvUyzw==}
@@ -5613,6 +5629,8 @@ snapshots:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
 
+  '@dimforge/rapier3d-compat@0.14.0': {}
+
   '@emotion/is-prop-valid@1.2.2':
     dependencies:
       '@emotion/memoize': 0.8.1
@@ -6568,6 +6586,15 @@ snapshots:
     transitivePeerDependencies:
       - '@types/react'
       - immer
+
+  '@react-three/rapier@1.5.0(@react-three/fiber@9.0.0-rc.3(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(three@0.172.0))(react@19.0.0)(three@0.172.0)':
+    dependencies:
+      '@dimforge/rapier3d-compat': 0.14.0
+      '@react-three/fiber': 9.0.0-rc.3(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(three@0.172.0)
+      react: 19.0.0
+      suspend-react: 0.1.3(react@19.0.0)
+      three: 0.172.0
+      three-stdlib: 2.35.7(three@0.172.0)
 
   '@react-three/uikit-default@0.8.5(@react-three/fiber@9.0.0-rc.3(@types/react@19.0.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(three@0.172.0))(@types/react@19.0.2)(react@19.0.0)(three@0.172.0)':
     dependencies:

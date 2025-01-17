@@ -1,3 +1,4 @@
+import { RigidBody } from '@react-three/rapier';
 import { useXRPlanes, XRPlaneModel, XRSpace } from '@react-three/xr';
 import { createContext, useContext, useState } from 'react';
 import { DoubleSide, Mesh } from 'three';
@@ -36,23 +37,33 @@ export const Environment = ({ children }: { children: React.ReactNode }) => {
 						planeMeshes[label] = [];
 					}
 
+					// const halfExtents = [
+					// 	Math.abs(plane.polygon[0].x - plane.polygon[1].x) / 2,
+					// 	Math.abs(plane.polygon[0].y - plane.polygon[1].y) / 2,
+					// 	// arbitrary depth
+					// 	0.01,
+					// ] satisfies CuboidArgs;
+
 					return (
 						<XRSpace key={label + index} space={plane.planeSpace}>
 							<XRPlaneModel renderOrder={-1} plane={plane} receiveShadow={true}>
 								<shadowMaterial side={DoubleSide} shadowSide={DoubleSide} transparent={true} opacity={0.6 * sunlightIntensity} />
 							</XRPlaneModel>
-							<XRPlaneModel
-								ref={(mesh: Mesh | null) => {
-									if (mesh) {
-										planeMeshes[label].push(mesh);
-									}
-								}}
-								renderOrder={-1}
-								plane={plane}
-								position={[0, 0.01, 0]}
-							>
-								<meshBasicMaterial colorWrite={false} side={DoubleSide} />
-							</XRPlaneModel>
+							<RigidBody type="fixed" colliders="cuboid">
+								{/* <CuboidCollider args={halfExtents} /> */}
+								<XRPlaneModel
+									ref={(mesh: Mesh | null) => {
+										if (mesh) {
+											planeMeshes[label].push(mesh);
+										}
+									}}
+									renderOrder={-1}
+									plane={plane}
+									position={[0, 0.01, 0]}
+								>
+									<meshBasicMaterial colorWrite={false} side={DoubleSide} />
+								</XRPlaneModel>
+							</RigidBody>
 						</XRSpace>
 					);
 				})}

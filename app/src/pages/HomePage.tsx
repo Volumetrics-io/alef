@@ -14,6 +14,7 @@ import { noEvents, PointerEvents, XR } from '@react-three/xr';
 
 import { RoomRenderer } from '@/components/xr/room/RoomRenderer';
 import { useMe } from '@/services/publicApi/userHooks';
+import { Physics } from '@react-three/rapier';
 import { useNavigate } from '@verdant-web/react-router';
 import { useEffect } from 'react';
 
@@ -40,29 +41,31 @@ const HomePage = () => {
 						}}
 						shadows={true}
 					>
-						<PointerEvents />
-						<XR store={xrStore}>
-							<DepthShader />
-							<ControlCenter>
-								<Toggle>
-									<Bed color={colors.primary} />
-								</Toggle>
-								<Toggle>
-									<LampDesk color={colors.primary} />
-								</Toggle>
-								<Toggle>
-									<Baby color={colors.primary} />
-								</Toggle>
-								{/* <Toggle>
+						<Physics debug>
+							<PointerEvents />
+							<XR store={xrStore}>
+								<DepthShader />
+								<ControlCenter>
+									<Toggle>
+										<Bed color={colors.primary} />
+									</Toggle>
+									<Toggle>
+										<LampDesk color={colors.primary} />
+									</Toggle>
+									<Toggle>
+										<Baby color={colors.primary} />
+									</Toggle>
+									{/* <Toggle>
 								<Sofa color={colors.primary} />
 							</Toggle> */}
-							</ControlCenter>
-							<Environment>
-								<SunLight />
-								{/* <Bedroom /> */}
-								<RoomRenderer />
-							</Environment>
-						</XR>
+								</ControlCenter>
+								<Environment>
+									<SunLight />
+									{/* <Bedroom /> */}
+									<RoomRenderer />
+								</Environment>
+							</XR>
+						</Physics>
 					</Canvas>
 				</ErrorBoundary>
 			</Main>

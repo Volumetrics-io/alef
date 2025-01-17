@@ -14,7 +14,7 @@
 		"@alef/sys": "workspace:*",
 		"@alef/services": "workspace:*",
 		"@tanstack/react-query": "5.62.15",
-		"@verdant-web/react-router": "^0.7.1",
+		"@verdant-web/react-router": "^0.7.0",
 		"clsx": "2.1.1",
 		"hono": "catalog:",
 		"react": "catalog:",

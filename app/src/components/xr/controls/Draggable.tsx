@@ -1,18 +1,19 @@
+import { Vector3, Group } from 'three';
+import React, { useState, createContext, useContext, useCallback } from 'react';
 import { ThreeEvent } from '@react-three/fiber';
+import { useRef } from 'react';
 import { Container } from '@react-three/uikit';
-import React, { createContext, useCallback, useContext, useRef, useState } from 'react';
-import { Group, Vector3 } from 'three';
 
 // Create a context for the drag controls
-interface DragContextType {
+export interface DragContextType {
 	isDragging: boolean;
 	setIsDragging: (dragging: boolean) => void;
 	setInitialPosition: (position: Vector3) => void;
 }
 
-const DragContext = createContext<DragContextType | null>(null);
+export const DragContext = createContext<DragContextType | null>(null);
 
-export function Draggable({ children }: { children: React.ReactNode }) {
+export function Draggable({ fixed, children }: { fixed?: boolean, children: React.ReactNode }) {
 	const groupRef = useRef<Group>(null);
 	const [isDragging, setIsDragging] = useState(false);
 	const lastPointerPosition = useRef<Vector3>(new Vector3());
@@ -35,6 +36,10 @@ export function Draggable({ children }: { children: React.ReactNode }) {
 				// Scale factor increases with distance (adjust multiplier as needed)
 				const scaleFactor = 1 + distanceFromStart * 2;
 				delta.current.multiplyScalar(scaleFactor);
+
+                if (fixed) {
+                    delta.current.setY(0);
+                }
 
 				groupRef.current.position.add(delta.current);
 			}

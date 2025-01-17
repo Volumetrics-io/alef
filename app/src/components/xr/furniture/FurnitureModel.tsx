@@ -9,5 +9,8 @@ export interface FurnitureModelProps {
 export function FurnitureModel({ furnitureId }: FurnitureModelProps) {
 	const model = useFurnitureModel(furnitureId);
 
+	if (!model) return null;
+
+	// @ts-ignore
 	return <Clone object={model.scene} />;
 }

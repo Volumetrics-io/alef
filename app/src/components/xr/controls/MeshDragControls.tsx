@@ -1,15 +1,14 @@
-import { Vector3, Group } from 'three';
-import React, { useState,  useContext, useCallback } from 'react';
 import { ThreeEvent } from '@react-three/fiber';
-import { useRef } from 'react';
+import React, { useCallback, useContext, useRef, useState } from 'react';
+import { Group, Vector3 } from 'three';
 
 import { DragContext } from './Draggable';
 
-export function MeshDraggable({ fixed, children }: { fixed: boolean, children: React.ReactNode }) {
+export function MeshDraggable({ fixed, children }: { fixed: boolean; children: React.ReactNode }) {
 	const groupRef = useRef<Group>(null);
 	const [isDragging, setIsDragging] = useState(false);
 	const lastPointerPosition = useRef<Vector3>(new Vector3());
-    const worldPosition = useRef<Vector3>(new Vector3());
+	const worldPosition = useRef<Vector3>(new Vector3());
 
 	const currentPointerPosition = new Vector3();
 	const delta = new Vector3();
@@ -32,16 +31,16 @@ export function MeshDraggable({ fixed, children }: { fixed: boolean, children: R
 				// Scale factor increases with distance (adjust multiplier as needed)
 				scaleFactor = 1 + distanceFromStart * 5;
 				delta.multiplyScalar(scaleFactor);
-                
-                groupRef.current.getWorldPosition(worldPosition.current);
 
-                worldPosition.current.add(delta);
+				groupRef.current.getWorldPosition(worldPosition.current);
 
-                groupRef.current.parent?.worldToLocal(worldPosition.current);
+				worldPosition.current.add(delta);
 
-                if (fixed) {
-                    worldPosition.current.setY(0);
-                }
+				groupRef.current.parent?.worldToLocal(worldPosition.current);
+
+				if (fixed) {
+					worldPosition.current.setY(0);
+				}
 
 				groupRef.current.position.copy(worldPosition.current);
 			}
@@ -87,9 +86,5 @@ export function MeshDragController({ children }: { children: React.ReactNode }) 
 		context.setInitialPosition(event.pointerPosition);
 	};
 
-	return (
-		<group onPointerDown={handlePointerDown}>
-			{children}
-		</group>
-	);
+	return <group onPointerDown={handlePointerDown}>{children}</group>;
 }

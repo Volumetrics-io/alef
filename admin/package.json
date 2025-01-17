@@ -17,10 +17,10 @@
 		"@verdant-web/react-router": "^0.7.0",
 		"clsx": "2.1.1",
 		"hono": "catalog:",
-		"react": "18.3.1",
-		"react-dom": "18.3.1",
+		"react": "catalog:",
+		"react-dom": "catalog:",
 		"react-hot-toast": "2.5.1",
-		"@react-three/fiber": "8.16.6",
+		"@react-three/fiber": "catalog:",
 		"@react-three/drei": "catalog:"
 	},
 	"devDependencies": {

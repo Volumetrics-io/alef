@@ -5,8 +5,12 @@ export const xrStore: XRStore = createXRStore({
 	depthSensing: true,
 	bounded: false,
 	hand: {
-		touchPointer: false,
-		grabPointer: false,
+		touchPointer: {
+			cursorModel: {
+				color: colors.primary.value,
+				opacity: (pointer) => (pointer.getButtonsDown().size > 0 ? 0.6 : 0.4),
+			},
+		},
 		rayPointer: {
 			rayModel: {
 				color: (pointer) => (pointer.getButtonsDown().size > 0 ? 'hsl(240, 100%, 70%)' : 'white'),
@@ -17,11 +21,10 @@ export const xrStore: XRStore = createXRStore({
 				opacity: (pointer) => (pointer.getButtonsDown().size > 0 ? 0.6 : 0.4),
 			},
 		},
+		grabPointer: false,
 		model: false,
 	},
 	controller: {
-		teleportPointer: false,
-		grabPointer: false,
 		rayPointer: {
 			rayModel: {
 				color: (pointer) => (pointer.getButtonsDown().size > 0 ? 'hsl(240, 100%, 70%)' : 'white'),
@@ -32,6 +35,8 @@ export const xrStore: XRStore = createXRStore({
 				opacity: (pointer) => (pointer.getButtonsDown().size > 0 ? 0.6 : 0.4),
 			},
 		},
+		teleportPointer: false,
+		grabPointer: false,
 		model: false,
 	},
 });

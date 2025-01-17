@@ -1,9 +1,9 @@
-import { Vector3, Group, Object3D } from 'three';
+import { Vector3, Group } from 'three';
 import React, { useState,  useContext, useCallback } from 'react';
 import { ThreeEvent } from '@react-three/fiber';
 import { useRef } from 'react';
 
-import { DragContext, DragContextType } from './Draggable';
+import { DragContext } from './Draggable';
 
 export function MeshDraggable({ fixed, children }: { fixed: boolean, children: React.ReactNode }) {
 	const groupRef = useRef<Group>(null);

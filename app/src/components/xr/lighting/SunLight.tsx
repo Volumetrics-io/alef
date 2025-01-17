@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import SunCalc from 'suncalc';
 import { useEnvironmentContext } from '../Environment';
-import { Object3D, Vector3, Quaternion, DirectionalLight, AmbientLight } from 'three';
+import { Vector3, Quaternion, DirectionalLight, AmbientLight, Object3D } from 'three';
 import { useGeoStore } from '../../../stores/geoStore';
 
 // Define the LightData type
@@ -93,7 +93,7 @@ const calculateSunData = (latitude: number, longitude: number): LightData => {
 const SunLight: React.FC = () => {
   const { scene, gl } = useThree();
   const { planeMeshes } = useEnvironmentContext();
-  const lightTarget = useRef<Object3D>(new Object3D());
+  const lightTarget = useRef<Object3D>(null);
   const {
     position: { latitude, longitude },
     error,
@@ -111,13 +111,16 @@ const SunLight: React.FC = () => {
 
   // Initialize the target object in the scene
   useEffect(() => {
-    scene.add(lightTarget.current);
-    return () => {
-      scene.remove(lightTarget.current);
-    };
+    if (lightTarget.current) {
+      scene.add(lightTarget.current);
+      return () => {
+        if (!lightTarget.current) return;
+        scene.remove(lightTarget.current);
+      };
+    }
   }, [scene]);
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     // Accumulate elapsed time
     elapsedTimeRef.current += delta;
 
@@ -167,7 +170,7 @@ const SunLight: React.FC = () => {
       const directionVector = new Vector3().subVectors(sunPos, avgPos).normalize();
 
       const targetDistance = 50; // Adjust based on your scene scale
-      lightTarget.current.position.copy(avgPos).add(directionVector.multiplyScalar(targetDistance));
+      lightTarget.current?.position.copy(avgPos).add(directionVector.multiplyScalar(targetDistance));
 
       // Update directional light properties
       if (directionalLightRef.current) {
@@ -192,13 +195,15 @@ const SunLight: React.FC = () => {
 
   return (
     <>
+      <object3D ref={lightTarget} />
+
       <directionalLight
         ref={directionalLightRef}
         position={[0, 100, 0]} // Initial position; will be updated by useFrame
         color="#ffffff" // Initial color
         intensity={1} // Initial intensity
         castShadow
-        target={lightTarget.current}
+        target={lightTarget.current!}
         shadow-mapSize-width={2048}
         shadow-mapSize-height={2048}
         shadow-camera-far={500}

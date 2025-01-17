@@ -16,5 +16,10 @@ export class AuthedStore extends RpcTarget {
 		return this.#db.selectFrom('User').where('id', '=', this.#userId).select(['id', userNameSelector, 'isProductAdmin']).executeTakeFirst();
 	}
 
+	// returns more data than getSession
+	async getMe() {
+		return this.#db.selectFrom('User').where('id', '=', this.#userId).selectAll().select(userNameSelector).executeTakeFirst();
+	}
+
 	// any authorized user-scoped operations go here
 }

@@ -1,26 +1,26 @@
-import { useXRPlanes, XRSpace, XRPlaneModel } from "@react-three/xr";
-import { createContext, useContext, useState } from "react";
-import { DoubleSide, FrontSide, Mesh } from "three";
+import { useXRPlanes, XRPlaneModel, XRSpace } from '@react-three/xr';
+import { createContext, useContext, useState } from 'react';
+import { DoubleSide, Mesh } from 'three';
 
 type PlaneMeshes = {
-    [label: string]: Mesh[]
+	[label: string]: Mesh[];
 };
 
 interface EnvironmentContextType {
-    planeMeshes: PlaneMeshes;
-    sunlightIntensity: number;
-    setSunlightIntensity: (intensity: number) => void;
+	planeMeshes: PlaneMeshes;
+	sunlightIntensity: number;
+	setSunlightIntensity: (intensity: number) => void;
 }
 
 export const EnvironmentContext = createContext<EnvironmentContextType>({
-    planeMeshes: {},
-    sunlightIntensity: 1,
-    setSunlightIntensity: (intensity: number) => {},
+	planeMeshes: {},
+	sunlightIntensity: 1,
+	setSunlightIntensity: () => {},
 });
 
 export const useEnvironmentContext = () => {
-    return useContext(EnvironmentContext);
-}
+	return useContext(EnvironmentContext);
+};
 
 export const Environment = ({ children }: { children: React.ReactNode }) => {
     const planes = useXRPlanes();

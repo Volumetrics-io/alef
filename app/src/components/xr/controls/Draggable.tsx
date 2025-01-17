@@ -13,38 +13,35 @@ export interface DragContextType {
 
 export const DragContext = createContext<DragContextType | null>(null);
 
-export function Draggable({ fixed, children }: { fixed: boolean, children: React.ReactNode }) {
+export function Draggable({ fixed, children }: { fixed?: boolean, children: React.ReactNode }) {
 	const groupRef = useRef<Group>(null);
 	const [isDragging, setIsDragging] = useState(false);
 	const lastPointerPosition = useRef<Vector3>(new Vector3());
 
-	const currentPointerPosition = new Vector3();
-	const delta = new Vector3();
-
-	let distanceFromStart = 0;
-	let scaleFactor = 1;
+	const currentPointerPosition = useRef(new Vector3());
+	const delta = useRef(new Vector3());
 
 	const handlePointerMove = useCallback(
 		(event: ThreeEvent<PointerEvent>) => {
 			if (isDragging && lastPointerPosition.current) {
 				if (!groupRef.current) return;
-				// @ts-ignore NOTE: This does exist on the event object
-				currentPointerPosition.copy(event.pointerPosition);
-				delta.subVectors(currentPointerPosition, lastPointerPosition.current);
-				lastPointerPosition.current.copy(currentPointerPosition);
+				// @ts-expect-error NOTE: This does exist on the event object
+				currentPointerPosition.current.copy(event.pointerPosition);
+				delta.current.subVectors(currentPointerPosition.current, lastPointerPosition.current);
+				lastPointerPosition.current.copy(currentPointerPosition.current);
 
 				// Calculate distance from initial position
-				distanceFromStart = groupRef.current.position.distanceTo(currentPointerPosition);
+				const distanceFromStart = groupRef.current.position.distanceTo(currentPointerPosition.current);
 
 				// Scale factor increases with distance (adjust multiplier as needed)
-				scaleFactor = 1 + distanceFromStart * 2;
-				delta.multiplyScalar(scaleFactor);
+				const scaleFactor = 1 + distanceFromStart * 2;
+				delta.current.multiplyScalar(scaleFactor);
 
                 if (fixed) {
-                    delta.setY(0);
+                    delta.current.setY(0);
                 }
 
-				groupRef.current.position.add(delta);
+				groupRef.current.position.add(delta.current);
 			}
 		},
 		[isDragging]
@@ -67,7 +64,6 @@ export function Draggable({ fixed, children }: { fixed: boolean, children: React
 				},
 			}}
 		>
-			{/* @ts-ignore NOTE: This is valid */}
 			<group ref={groupRef} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerLeave={handlePointerUp}>
 				{children}
 			</group>
@@ -84,7 +80,7 @@ export function DragController({ children }: { children: React.ReactNode }) {
 
 	const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {
 		context.setIsDragging(true);
-		// @ts-ignore NOTE: This does exist on the event object
+		// @ts-expect-error NOTE: This does exist on the event object
 		context.setInitialPosition(event.pointerPosition);
 	};
 

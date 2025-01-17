@@ -24,14 +24,14 @@ export const Bedroom = forwardRef(() => {
                     </MeshDraggable>
                 </SnapAnchor>
 
-                {/* <SnapAnchor label="wall" padding={1}> */}
-                    {/* <Gltf castShadow receiveShadow src="./assets/bedroom/bed.glb"/> */}
-                    {/* {<mesh position={[0, 0.5, 0]} castShadow receiveShadow>
+				{/* <SnapAnchor label="wall" padding={1}> */}
+				{/* <Gltf castShadow receiveShadow src="https://testing-models.alef.io/assets/bedroom/bed.glb"/> */}
+				{/* {<mesh position={[0, 0.5, 0]} castShadow receiveShadow>
                         <boxGeometry args={[0.7, 0.3, 0.3]} />
                         <meshBasicMaterial color="red" />
                     </mesh> */}
-                {/* </SnapAnchor> */}
-            </PlaneAnchor>
-        </>
-    )
-})
+				{/* </SnapAnchor> */}
+			</PlaneAnchor>
+		</>
+	);
+});

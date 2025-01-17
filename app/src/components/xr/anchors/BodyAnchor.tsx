@@ -1,11 +1,12 @@
-import { animated, useSpring, config } from '@react-spring/three';
-import { Vector3 } from 'three';
-import { useCameraOrigin, useCameraForward } from '../../../hooks/useCameraOrigin.js';
-import React from 'react';
+import { animated, config, useSpring } from '@react-spring/three';
 import { useFrame } from '@react-three/fiber';
-import { Billboard } from '../Billboard.js';
 import { useXR } from '@react-three/xr';
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { Vector3 } from 'three';
+import { useCameraForward, useCameraOrigin } from '../../../hooks/useCameraOrigin.js';
+import { Billboard } from '../Billboard.js';
+
+const AnimatedGroup = animated('group');
 
 export function BodyAnchor({
 	position = [0, -0.2, -0.8],
@@ -51,7 +52,8 @@ export function BodyAnchor({
 	cameraWorldPos.copy(getCameraPos());
 
 	if (lockY && position) {
-		newPos.y = position[1] + cameraWorldPos.y;
+		const y = Array.isArray(position) ? position[1] : position.y;
+		newPos.y = y + cameraWorldPos.y;
 	}
 
 	const [{ pos }, api] = useSpring<{ pos: [number, number, number] }>(() => ({
@@ -67,7 +69,8 @@ export function BodyAnchor({
 		cameraWorldPos.copy(getCameraPos());
 
 		if (lockY && position) {
-			newPos.y = position[1] + cameraWorldPos.y;
+			const y = Array.isArray(position) ? position[1] : position.y;
+			newPos.y = y + cameraWorldPos.y;
 		}
 
 		currentPos.set(pos.get()[0], pos.get()[1], pos.get()[2]);
@@ -80,8 +83,8 @@ export function BodyAnchor({
 	});
 
 	return (
-		<animated.group position={follow ? pos : newPos}>
+		<AnimatedGroup position={follow ? pos : newPos}>
 			<Billboard>{children}</Billboard>
-		</animated.group>
+		</AnimatedGroup>
 	);
 }

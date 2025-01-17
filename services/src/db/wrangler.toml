@@ -1,7 +1,11 @@
 name = "db-service"
 compatibility_date = "2025-01-01"
-main = "./index.ts"
+main = "index.ts"
 account_id = "ad8af7aeb571031ffc236c411f39afe7"
+
+[observability]
+enabled = true
+head_sampling_rate = 1 # optional. default = 1.
 
 [[d1_databases]]
 binding = "D1"

@@ -1,9 +1,12 @@
-import { forwardRef } from 'react';
-import { Logo } from '@alef/sys';
+import { useMe } from '@/services/publicApi/userHooks';
+import { Button, Logo, NavBarProps, NavBar as SysNavBar, Text } from '@alef/sys';
 import { Link } from '@verdant-web/react-router';
-import { NavBar as SysNavBar, NavBarProps } from '@alef/sys';
+import { forwardRef } from 'react';
+import { LogoutButton } from './auth/LogoutButton';
 
 export const NavBar = forwardRef<HTMLDivElement, NavBarProps>(function NavBar(props, ref) {
+	const { data: session } = useMe();
+
 	return (
 		<SysNavBar {...props} ref={ref}>
 			<SysNavBar.Start>
@@ -11,8 +14,17 @@ export const NavBar = forwardRef<HTMLDivElement, NavBarProps>(function NavBar(pr
 					<Logo />
 				</Link>
 			</SysNavBar.Start>
-			<SysNavBar.End>
-				<Link to="/login">Login</Link>
+			<SysNavBar.End gapped align="center">
+				{session ? (
+					<>
+						<Text>Hi, {session.friendlyName}</Text>
+						<LogoutButton />
+					</>
+				) : (
+					<Button asChild color="suggested">
+						<Link to="/login">Login</Link>
+					</Button>
+				)}
 			</SysNavBar.End>
 		</SysNavBar>
 	);

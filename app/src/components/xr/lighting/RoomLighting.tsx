@@ -1,8 +1,7 @@
-import { Mesh, Vector3, DoubleSide } from "three";
-import { LightProps } from "@react-three/drei";
+import { Mesh, Vector3 } from "three";
 import { useEnvironmentContext } from "../Environment";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ThreeEvent, useThree } from "@react-three/fiber";
+import { useCallback, useEffect, useRef } from "react";
+import { SpotLightProps, ThreeEvent, useThree } from "@react-three/fiber";
 import { create } from "zustand";
 
 type LightDetails = {
@@ -77,6 +76,7 @@ export const RoomLighting = () => {
         if (!ceilingPlane) return;
         
         setTimeout(() => {
+            if (!meshRef.current) return;
             ceilingPlane.getWorldPosition(meshRef.current.position);
         }, 100);
         
@@ -99,9 +99,9 @@ export const RoomLighting = () => {
 
     return (
         <group>
-            <mesh ref={meshRef} rotation={[Math.PI / 2, 0, 0]} onClick={handleClick}>
+            <mesh ref={meshRef} rotation={[Math.PI / 2, 0, 0]} onPointerUp={handleClick}>
                 <planeGeometry args={[100, 100]} />
-                <meshStandardMaterial transparent={true} opacity={1}/>
+                <meshStandardMaterial transparent={true} colorWrite={false}/>
             </mesh>
             <ambientLight intensity={0.1} color={getWarmLightVariation('#FFE5B7')} />
             {lightDetails.map((light, index) => {
@@ -115,7 +115,7 @@ export const RoomLighting = () => {
 }
 
 
-export const CeilingLight = ({...props}: LightProps) => {
+export const CeilingLight = ({...props}: SpotLightProps) => {
     return (
         <group>
             <mesh position={props.position}>

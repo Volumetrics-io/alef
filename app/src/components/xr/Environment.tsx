@@ -39,7 +39,7 @@ export const Environment = ({ children }: { children: React.ReactNode }) => {
 
 					return (
 						<XRSpace key={label + index} space={plane.planeSpace}>
-							<RigidBody type="fixed" colliders="cuboid">
+							<RigidBody type="fixed" colliders="trimesh">
 								<XRPlaneModel renderOrder={-1} plane={plane} receiveShadow={true}>
 									<shadowMaterial side={DoubleSide} shadowSide={DoubleSide} transparent={true} opacity={0.2 * sunlightIntensity} />
 								</XRPlaneModel>

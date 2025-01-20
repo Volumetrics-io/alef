@@ -9,10 +9,12 @@ export interface FurnitureAttributeTagProps {
 export function FurnitureAttributeTag({ value }: FurnitureAttributeTagProps) {
 	return (
 		<Container borderWidth={1} borderRadius={12} borderColor={colors.border} paddingX={8} paddingY={2}>
-			<Text fontWeight="black" fontSize={8}>
+			<Text fontSize={8} color={colors.primary}>
 				{value.key}:
 			</Text>
-			<Text fontSize={8}>{value.value}</Text>
+			<Text fontSize={8} color={colors.primary}>
+				{value.value}
+			</Text>
 		</Container>
 	);
 }

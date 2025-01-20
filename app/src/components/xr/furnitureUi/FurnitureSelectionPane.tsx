@@ -39,6 +39,7 @@ function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }
 			borderRadius={10}
 			padding={5}
 			gap={5}
+			width="25%"
 			onClick={() =>
 				addFurniture({
 					furnitureId: furnitureItem.id,
@@ -46,7 +47,7 @@ function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }
 				})
 			}
 		>
-			<Text fontSize={18} fontWeight="black">
+			<Text fontSize={18} color={colors.primary}>
 				{furnitureItem.name}
 			</Text>
 			<Container flexDirection="row" gap={2} flexWrap="wrap">
@@ -54,8 +55,9 @@ function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }
 					<FurnitureAttributeTag key={formatAttribute(attr)} value={attr} />
 				))}
 			</Container>
-			<Container backgroundColor={colors.accent} borderRadius={5} padding={4} height={120}>
-				<Content>
+			<Container flexDirection="column" flexGrow={1} flexShrink={0} backgroundColor={colors.accent} borderRadius={5} padding={4} height={120}>
+				<Content marginY="auto">
+					<ambientLight intensity={0.5} />
 					<FurnitureModel furnitureId={furnitureItem.id} />
 				</Content>
 			</Container>

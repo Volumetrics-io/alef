@@ -20,5 +20,5 @@ catalog:
   '@a-type/auth-fetch': ^1.0.1
   '@react-three/fiber': 8.16.6
   '@react-three/drei': ^9.120.8
-  three: ^0.172.0
+  three: ^0.161.0
   '@types/three': ^0.172.0

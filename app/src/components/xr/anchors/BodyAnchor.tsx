@@ -1,28 +1,28 @@
 import { animated, config, useSpring } from '@react-spring/three';
-import { useFrame } from '@react-three/fiber';
+import { GroupProps, useFrame } from '@react-three/fiber';
 import { useXR } from '@react-three/xr';
-import React, { useEffect, useRef } from 'react';
-import { Vector3 } from 'three';
+import React, { useEffect, useRef, forwardRef } from 'react';
+import { Group, Vector3 } from 'three';
 import { useCameraForward, useCameraOrigin } from '../../../hooks/useCameraOrigin.js';
 import { Billboard } from '../Billboard.js';
+import { useImperativeHandle } from 'react';
 
 const AnimatedGroup = animated('group');
 
-export function BodyAnchor({
+export const BodyAnchor = forwardRef<Group, BodyAnchorProps>(({
 	position = [0, -0.2, -0.8],
 	children,
 	follow = false,
 	lockY = false,
 	distance = 0.2,
-}: {
-	position?: Vector3 | [number, number, number];
-	children: React.ReactNode;
-	lockY?: boolean;
-	distance?: number;
-	follow?: boolean;
-}) {
-	const immersive = useXR((xr) => xr.mode == 'immersive-ar');
+	...groupProps
+}, ref) => {
+	const immersive = useXR((xr) => xr.mode === 'immersive-ar');
 	const isStabilized = useRef(true);
+	const groupRef = useRef<Group>(new Group());
+	const stopped = useRef(false);
+
+	useImperativeHandle(ref, () => groupRef.current);
 
 	// Reset stabilization when entering/exiting immersive mode
 	useEffect(() => {
@@ -30,9 +30,9 @@ export function BodyAnchor({
 		let stabilizationTimer: number;
 		if (immersive) {
 			isStabilized.current = false;
-			stabilizationTimer = setTimeout(() => {
+			stabilizationTimer = window.setTimeout(() => {
 				isStabilized.current = true;
-			}, 100); // Wait 500ms for XR camera to stabilize
+			}, 100); // Wait 100ms for XR camera to stabilize
 		}
 		return () => {
 			if (stabilizationTimer) {
@@ -48,7 +48,7 @@ export function BodyAnchor({
 	const currentPos = new Vector3();
 	const newPos = new Vector3();
 
-	newPos.copy(getForward());
+	newPos.copy(getForward(Array.isArray(position) ? position[2] : position.z));
 	cameraWorldPos.copy(getCameraPos());
 
 	if (lockY && position) {
@@ -61,11 +61,20 @@ export function BodyAnchor({
 		config: config.molasses,
 	}));
 
+	// Sync spring position with groupRef when 'follow' is enabled
+	useEffect(() => {
+		if (follow && groupRef.current) {
+			const { x, y, z } = groupRef.current.position;
+			api.set({ pos: [x, y, z] });
+		}
+	}, [follow, api]);
+
 	useFrame(() => {
-		if (!follow && isStabilized.current) {
+		if (!isStabilized.current) {
 			return;
 		}
-		newPos.copy(getForward());
+		if (!groupRef.current) return;
+		newPos.copy(getForward(Array.isArray(position) ? position[2] : position.z));
 		cameraWorldPos.copy(getCameraPos());
 
 		if (lockY && position) {
@@ -73,18 +82,34 @@ export function BodyAnchor({
 			newPos.y = y + cameraWorldPos.y;
 		}
 
-		currentPos.set(pos.get()[0], pos.get()[1], pos.get()[2]);
+		currentPos.set(groupRef.current.position.x, groupRef.current.position.y, groupRef.current.position.z);
 
-		if (currentPos.distanceTo(newPos) > distance) {
+		if (!stopped.current && currentPos.distanceTo(newPos) > distance) {
 			api.start({
 				pos: [newPos.x, newPos.y, newPos.z],
 			});
 		}
+
+		if (!follow && currentPos.distanceTo(newPos) < distance) {
+			stopped.current = true;
+		} else if (follow && stopped.current) {
+			stopped.current = false;
+		}
+
+
 	});
 
 	return (
-		<AnimatedGroup position={follow ? pos : newPos}>
+		<AnimatedGroup ref={groupRef} position={pos} {...groupProps}>
 			<Billboard>{children}</Billboard>
 		</AnimatedGroup>
 	);
+});
+
+export interface BodyAnchorProps extends GroupProps {
+	position?: Vector3 | [number, number, number];
+	children: React.ReactNode;
+	lockY?: boolean;
+	distance?: number;
+	follow?: boolean;
 }

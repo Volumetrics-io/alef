@@ -1,25 +1,23 @@
 import { Container, Root } from '@react-three/uikit';
 import { Toggle } from '@react-three/uikit-default';
-import { Menu, X } from '@react-three/uikit-lucide';
+import { Menu, X, Sofa, Lamp } from '@react-three/uikit-lucide';
+import { LampDesk } from "@react-three/uikit-lucide"
 import { useState } from 'react';
-
 import { colors } from '@react-three/uikit-default';
-import { BodyAnchor } from './anchors/BodyAnchor.js';
-import { FurnitureSelectionPane } from './furnitureUi/FurnitureSelectionPane.js';
-import { DraggableBodyAnchor } from './anchors/DraggableBodyAnchor.js';
-import { DragController } from './controls/Draggable.js';
+import { FurnitureSelectionPane } from '../furnitureUi/FurnitureSelectionPane';
+import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
+import { DragController } from '../controls/Draggable';
+import { Lighting } from './staging/Lighting';
+import { useStageStore } from '@/stores/stageStore';
 
-export function ControlCenter({ onToggle, children }: { onToggle?: () => void; children?: React.ReactNode }) {
+export function StagerPanel({ onToggle, children }: { onToggle?: () => void; children?: React.ReactNode }) {
+	const { mode, setMode } = useStageStore();
 	const [isOpen, setIsOpen] = useState(false);
 
 	return (
-		<DraggableBodyAnchor follow={!isOpen} position={[0, isOpen ? 0.1 : 0.3, isOpen ? -0.8 : -1]} lockY={true} distance={0.15}>
+		<DraggableBodyAnchor follow={!isOpen} position={[0, isOpen ? -0.1 : -0.3, isOpen ? 0.8 : 0.5]} lockY={true} distance={0.15}>
 			<Root pixelSize={0.001} flexDirection="column" gap={10}>
-				{/* <FontFamilyProvider
-					jetbrainsmono={{
-						normal: 'https://cdn.volu.dev/fonts/fixed-jetbrainsmono.json',
-					}}
-				> */}
+
 				<Container
 					backgroundColor={colors.background}
 					borderColor={colors.border}
@@ -34,6 +32,7 @@ export function ControlCenter({ onToggle, children }: { onToggle?: () => void; c
 				>
 					<Toggle
 						onClick={() => {
+                            setMode(null);
 							setIsOpen(!isOpen);
 							onToggle?.();
 						}}
@@ -41,13 +40,23 @@ export function ControlCenter({ onToggle, children }: { onToggle?: () => void; c
 						{isOpen ? <X color={colors.primary} /> : <Menu color={colors.primary} />}
 					</Toggle>
 					<Container display={isOpen ? 'flex' : 'none'} flexDirection="row" alignItems={'center'} gap={10}>
-						{children}
+						<Toggle onClick={() => setMode('furniture')}>
+							<Sofa color={colors.primary} />
+						</Toggle>
+						<Toggle onClick={() => setMode('lighting')}>
+							<LampDesk color={colors.primary} />
+						</Toggle>
 					</Container>
 				</Container>
-				{/* </FontFamilyProvider> */}
 				{isOpen && (
 					<>
-						<FurnitureSelectionPane />
+                        {mode === 'lighting' && (
+                            <Lighting />
+                        )}
+                        {mode === 'furniture' && (
+                            <FurnitureSelectionPane />
+                        )}
+                        {mode !== null && (
 						<DragController>
 							<Container flexDirection="row" width="50%" gap={10} alignItems="center">
 								<Container
@@ -61,6 +70,7 @@ export function ControlCenter({ onToggle, children }: { onToggle?: () => void; c
 								></Container>
 							</Container>
 						</DragController>
+                        )}
 					</>
 				)}
 			</Root>

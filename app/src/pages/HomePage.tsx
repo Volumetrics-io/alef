@@ -19,6 +19,7 @@ import { RoomLighting } from '@/components/xr/lighting/RoomLighting';
 import { PCFSoftShadowMap } from 'three';
 import { useNavigate } from '@verdant-web/react-router';
 import { useEffect } from 'react';
+import { StagerPanel } from '@/components/xr/panels/StagerPanel';
 
 const HomePage = () => {
 	const geoStore = useGeoStore();
@@ -31,7 +32,7 @@ const HomePage = () => {
 	}, [session?.emailVerifiedAt, navigate]);
 	return (
 		<>
-			<NavBar />
+			{/* <NavBar /> */}
 			<Main full style={{ height: '100vh' }}>
 				<ErrorBoundary>
 					<Canvas
@@ -48,23 +49,13 @@ const HomePage = () => {
 						<PointerEvents />
 						<XR store={xrStore}>
 							<DepthShader />
-							<ControlCenter>
-								<Toggle>
-									<Bed color={colors.primary} />
-								</Toggle>
-								<Toggle>
-									<LampDesk color={colors.primary} />
-								</Toggle>
-								<Toggle>
-									<Baby color={colors.primary} />
-								</Toggle>
-							</ControlCenter>
+							<StagerPanel />
 							<Environment>
 								<RoomLighting />
 								{/* TODO: sun light needs refinement */}
 								{/* <SunLight /> */}
 								{/* <Bedroom /> */}
-								<RoomRenderer />
+								{/* <RoomRenderer /> */}
 							</Environment>
 						</XR>
 					</Canvas>

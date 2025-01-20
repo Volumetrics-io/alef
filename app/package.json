@@ -31,7 +31,7 @@
 		"react-dom": "catalog:",
 		"react-hot-toast": "2.5.1",
 		"suncalc": "^1.9.0",
-		"three": "^0.171.0",
+		"three": "catalog:",
 		"zustand": "^5.0.3"
 	},
 	"devDependencies": {

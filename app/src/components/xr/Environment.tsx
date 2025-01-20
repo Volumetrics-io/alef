@@ -45,7 +45,6 @@ function PhysicalXRPlane({ plane }: { plane: XRPlane }) {
 	});
 
 	const halfExtents = [getSizeOfPolygonDimension(plane.polygon, 'x') / 2, 0.01, getSizeOfPolygonDimension(plane.polygon, 'z') / 2] as [number, number, number];
-	console.log(plane.semanticLabel, halfExtents, plane.polygon);
 
 	return (
 		<XRSpace space={plane.planeSpace}>

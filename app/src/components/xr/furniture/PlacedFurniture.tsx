@@ -1,6 +1,6 @@
-import { useFurniturePlacementFurnitureId } from '@/stores/roomStore';
+import { useFurniturePlacementDrag, useFurniturePlacementFurnitureId } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
-import { PhysicsDraggable } from '../controls/PhysicsDraggable';
+import { RigidBody } from '@react-three/rapier';
 import { FurnitureModel } from './FurnitureModel';
 
 export interface PlacedFurnitureProps {
@@ -9,15 +9,13 @@ export interface PlacedFurnitureProps {
 
 export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) {
 	const furnitureId = useFurniturePlacementFurnitureId(furniturePlacementId);
+	const { handleProps, rigidBodyRef } = useFurniturePlacementDrag(furniturePlacementId);
 
 	return (
-		<PhysicsDraggable
-			onRest={(position) => {
-				// Save the new position
-				// NOTE: This is where we would update the position in the store
-			}}
-		>
-			<FurnitureModel furnitureId={furnitureId} />
-		</PhysicsDraggable>
+		<RigidBody type="kinematicPosition" colliders="cuboid" ref={rigidBodyRef}>
+			<group {...handleProps}>
+				<FurnitureModel furnitureId={furnitureId} />
+			</group>
+		</RigidBody>
 	);
 }

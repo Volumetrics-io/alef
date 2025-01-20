@@ -1,8 +1,9 @@
 import { PlaneLabel } from '@/components/xr/anchors';
 import { id, PrefixedId } from '@alef/common';
-import { KinematicCharacterController, RigidBody, World } from '@dimforge/rapier3d-compat';
-import { ThreeEvent } from '@pmndrs/uikit';
-import { useRapier, vec3 } from '@react-three/rapier';
+import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
+import { KinematicCharacterController, World } from '@dimforge/rapier3d-compat';
+import { ThreeEvent } from '@react-three/fiber';
+import { useRapier } from '@react-three/rapier';
 import * as O from 'optics-ts';
 import { useCallback, useEffect, useRef } from 'react';
 import { Group, Object3D, Vector3 } from 'three';
@@ -96,104 +97,117 @@ export function useSubscribeToPlacementPosition(id: PrefixedId<'fp'>, callback: 
 	);
 }
 
-export function useFurniturePlacementPosition(id: PrefixedId<'fp'>) {
-	const rigidBodyRef = useRef<RigidBody>(null);
+export function useUpdatePlacementPosition(id: PrefixedId<'fp'>) {
+	const set = useRoomStore((s) => s.moveFurniture);
+	return useCallback((position: Vector3) => set(id, position), [id, set]);
+}
+
+export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
+	const updatePosition = useUpdatePlacementPosition(id);
+
 	const groupRef = useRef<Group>(null);
-	const previousPositionRef = useRef<Vector3>(new Vector3());
-	const currentPositionRef = useRef<Vector3>(new Vector3());
-	const deltaRef = useRef<Vector3>(new Vector3());
-	const initialPositionRef = useRef<Vector3>(new Vector3());
-	const isDraggingRef = useRef(false);
-	const moveFurniture = useRoomStore((s) => s.moveFurniture);
+	const rigidBodyRef = useRef<RRigidBody>(null);
+	const isDraggingRef = useRef<boolean>(false);
+	const lastPointerPosition = useRef<Vector3>(new Vector3());
+	const worldPosition = useRef<Vector3>(new Vector3());
 
-	useSubscribeToPlacementPosition(id, (position) => {
-		// avoid clobbering in-progress drag
-		if (isDraggingRef.current) {
-			return;
+	const currentPointerPositionRef = useRef(new Vector3());
+	const deltaRef = useRef(new Vector3());
+
+	const controllerRef = useRef<KinematicCharacterController | null>(null);
+	const { world } = useRapier();
+
+	// initialize controller. use maximally permissive sliding
+	// so that the user can drag the object around along walls and floors
+	// of all angles.
+	useEffect(() => {
+		const controller = world.createCharacterController(0.1);
+		controller.setMaxSlopeClimbAngle(Math.PI * 2);
+		controller.setSlideEnabled(true);
+		controller.disableSnapToGround();
+		controllerRef.current = controller;
+	}, [world]);
+
+	// setup rigid body position subscription. position will not be set
+	// if the user is in the middle of dragging
+	useSubscribeToPlacementPosition(id, (pos) => {
+		if (!isDraggingRef.current) {
+			rigidBodyRef.current?.setNextKinematicTranslation(pos);
 		}
-
-		rigidBodyRef.current?.setTranslation(vec3(position), false);
 	});
 
-	// register the character controller and set up drag handlers. the controller
-	// is accessible by this furniture placement's id if other parts of the app
-	// need to reference it.
-	const { world } = useRapier();
-	const register = useRoomStore((s) => s.registerFurnitureController);
-	const controllerRef = useRef<KinematicCharacterController | null>(null);
-	useEffect(() => {
-		const { controller, cleanup } = register(id, world);
-		controllerRef.current = controller;
-		return () => {
-			cleanup();
-			controllerRef.current = null;
-		};
-	}, [id, world, register]);
+	const handlePointerMove = useCallback((event: ThreeEvent<PointerEvent>) => {
+		/**
+		 * ADAPTATION NOTE
+		 *
+		 * original code converted position to local space of the parent, but
+		 * with the rigidbody we are dealing in the world space of the simulation.
+		 */
 
-	const beginDrag = useCallback((ev: ThreeEvent) => {
-		if (!groupRef.current || !rigidBodyRef.current) {
-			return;
+		if (isDraggingRef.current && lastPointerPosition.current) {
+			if (!groupRef.current || !groupRef.current.parent || !rigidBodyRef.current || !controllerRef.current) {
+				console.log('pointer move early return', {
+					groupRef: groupRef.current,
+					rigidBodyRef: rigidBodyRef.current,
+					controllerRef: controllerRef.current,
+				});
+				return;
+			}
+			const currentPointerPosition = currentPointerPositionRef.current;
+			const delta = deltaRef.current;
+			// @ts-expect-error NOTE: This does exist on the event object
+			currentPointerPosition.copy(event.pointerPosition);
+			delta.subVectors(currentPointerPosition, lastPointerPosition.current);
+			lastPointerPosition.current.copy(currentPointerPosition);
+
+			// copy world position of body into the vector
+			worldPosition.current.copy(rigidBodyRef.current.translation());
+			// Calculate distance from initial position
+			const distanceFromStart = Math.abs(worldPosition.current.distanceTo(currentPointerPosition));
+
+			// Scale factor increases with distance (adjust multiplier as needed)
+			const scaleFactor = 1 + distanceFromStart * 5;
+			delta.multiplyScalar(scaleFactor);
+
+			// calculate corrected delta
+			controllerRef.current.computeColliderMovement(rigidBodyRef.current.collider(0), delta);
+			delta.copy(controllerRef.current.computedMovement());
+			// add the corrected delta
+			worldPosition.current.add(delta);
+			// set the new position of the rigidbody
+			rigidBodyRef.current.setNextKinematicTranslation(worldPosition.current);
 		}
+	}, []);
 
+	const handlePointerUp = useCallback(() => {
+		console.log('pointer up');
+		isDraggingRef.current = false;
+		lastPointerPosition.current.set(0, 0, 0);
+		updatePosition(worldPosition.current);
+	}, [updatePosition]);
+
+	const handlePointerCancel = useCallback(() => {
+		isDraggingRef.current = false;
+		lastPointerPosition.current.set(0, 0, 0);
+	}, []);
+
+	const handlePointerDown = useCallback((event: ThreeEvent<PointerEvent>) => {
 		isDraggingRef.current = true;
-		const pointerPosition = (ev as any).pointerPosition;
-		initialPositionRef.current.copy(pointerPosition);
+		// @ts-expect-error NOTE: This does exist on the event object
+		lastPointerPosition.current.copy(event.pointerPosition);
+		console.log('pointer down');
 		// IDK why TS doesn't see Group as a subclass of Object3D.
-		(groupRef.current as unknown as Object3D).setPointerCapture(ev.pointerId);
+		(groupRef.current as unknown as Object3D).setPointerCapture(event.pointerId);
 	}, []);
 
-	const commitDrag = useCallback(() => {
-		if (!isDraggingRef.current || !rigidBodyRef.current) {
-			console.debug('invalid drag commit');
-			return;
-		}
-		isDraggingRef.current = false;
-		const pos = new Vector3();
-		pos.copy(rigidBodyRef.current.translation());
-		moveFurniture(id, pos);
-		console.debug('drag committed');
-	}, [id, moveFurniture]);
-
-	const translationRef = useRef(new Vector3());
-	const onDrag = useCallback((ev: ThreeEvent) => {
-		if (!groupRef.current || !isDraggingRef.current || !rigidBodyRef.current || !controllerRef.current) {
-			return;
-		}
-
-		const pointerPosition = (ev as any).pointerPosition;
-		currentPositionRef.current.copy(pointerPosition);
-		deltaRef.current.subVectors(currentPositionRef.current, previousPositionRef.current);
-		previousPositionRef.current.copy(currentPositionRef.current);
-		const distanceFromStart = groupRef.current.position.distanceTo(initialPositionRef.current);
-		const scaleFactor = 1 + distanceFromStart * 2;
-		deltaRef.current.multiplyScalar(scaleFactor);
-
-		// using the first (should be only) collider, compute allowed movement
-		// within the scene when we add the delta movement to the current position.
-		const collider = rigidBodyRef.current.collider(0);
-
-		const usePhysics = true;
-		if (usePhysics) {
-			controllerRef.current.computeColliderMovement(collider, vec3(deltaRef.current));
-			const correctedMovement = controllerRef.current.computedMovement();
-			translationRef.current.copy(rigidBodyRef.current.translation());
-			translationRef.current.add(correctedMovement);
-		} else {
-			translationRef.current.copy(groupRef.current.position);
-			translationRef.current.add(deltaRef.current);
-		}
-		rigidBodyRef.current.setNextKinematicTranslation(translationRef.current);
-	}, []);
-
-	const cancelDrag = useCallback(() => {
-		isDraggingRef.current = false;
-		// force body back to original position
-		const placement = useRoomStore.getState().furniture[id];
-		if (placement) {
-			rigidBodyRef.current?.setNextKinematicTranslation(vec3(placement.worldPosition));
-		}
-		console.debug('drag cancelled');
-	}, [id]);
-
-	return { beginDrag, commitDrag, onDrag, groupRef, cancelDrag, rigidBodyRef };
+	return {
+		handleProps: {
+			onPointerMove: handlePointerMove,
+			onPointerUp: handlePointerUp,
+			onPointerCancel: handlePointerCancel,
+			onPointerDown: handlePointerDown,
+			ref: groupRef,
+		},
+		rigidBodyRef,
+	};
 }

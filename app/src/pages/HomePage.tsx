@@ -1,7 +1,6 @@
 import { ErrorBoundary, Main } from '@alef/sys';
 
 import { NavBar } from '@/components/NavBar';
-import { ControlCenter } from '@/components/xr/ControlCenter.tsx';
 import { Environment } from '@/components/xr/Environment';
 import { DepthShader } from '@/components/xr/shaders/DepthShader';
 // import SunLight from '@/components/xr/lighting/SunLight.tsx';
@@ -9,8 +8,6 @@ import { useGeoStore } from '@/stores/geoStore.ts';
 import { xrStore } from '@/stores/xrStore.ts';
 import { reversePainterSortStable } from '@pmndrs/uikit';
 import { Canvas } from '@react-three/fiber';
-import { colors, Toggle } from '@react-three/uikit-default';
-import { Baby, Bed, LampDesk } from '@react-three/uikit-lucide';
 import { noEvents, PointerEvents, XR } from '@react-three/xr';
 
 import { RoomRenderer } from '@/components/xr/room/RoomRenderer';
@@ -32,7 +29,7 @@ const HomePage = () => {
 	}, [session?.emailVerifiedAt, navigate]);
 	return (
 		<>
-			{/* <NavBar /> */}
+			<NavBar />
 			<Main full style={{ height: '100vh' }}>
 				<ErrorBoundary>
 					<Canvas
@@ -55,7 +52,7 @@ const HomePage = () => {
 								{/* TODO: sun light needs refinement */}
 								{/* <SunLight /> */}
 								{/* <Bedroom /> */}
-								{/* <RoomRenderer /> */}
+								<RoomRenderer />
 							</Environment>
 						</XR>
 					</Canvas>

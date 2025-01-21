@@ -59,10 +59,20 @@ export const RoomLighting = () => {
     const {planeMeshes} = useEnvironmentContext();
     const ceilingPlanes = planeMeshes['ceiling'];
     const meshRef = useRef<Mesh>(null);
-    const {lightDetails, setLightDetails} = useLightStore();
+    const {lightDetails, setLightDetails, globalIntensity, globalColor} = useLightStore();
     const {mode} = useStageStore();
     const [editable, setEditable] = useState(mode === 'lighting');
+    const [ intensity, setIntensity] = useState<number>(globalIntensity);
+    const [ color, setColor] = useState<number>(globalColor);
     const {gl} = useThree();
+
+    useEffect(() => {
+        setIntensity(globalIntensity);
+    }, [globalIntensity]);
+
+    useEffect(() => {
+        setColor(globalColor);
+    }, [globalColor]);
 
     useEffect(() => {
         setEditable(mode === 'lighting');
@@ -88,10 +98,10 @@ export const RoomLighting = () => {
         if (!editable) return;
         const light = {
             position: event.point,
-            intensity: 0.8,
-            color: 2.7,
+            // intensity: 0.8,
+            // color: 2.7,
         };
-        lightDetails[Object.keys(lightDetails).length.toString()] = light;
+        lightDetails[new Date().getTime().toString()] = light;
 
         setLightDetails(lightDetails);
     }, [editable]);
@@ -104,10 +114,10 @@ export const RoomLighting = () => {
                 <meshStandardMaterial transparent={true} colorWrite={false}/>
             </mesh>
             <ambientLight intensity={0.1} color={getLightColor(2.7)} />
-            {Object.entries(lightDetails).map(([index, light]) => {
+            {Object.entries(lightDetails).map(([id, light]) => {
                 gl.shadowMap.needsUpdate = true;
                 return (
-                    <CeilingLight key={index} id={index} position={light.position} intensity={light.intensity} color={getLightColor(light.color)} />
+                    <CeilingLight key={id} id={id} position={light.position} intensity={intensity} color={getLightColor(color)} />
                 )
             })}
         </group>

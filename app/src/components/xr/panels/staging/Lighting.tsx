@@ -7,14 +7,15 @@ import { useState } from "react";
 
 export const Lighting = () => {
     const { selectedLightId, lightDetails } = useLightStore();
-    const [light, setLight] = useState<LightDetails | null>(null);
+
+    const [lightID, setLightID] = useState<string | null>(null);
 
     useEffect(() => {
         if (selectedLightId == null) {
-            setLight(null);
+            setLightID(null);
             return;
         }
-        setLight(lightDetails[selectedLightId]);
+        setLightID(selectedLightId);
     }, [selectedLightId]);
 
     return (
@@ -29,37 +30,27 @@ export const Lighting = () => {
 			padding={5}
 			backgroundColor={colors.background}
         >
-            {!light && (
-                <Text color={colors.primary}>place or select a light</Text>
-            )}
-            {light && (
-                <SelectedLightPane id={selectedLightId} />
-            )}
+
+            <SelectedLightPane id={lightID} />
         </Container>
     );
 };
 
-const SelectedLightPane = ( {id}: {id: string} ) => {
+const SelectedLightPane = ( {id}: {id?: string} ) => {
 
-    const { setLightDetails, lightDetails } = useLightStore();
+    const { globalIntensity, globalColor, setGlobalIntensity, setGlobalColor, lightDetails, setLightDetails } = useLightStore();
 
-    const light = lightDetails[id];
-
-    if (!light) {
-        return null;
-    }
 
     const handleIntensityChange = (value: number) => {
-        lightDetails[id].intensity = value;
-        setLightDetails({ ...lightDetails });
+        setGlobalIntensity(value);
     }
 
     const handleWarmthChange = (value: number) => {
-        lightDetails[id].color = value;
-        setLightDetails({ ...lightDetails });
+        setGlobalColor(value);
     }
 
     const handleDelete = () => {
+        if (!id) return;
         delete lightDetails[id];
         setLightDetails({ ...lightDetails });
     }
@@ -73,21 +64,23 @@ const SelectedLightPane = ( {id}: {id: string} ) => {
             padding={20}
         >
             <Container flexDirection="column" gap={20} width="100%">
-                <Container flexDirection="row" gap={10} alignItems="center">
+                <Container flexDirection="column" gap={10}>
                     <Text fontSize={16} fontWeight="bold" color={colors.primary}>Intensity</Text>
-                    <Slider value={light.intensity} min={0} max={2} step={0.01} onValueChange={handleIntensityChange} />
+                    <Slider value={globalIntensity} min={0} max={2} step={0.01} onValueChange={handleIntensityChange} />
                 </Container>
                 <Container flexDirection="column" gap={10} width="100%">
                     <Text fontSize={16} fontWeight="bold" color={colors.primary}>Warmth</Text>
-                    <Slider value={light.color} min={0} max={10} step={0.1} onValueChange={handleWarmthChange} />
+                    <Slider value={globalColor} min={0} max={10} step={0.1} onValueChange={handleWarmthChange} />
                 </Container>
             </Container>
 
-            <Container flexDirection="row" gap={10} alignItems="center">
-                <Button backgroundColor={colors.destructive} onClick={handleDelete}>
-                    <Trash color={colors.destructiveForeground} />
-                </Button>
-            </Container>
+            {id && (
+                <Container flexDirection="row" gap={10} alignItems="center">
+                    <Button backgroundColor={colors.destructive} onClick={handleDelete}>
+                        <Trash color={colors.destructiveForeground} />
+                    </Button>
+                </Container>
+            )}
 
         </Container>
     );

@@ -1,9 +1,12 @@
-import { useFrame, useThree } from '@react-three/fiber';
-import { Group } from 'three';
+import { GroupProps, useFrame, useThree } from '@react-three/fiber';
 import { useRef } from 'react';
-import { Vector3 } from 'three';
+import { Group, Vector3 } from 'three';
 
-export function Billboard({ enabled = true, children }: { enabled?: boolean; children: React.ReactNode }) {
+export interface BillboardProps extends GroupProps {
+	enabled?: boolean;
+}
+
+export function Billboard({ enabled = true, ...rest }: BillboardProps) {
 	const groupRef = useRef<Group>(null);
 	const camera = useThree((state) => state.camera);
 	const cameraWorldPos = new Vector3();
@@ -23,5 +26,5 @@ export function Billboard({ enabled = true, children }: { enabled?: boolean; chi
 		}
 	});
 
-	return <group ref={groupRef}>{children}</group>;
+	return <group ref={groupRef} {...rest} />;
 }

@@ -1,7 +1,7 @@
 import { PlaneLabel } from '@/components/xr/anchors';
 import { id, PrefixedId } from '@alef/common';
 import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
-import { KinematicCharacterController, World } from '@dimforge/rapier3d-compat';
+import { KinematicCharacterController } from '@dimforge/rapier3d-compat';
 import { TransformHandlesProperties } from '@react-three/handle';
 import { useRapier } from '@react-three/rapier';
 import * as O from 'optics-ts';
@@ -24,12 +24,10 @@ export interface FurniturePlacement {
 
 export type RoomStoreState = {
 	furniture: Record<string, FurniturePlacement>;
-	furnitureControllers: Record<string, KinematicCharacterController | null>;
 
 	addFurniture: (init: FurniturePlacement) => void;
 	moveFurniture: (id: PrefixedId<'fp'>, position: Vector3) => void;
-
-	registerFurnitureController: (id: PrefixedId<'fp'>, world: World) => { controller: KinematicCharacterController; cleanup: () => void };
+	deleteFurniture: (id: PrefixedId<'fp'>) => void;
 };
 
 export const useRoomStore = create<RoomStoreState>()(
@@ -38,7 +36,6 @@ export const useRoomStore = create<RoomStoreState>()(
 		subscribeWithSelector((set) => {
 			return {
 				furniture: {},
-				furnitureControllers: {},
 				addFurniture: (init: FurniturePlacement) => {
 					const placementId = id('fp');
 					set(O.modify(O.optic<RoomStoreState>().prop('furniture'))((s) => ({ ...s, [placementId]: init })));
@@ -46,16 +43,13 @@ export const useRoomStore = create<RoomStoreState>()(
 				moveFurniture: (id, position) => {
 					set(O.modify(O.optic<RoomStoreState>().prop('furniture').prop(id).prop('worldPosition'))(() => position));
 				},
-				registerFurnitureController: (id, world) => {
-					const controller = world.createCharacterController(0.1);
-
-					set(O.modify(O.optic<RoomStoreState>().prop('furnitureControllers'))((s) => ({ ...s, [id]: controller })));
-					const cleanup = () => {
-						world.removeCharacterController(controller);
-						controller.free();
-						set(O.modify(O.optic<RoomStoreState>().prop('furnitureControllers'))((s) => ({ ...s, [id]: null })));
-					};
-					return { controller, cleanup };
+				deleteFurniture: (id) => {
+					set(
+						O.modify(O.optic<RoomStoreState>().prop('furniture'))((s) => {
+							const { [id]: _, ...rest } = s;
+							return rest;
+						})
+					);
 				},
 			};
 		}),
@@ -74,6 +68,13 @@ export function useFurniturePlacementIds() {
 
 export function useFurniturePlacement(id: PrefixedId<'fp'>) {
 	return useRoomStore((s) => s.furniture[id]);
+}
+
+export function useDeleteFurniturePlacement(id: PrefixedId<'fp'>) {
+	const deleteFn = useRoomStore((s) => s.deleteFurniture);
+	return useCallback(() => {
+		deleteFn(id);
+	}, [deleteFn, id]);
 }
 
 export function useFurniturePlacementFurnitureId(id: PrefixedId<'fp'>) {

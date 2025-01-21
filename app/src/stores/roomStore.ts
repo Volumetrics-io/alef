@@ -2,14 +2,15 @@ import { PlaneLabel } from '@/components/xr/anchors';
 import { id, PrefixedId } from '@alef/common';
 import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
 import { KinematicCharacterController, World } from '@dimforge/rapier3d-compat';
-import { ThreeEvent } from '@react-three/fiber';
+import { TransformHandlesProperties } from '@react-three/handle';
 import { useRapier } from '@react-three/rapier';
 import * as O from 'optics-ts';
 import { useCallback, useEffect, useRef } from 'react';
-import { Group, Object3D, Vector3 } from 'three';
+import { Object3D, Quaternion, Vector3 } from 'three';
 import { create } from 'zustand';
 import { persist, subscribeWithSelector } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
+import { useEditorStore } from './editorStore';
 
 export interface FurniturePlacement {
 	furnitureId: PrefixedId<'f'>;
@@ -102,17 +103,19 @@ export function useUpdatePlacementPosition(id: PrefixedId<'fp'>) {
 	return useCallback((position: Vector3) => set(id, position), [id, set]);
 }
 
-export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
-	const updatePosition = useUpdatePlacementPosition(id);
+type HandleState = Parameters<NonNullable<TransformHandlesProperties['apply']>>[0];
 
-	const groupRef = useRef<Group>(null);
+export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 	const rigidBodyRef = useRef<RRigidBody>(null);
 	const isDraggingRef = useRef<boolean>(false);
-	const lastPointerPosition = useRef<Vector3>(new Vector3());
-	const worldPosition = useRef<Vector3>(new Vector3());
+	const updatePosition = useUpdatePlacementPosition(id);
+	const deltaRef = useRef<Vector3>(new Vector3());
+	const translationRef = useRef<Vector3>(new Vector3());
+	const rotationRef = useRef<Quaternion>(new Quaternion());
+	const rotationDeltaRef = useRef<Quaternion>(new Quaternion());
+	const prevRotationRef = useRef<Quaternion>(new Quaternion());
 
-	const currentPointerPositionRef = useRef(new Vector3());
-	const deltaRef = useRef(new Vector3());
+	const selectedFurniturePlacementId = useEditorStore((s) => s.selectedFurniturePlacementId);
 
 	const controllerRef = useRef<KinematicCharacterController | null>(null);
 	const { world } = useRapier();
@@ -132,81 +135,66 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 	// if the user is in the middle of dragging
 	useSubscribeToPlacementPosition(id, (pos) => {
 		if (!isDraggingRef.current) {
+			console.log('update position', pos);
 			rigidBodyRef.current?.setNextKinematicTranslation(pos);
 		}
 	});
 
-	const handlePointerMove = useCallback((event: ThreeEvent<PointerEvent>) => {
-		/**
-		 * ADAPTATION NOTE
-		 *
-		 * original code converted position to local space of the parent, but
-		 * with the rigidbody we are dealing in the world space of the simulation.
-		 */
+	const apply = useCallback(
+		(state: HandleState, _target: Object3D) => {
+			// don't bother if dependencies aren't ready
+			if (!rigidBodyRef.current || !controllerRef.current) return;
+			const body = rigidBodyRef.current;
+			const controller = controllerRef.current;
+			const collider = body.collider(0);
 
-		if (isDraggingRef.current && lastPointerPosition.current) {
-			if (!groupRef.current || !groupRef.current.parent || !rigidBodyRef.current || !controllerRef.current) {
-				console.log('pointer move early return', {
-					groupRef: groupRef.current,
-					rigidBodyRef: rigidBodyRef.current,
-					controllerRef: controllerRef.current,
-				});
-				return;
+			// set flag to prevent external updates to position
+			if (state.first) {
+				isDraggingRef.current = true;
+				console.debug('start dragging');
 			}
-			const currentPointerPosition = currentPointerPositionRef.current;
-			const delta = deltaRef.current;
-			// @ts-expect-error NOTE: This does exist on the event object
-			currentPointerPosition.copy(event.pointerPosition);
-			delta.subVectors(currentPointerPosition, lastPointerPosition.current);
-			lastPointerPosition.current.copy(currentPointerPosition);
 
-			// copy world position of body into the vector
-			worldPosition.current.copy(rigidBodyRef.current.translation());
-			// Calculate distance from initial position
-			const distanceFromStart = Math.abs(worldPosition.current.distanceTo(currentPointerPosition));
+			// if a delta is available, apply it to the kinematic controller, and then
+			// use the computed movement to update the rigid body.
+			if (state.delta && state.previous) {
+				deltaRef.current.subVectors(state.current.position, state.previous.position || state.current.position);
+				controller.computeColliderMovement(collider, deltaRef.current);
+				// TODO: won't be necessary once https://github.com/pmndrs/xr/issues/383 is fixed
+				translationRef.current.copy(body.translation());
+				translationRef.current.add(controller.computedMovement());
+				body.setNextKinematicTranslation(translationRef.current);
 
-			// Scale factor increases with distance (adjust multiplier as needed)
-			const scaleFactor = 1 + distanceFromStart * 5;
-			delta.multiplyScalar(scaleFactor);
+				// apply rotation
 
-			// calculate corrected delta
-			controllerRef.current.computeColliderMovement(rigidBodyRef.current.collider(0), delta);
-			delta.copy(controllerRef.current.computedMovement());
-			// add the corrected delta
-			worldPosition.current.add(delta);
-			// set the new position of the rigidbody
-			rigidBodyRef.current.setNextKinematicTranslation(worldPosition.current);
-		}
-	}, []);
+				// TODO: won't be necessary once https://github.com/pmndrs/xr/issues/383 is fixed
+				rotationRef.current.copy(body.rotation());
+				prevRotationRef.current.setFromEuler(state.previous.rotation);
+				rotationDeltaRef.current.setFromEuler(state.current.rotation).invert().premultiply(prevRotationRef.current).invert();
 
-	const handlePointerUp = useCallback(() => {
-		console.log('pointer up');
-		isDraggingRef.current = false;
-		lastPointerPosition.current.set(0, 0, 0);
-		updatePosition(worldPosition.current);
-	}, [updatePosition]);
+				// apply rotation to the controller
+				rotationRef.current.premultiply(rotationDeltaRef.current);
+				body.setNextKinematicRotation(rotationRef.current);
+			}
 
-	const handlePointerCancel = useCallback(() => {
-		isDraggingRef.current = false;
-		lastPointerPosition.current.set(0, 0, 0);
-	}, []);
-
-	const handlePointerDown = useCallback((event: ThreeEvent<PointerEvent>) => {
-		isDraggingRef.current = true;
-		// @ts-expect-error NOTE: This does exist on the event object
-		lastPointerPosition.current.copy(event.pointerPosition);
-		console.log('pointer down');
-		// IDK why TS doesn't see Group as a subclass of Object3D.
-		(groupRef.current as unknown as Object3D).setPointerCapture(event.pointerId);
-	}, []);
+			// clear flag when dragging is done and update the position in the store
+			if (state.last) {
+				// allocation isn't so bad since this happens once per gesture.
+				const finalPosition = new Vector3().copy(body.translation());
+				console.debug('end dragging', finalPosition);
+				isDraggingRef.current = false;
+				updatePosition(finalPosition);
+			}
+		},
+		[updatePosition]
+	);
 
 	return {
 		handleProps: {
-			onPointerMove: handlePointerMove,
-			onPointerUp: handlePointerUp,
-			onPointerCancel: handlePointerCancel,
-			onPointerDown: handlePointerDown,
-			ref: groupRef,
+			apply,
+			scale: false,
+			rotate: { x: false, y: true, z: false },
+			// only enable controls when selected
+			enabled: selectedFurniturePlacementId === id,
 		},
 		rigidBodyRef,
 	};

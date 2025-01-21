@@ -8,6 +8,7 @@ export default defineConfig({
 		alias: {
 			'@': '/src',
 		},
+		dedupe: ['@react-three/fiber', 'three'],
 	},
 	server: {
 		port: 4200,

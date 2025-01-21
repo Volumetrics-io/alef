@@ -11,11 +11,12 @@ import { reversePainterSortStable } from '@pmndrs/uikit';
 import { Canvas } from '@react-three/fiber';
 import { colors, Toggle } from '@react-three/uikit-default';
 import { Baby, Bed, LampDesk } from '@react-three/uikit-lucide';
-import { noEvents, PointerEvents, XR } from '@react-three/xr';
+import { noEvents, NotInXR, PointerEvents, XR } from '@react-three/xr';
 
 import { RoomLighting } from '@/components/xr/lighting/RoomLighting';
 import { RoomRenderer } from '@/components/xr/room/RoomRenderer';
 import { useMe } from '@/services/publicApi/userHooks';
+import { OrbitHandles } from '@react-three/handle';
 import { Physics } from '@react-three/rapier';
 import { useNavigate } from '@verdant-web/react-router';
 import { useEffect } from 'react';
@@ -45,10 +46,14 @@ const HomePage = () => {
 							state.gl.shadowMap.type = PCFSoftShadowMap;
 						}}
 						shadows={true}
+						camera={{ position: [-0.5, 0.5, 0.5] }}
 					>
-						<Physics debug>
-							<PointerEvents />
-							<XR store={xrStore}>
+						<XR store={xrStore}>
+							<Physics debug>
+								<NotInXR>
+									<OrbitHandles damping />
+								</NotInXR>
+								<PointerEvents />
 								<DepthShader />
 								<ControlCenter>
 									<Toggle>
@@ -61,6 +66,7 @@ const HomePage = () => {
 										<Baby color={colors.primary} />
 									</Toggle>
 								</ControlCenter>
+
 								<Environment>
 									<RoomLighting />
 									{/* TODO: sun light needs refinement */}
@@ -68,8 +74,8 @@ const HomePage = () => {
 									{/* <Bedroom /> */}
 									<RoomRenderer />
 								</Environment>
-							</XR>
-						</Physics>
+							</Physics>
+						</XR>
 					</Canvas>
 				</ErrorBoundary>
 			</Main>

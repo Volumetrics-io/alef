@@ -17,7 +17,7 @@ export interface PlacedFurnitureProps {
 
 export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) {
 	const furnitureId = useFurniturePlacementFurnitureId(furniturePlacementId);
-	const { handleProps, rigidBodyRef } = useFurniturePlacementDrag(furniturePlacementId);
+	const { handleProps, rigidBodyProps } = useFurniturePlacementDrag(furniturePlacementId);
 	const select = useEditorStore((s) => s.select);
 
 	const handleClick = useCallback(() => {
@@ -26,7 +26,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	const groupRef = useVibrateOnHover();
 
 	return (
-		<RigidBody type="kinematicPosition" colliders="cuboid" ref={rigidBodyRef}>
+		<RigidBody {...rigidBodyProps}>
 			<group onClick={handleClick} ref={groupRef}>
 				<PivotHandles {...handleProps}>
 					<FurnitureModel furnitureId={furnitureId} />
@@ -48,7 +48,7 @@ function DeleteUI({ furniturePlacementId }: { furniturePlacementId: PrefixedId<'
 
 	return (
 		<Billboard position={[0, 1, 0]}>
-			<Root pixelSize={0.001}>
+			<Root pixelSize={0.005}>
 				<Container padding={2} backgroundColor={colors.destructive} borderRadius={5} onClick={handleDelete}>
 					<Trash />
 				</Container>

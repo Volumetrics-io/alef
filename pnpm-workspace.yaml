@@ -18,7 +18,7 @@ catalog:
   '@a-type/utils': 1.1.4
   '@hono/zod-validator': ^0.4.2
   '@a-type/auth-fetch': ^1.0.1
-  '@react-three/fiber': 8.16.6
-  '@react-three/drei': ^9.120.8
+  '@react-three/fiber': 8.17.12
+  '@react-three/drei': ^9.121.3
   three: ^0.161.0
   '@types/three': ^0.172.0

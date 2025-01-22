@@ -1,8 +1,7 @@
-import { Vector3, Group } from 'three';
-import React, { useState, createContext, useContext, useCallback } from 'react';
 import { ThreeEvent } from '@react-three/fiber';
-import { useRef } from 'react';
-import { Container } from '@react-three/uikit';
+import { Container, ContainerRef } from '@react-three/uikit';
+import React, { createContext, useCallback, useContext, useRef, useState } from 'react';
+import { Group, Object3D, Vector3 } from 'three';
 
 // Create a context for the drag controls
 export interface DragContextType {
@@ -13,7 +12,7 @@ export interface DragContextType {
 
 export const DragContext = createContext<DragContextType | null>(null);
 
-export function Draggable({ fixed, children }: { fixed?: boolean, children: React.ReactNode }) {
+export function Draggable({ fixed, children }: { fixed?: boolean; children: React.ReactNode }) {
 	const groupRef = useRef<Group>(null);
 	const [isDragging, setIsDragging] = useState(false);
 	const lastPointerPosition = useRef<Vector3>(new Vector3());
@@ -37,9 +36,9 @@ export function Draggable({ fixed, children }: { fixed?: boolean, children: Reac
 				const scaleFactor = 1 + distanceFromStart * 2;
 				delta.current.multiplyScalar(scaleFactor);
 
-                if (fixed) {
-                    delta.current.setY(0);
-                }
+				if (fixed) {
+					delta.current.setY(0);
+				}
 
 				groupRef.current.position.add(delta.current);
 			}
@@ -73,6 +72,7 @@ export function Draggable({ fixed, children }: { fixed?: boolean, children: Reac
 
 export function DragController({ children }: { children: React.ReactNode }) {
 	const context = useContext(DragContext);
+	const ref = useRef<ContainerRef>(null);
 
 	if (!context) {
 		throw new Error('DragController must be used within a Draggable component');
@@ -82,10 +82,17 @@ export function DragController({ children }: { children: React.ReactNode }) {
 		context.setIsDragging(true);
 		// @ts-expect-error NOTE: This does exist on the event object
 		context.setInitialPosition(event.pointerPosition);
+
+		// pointer capture helps keep this handle active as the user moves
+		const container = ref.current;
+		if (container && (container as unknown as Object3D).setPointerCapture) {
+			// @ts-expect-error NOTE: This does exist on the event object
+			(container as Object3D).setPointerCapture(event.pointerId);
+		}
 	};
 
 	return (
-		<Container onPointerDown={handlePointerDown} padding={10} paddingBottom={30} width="100%" justifyContent="center" alignItems="center">
+		<Container ref={ref} onPointerDown={handlePointerDown} padding={10} paddingBottom={30} width="100%" justifyContent="center" alignItems="center">
 			{children}
 		</Container>
 	);

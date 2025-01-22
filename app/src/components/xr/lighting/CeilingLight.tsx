@@ -1,21 +1,20 @@
 import { useLightStore } from '@/stores/lightStore';
 import { useStageStore } from '@/stores/stageStore';
-import { SpotLightProps, ThreeEvent } from '@react-three/fiber';
-import { useCallback, useRef } from 'react';
+import { Handle, HandleOptions } from '@react-three/handle';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Group, Vector3 } from 'three';
+import { getLightColor } from './getLightColor';
 
-export const CeilingLight = ({ id, ...props }: { id: string } & Omit<SpotLightProps, 'id'>) => {
+export const CeilingLight = ({ id, ...props }: { id: string }) => {
 	const { selectedLightId, setSelectedLightId, hoveredLightId, setHoveredLightId, setLightPosition } = useLightStore();
 	const { mode } = useStageStore();
 	const editable = mode === 'lighting';
 	const selected = selectedLightId === id;
 	const hovered = hoveredLightId === id;
+	const globalIntensity = useLightStore((s) => s.globalIntensity);
+	const globalColor = useLightStore((s) => s.globalColor);
 
-	const dragRef = useRef<boolean>(false);
 	const groupRef = useRef<Group>(null);
-	const lastPointerPosition = useRef<Vector3>(new Vector3());
-	const currentPointerPosition = useRef<Vector3>(new Vector3());
-	const delta = useRef<Vector3>(new Vector3());
 
 	const handleClick = () => {
 		if (!editable) return;
@@ -32,79 +31,64 @@ export const CeilingLight = ({ id, ...props }: { id: string } & Omit<SpotLightPr
 		setHoveredLightId(null);
 	}, [editable, setHoveredLightId]);
 
-	const handlePointerDown = useCallback(
-		(event: ThreeEvent<PointerEvent>) => {
-			if (!editable) return;
-			dragRef.current = true;
-			lastPointerPosition.current.copy(event.point);
-		},
-		[editable]
-	);
-
-	const handlePointerUp = useCallback(() => {
-		if (!editable) return;
-		dragRef.current = false;
-		lastPointerPosition.current.set(0, 0, 0);
-	}, [editable]);
-
-	const hasPosition = !!props.position;
-	const handlePointerMove = useCallback(
-		(event: ThreeEvent<PointerEvent>) => {
-			if (!hasPosition) return;
-			if (!groupRef.current) return;
-			if (dragRef.current) {
-				currentPointerPosition.current.copy(event.point);
-				delta.current.subVectors(currentPointerPosition.current, lastPointerPosition.current);
-				lastPointerPosition.current.copy(currentPointerPosition.current);
-				const distanceFromStart = groupRef.current.position.distanceTo(currentPointerPosition.current);
-
-				const scaleFactor = 1 + distanceFromStart * 0.5;
-				delta.current.multiplyScalar(scaleFactor);
-				delta.current.y = 0;
-				groupRef.current.position.add(delta.current);
-				setLightPosition(id, groupRef.current.position);
+	const positionRef = useRef<Vector3>(new Vector3());
+	const applyMovement = useMemo<HandleOptions<unknown>['apply']>(
+		() => (state) => {
+			positionRef.current.copy(state.current.position);
+			const currentY = useLightStore.getState().lightDetails[id]?.position?.y;
+			// make extra sure the light can't leave the plane
+			if (currentY !== undefined) {
+				positionRef.current.setY(currentY);
 			}
+			setLightPosition(id, positionRef.current);
 		},
-		[id, hasPosition, setLightPosition]
+		[setLightPosition, id]
 	);
+
+	// subscribe to position changes
+	useEffect(() => {
+		return useLightStore.subscribe(
+			(s) => s.lightDetails[id].position,
+			(position) => {
+				if (position) {
+					groupRef.current?.position.copy(position);
+				}
+			}
+		);
+	});
 
 	return (
-		<group
-			ref={groupRef}
-			position={props.position}
-			onPointerDown={handlePointerDown}
-			onPointerUp={handlePointerUp}
-			onPointerLeave={handlePointerUp}
-			onPointerMove={handlePointerMove}
-		>
-			{editable && (
-				<group>
-					<mesh position={[0, -0.01, 0]} visible={hovered || selected} rotation={[Math.PI / 2, 0, 0]}>
-						<ringGeometry args={[0.125, 0.16, 32]} />
-						<meshBasicMaterial color="white" />
-					</mesh>
-					<mesh onClick={handleClick} onPointerOver={handleHover} onPointerOut={handleHoverLeave}>
-						<sphereGeometry args={[0.1, 32, 32]} />
-						<meshBasicMaterial color={props.color} transparent={true} opacity={props.intensity} />
-					</mesh>
-				</group>
-			)}
-			<spotLight
-				castShadow={true}
-				shadow-mapSize-width={2048}
-				shadow-mapSize-height={2048}
-				shadow-camera-far={10}
-				shadow-bias={0.000008}
-				shadow-normalBias={0.013}
-				angle={Math.PI / 2.5} // 60 degrees spread
-				penumbra={0.2} // Soft edges
-				decay={0.5} // Physical light falloff
-				distance={20} // Maximum range
-				position={[0, 0, 0]}
-				intensity={props.intensity} // Compensate for directional nature
-				color={props.color}
-				{...props}
-			/>
-		</group>
+		<Handle apply={applyMovement} translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
+			<group ref={groupRef}>
+				{editable && (
+					<group>
+						<mesh position={[0, -0.01, 0]} visible={hovered || selected} rotation={[Math.PI / 2, 0, 0]}>
+							<ringGeometry args={[0.125, 0.16, 32]} />
+							<meshBasicMaterial color="white" />
+						</mesh>
+						<mesh onClick={handleClick} onPointerOver={handleHover} onPointerOut={handleHoverLeave}>
+							<sphereGeometry args={[0.1, 32, 32]} />
+							<meshBasicMaterial color={getLightColor(globalColor)} transparent={true} opacity={globalIntensity} />
+						</mesh>
+					</group>
+				)}
+				<spotLight
+					castShadow={true}
+					shadow-mapSize-width={2048}
+					shadow-mapSize-height={2048}
+					shadow-camera-far={10}
+					shadow-bias={0.000008}
+					shadow-normalBias={0.013}
+					angle={Math.PI / 2.5} // 60 degrees spread
+					penumbra={0.2} // Soft edges
+					decay={0.5} // Physical light falloff
+					distance={20} // Maximum range
+					position={[0, 0, 0]}
+					intensity={globalIntensity} // Compensate for directional nature
+					color={getLightColor(globalColor)}
+					{...props}
+				/>
+			</group>
+		</Handle>
 	);
 };

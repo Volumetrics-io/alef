@@ -58,7 +58,6 @@ const HomePage = () => {
 									<RoomLighting />
 									{/* TODO: sun light needs refinement */}
 									{/* <SunLight /> */}
-									{/* <Bedroom /> */}
 									<RoomRenderer />
 								</Environment>
 							</Physics>

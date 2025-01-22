@@ -30,7 +30,7 @@ export function handleError(reason: unknown): Response {
 			status: 400,
 			headers: {
 				'Content-Type': 'application/json',
-				'x-long-game-error': AlefError.Code.BadRequest.toString(),
+				'x-alef-error': AlefError.Code.BadRequest.toString(),
 			},
 		});
 	}
@@ -40,7 +40,7 @@ export function handleError(reason: unknown): Response {
 		status: 500,
 		headers: {
 			'Content-Type': 'text/plain',
-			'x-long-game-error': AlefError.Code.InternalServerError.toString(),
+			'x-alef-error': AlefError.Code.InternalServerError.toString(),
 		},
 	});
 }

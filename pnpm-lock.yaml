@@ -171,6 +171,12 @@ importers:
       '@alef/sys':
         specifier: workspace:*
         version: link:../packages/sys
+      '@dimforge/rapier3d-compat':
+        specifier: ^0.14.0
+        version: 0.14.0
+      '@pmndrs/pointer-events':
+        specifier: ^6.5.1
+        version: 6.5.1
       '@pmndrs/uikit':
         specifier: ^0.8.5
         version: 0.8.5(three@0.161.0)
@@ -186,6 +192,12 @@ importers:
       '@react-three/fiber':
         specifier: 'catalog:'
         version: 8.16.6(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0)
+      '@react-three/handle':
+        specifier: ^6.5.1
+        version: 6.5.1(@react-three/fiber@8.16.6(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0))(@types/react@18.3.18)(react@18.3.1)(three@0.161.0)
+      '@react-three/rapier':
+        specifier: ^1.5.0
+        version: 1.5.0(@react-three/fiber@8.16.6(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0))(react@18.3.1)(three@0.161.0)
       '@react-three/uikit':
         specifier: ^0.8.5
         version: 0.8.5(@react-three/fiber@8.16.6(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0))(@types/react@18.3.18)(react@18.3.1)(three@0.161.0)
@@ -196,8 +208,8 @@ importers:
         specifier: ^0.8.5
         version: 0.8.5(@react-three/fiber@8.16.6(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0))(@types/react@18.3.18)(react@18.3.1)(three@0.161.0)
       '@react-three/xr':
-        specifier: ^6.4.12
-        version: 6.4.12(@react-three/fiber@8.16.6(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0)
+        specifier: ^6.5.1
+        version: 6.5.1(@react-three/fiber@8.16.6(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0)
       '@tanstack/react-query':
         specifier: 5.62.15
         version: 5.62.15(react@18.3.1)
@@ -747,6 +759,9 @@ packages:
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
     engines: {node: '>=12'}
+
+  '@dimforge/rapier3d-compat@0.14.0':
+    resolution: {integrity: sha512-/uHrUzS+CRQ+NQrrJCEDUkhwHlNsAAexbNXgbN9sHY+GwR+SFFAFrxRr8Llf5/AJZzqiLANdQIfJ63Cw4gJVqw==}
 
   '@emotion/is-prop-valid@1.2.2':
     resolution: {integrity: sha512-uNsoYd37AFmaCdXlg6EYD1KaPOaRWRByMCYzbKUX4+hhMfrxdVSelShywL4JVaAeM/eHUOSprYBQls+/neX3pw==}
@@ -1304,19 +1319,22 @@ packages:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
 
+  '@pmndrs/handle@6.5.1':
+    resolution: {integrity: sha512-1d7ZUwEpSHGWcnE4LRTTU2OpHb7vg2NTcfdQJd/eRf9He1Afvms6kkl8hPVRisVpXSCGoYbwlJ4ZqYlNd7Ef5A==}
+
   '@pmndrs/msdfonts@0.8.5':
     resolution: {integrity: sha512-2UOD6oz5beaK+5ZoqvPC5rG0DKovcBvFsnhmkJer/Vd9DGs/2xF4PAM4s1FAvVKw0p9kuQ+ht1+u54KK4Yd+zQ==}
 
-  '@pmndrs/pointer-events@6.4.12':
-    resolution: {integrity: sha512-lBWekNl5ZWxAkg8U/TN3/Pwtv+6Pu6/1S1QDKzsrHgxaEbetATtGR8BbvaAFtr5vfxmdgeB2Aep/uDTVmqwYTQ==}
+  '@pmndrs/pointer-events@6.5.1':
+    resolution: {integrity: sha512-/5Tll4PgUFR8GCeDDZaUmoH4gLHXKl1OhAoqLTSkqEtgYnk3mc0Px5YntsGz4ilKsDqpVITy/+Kt2lzTp4CdTQ==}
 
   '@pmndrs/uikit@0.8.5':
     resolution: {integrity: sha512-MYaZablGHDZe/Z+eXV8q1geiwEvuCpDjFjQBwQVjRuIq4fEhM5KmbQD2SyfMrplMeusx8O5ew5bAW8sYPH2Xmw==}
     peerDependencies:
       three: '>=0.160'
 
-  '@pmndrs/xr@6.4.12':
-    resolution: {integrity: sha512-PgNTj8eDrkbY53JmKfLb6mCtRI7C+rleRHlqP4XSq2uudCv7g12boTqklWmR1lMNFJ/DvrBW6YLk9IPsEn6aMA==}
+  '@pmndrs/xr@6.5.1':
+    resolution: {integrity: sha512-sn4oeWNkXWTETmrQ0AikNdSFz0j/eZm6w91/WYtLYpTHQypbk/5eJVdxXRsoTg0BW9KU4inQlE9kF0GZgP8cpw==}
     peerDependencies:
       three: '*'
 
@@ -1804,6 +1822,20 @@ packages:
       react-native:
         optional: true
 
+  '@react-three/handle@6.5.1':
+    resolution: {integrity: sha512-nN01XT+6kcbf9FBcZvPtl4tBlfEUbGRMKfKXS7ZjOu1nTz3isQfGtFN50ax5Jf1SqKTUE/XvuTWrcyQXEzl2Bw==}
+    peerDependencies:
+      '@react-three/fiber': '>=8'
+      react: '>=18'
+      three: '*'
+
+  '@react-three/rapier@1.5.0':
+    resolution: {integrity: sha512-gylk2KyCer9EoymFyTyc+g2IqyAq4mTbZgaHoSJi6gHoXlJsC2LVeN4jedvegvjUsXPExdE60wHjCPa+DS4iXw==}
+    peerDependencies:
+      '@react-three/fiber': '>=8.9.0'
+      react: '>=18.0.0'
+      three: '>=0.139.0'
+
   '@react-three/uikit-default@0.8.5':
     resolution: {integrity: sha512-ytkYNJtJg/VaVvIf+wZROApLdiP6Jq2I3KWMl4GetjAi0BJL5y6y9nAFc1HBnFxoFnlwEKhMt/3IhaUijvUyzw==}
 
@@ -1817,8 +1849,8 @@ packages:
       '@react-three/fiber': '>=8'
       react: '>=18'
 
-  '@react-three/xr@6.4.12':
-    resolution: {integrity: sha512-B6jHxg2S47Qe38RpnBG4r4gtfi8ZwyaRdCK22adT0j9K7E33IEQBIBbIEIIWssysvHBbnBrFMMPlCljSky5neg==}
+  '@react-three/xr@6.5.1':
+    resolution: {integrity: sha512-CLuKsujpfq8yLJLfokdYjfpE5g2MIWJ9XDAkIVlLfMVESJJOraD7elt8TcbXpquFW9qq6afUgAimE6neTZ/sSg==}
     peerDependencies:
       '@react-three/fiber': '>=8'
       react: '>=18'
@@ -4779,6 +4811,7 @@ packages:
   wrangler@3.101.0:
     resolution: {integrity: sha512-zKRqL/jjyF54DH8YCCaF4B2x0v9kSdxLpNkxGDltZ17vCBbq9PCchooN25jbmxOTC2LWdB2LVDw7S66zdl7XuQ==}
     engines: {node: '>=16.17.0'}
+    deprecated: Downgrade to 3.99.0
     hasBin: true
     peerDependencies:
       '@cloudflare/workers-types': ^4.20241230.0
@@ -5625,6 +5658,8 @@ snapshots:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
 
+  '@dimforge/rapier3d-compat@0.14.0': {}
+
   '@emotion/is-prop-valid@1.2.2':
     dependencies:
       '@emotion/memoize': 0.8.1
@@ -6028,9 +6063,18 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
+  '@pmndrs/handle@6.5.1(@types/react@18.3.18)(react@18.3.1)':
+    dependencies:
+      '@pmndrs/pointer-events': 6.5.1
+      zustand: 4.5.5(@types/react@18.3.18)(react@18.3.1)
+    transitivePeerDependencies:
+      - '@types/react'
+      - immer
+      - react
+
   '@pmndrs/msdfonts@0.8.5': {}
 
-  '@pmndrs/pointer-events@6.4.12': {}
+  '@pmndrs/pointer-events@6.5.1': {}
 
   '@pmndrs/uikit@0.8.5(three@0.161.0)':
     dependencies:
@@ -6044,10 +6088,10 @@ snapshots:
     transitivePeerDependencies:
       - ts-node
 
-  '@pmndrs/xr@6.4.12(@types/react@18.3.18)(react@18.3.1)(three@0.161.0)':
+  '@pmndrs/xr@6.5.1(@types/react@18.3.18)(react@18.3.1)(three@0.161.0)':
     dependencies:
       '@iwer/devui': 0.2.1(iwer@1.0.4)
-      '@pmndrs/pointer-events': 6.4.12
+      '@pmndrs/pointer-events': 6.5.1
       iwer: 1.0.4
       meshline: 3.3.1(three@0.161.0)
       three: 0.161.0
@@ -6650,6 +6694,27 @@ snapshots:
     transitivePeerDependencies:
       - '@types/react'
 
+  '@react-three/handle@6.5.1(@react-three/fiber@8.16.6(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0))(@types/react@18.3.18)(react@18.3.1)(three@0.161.0)':
+    dependencies:
+      '@pmndrs/handle': 6.5.1(@types/react@18.3.18)(react@18.3.1)
+      '@pmndrs/pointer-events': 6.5.1
+      '@react-three/fiber': 8.16.6(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0)
+      react: 18.3.1
+      three: 0.161.0
+      zustand: 4.5.5(@types/react@18.3.18)(react@18.3.1)
+    transitivePeerDependencies:
+      - '@types/react'
+      - immer
+
+  '@react-three/rapier@1.5.0(@react-three/fiber@8.16.6(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0))(react@18.3.1)(three@0.161.0)':
+    dependencies:
+      '@dimforge/rapier3d-compat': 0.14.0
+      '@react-three/fiber': 8.16.6(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0)
+      react: 18.3.1
+      suspend-react: 0.1.3(react@18.3.1)
+      three: 0.161.0
+      three-stdlib: 2.35.7(three@0.161.0)
+
   '@react-three/uikit-default@0.8.5(@react-three/fiber@8.16.6(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0))(@types/react@18.3.18)(react@18.3.1)(three@0.161.0)':
     dependencies:
       '@react-three/uikit': 0.8.5(@react-three/fiber@8.16.6(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0))(@types/react@18.3.18)(react@18.3.1)(three@0.161.0)
@@ -6693,10 +6758,10 @@ snapshots:
       - three
       - ts-node
 
-  '@react-three/xr@6.4.12(@react-three/fiber@8.16.6(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0)':
+  '@react-three/xr@6.5.1(@react-three/fiber@8.16.6(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0)':
     dependencies:
-      '@pmndrs/pointer-events': 6.4.12
-      '@pmndrs/xr': 6.4.12(@types/react@18.3.18)(react@18.3.1)(three@0.161.0)
+      '@pmndrs/pointer-events': 6.5.1
+      '@pmndrs/xr': 6.5.1(@types/react@18.3.18)(react@18.3.1)(three@0.161.0)
       '@react-three/fiber': 8.16.6(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(three@0.161.0)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)

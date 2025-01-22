@@ -1,12 +1,16 @@
 import { PlaneLabel } from '@/components/xr/anchors';
 import { id, PrefixedId } from '@alef/common';
-import { ThreeEvent } from '@pmndrs/uikit';
+import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
+import { KinematicCharacterController } from '@dimforge/rapier3d-compat';
+import { TransformHandlesProperties } from '@react-three/handle';
+import { useRapier } from '@react-three/rapier';
 import * as O from 'optics-ts';
-import { useCallback, useRef } from 'react';
-import { Group, Object3D, Vector3 } from 'three';
+import { useCallback, useEffect, useRef } from 'react';
+import { Object3D, Quaternion, Vector3 } from 'three';
 import { create } from 'zustand';
 import { persist, subscribeWithSelector } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
+import { useEditorStore } from './editorStore';
 
 export interface FurniturePlacement {
 	furnitureId: PrefixedId<'f'>;
@@ -23,6 +27,7 @@ export type RoomStoreState = {
 
 	addFurniture: (init: FurniturePlacement) => void;
 	moveFurniture: (id: PrefixedId<'fp'>, position: Vector3) => void;
+	deleteFurniture: (id: PrefixedId<'fp'>) => void;
 };
 
 export const useRoomStore = create<RoomStoreState>()(
@@ -37,6 +42,14 @@ export const useRoomStore = create<RoomStoreState>()(
 				},
 				moveFurniture: (id, position) => {
 					set(O.modify(O.optic<RoomStoreState>().prop('furniture').prop(id).prop('worldPosition'))(() => position));
+				},
+				deleteFurniture: (id) => {
+					set(
+						O.modify(O.optic<RoomStoreState>().prop('furniture'))((s) => {
+							const { [id]: _, ...rest } = s;
+							return rest;
+						})
+					);
 				},
 			};
 		}),
@@ -55,6 +68,13 @@ export function useFurniturePlacementIds() {
 
 export function useFurniturePlacement(id: PrefixedId<'fp'>) {
 	return useRoomStore((s) => s.furniture[id]);
+}
+
+export function useDeleteFurniturePlacement(id: PrefixedId<'fp'>) {
+	const deleteFn = useRoomStore((s) => s.deleteFurniture);
+	return useCallback(() => {
+		deleteFn(id);
+	}, [deleteFn, id]);
 }
 
 export function useFurniturePlacementFurnitureId(id: PrefixedId<'fp'>) {
@@ -79,53 +99,104 @@ export function useSubscribeToPlacementPosition(id: PrefixedId<'fp'>, callback: 
 	);
 }
 
-export function useFurniturePlacementPosition(id: PrefixedId<'fp'>) {
-	const groupRef = useRef<Group>(null);
-	const initialPositionRef = useRef<Vector3>(new Vector3());
-	const isDraggingRef = useRef(false);
-	const moveFurniture = useRoomStore((s) => s.moveFurniture);
+export function useUpdatePlacementPosition(id: PrefixedId<'fp'>) {
+	const set = useRoomStore((s) => s.moveFurniture);
+	return useCallback((position: Vector3) => set(id, position), [id, set]);
+}
 
-	useSubscribeToPlacementPosition(id, (position) => {
-		// avoid clobbering in-progress drag
-		if (isDraggingRef.current) {
-			return;
+type HandleState = Parameters<NonNullable<TransformHandlesProperties['apply']>>[0];
+
+export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
+	const rigidBodyRef = useRef<RRigidBody>(null);
+	const isDraggingRef = useRef<boolean>(false);
+	const updatePosition = useUpdatePlacementPosition(id);
+	const deltaRef = useRef<Vector3>(new Vector3());
+	const translationRef = useRef<Vector3>(new Vector3());
+	const rotationRef = useRef<Quaternion>(new Quaternion());
+	const rotationDeltaRef = useRef<Quaternion>(new Quaternion());
+	const prevRotationRef = useRef<Quaternion>(new Quaternion());
+
+	const selectedFurniturePlacementId = useEditorStore((s) => s.selectedFurniturePlacementId);
+
+	const controllerRef = useRef<KinematicCharacterController | null>(null);
+	const { world } = useRapier();
+
+	// initialize controller. use maximally permissive sliding
+	// so that the user can drag the object around along walls and floors
+	// of all angles.
+	useEffect(() => {
+		const controller = world.createCharacterController(0.1);
+		controller.setMaxSlopeClimbAngle(Math.PI * 2);
+		controller.setSlideEnabled(true);
+		controller.disableSnapToGround();
+		controllerRef.current = controller;
+	}, [world]);
+
+	// setup rigid body position subscription. position will not be set
+	// if the user is in the middle of dragging
+	useSubscribeToPlacementPosition(id, (pos) => {
+		if (!isDraggingRef.current) {
+			console.log('update position', pos);
+			rigidBodyRef.current?.setNextKinematicTranslation(pos);
 		}
-
-		groupRef.current?.position.copy(position);
 	});
 
-	const beginDrag = useCallback((ev: ThreeEvent) => {
-		if (!groupRef.current) {
-			return;
-		}
+	const apply = useCallback(
+		(state: HandleState, _target: Object3D) => {
+			// don't bother if dependencies aren't ready
+			if (!rigidBodyRef.current || !controllerRef.current) return;
+			const body = rigidBodyRef.current;
+			const controller = controllerRef.current;
+			const collider = body.collider(0);
 
-		isDraggingRef.current = true;
-		initialPositionRef.current.copy(groupRef.current.position);
-		// IDK why TS doesn't see Group as a subclass of Object3D.
-		(groupRef.current as unknown as Object3D).setPointerCapture(ev.pointerId);
-	}, []);
+			// set flag to prevent external updates to position
+			if (state.first) {
+				isDraggingRef.current = true;
+				console.debug('start dragging');
+			}
 
-	const commitDrag = useCallback(() => {
-		if (!isDraggingRef.current || !groupRef.current) {
-			return;
-		}
-		isDraggingRef.current = false;
-		initialPositionRef.current.set(0, 0, 0);
-		moveFurniture(id, groupRef.current.position);
-	}, [id, moveFurniture]);
+			// if a delta is available, apply it to the kinematic controller, and then
+			// use the computed movement to update the rigid body.
+			if (state.delta && state.previous) {
+				deltaRef.current.subVectors(state.current.position, state.previous.position || state.current.position);
+				controller.computeColliderMovement(collider, deltaRef.current);
+				// TODO: won't be necessary once https://github.com/pmndrs/xr/issues/383 is fixed
+				translationRef.current.copy(body.translation());
+				translationRef.current.add(controller.computedMovement());
+				body.setNextKinematicTranslation(translationRef.current);
 
-	const onDrag = useCallback((ev: ThreeEvent) => {
-		if (!groupRef.current || !isDraggingRef.current) {
-			return;
-		}
+				// apply rotation
 
-		groupRef.current.position.copy(ev.point);
-	}, []);
+				// TODO: won't be necessary once https://github.com/pmndrs/xr/issues/383 is fixed
+				rotationRef.current.copy(body.rotation());
+				prevRotationRef.current.setFromEuler(state.previous.rotation);
+				rotationDeltaRef.current.setFromEuler(state.current.rotation).invert().premultiply(prevRotationRef.current).invert();
 
-	const cancelDrag = useCallback(() => {
-		isDraggingRef.current = false;
-		groupRef.current?.position.copy(initialPositionRef.current);
-	}, []);
+				// apply rotation to the controller
+				rotationRef.current.premultiply(rotationDeltaRef.current);
+				body.setNextKinematicRotation(rotationRef.current);
+			}
 
-	return { beginDrag, commitDrag, onDrag, groupRef, cancelDrag };
+			// clear flag when dragging is done and update the position in the store
+			if (state.last) {
+				// allocation isn't so bad since this happens once per gesture.
+				const finalPosition = new Vector3().copy(body.translation());
+				console.debug('end dragging', finalPosition);
+				isDraggingRef.current = false;
+				updatePosition(finalPosition);
+			}
+		},
+		[updatePosition]
+	);
+
+	return {
+		handleProps: {
+			apply,
+			scale: false,
+			rotate: { x: false, y: true, z: false },
+			// only enable controls when selected
+			enabled: selectedFurniturePlacementId === id,
+		},
+		rigidBodyRef,
+	};
 }

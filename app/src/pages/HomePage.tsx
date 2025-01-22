@@ -8,15 +8,17 @@ import { useGeoStore } from '@/stores/geoStore.ts';
 import { xrStore } from '@/stores/xrStore.ts';
 import { reversePainterSortStable } from '@pmndrs/uikit';
 import { Canvas } from '@react-three/fiber';
-import { noEvents, PointerEvents, XR } from '@react-three/xr';
+import { noEvents, NotInXR, PointerEvents, XR } from '@react-three/xr';
 
+import { RoomLighting } from '@/components/xr/lighting/RoomLighting';
+import { StagerPanel } from '@/components/xr/panels/StagerPanel';
 import { RoomRenderer } from '@/components/xr/room/RoomRenderer';
 import { useMe } from '@/services/publicApi/userHooks';
-import { RoomLighting } from '@/components/xr/lighting/RoomLighting';
-import { PCFSoftShadowMap } from 'three';
+import { OrbitHandles } from '@react-three/handle';
+import { Physics } from '@react-three/rapier';
 import { useNavigate } from '@verdant-web/react-router';
 import { useEffect } from 'react';
-import { StagerPanel } from '@/components/xr/panels/StagerPanel';
+import { PCFSoftShadowMap } from 'three';
 
 const HomePage = () => {
 	const geoStore = useGeoStore();
@@ -42,18 +44,24 @@ const HomePage = () => {
 							state.gl.shadowMap.type = PCFSoftShadowMap;
 						}}
 						shadows={true}
+						camera={{ position: [-0.5, 0.5, 0.5] }}
 					>
-						<PointerEvents />
 						<XR store={xrStore}>
-							<DepthShader />
-							<StagerPanel />
-							<Environment>
-								<RoomLighting />
-								{/* TODO: sun light needs refinement */}
-								{/* <SunLight /> */}
-								{/* <Bedroom /> */}
-								<RoomRenderer />
-							</Environment>
+							<Physics debug>
+								<NotInXR>
+									<OrbitHandles damping />
+								</NotInXR>
+								<PointerEvents />
+								<DepthShader />
+								<StagerPanel />
+								<Environment>
+									<RoomLighting />
+									{/* TODO: sun light needs refinement */}
+									{/* <SunLight /> */}
+									{/* <Bedroom /> */}
+									<RoomRenderer />
+								</Environment>
+							</Physics>
 						</XR>
 					</Canvas>
 				</ErrorBoundary>
@@ -78,7 +86,7 @@ const HomePage = () => {
 					xrStore.enterAR();
 					geoStore.fetchLocation();
 				}}
-				>
+			>
 				Enter AR
 			</button>
 		</>

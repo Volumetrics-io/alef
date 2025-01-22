@@ -1,4 +1,4 @@
-import { LightDetails, useLightStore } from "@/stores/lightStore";
+import { useLightStore } from "@/stores/lightStore";
 import { Container, Text } from "@react-three/uikit"
 import { Button, colors, Slider } from "@react-three/uikit-default";
 import { Trash } from "@react-three/uikit-lucide";
@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import { useState } from "react";
 
 export const Lighting = () => {
-    const { selectedLightId, lightDetails } = useLightStore();
+    const { selectedLightId } = useLightStore();
 
     const [lightID, setLightID] = useState<string | null>(null);
 

@@ -2,9 +2,8 @@ import { PlaneLabel } from '@/components/xr/anchors';
 import { id, PrefixedId } from '@alef/common';
 import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
 import { KinematicCharacterController } from '@dimforge/rapier3d-compat';
-import { useFrame } from '@react-three/fiber';
 import { PivotHandlesProperties, TransformHandlesProperties } from '@react-three/handle';
-import { RigidBodyProps, useRapier } from '@react-three/rapier';
+import { RigidBodyProps, useBeforePhysicsStep, useRapier } from '@react-three/rapier';
 import * as O from 'optics-ts';
 import { RefObject, useCallback, useEffect, useRef } from 'react';
 import { Euler, Object3D, Quaternion, Vector3 } from 'three';
@@ -216,7 +215,7 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 			handleStateRef.current.angular.setFromQuaternion(rotationDeltaRef.current, 'XYZ');
 
 			// TODO: won't be necessary once https://github.com/pmndrs/xr/issues/383 is fixed
-			deltaRef.current.subVectors(state.current.position, state.previous.position || state.current.position);
+			deltaRef.current.subVectors(state.current.position, state.previous.position);
 			controller.computeColliderMovement(collider, deltaRef.current);
 			handleStateRef.current.linear.copy(controller.computedMovement());
 			// since handles rotate with the object, we have to apply the object's rotation
@@ -227,11 +226,12 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 		// clear flag when dragging is done and update the position in the store
 		if (state.last) {
 			isDraggingRef.current = false;
+			// can't actually commit yet, have to wait for frame update below
 			handleStateRef.current.commitNow = true;
 		}
 	}, []);
 
-	useFrame((_s, dt) => {
+	useBeforePhysicsStep(({ timestep: dt }) => {
 		const { linear, angular, commitNow: committed } = handleStateRef.current;
 		if (rigidBodyRef.current) {
 			const body = rigidBodyRef.current;

@@ -1,5 +1,5 @@
 import { animated, config, useSpring } from '@react-spring/three';
-import { Billboard } from '@react-three/drei';
+import { Billboard, ScreenSpace } from '@react-three/drei';
 import { GroupProps, useFrame } from '@react-three/fiber';
 import { useXR } from '@react-three/xr';
 import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
@@ -8,7 +8,24 @@ import { useCameraForward, useCameraOrigin } from '../../../hooks/useCameraOrigi
 
 const AnimatedGroup = animated('group');
 
-export const BodyAnchor = forwardRef<Group, BodyAnchorProps>(({ position = [0, -0.2, -0.8], children, follow = false, lockY = false, distance = 0.2, ...groupProps }, ref) => {
+export interface BodyAnchorProps extends GroupProps {
+	position?: Vector3 | [number, number, number];
+	children: React.ReactNode;
+	lockY?: boolean;
+	distance?: number;
+	follow?: boolean;
+}
+
+export const BodyAnchor = forwardRef<Group, BodyAnchorProps>(function BodyAnchor(props, ref) {
+	const isInXR = useXR((s) => !!s.session);
+
+	if (isInXR) {
+		return <XRBodyAnchor ref={ref} {...props} />;
+	}
+	return <TwoDBodyAnchor ref={ref} {...props} />;
+});
+
+const XRBodyAnchor = forwardRef<Group, BodyAnchorProps>(({ position = [0, -0.2, -0.8], children, follow = false, lockY = false, distance = 0.2, ...groupProps }, ref) => {
 	const immersive = useXR((xr) => xr.mode === 'immersive-ar');
 	const isStabilized = useRef(true);
 	const groupRef = useRef<Group>(new Group());
@@ -96,10 +113,12 @@ export const BodyAnchor = forwardRef<Group, BodyAnchorProps>(({ position = [0, -
 	);
 });
 
-export interface BodyAnchorProps extends GroupProps {
-	position?: Vector3 | [number, number, number];
-	children: React.ReactNode;
-	lockY?: boolean;
-	distance?: number;
-	follow?: boolean;
-}
+const TwoDBodyAnchor = forwardRef<Group, BodyAnchorProps>(({ position = [0, -0.2, -0.8], children, ...groupProps }, ref) => {
+	return (
+		<ScreenSpace depth={1} {...groupProps} ref={ref}>
+			<Billboard scale={0.5} position={position}>
+				{children}
+			</Billboard>
+		</ScreenSpace>
+	);
+});

@@ -1,9 +1,10 @@
 import { PlaneLabel } from '@/components/xr/anchors';
+import { isXRPlaneUserData } from '@/physics/xrPlaneUserData';
 import { id, PrefixedId } from '@alef/common';
 import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
 import { KinematicCharacterController } from '@dimforge/rapier3d-compat';
-import { PivotHandlesProperties, TransformHandlesProperties } from '@react-three/handle';
-import { RigidBodyProps, useBeforePhysicsStep, useRapier } from '@react-three/rapier';
+import { HandleOptions, TransformHandlesProperties } from '@react-three/handle';
+import { IntersectionEnterPayload, IntersectionExitPayload, RigidBodyProps, useBeforePhysicsStep, useRapier } from '@react-three/rapier';
 import * as O from 'optics-ts';
 import { RefObject, useCallback, useEffect, useRef } from 'react';
 import { Euler, Object3D, Quaternion, Vector3 } from 'three';
@@ -161,6 +162,8 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 	const rotationDeltaRef = useRef<Quaternion>(new Quaternion());
 
 	const selectedFurniturePlacementId = useEditorStore((s) => s.selectedFurniturePlacementId);
+	const updateIntersectionEnter = useEditorStore((s) => s.onIntersectionEnter);
+	const updateIntersectionExit = useEditorStore((s) => s.onIntersectionExit);
 
 	const controllerRef = useRef<KinematicCharacterController | null>(null);
 	const { world } = useRapier();
@@ -256,20 +259,42 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 		angular.set(0, 0, 0);
 	});
 
+	const onIntersectionEnter = useCallback(
+		(intersection: IntersectionEnterPayload) => {
+			const userData = intersection.rigidBody?.userData;
+			if (isXRPlaneUserData(userData)) {
+				console.log('intersection enter', userData.plane);
+				updateIntersectionEnter(id, userData.plane);
+			}
+		},
+		[id, updateIntersectionEnter]
+	);
+
+	const onIntersectionExit = useCallback(
+		(intersection: IntersectionExitPayload) => {
+			const userData = intersection.rigidBody?.userData;
+			if (isXRPlaneUserData(userData)) {
+				console.log('intersection exit', userData.plane);
+				updateIntersectionExit(id, userData.plane);
+			}
+		},
+		[id, updateIntersectionExit]
+	);
+
 	return {
 		handleProps: {
 			apply,
 			scale: false,
-			rotation: { x: false, y: true, z: false } as any,
-			// only enable controls when selected
-			enabled: selectedFurniturePlacementId === id,
-		} satisfies PivotHandlesProperties,
+			rotate: { x: false, y: true, z: false } as any,
+		} satisfies HandleOptions<unknown>,
 		rigidBodyProps: {
 			ref: rigidBodyRef,
 			type: 'kinematicVelocity' as const,
 			colliders: 'cuboid' as const,
 			linearDamping: 0,
 			angularDamping: 0,
+			onIntersectionEnter,
+			onIntersectionExit,
 		} satisfies RigidBodyProps & { ref: RefObject<RRigidBody> },
 	};
 }

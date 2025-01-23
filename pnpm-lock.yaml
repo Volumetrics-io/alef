@@ -175,8 +175,8 @@ importers:
         specifier: ^0.14.0
         version: 0.14.0
       '@pmndrs/pointer-events':
-        specifier: ^6.5.1
-        version: 6.5.1
+        specifier: ^6.5.2
+        version: 6.5.2
       '@pmndrs/uikit':
         specifier: ^0.8.5
         version: 0.8.5(three@0.161.0)
@@ -1324,9 +1324,6 @@ packages:
 
   '@pmndrs/msdfonts@0.8.5':
     resolution: {integrity: sha512-2UOD6oz5beaK+5ZoqvPC5rG0DKovcBvFsnhmkJer/Vd9DGs/2xF4PAM4s1FAvVKw0p9kuQ+ht1+u54KK4Yd+zQ==}
-
-  '@pmndrs/pointer-events@6.5.1':
-    resolution: {integrity: sha512-/5Tll4PgUFR8GCeDDZaUmoH4gLHXKl1OhAoqLTSkqEtgYnk3mc0Px5YntsGz4ilKsDqpVITy/+Kt2lzTp4CdTQ==}
 
   '@pmndrs/pointer-events@6.5.2':
     resolution: {integrity: sha512-KLCeQnvFfwCrUN6nnBwJNyDy9cDDBNvT1GC6WI1xajflrkxp2JC+kHZ9xUkInV+ZGxKOKJgLu9qZhwzFji9k4Q==}
@@ -6073,8 +6070,6 @@ snapshots:
       - react
 
   '@pmndrs/msdfonts@0.8.5': {}
-
-  '@pmndrs/pointer-events@6.5.1': {}
 
   '@pmndrs/pointer-events@6.5.2': {}
 

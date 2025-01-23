@@ -14,7 +14,7 @@
 		"@alef/services": "workspace:*",
 		"@alef/sys": "workspace:*",
 		"@dimforge/rapier3d-compat": "^0.14.0",
-		"@pmndrs/pointer-events": "^6.5.1",
+		"@pmndrs/pointer-events": "^6.5.2",
 		"@pmndrs/uikit": "^0.8.5",
 		"@preact/signals-react": "^3.0.1",
 		"@react-spring/three": "^9.7.5",

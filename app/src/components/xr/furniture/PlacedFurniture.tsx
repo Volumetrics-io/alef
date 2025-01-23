@@ -2,7 +2,7 @@ import { useVibrateOnHover } from '@/hooks/useVibrateOnHover';
 import { useEditorStore } from '@/stores/editorStore';
 import { useDeleteFurniturePlacement, useFurniturePlacementDrag, useFurniturePlacementFurnitureId } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
-import { PivotHandles } from '@react-three/handle';
+import { Handle } from '@react-three/handle';
 import { RigidBody } from '@react-three/rapier';
 import { Container, Root } from '@react-three/uikit';
 import { colors } from '@react-three/uikit-default';
@@ -19,6 +19,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	const furnitureId = useFurniturePlacementFurnitureId(furniturePlacementId);
 	const { handleProps, rigidBodyProps } = useFurniturePlacementDrag(furniturePlacementId);
 	const select = useEditorStore((s) => s.select);
+	const selected = useEditorStore((s) => s.selectedFurniturePlacementId === furniturePlacementId);
 
 	const handleClick = useCallback(() => {
 		select(furniturePlacementId);
@@ -28,9 +29,13 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	return (
 		<RigidBody {...rigidBodyProps}>
 			<group onClick={handleClick} ref={groupRef}>
-				<PivotHandles {...handleProps}>
+				{selected ? (
+					<Handle {...handleProps}>
+						<FurnitureModel furnitureId={furnitureId} outline={selected} />
+					</Handle>
+				) : (
 					<FurnitureModel furnitureId={furnitureId} />
-				</PivotHandles>
+				)}
 				<DeleteUI furniturePlacementId={furniturePlacementId} />
 			</group>
 		</RigidBody>

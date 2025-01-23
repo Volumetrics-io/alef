@@ -45,11 +45,22 @@ function PhysicalXRPlane({ plane }: { plane: XRPlane }) {
 	});
 
 	const halfExtents = [getSizeOfPolygonDimension(plane.polygon, 'x') / 2, 0.01, getSizeOfPolygonDimension(plane.polygon, 'z') / 2] as [number, number, number];
+	const sensorHalfExtents = [halfExtents[0], 0.1, halfExtents[2]] as [number, number, number];
 
 	return (
 		<XRSpace space={plane.planeSpace}>
-			<RigidBody type="fixed" colliders={false} ref={bodyRef}>
+			<RigidBody
+				type="fixed"
+				colliders={false}
+				ref={bodyRef}
+				userData={{
+					type: 'XRPlane',
+					plane,
+				}}
+			>
 				<CuboidCollider args={halfExtents} />
+				{/* A larger Sensor allows us to detect when furniture is close to the wall */}
+				<CuboidCollider args={sensorHalfExtents} />
 			</RigidBody>
 			<XRPlaneModel renderOrder={-1} plane={plane} receiveShadow={true}>
 				<shadowMaterial ref={shadowMaterialRef} side={DoubleSide} shadowSide={DoubleSide} transparent={true} opacity={0} />

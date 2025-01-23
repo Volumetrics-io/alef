@@ -1,0 +1,12 @@
+{
+	"recommendations": [
+		"dbaeumer.vscode-eslint",
+		"christian-kohler.npm-intellisense",
+		"codeandstuff.package-json-upgrade",
+		"antfu.pnpm-catalog-lens",
+		"chavyleung.vscode-pnpm-verlens",
+		"streetsidesoftware.code-spell-checker",
+		"wayou.vscode-todo-highlight",
+		"iulian-radu-at.find-unused-exports"
+	]
+}

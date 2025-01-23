@@ -3,13 +3,13 @@ import { useVibrateOnHover } from '@/hooks/useVibrateOnHover';
 import { useEditorStore } from '@/stores/editorStore';
 import { useDeleteFurniturePlacement, useFurniturePlacementDrag, useFurniturePlacementFurnitureId } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
+import { Billboard } from '@react-three/drei';
 import { Handle } from '@react-three/handle';
 import { RigidBody, RoundCuboidCollider } from '@react-three/rapier';
 import { Container, Root } from '@react-three/uikit';
 import { colors } from '@react-three/uikit-default';
 import { Trash } from '@react-three/uikit-lucide';
 import { useCallback } from 'react';
-import { Billboard } from '../Billboard';
 import { FurnitureModel } from './FurnitureModel';
 
 export interface PlacedFurnitureProps {
@@ -41,7 +41,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 				) : (
 					<FurnitureModel furnitureId={furnitureId} ref={modelRef} />
 				)}
-				{selected && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + 0.2} />}
+				{selected && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + center.y + 0.2} />}
 			</group>
 		</RigidBody>
 	);

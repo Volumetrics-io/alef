@@ -1,6 +1,6 @@
-import { Container } from '@react-three/uikit';
-import { Slider, Input } from '@react-three/uikit-default';
 import { useSignal } from '@preact/signals-react';
+import { Container } from '@react-three/uikit';
+import { Input, Slider } from '@react-three/uikit-default';
 
 export function InputSlider({ value, min, max, step, onChange = () => {} }: { value: number; min: number; max: number; step: number; onChange: (value: number) => void }) {
 	const sliderValue = useSignal(value);

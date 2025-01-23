@@ -1,9 +1,9 @@
+import { Billboard } from '@react-three/drei';
 import { ThreeElements } from '@react-three/fiber';
 import { Container, Root } from '@react-three/uikit';
 import { colors } from '@react-three/uikit-default';
 import { X } from '@react-three/uikit-lucide';
 import { useState } from 'react';
-import { Billboard } from './Billboard.js';
 import { DragController, Draggable } from './controls/Draggable.tsx';
 
 type GroupProps = ThreeElements['group'];
@@ -18,7 +18,7 @@ export function Panel({ open = true, onToggle, children, ...props }: { open?: bo
 	return (
 		<Draggable>
 			<group {...props}>
-				<Billboard enabled={isDragging}>
+				<Billboard follow={isDragging}>
 					<Root
 						pixelSize={0.001}
 						flexDirection="column"

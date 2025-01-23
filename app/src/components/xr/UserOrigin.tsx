@@ -9,8 +9,8 @@ export function UserOrigin() {
 
 	const origin: Vector3 = useMemo(() => {
 		if (!session) return new Vector3(0, 0, 0);
-		let result = new Vector3();
-		let direction = new Vector3();
+		const result = new Vector3();
+		const direction = new Vector3();
 		camera.getWorldPosition(result);
 		result.y *= -1;
 		camera.getWorldDirection(direction);

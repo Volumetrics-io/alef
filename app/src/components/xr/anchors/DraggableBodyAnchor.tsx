@@ -1,14 +1,11 @@
-import { useCallback, useState, useRef, forwardRef } from "react";
-import { DragContext } from "../controls/Draggable";
-import { BodyAnchor, BodyAnchorProps } from "./BodyAnchor";
-import { Group, Vector3 } from "three";
-import { ThreeEvent } from "@react-three/fiber";
+import { ThreeEvent } from '@react-three/fiber';
+import { forwardRef, useCallback, useRef, useState } from 'react';
+import { Group, Vector3 } from 'three';
+import { DragContext } from '../controls/Draggable';
+import { BodyAnchor, BodyAnchorProps } from './BodyAnchor';
 
-export const DraggableBodyAnchor = forwardRef<THREE.Group, BodyAnchorProps>(({
-	children,
-	...props
-}, ref) => {
-    const groupRef = useRef<Group>(null);
+export const DraggableBodyAnchor = forwardRef<Group, BodyAnchorProps>(({ children, ...props }, ref) => {
+	const groupRef = useRef<Group>(null);
 	const [isDragging, setIsDragging] = useState(false);
 	const lastPointerPosition = useRef<Vector3>(new Vector3());
 
@@ -53,10 +50,7 @@ export const DraggableBodyAnchor = forwardRef<THREE.Group, BodyAnchorProps>(({
 				},
 			}}
 		>
-			<BodyAnchor ref={groupRef} {...props}
-                        onPointerMove={handlePointerMove} 
-                        onPointerUp={handlePointerUp} 
-                        onPointerLeave={handlePointerUp}>
+			<BodyAnchor ref={groupRef} {...props} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerLeave={handlePointerUp}>
 				{children}
 			</BodyAnchor>
 		</DragContext.Provider>

@@ -1,22 +1,14 @@
 import { animated, config, useSpring } from '@react-spring/three';
+import { Billboard } from '@react-three/drei';
 import { GroupProps, useFrame } from '@react-three/fiber';
 import { useXR } from '@react-three/xr';
-import React, { useEffect, useRef, forwardRef } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { Group, Vector3 } from 'three';
 import { useCameraForward, useCameraOrigin } from '../../../hooks/useCameraOrigin.js';
-import { Billboard } from '../Billboard.js';
-import { useImperativeHandle } from 'react';
 
 const AnimatedGroup = animated('group');
 
-export const BodyAnchor = forwardRef<Group, BodyAnchorProps>(({
-	position = [0, -0.2, -0.8],
-	children,
-	follow = false,
-	lockY = false,
-	distance = 0.2,
-	...groupProps
-}, ref) => {
+export const BodyAnchor = forwardRef<Group, BodyAnchorProps>(({ position = [0, -0.2, -0.8], children, follow = false, lockY = false, distance = 0.2, ...groupProps }, ref) => {
 	const immersive = useXR((xr) => xr.mode === 'immersive-ar');
 	const isStabilized = useRef(true);
 	const groupRef = useRef<Group>(new Group());
@@ -95,8 +87,6 @@ export const BodyAnchor = forwardRef<Group, BodyAnchorProps>(({
 		} else if (follow && stopped.current) {
 			stopped.current = false;
 		}
-
-
 	});
 
 	return (

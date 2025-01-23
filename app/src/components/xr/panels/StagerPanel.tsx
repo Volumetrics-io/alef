@@ -1,7 +1,8 @@
+import { useRescanRoom } from '@/hooks/useRescanRoom';
 import { useStageStore } from '@/stores/stageStore';
 import { Container, Root } from '@react-three/uikit';
 import { colors, Toggle } from '@react-three/uikit-default';
-import { LampDesk, Menu, Sofa, X } from '@react-three/uikit-lucide';
+import { BoxIcon, LampDesk, Menu, Sofa, X } from '@react-three/uikit-lucide';
 import { useState } from 'react';
 import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
 import { DragController } from '../controls/Draggable';
@@ -11,6 +12,8 @@ import { Lighting } from './staging/Lighting';
 export function StagerPanel({ onToggle, children }: { onToggle?: () => void; children?: React.ReactNode }) {
 	const { mode, setMode } = useStageStore();
 	const [isOpen, setIsOpen] = useState(false);
+
+	const { canRescan, rescanRoom } = useRescanRoom();
 
 	return (
 		<DraggableBodyAnchor follow={!isOpen} position={[0, isOpen ? -0.1 : -0.3, isOpen ? 0.8 : 0.5]} lockY={true} distance={0.15}>
@@ -43,6 +46,11 @@ export function StagerPanel({ onToggle, children }: { onToggle?: () => void; chi
 						<Toggle onClick={() => setMode('lighting')}>
 							<LampDesk color={colors.primary} />
 						</Toggle>
+						{canRescan && (
+							<Toggle onClick={() => rescanRoom()}>
+								<BoxIcon color={colors.primary} />
+							</Toggle>
+						)}
 					</Container>
 				</Container>
 				{isOpen && (

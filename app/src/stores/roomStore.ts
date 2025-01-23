@@ -4,10 +4,10 @@ import { id, PrefixedId } from '@alef/common';
 import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
 import { KinematicCharacterController } from '@dimforge/rapier3d-compat';
 import { HandleOptions, TransformHandlesProperties } from '@react-three/handle';
-import { IntersectionEnterPayload, IntersectionExitPayload, RigidBodyProps, useBeforePhysicsStep, useRapier } from '@react-three/rapier';
+import { IntersectionEnterPayload, IntersectionExitPayload, RigidBodyProps, useRapier } from '@react-three/rapier';
 import * as O from 'optics-ts';
 import { RefObject, useCallback, useEffect, useRef } from 'react';
-import { Euler, Object3D, Quaternion, Vector3 } from 'three';
+import { Object3D, Quaternion, Vector3 } from 'three';
 import { create } from 'zustand';
 import { persist, subscribeWithSelector } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
@@ -84,6 +84,8 @@ export const useRoomStore = create<RoomStoreState>()(
 	)
 );
 
+(window as any).roomStore = useRoomStore;
+
 export function useFurniturePlacementIds() {
 	return useRoomStore(useShallow((s) => Object.keys(s.furniture) as PrefixedId<'fp'>[]));
 }
@@ -158,10 +160,7 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 	const rigidBodyRef = useRef<RRigidBody>(null);
 	const isDraggingRef = useRef<boolean>(false);
 	const updatePosition = useUpdateFurniturePlacementTransform(id);
-	const deltaRef = useRef<Vector3>(new Vector3());
-	const rotationDeltaRef = useRef<Quaternion>(new Quaternion());
 
-	const selectedFurniturePlacementId = useEditorStore((s) => s.selectedFurniturePlacementId);
 	const updateIntersectionEnter = useEditorStore((s) => s.onIntersectionEnter);
 	const updateIntersectionExit = useEditorStore((s) => s.onIntersectionExit);
 
@@ -194,70 +193,66 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 		}
 	});
 
-	const handleStateRef = useRef<{ linear: Vector3; angular: Euler; commitNow: boolean }>({ linear: new Vector3(), angular: new Euler(), commitNow: false });
+	/**
+	 * Big grab bag of allocated state vars for use during gesture handling
+	 */
+	const handleStateRef = useRef<{ translation: Vector3; rotation: Quaternion; rotationDelta: Quaternion; translationDelta: Vector3 }>({
+		translation: new Vector3(),
+		rotation: new Quaternion(),
+		rotationDelta: new Quaternion(),
+		translationDelta: new Vector3(),
+	});
 
-	const apply = useCallback((state: HandleState, _target: Object3D) => {
-		// don't bother if dependencies aren't ready
-		if (!rigidBodyRef.current || !controllerRef.current) return;
-		const body = rigidBodyRef.current;
-		const controller = controllerRef.current;
-		const collider = body.collider(0);
-
-		// set flag to prevent external updates to position
-		if (state.first) {
-			isDraggingRef.current = true;
-			console.debug('start dragging');
-		}
-
-		// if a delta is available, apply it to the kinematic controller, and then
-		// use the computed movement to update the rigid body.
-		if (state.delta && state.previous) {
-			// get the diff TODO: won't be necessary once https://github.com/pmndrs/xr/issues/383 is fixed
-			rotationDeltaRef.current.copy(state.previous.quaternion);
-			rotationDeltaRef.current.invert().premultiply(state.current.quaternion);
-			handleStateRef.current.angular.setFromQuaternion(rotationDeltaRef.current, 'XYZ');
-
-			// TODO: won't be necessary once https://github.com/pmndrs/xr/issues/383 is fixed
-			deltaRef.current.subVectors(state.current.position, state.previous.position);
-			controller.computeColliderMovement(collider, deltaRef.current);
-			handleStateRef.current.linear.copy(controller.computedMovement());
-			// since handles rotate with the object, we have to apply the object's rotation
-			// to the movement vector to get it in world space.
-			handleStateRef.current.linear.applyQuaternion(body.rotation());
-		}
-
-		// clear flag when dragging is done and update the position in the store
-		if (state.last) {
-			isDraggingRef.current = false;
-			// can't actually commit yet, have to wait for frame update below
-			handleStateRef.current.commitNow = true;
-		}
-	}, []);
-
-	useBeforePhysicsStep(({ timestep: dt }) => {
-		const { linear, angular, commitNow: committed } = handleStateRef.current;
-		if (rigidBodyRef.current) {
+	const apply = useCallback(
+		(state: HandleState, _target: Object3D) => {
+			// don't bother if dependencies aren't ready
+			if (!rigidBodyRef.current || !controllerRef.current) return;
 			const body = rigidBodyRef.current;
-			linear.multiplyScalar(1 / dt);
-			body.setLinvel(linear, true);
-			// euler doesn't have multiplyScalar :(
-			angular.x *= 1 / dt;
-			angular.y *= 1 / dt;
-			angular.z *= 1 / dt;
-			body.setAngvel(angular, true);
+			const controller = controllerRef.current;
+			const collider = body.collider(0);
 
-			if (committed) {
-				// drag ended - update stored position
+			const { rotation, translation, rotationDelta, translationDelta } = handleStateRef.current;
+
+			// set flag to prevent external updates to position
+			if (state.first) {
+				isDraggingRef.current = true;
+				console.debug('start dragging');
+			}
+
+			// if a delta is available, apply it to the kinematic controller, and then
+			// use the computed movement to update the rigid body.
+			if (state.delta && state.previous) {
+				// get the diff TODO: won't be necessary once https://github.com/pmndrs/xr/issues/383 is fixed
+				rotationDelta.copy(state.previous.quaternion);
+				rotationDelta.invert().premultiply(state.current.quaternion);
+				// "add" (multiply) to current rotation
+				rotation.copy(body.rotation()).multiply(rotationDelta);
+				body.setNextKinematicRotation(rotation);
+
+				// get the diff TODO: won't be necessary once https://github.com/pmndrs/xr/issues/383 is fixed
+				translationDelta.subVectors(state.current.position, state.previous.position);
+				controller.computeColliderMovement(collider, translationDelta);
+				// copy back to vector for further adjustment
+				translationDelta.copy(controller.computedMovement());
+				// since handles rotate with the object, we have to apply the object's rotation
+				// to the movement vector to get it in world space.
+				// translationDelta.applyQuaternion(rotation);
+				// add adjusted delta translation
+				translation.addVectors(body.translation(), translationDelta);
+				body.setNextKinematicTranslation(translation);
+			}
+
+			// clear flag when dragging is done and update the position in the store
+			if (state.last) {
+				isDraggingRef.current = false;
 				updatePosition({
 					position: body.translation(),
 					rotation: body.rotation(),
 				});
-				handleStateRef.current.commitNow = false;
 			}
-		}
-		linear.set(0, 0, 0);
-		angular.set(0, 0, 0);
-	});
+		},
+		[updatePosition]
+	);
 
 	const onIntersectionEnter = useCallback(
 		(intersection: IntersectionEnterPayload) => {
@@ -289,8 +284,7 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 		} satisfies HandleOptions<unknown>,
 		rigidBodyProps: {
 			ref: rigidBodyRef,
-			type: 'kinematicVelocity' as const,
-			colliders: 'cuboid' as const,
+			type: 'kinematicPosition' as const,
 			linearDamping: 0,
 			angularDamping: 0,
 			onIntersectionEnter,

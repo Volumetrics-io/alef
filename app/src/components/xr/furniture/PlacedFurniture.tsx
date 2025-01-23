@@ -1,9 +1,10 @@
+import { useAABB } from '@/hooks/useAABB';
 import { useVibrateOnHover } from '@/hooks/useVibrateOnHover';
 import { useEditorStore } from '@/stores/editorStore';
 import { useDeleteFurniturePlacement, useFurniturePlacementDrag, useFurniturePlacementFurnitureId } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
 import { Handle } from '@react-three/handle';
-import { RigidBody } from '@react-three/rapier';
+import { RigidBody, RoundCuboidCollider } from '@react-three/rapier';
 import { Container, Root } from '@react-three/uikit';
 import { colors } from '@react-three/uikit-default';
 import { Trash } from '@react-three/uikit-lucide';
@@ -26,33 +27,31 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	}, [select, furniturePlacementId]);
 	const groupRef = useVibrateOnHover();
 
+	const { halfExtents, center, ref: modelRef, ready } = useAABB();
+	const roundedArgs = [...halfExtents.map((v) => v - 0.1), 0.1] as [number, number, number, number];
+
 	return (
-		<RigidBody {...rigidBodyProps}>
+		<RigidBody {...rigidBodyProps} colliders={false}>
+			{ready && <RoundCuboidCollider args={roundedArgs} position={center} />}
 			<group onClick={handleClick} ref={groupRef}>
 				{selected ? (
 					<Handle {...handleProps}>
-						<FurnitureModel furnitureId={furnitureId} outline={selected} />
+						<FurnitureModel furnitureId={furnitureId} outline={selected} ref={modelRef} />
 					</Handle>
 				) : (
-					<FurnitureModel furnitureId={furnitureId} />
+					<FurnitureModel furnitureId={furnitureId} ref={modelRef} />
 				)}
-				<DeleteUI furniturePlacementId={furniturePlacementId} />
+				{selected && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + 0.2} />}
 			</group>
 		</RigidBody>
 	);
 }
 
-function DeleteUI({ furniturePlacementId }: { furniturePlacementId: PrefixedId<'fp'> }) {
-	const selectedFurniturePlacementId = useEditorStore((s) => s.selectedFurniturePlacementId);
-	const isSelected = selectedFurniturePlacementId === furniturePlacementId;
+function DeleteUI({ furniturePlacementId, height }: { furniturePlacementId: PrefixedId<'fp'>; height: number }) {
 	const handleDelete = useDeleteFurniturePlacement(furniturePlacementId);
 
-	if (!isSelected) {
-		return null;
-	}
-
 	return (
-		<Billboard position={[0, 1, 0]}>
+		<Billboard position={[0, height, 0]}>
 			<Root pixelSize={0.005}>
 				<Container padding={2} backgroundColor={colors.destructive} borderRadius={5} onClick={handleDelete}>
 					<Trash />

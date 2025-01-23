@@ -31,7 +31,7 @@ const HomePage = () => {
 	}, [session?.emailVerifiedAt, navigate]);
 	return (
 		<>
-			<NavBar />
+			<NavBar style={{ position: 'fixed', top: '0' }} />
 			<Main full style={{ height: '100vh' }}>
 				<ErrorBoundary>
 					<Canvas

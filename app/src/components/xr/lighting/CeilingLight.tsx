@@ -56,10 +56,11 @@ export const CeilingLight = ({ id, ...props }: { id: string }) => {
 			}
 		);
 	});
+	const initialPosition = useLightStore((s) => s.lightDetails[id].position);
 
 	return (
 		<Handle apply={applyMovement} translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
-			<group ref={groupRef}>
+			<group position={initialPosition} ref={groupRef}>
 				{editable && (
 					<group>
 						<mesh position={[0, -0.01, 0]} visible={hovered || selected} rotation={[Math.PI / 2, 0, 0]}>

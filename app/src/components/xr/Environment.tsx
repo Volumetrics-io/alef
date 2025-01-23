@@ -2,7 +2,7 @@ import { useEnvironmentStore } from '@/stores/environmentStore';
 import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
 import { useFrame } from '@react-three/fiber';
 import { CuboidCollider, RigidBody } from '@react-three/rapier';
-import { useXR, useXRPlanes, XRPlaneModel, XRSpace } from '@react-three/xr';
+import { NotInXR, useXR, useXRPlanes, XRPlaneModel, XRSpace } from '@react-three/xr';
 import { useRef } from 'react';
 import { DoubleSide, ShadowMaterial } from 'three';
 
@@ -14,6 +14,12 @@ export const Environment = ({ children }: { children: React.ReactNode }) => {
 			{planes.map((plane, index) => {
 				return <PhysicalXRPlane key={index} plane={plane} />;
 			})}
+			<NotInXR>
+				{/* default floor plane */}
+				<RigidBody type="fixed" colliders={false}>
+					<CuboidCollider args={[100, 0, 100]} />
+				</RigidBody>
+			</NotInXR>
 			{children}
 		</group>
 	);
@@ -35,7 +41,7 @@ function PhysicalXRPlane({ plane }: { plane: XRPlane }) {
 	// provided plane
 	const bodyRef = useRef<RRigidBody>(null);
 	useFrame((_s, _d, frame: XRFrame) => {
-		if (!originReferenceSpace) return;
+		if (!originReferenceSpace || !frame) return;
 		const pose = frame.getPose(plane.planeSpace, originReferenceSpace);
 		if (!pose) return;
 		const position = pose.transform.position;

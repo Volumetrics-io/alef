@@ -18,7 +18,7 @@ export interface PlacedFurnitureProps {
 
 export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) {
 	const furnitureId = useFurniturePlacementFurnitureId(furniturePlacementId);
-	const { handleProps, rigidBodyProps } = useFurniturePlacementDrag(furniturePlacementId);
+	const { dragHandleProps: handleProps, rotateHandleProps, rigidBodyProps } = useFurniturePlacementDrag(furniturePlacementId);
 	const select = useEditorStore((s) => s.select);
 	const selected = useEditorStore((s) => s.selectedFurniturePlacementId === furniturePlacementId);
 

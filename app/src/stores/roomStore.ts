@@ -277,11 +277,12 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 	);
 
 	return {
-		handleProps: {
+		dragHandleProps: {
 			apply,
 			scale: false,
 			rotate: { x: false, y: true, z: false } as any,
 		} satisfies HandleOptions<unknown>,
+		rotateHandleProps: {} satisfies HandleOptions<unknown>,
 		rigidBodyProps: {
 			ref: rigidBodyRef,
 			type: 'kinematicPosition' as const,

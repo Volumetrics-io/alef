@@ -1,7 +1,6 @@
 import { ErrorBoundary, Main } from '@alef/sys';
 
 import { NavBar } from '@/components/NavBar';
-import { Environment } from '@/components/xr/Environment';
 import { DepthShader } from '@/components/xr/shaders/DepthShader';
 // import SunLight from '@/components/xr/lighting/SunLight.tsx';
 import { useGeoStore } from '@/stores/geoStore.ts';
@@ -10,7 +9,6 @@ import { reversePainterSortStable } from '@pmndrs/uikit';
 import { Canvas } from '@react-three/fiber';
 import { noEvents, NotInXR, PointerEvents, XR } from '@react-three/xr';
 
-import { RoomLighting } from '@/components/xr/lighting/RoomLighting';
 import { StagerPanel } from '@/components/xr/panels/StagerPanel';
 import { RoomRenderer } from '@/components/xr/room/RoomRenderer';
 import { useMe } from '@/services/publicApi/userHooks';
@@ -54,12 +52,7 @@ const HomePage = () => {
 								<PointerEvents />
 								<DepthShader />
 								<StagerPanel />
-								<Environment>
-									<RoomLighting />
-									{/* TODO: sun light needs refinement */}
-									{/* <SunLight /> */}
-									<RoomRenderer />
-								</Environment>
+								<RoomRenderer />
 							</Physics>
 						</XR>
 					</Canvas>

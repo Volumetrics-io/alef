@@ -1,89 +1,12 @@
-import { useEnvironmentStore } from '@/stores/environmentStore';
-import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
-import { useFrame } from '@react-three/fiber';
-import { CuboidCollider, RigidBody } from '@react-three/rapier';
-import { NotInXR, useXR, useXRPlanes, XRPlaneModel, XRSpace } from '@react-three/xr';
-import { useRef } from 'react';
-import { DoubleSide, ShadowMaterial } from 'three';
+import { Floors } from './room/Floors';
+import { Walls } from './room/Walls';
 
 export const Environment = ({ children }: { children: React.ReactNode }) => {
-	const planes = useXRPlanes();
-
 	return (
-		<group>
-			{planes.map((plane, index) => {
-				return <PhysicalXRPlane key={index} plane={plane} />;
-			})}
-			<NotInXR>
-				{/* default floor plane */}
-				<RigidBody type="fixed" colliders={false}>
-					<CuboidCollider args={[100, 0, 100]} />
-				</RigidBody>
-			</NotInXR>
+		<>
+			<Walls />
+			<Floors />
 			{children}
-		</group>
+		</>
 	);
 };
-
-function PhysicalXRPlane({ plane }: { plane: XRPlane }) {
-	const { originReferenceSpace } = useXR();
-
-	// sync sunlight to shadow material
-	const shadowMaterialRef = useRef<ShadowMaterial>(null);
-	useFrame(() => {
-		const sunlightIntensity = useEnvironmentStore.getState().sunlightIntensity;
-		if (shadowMaterialRef.current) {
-			shadowMaterialRef.current.opacity = 0.2 * sunlightIntensity;
-		}
-	});
-
-	// enforce position of rigid body by computing the pose of the
-	// provided plane
-	const bodyRef = useRef<RRigidBody>(null);
-	useFrame((_s, _d, frame: XRFrame) => {
-		if (!originReferenceSpace || !frame) return;
-		const pose = frame.getPose(plane.planeSpace, originReferenceSpace);
-		if (!pose) return;
-		const position = pose.transform.position;
-		const rotation = pose.transform.orientation;
-		bodyRef.current?.setTranslation({ x: position.x, y: position.y, z: position.z }, false);
-		bodyRef.current?.setRotation({ x: rotation.x, y: rotation.y, z: rotation.z, w: rotation.w }, false);
-	});
-
-	const halfExtents = [getSizeOfPolygonDimension(plane.polygon, 'x') / 2, 0.01, getSizeOfPolygonDimension(plane.polygon, 'z') / 2] as [number, number, number];
-	const sensorHalfExtents = [halfExtents[0], 0.1, halfExtents[2]] as [number, number, number];
-
-	return (
-		<XRSpace space={plane.planeSpace}>
-			<RigidBody
-				type="fixed"
-				colliders={false}
-				ref={bodyRef}
-				userData={{
-					type: 'XRPlane',
-					plane,
-				}}
-			>
-				<CuboidCollider args={halfExtents} />
-				{/* A larger Sensor allows us to detect when furniture is close to the wall */}
-				<CuboidCollider args={sensorHalfExtents} />
-			</RigidBody>
-			<XRPlaneModel renderOrder={-1} plane={plane} receiveShadow={true}>
-				<shadowMaterial ref={shadowMaterialRef} side={DoubleSide} shadowSide={DoubleSide} transparent={true} opacity={0} />
-			</XRPlaneModel>
-			<XRPlaneModel renderOrder={-1} plane={plane} position={[0, 0.01, 0]}>
-				<meshBasicMaterial colorWrite={false} side={DoubleSide} />
-			</XRPlaneModel>
-		</XRSpace>
-	);
-}
-
-function getSizeOfPolygonDimension(polygon: XRPlane['polygon'], field: 'x' | 'z') {
-	let min = Infinity;
-	let max = -Infinity;
-	for (const point of polygon) {
-		min = Math.min(min, point[field]);
-		max = Math.max(max, point[field]);
-	}
-	return Math.abs(max - min);
-}

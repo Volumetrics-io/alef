@@ -1,6 +1,9 @@
 import { useEditorSelectionReset } from '@/stores/editorStore';
 import { useFurniturePlacementIds } from '@/stores/roomStore';
 import { PlacedFurniture } from '../furniture/PlacedFurniture';
+import { RoomLighting } from '../lighting/RoomLighting';
+import { Floors } from './Floors';
+import { Walls } from './Walls';
 
 export function RoomRenderer() {
 	const furniturePlacementIds = useFurniturePlacementIds();
@@ -9,9 +12,12 @@ export function RoomRenderer() {
 
 	return (
 		<>
+			<Floors />
+			<Walls />
 			{furniturePlacementIds.map((furniturePlacementId) => {
 				return <PlacedFurniture key={furniturePlacementId} furniturePlacementId={furniturePlacementId} />;
 			})}
+			<RoomLighting />
 		</>
 	);
 }

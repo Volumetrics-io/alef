@@ -18,7 +18,7 @@ export interface PlacedFurnitureProps {
 
 export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) {
 	const furnitureId = useFurniturePlacementFurnitureId(furniturePlacementId);
-	const { dragHandleProps: handleProps, rotateHandleProps, rigidBodyProps } = useFurniturePlacementDrag(furniturePlacementId);
+	const { dragHandleProps: handleProps, rotateHandleProps, colliderProps, rigidBodyProps } = useFurniturePlacementDrag(furniturePlacementId);
 	const select = useEditorStore((s) => s.select);
 	const selected = useEditorStore((s) => s.selectedFurniturePlacementId === furniturePlacementId);
 
@@ -32,7 +32,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 
 	return (
 		<RigidBody {...rigidBodyProps} colliders={false}>
-			{ready && <RoundCuboidCollider args={roundedArgs} position={center} />}
+			{ready && <RoundCuboidCollider args={roundedArgs} position={center} {...colliderProps} />}
 			<group onClick={handleClick} ref={groupRef}>
 				{selected ? (
 					<Handle {...handleProps}>
@@ -42,6 +42,14 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 					<FurnitureModel furnitureId={furnitureId} ref={modelRef} />
 				)}
 				{selected && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + center.y + 0.2} />}
+				{rotateHandleProps && (
+					<Handle {...rotateHandleProps}>
+						<mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+							<ringGeometry args={[halfExtents[0] * 1.5, halfExtents[0] * 1.5 + 0.16, 32]} />
+							<meshBasicMaterial color="white" />
+						</mesh>
+					</Handle>
+				)}
 			</group>
 		</RigidBody>
 	);

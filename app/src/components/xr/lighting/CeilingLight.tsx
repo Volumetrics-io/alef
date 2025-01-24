@@ -1,8 +1,8 @@
 import { useLightStore } from '@/stores/lightStore';
 import { useStageStore } from '@/stores/stageStore';
-import { Handle, HandleOptions, HandleTarget } from '@react-three/handle';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Group, Vector3 } from 'three';
+import { Handle, HandleTarget } from '@react-three/handle';
+import { useCallback, useEffect, useRef } from 'react';
+import { Group } from 'three';
 import { getLightColor } from './getLightColor';
 
 export const CeilingLight = ({ id, ...props }: { id: string }) => {
@@ -52,7 +52,7 @@ export const CeilingLight = ({ id, ...props }: { id: string }) => {
 	});
 
 	return (
-		<HandleTarget targetRef={groupRef}>
+		<HandleTarget targetRef={groupRef as any}>
 			<group position={initialPosition} ref={groupRef}>
 				{editable && (
 					<group>

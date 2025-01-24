@@ -5,7 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import { CuboidCollider, RigidBody } from '@react-three/rapier';
 import { useXR, XRPlaneModel, XRSpace } from '@react-three/xr';
 import { forwardRef, useRef } from 'react';
-import { DoubleSide, Object3D, ShadowMaterial } from 'three';
+import { DoubleSide, Object3D, ShadowMaterial, Vector3 } from 'three';
 
 export interface PhysicalXRPlaneProps {
 	/** Whether to add a sensor for snapping moved objects to this plane when they're close */
@@ -38,8 +38,8 @@ export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(functi
 		bodyRef.current?.setRotation({ x: rotation.x, y: rotation.y, z: rotation.z, w: rotation.w }, false);
 	});
 
-	const halfExtents = [getSizeOfPolygonDimension(plane.polygon, 'x') / 2, 0.01, getSizeOfPolygonDimension(plane.polygon, 'z') / 2] as [number, number, number];
-	const sensorHalfExtents = [halfExtents[0], 0.2, halfExtents[2]] as [number, number, number];
+	const halfExtents = [getSizeOfPolygonDimension(plane.polygon, 'x') / 2, 0.02, getSizeOfPolygonDimension(plane.polygon, 'z') / 2] as [number, number, number];
+	const sensorHalfExtents = [halfExtents[0], 0.4, halfExtents[2]] as [number, number, number];
 
 	// whether a dragged object is intersecting this plane, which means the object should snap to it.
 	// we render it differently to indicate the detection of the snap
@@ -60,15 +60,16 @@ export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(functi
 					plane,
 				}}
 			>
-				<CuboidCollider args={halfExtents} />
+				<CuboidCollider args={halfExtents} position={new Vector3(0, 0.01, 0)} />
 				{/* A larger Sensor allows us to detect when furniture is close to the wall */}
-				{snapSensor && <CuboidCollider args={sensorHalfExtents} />}
+				{snapSensor && <CuboidCollider args={sensorHalfExtents} sensor />}
 			</RigidBody>
 			<XRPlaneModel renderOrder={-1} plane={plane} receiveShadow={true}>
 				<shadowMaterial ref={shadowMaterialRef} side={DoubleSide} shadowSide={DoubleSide} transparent={true} opacity={0} />
 			</XRPlaneModel>
 			<XRPlaneModel renderOrder={-1} plane={plane} position={[0, 0.01, 0]}>
-				<meshBasicMaterial opacity={0.01} colorWrite={snapped} side={DoubleSide} />
+				{/* temp debug - render plane color when snapping */}
+				<meshBasicMaterial colorWrite={snapped} side={DoubleSide} />
 			</XRPlaneModel>
 		</XRSpace>
 	);

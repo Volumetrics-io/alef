@@ -236,7 +236,7 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 				translationDelta.copy(controller.computedMovement());
 				// since handles rotate with the object, we have to apply the object's rotation
 				// to the movement vector to get it in world space.
-				// translationDelta.applyQuaternion(rotation);
+				translationDelta.applyQuaternion(rotation);
 				// add adjusted delta translation
 				translation.addVectors(body.translation(), translationDelta);
 				body.setNextKinematicTranslation(translation);

@@ -56,9 +56,9 @@ export const DepthShader = () => {
 
 	useFrame(() => {
 		if (shaderSet.current) return;
-		if (!renderer.xr.hasDepthSensing()) return;
+		if (!renderer.xr.hasDepthSensing() || !renderer.xr.getDepthTexture) return;
 		const depthTexture = renderer.xr.getDepthTexture();
-		const depthMesh = renderer.xr.getDepthSensingMesh();
+		const depthMesh = renderer.xr.getDepthSensingMesh?.();
 
 		if (!depthMesh) return null;
 
@@ -75,7 +75,7 @@ export const DepthShader = () => {
 		});
 
 		depthMesh.material = shader;
-		shaderSet.current = true;		
+		shaderSet.current = true;
 	});
 
 	return null;

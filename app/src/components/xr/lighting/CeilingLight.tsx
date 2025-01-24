@@ -1,6 +1,6 @@
 import { useLightStore } from '@/stores/lightStore';
 import { useStageStore } from '@/stores/stageStore';
-import { Handle, HandleOptions } from '@react-three/handle';
+import { Handle, HandleOptions, HandleTarget } from '@react-three/handle';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Group, Vector3 } from 'three';
 import { getLightColor } from './getLightColor';
@@ -31,19 +31,13 @@ export const CeilingLight = ({ id, ...props }: { id: string }) => {
 		setHoveredLightId(null);
 	}, [editable, setHoveredLightId]);
 
-	const positionRef = useRef<Vector3>(new Vector3());
-	const applyMovement = useMemo<HandleOptions<unknown>['apply']>(
-		() => (state) => {
-			positionRef.current.copy(state.current.position);
-			const currentY = useLightStore.getState().lightDetails[id]?.position?.y;
-			// make extra sure the light can't leave the plane
-			if (currentY !== undefined) {
-				positionRef.current.setY(currentY);
-			}
-			setLightPosition(id, positionRef.current);
-		},
-		[setLightPosition, id]
-	);
+	const initialPosition = useLightStore((s) => s.lightDetails[id].position);
+
+	const handlePointerUp = useCallback(() => {
+		if (!groupRef.current) return;
+
+		setLightPosition(id, groupRef.current.position);
+	}, [setLightPosition, id]);
 
 	// subscribe to position changes
 	useEffect(() => {
@@ -56,10 +50,9 @@ export const CeilingLight = ({ id, ...props }: { id: string }) => {
 			}
 		);
 	});
-	const initialPosition = useLightStore((s) => s.lightDetails[id].position);
 
 	return (
-		<Handle apply={applyMovement} translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
+		<HandleTarget targetRef={groupRef}>
 			<group position={initialPosition} ref={groupRef}>
 				{editable && (
 					<group>
@@ -67,10 +60,12 @@ export const CeilingLight = ({ id, ...props }: { id: string }) => {
 							<ringGeometry args={[0.125, 0.16, 32]} />
 							<meshBasicMaterial color="white" />
 						</mesh>
-						<mesh onClick={handleClick} onPointerOver={handleHover} onPointerOut={handleHoverLeave}>
-							<sphereGeometry args={[0.1, 32, 32]} />
-							<meshBasicMaterial color={getLightColor(globalColor)} transparent={true} opacity={globalIntensity} />
-						</mesh>
+						<Handle useTargetFromContext translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
+							<mesh onClick={handleClick} onPointerOver={handleHover} onPointerUp={handlePointerUp} onPointerOut={handleHoverLeave}>
+								<sphereGeometry args={[0.1, 32, 32]} />
+								<meshBasicMaterial color={getLightColor(globalColor)} transparent={true} opacity={globalIntensity} />
+							</mesh>
+						</Handle>
 					</group>
 				)}
 				<spotLight
@@ -90,6 +85,6 @@ export const CeilingLight = ({ id, ...props }: { id: string }) => {
 					{...props}
 				/>
 			</group>
-		</Handle>
+		</HandleTarget>
 	);
 };

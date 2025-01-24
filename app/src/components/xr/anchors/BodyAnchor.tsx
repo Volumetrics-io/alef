@@ -1,5 +1,6 @@
 import { animated, config, useSpring } from '@react-spring/three';
-import { Billboard, ScreenSpace } from '@react-three/drei';
+import { ScreenSpace } from '@react-three/drei';
+import { Billboard } from '../Billboard';
 import { GroupProps, useFrame } from '@react-three/fiber';
 import { useXR } from '@react-three/xr';
 import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';

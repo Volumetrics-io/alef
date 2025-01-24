@@ -45,12 +45,12 @@ const HomePage = () => {
 						camera={{ position: [-0.5, 0.5, 0.5] }}
 					>
 						<XR store={xrStore}>
+						<DepthShader />
 							<Physics debug>
 								<NotInXR>
 									<OrbitHandles damping />
 								</NotInXR>
 								<PointerEvents />
-								<DepthShader />
 								<StagerPanel />
 								<RoomRenderer />
 							</Physics>

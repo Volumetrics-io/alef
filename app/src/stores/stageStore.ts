@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { Vector3 } from "three";
 
 export type StageMode = 'lighting' | 'furniture' | null
 
@@ -10,7 +9,7 @@ export type StageStore = {
 
 export const useStageStore = create<StageStore>((set) => {
     return {
-        mode: 'lighting',
+        mode: null,
         setMode: (mode: StageMode) => set({ mode }),
     }
 });

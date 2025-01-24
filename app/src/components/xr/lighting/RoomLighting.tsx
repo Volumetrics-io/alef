@@ -28,7 +28,6 @@ export const RoomLighting = () => {
 		const pose = frame.getPose(ceilingPlane.planeSpace, originReferenceSpace);
 		const y = pose?.transform.position?.y;
 		if (y !== undefined) {
-			console.log('ceiling height', y);
 			meshRef.current.position.y = y;
 		}
 	});
@@ -49,7 +48,7 @@ export const RoomLighting = () => {
 		<group>
 			<mesh ref={meshRef} rotation={[Math.PI / 2, 0, 0]} onClick={handleClick}>
 				<planeGeometry args={[100, 100]} />
-				<meshStandardMaterial transparent={false} colorWrite={true} color="red" />
+				<meshStandardMaterial transparent={false} colorWrite={false} color="red" />
 			</mesh>
 			<ambientLight intensity={0.1} color={getLightColor(2.7)} />
 			{lightIds.map((id) => {

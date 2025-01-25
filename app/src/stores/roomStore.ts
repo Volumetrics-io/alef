@@ -208,6 +208,7 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 		rotation: new Quaternion(),
 		rotationDelta: new Quaternion(),
 		translationDelta: new Vector3(),
+		previousTranslation: new Vector3(),
 
 		// for computing per frame
 		projectionTmp: new Vector3(),
@@ -221,7 +222,7 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 			if (!rigidBodyRef.current || !controllerRef.current) return;
 			const body = rigidBodyRef.current;
 
-			const { translationDelta } = handleStateRef.current;
+			const { translationDelta, previousTranslation } = handleStateRef.current;
 
 			// set flag to prevent external updates to position
 			if (state.first) {
@@ -234,6 +235,7 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 			if (state.delta && state.previous) {
 				// get the diff TODO: won't be necessary once https://github.com/pmndrs/xr/issues/383 is fixed
 				translationDelta.subVectors(state.current.position, state.previous.position);
+				previousTranslation.copy(state.previous.position);
 				// since handles rotate with the object, we have to apply the object's rotation
 				// to the movement vector to get it in world space.
 				translationDelta.applyQuaternion(body.rotation());
@@ -257,8 +259,9 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 		if (!controller || !body) return;
 
 		const collider = body.collider(0);
-		const { translation, translationDelta } = handleStateRef.current;
+		const { translation, translationDelta, previousTranslation } = handleStateRef.current;
 
+		if (translationDelta.lengthSq() === 0) return;
 		// exclude sensors -- we want to intersect these so we can detect snap areas, we only want
 		// to slide against walls and floors.
 		controller.computeColliderMovement(collider, translationDelta, QueryFilterFlags.EXCLUDE_SENSORS);
@@ -386,6 +389,7 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 			apply,
 			scale: false,
 			rotate: false,
+			alwaysUpdate: true,
 		} satisfies HandleOptions<unknown>,
 		rotateHandleProps,
 		rigidBodyProps: {

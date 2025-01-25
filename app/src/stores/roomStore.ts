@@ -244,6 +244,7 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 			// clear flag when dragging is done and update the position in the store
 			if (state.last) {
 				isDraggingRef.current = false;
+				// TODO: this should move after the body is updated, not here.
 				updatePosition({
 					position: body.translation(),
 					rotation: body.rotation(),

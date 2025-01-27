@@ -11,7 +11,14 @@ export type EditorStore = {
 	selectedFurniturePlacementId: PrefixedId<'fp'> | null;
 	select: (id: PrefixedId<'fp'>) => void;
 
-	intersections: Record<PrefixedId<'fp'>, string[]>;
+	/** Actual recorded intersections */
+	liveIntersections: Record<PrefixedId<'fp'>, string[]>;
+	/**
+	 * In practice, we always want to snap to something. So if
+	 * a movement threatens to empty the intersections list, this
+	 * modified list will keep the last seen intersection.
+	 */
+	stickyIntersections: Record<PrefixedId<'fp'>, string[]>;
 	onIntersectionEnter: (id: PrefixedId<'fp'>, planeId: string) => void;
 	onIntersectionExit: (id: PrefixedId<'fp'>, planeId: string) => void;
 };
@@ -20,22 +27,31 @@ export const useEditorStore = create<EditorStore>((set) => {
 	return {
 		selectedFurniturePlacementId: null,
 		select: (id: PrefixedId<'fp'>) => set({ selectedFurniturePlacementId: id }),
-		intersections: {},
+		liveIntersections: {},
+		stickyIntersections: {},
 		onIntersectionEnter: (id, plane) =>
 			set((state) => {
-				const existing = state.intersections[id];
+				const existing = state.liveIntersections[id];
 				const set = new Set(existing);
 				set.add(plane);
 
-				return { intersections: { ...state.intersections, [id]: Array.from(set) } };
+				return { liveIntersections: { ...state.liveIntersections, [id]: Array.from(set) }, stickyIntersections: { ...state.stickyIntersections, [id]: Array.from(set) } };
 			}),
 		onIntersectionExit: (id, plane) =>
 			set((state) => {
-				const existing = state.intersections[id];
+				const existing = state.liveIntersections[id];
 				if (!existing) return state;
 				const set = new Set(existing);
 				set.delete(plane);
-				return { intersections: { ...state.intersections, [id]: Array.from(set) } };
+
+				// only update stickyIntersections if there are still intersections remaining
+				if (set.size !== 0) {
+					return {
+						liveIntersections: { ...state.liveIntersections, [id]: Array.from(set) },
+						stickyIntersections: { ...state.stickyIntersections, [id]: Array.from(set) },
+					};
+				}
+				return { liveIntersections: { ...state.liveIntersections, [id]: Array.from(set) } };
 			}),
 	};
 });
@@ -51,7 +67,7 @@ export function useEditorSelectionReset() {
 }
 
 export function useIntersectingPlaneLabels(id: PrefixedId<'fp'>) {
-	const intersections = useEditorStore((s) => s.intersections[id]) ?? [];
+	const intersections = useEditorStore((s) => s.stickyIntersections[id]) ?? [];
 	// map to plane info
 	return usePlanesStore(useShallow((s) => intersections.map((i) => s.getPlaneLabel(i))));
 }

@@ -56,7 +56,9 @@ export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(functi
 
 	// whether a dragged object is intersecting this plane, which means the object should snap to it.
 	// we render it differently to indicate the detection of the snap
-	const snapped = useEditorStore((s) => (s.selectedFurniturePlacementId ? s.intersections[s.selectedFurniturePlacementId]?.some((value) => value === getPlaneId(plane)) : false));
+	const snapped = useEditorStore((s) =>
+		s.selectedFurniturePlacementId ? s.liveIntersections[s.selectedFurniturePlacementId]?.some((value) => value === getPlaneId(plane)) : false
+	);
 
 	const register = useRegisterXRPlane(plane);
 

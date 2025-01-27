@@ -154,7 +154,7 @@ export class DragController {
 	};
 
 	#getPlaneCandidates = (placementId: PrefixedId<'fp'>) => {
-		return useEditorStore.getState().intersections[placementId] ?? [];
+		return useEditorStore.getState().stickyIntersections[placementId] ?? [];
 	};
 
 	#getPlaneNormal = (planeId: string) => {

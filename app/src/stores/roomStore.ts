@@ -168,15 +168,19 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 	// which plane types are we contacting?
 	const snappedTo = useEditorStore(useShallow((s) => s.intersections[id] ?? []));
 	const isOnFloor = snappedTo.some((plane) => plane.semanticLabel === 'floor');
+	console.log(
+		'isOnFloor',
+		isOnFloor,
+		snappedTo.map((s) => s.semanticLabel)
+	);
 
 	const controllerRef = useRef<DragController | null>(null);
 	const { world } = useRapier();
 
 	useEffect(() => {
-		console.log('new drag controller', id);
+		console.debug('new drag controller', id);
 		controllerRef.current = new DragController(id, world, rigidBodyRef, {
 			onDragEnd: updatePosition,
-			disablePlaneSnap: true, // TODO:
 		});
 	}, [world, updatePosition, id]);
 

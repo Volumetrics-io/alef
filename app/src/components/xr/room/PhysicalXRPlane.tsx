@@ -1,19 +1,23 @@
 import { useEditorStore } from '@/stores/editorStore';
 import { useEnvironmentStore } from '@/stores/environmentStore';
+import { useRegisterPlane } from '@/stores/planesStore';
+import { useMergedRef } from '@alef/sys';
 import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
 import { useFrame } from '@react-three/fiber';
 import { CuboidCollider, RigidBody } from '@react-three/rapier';
 import { useXR, XRPlaneModel, XRSpace } from '@react-three/xr';
 import { forwardRef, useRef } from 'react';
 import { DoubleSide, Object3D, ShadowMaterial, Vector3 } from 'three';
+import { DebugPlaneNormal } from './DebugPlaneNormal';
 
 export interface PhysicalXRPlaneProps {
 	/** Whether to add a sensor for snapping moved objects to this plane when they're close */
 	snapSensor?: boolean;
 	plane: XRPlane;
+	debug?: boolean;
 }
 
-export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(function PhysicalXRPlane({ plane, snapSensor = true }, ref) {
+export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(function PhysicalXRPlane({ plane, snapSensor = true, debug }, ref) {
 	const { originReferenceSpace } = useXR();
 
 	// sync sunlight to shadow material
@@ -43,35 +47,39 @@ export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(functi
 
 	// whether a dragged object is intersecting this plane, which means the object should snap to it.
 	// we render it differently to indicate the detection of the snap
-	const snapped = useEditorStore((s) =>
-		Object.values(s.intersections)
-			.flat()
-			.some((value) => value === plane)
-	);
+	const snapped = useEditorStore((s) => (s.selectedFurniturePlacementId ? s.intersections[s.selectedFurniturePlacementId]?.some((value) => value === plane) : false));
+
+	const register = useRegisterPlane(plane);
+
+	const finalRef = useMergedRef(ref, register);
 
 	return (
-		<XRSpace space={plane.planeSpace} ref={ref}>
-			<RigidBody
-				type="fixed"
-				colliders={false}
-				ref={bodyRef}
-				userData={{
-					type: 'XRPlane',
-					plane,
-				}}
-			>
-				<CuboidCollider args={halfExtents} position={new Vector3(0, 0.01, 0)} />
-				{/* A larger Sensor allows us to detect when furniture is close to the wall */}
-				{snapSensor && <CuboidCollider args={sensorHalfExtents} sensor />}
-			</RigidBody>
-			<XRPlaneModel renderOrder={-1} plane={plane} receiveShadow={true}>
-				<shadowMaterial ref={shadowMaterialRef} side={DoubleSide} shadowSide={DoubleSide} transparent={true} opacity={0} />
-			</XRPlaneModel>
-			<XRPlaneModel renderOrder={-1} plane={plane} position={[0, 0.01, 0]}>
-				{/* temp debug - render plane color when snapping */}
-				<meshBasicMaterial colorWrite={snapped} side={DoubleSide} />
-			</XRPlaneModel>
-		</XRSpace>
+		<>
+			<XRSpace space={plane.planeSpace} ref={finalRef}>
+				<RigidBody
+					type="fixed"
+					colliders={false}
+					ref={bodyRef}
+					userData={{
+						type: 'XRPlane',
+						plane,
+					}}
+				>
+					<CuboidCollider args={halfExtents} position={new Vector3(0, 0.01, 0)} />
+					{/* A larger Sensor allows us to detect when furniture is close to the wall */}
+					{snapSensor && <CuboidCollider args={sensorHalfExtents} sensor />}
+				</RigidBody>
+				<XRPlaneModel renderOrder={-1} plane={plane} receiveShadow={true}>
+					<shadowMaterial ref={shadowMaterialRef} side={DoubleSide} shadowSide={DoubleSide} transparent={true} opacity={0} />
+				</XRPlaneModel>
+				<XRPlaneModel renderOrder={-1} plane={plane} position={[0, 0.01, 0]}>
+					{/* temp debug - render plane color when snapping */}
+					<meshBasicMaterial colorWrite={snapped} transparent opacity={0.01} color={0x002040} side={DoubleSide} />
+				</XRPlaneModel>
+			</XRSpace>
+			{/* Shows what our system thinks the center and normal of the plane is */}
+			{debug && <DebugPlaneNormal plane={plane} />}
+		</>
 	);
 });
 

@@ -34,3 +34,4 @@ export * from './components/tooltip/Tooltip.js';
 
 export * from './hocs/withClassName.js';
 export * from './hocs/withProps.js';
+export * from './hooks/useMergedRef.js';

@@ -39,6 +39,11 @@ export function getMostIntentionalPlaneSnappedMovement(movement: Vector3, planeN
 		return matchedIndex;
 	}
 
+	// not enough movement to determine affinity
+	if (movement.lengthSq() < 0.0001) {
+		return matchedIndex;
+	}
+
 	const movementNormalized = movement.clone().normalize();
 	// alignment is measured with dot products. however, since we're looking for the most /along/ the
 	// plane, a larger dot (more aligned with normal) is actually bad. negative dots are also treated

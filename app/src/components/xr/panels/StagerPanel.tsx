@@ -3,7 +3,7 @@ import { useStageStore } from '@/stores/stageStore';
 import { Container, Root } from '@react-three/uikit';
 import { colors, Toggle } from '@react-three/uikit-default';
 import { BoxIcon, LampDesk, Menu, Sofa, X } from '@react-three/uikit-lucide';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
 import { DragController } from '../controls/Draggable';
 import { Furniture } from './staging/Furniture';
@@ -56,7 +56,11 @@ export function StagerPanel({ onToggle, children }: { onToggle?: () => void; chi
 				{isOpen && (
 					<>
 						{mode === 'lighting' && <Lighting />}
-						{mode === 'furniture' && <Furniture />}
+						{mode === 'furniture' && (
+							<Suspense>
+								<Furniture />
+							</Suspense>
+						)}
 						{mode !== null && (
 							<DragController>
 								<Container flexDirection="row" width="50%" gap={10} alignItems="center">

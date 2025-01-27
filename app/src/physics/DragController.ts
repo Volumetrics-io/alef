@@ -1,3 +1,4 @@
+import { useDebugStore } from '@/stores/debugStore';
 import { useEditorStore } from '@/stores/editorStore';
 import { usePlanesStore } from '@/stores/planesStore';
 import { useRoomStore } from '@/stores/roomStore';
@@ -106,6 +107,12 @@ export class DragController {
 		if (!handleState.delta || !this.#body) return;
 		// apply object rotation to the delta since the handle is also rotated within it
 		this.#applyTranslationTmpVector.copy(handleState.delta.position).applyQuaternion(this.#rotation);
+
+		useDebugStore.setState({
+			rawDragDelta: this.#applyTranslationTmpVector,
+			rawDragStart: handleState.initial.position,
+		});
+
 		// snap to plane if applicable
 		if (!this.config.disablePlaneSnap) {
 			this.#applyTranslationTmpVector.copy(this.#snapToPlane(this.#applyTranslationTmpVector));
@@ -128,8 +135,9 @@ export class DragController {
 		const candidates = this.#getPlaneCandidates(this.id);
 		if (!candidates.length) return delta;
 
-		// determine normals of potential snap planes
-		const normals = candidates.map(this.#getPlaneNormal);
+		// determine normals of potential snap planes. filter any planes that aren't registered
+		// with the plane store system, which won't have a normal.
+		const normals = candidates.map(this.#getPlaneNormal).filter((v): v is Vector3 => !!v);
 		// find the most intentional plane based on the direction of movement -- i.e. which
 		// plane is the movement most aligned with?
 		const planeIndex = getMostIntentionalPlaneSnappedMovement(delta, normals);
@@ -150,7 +158,7 @@ export class DragController {
 	};
 
 	#getPlaneNormal = (plane: XRPlane) => {
-		return usePlanesStore.getState().getCenterAndNormal(plane).normal;
+		return usePlanesStore.getState().getPlaneInfo(plane)?.normal;
 	};
 
 	#getClosestPlanePoint = (plane: XRPlane, targetPoint: Vector3) => {

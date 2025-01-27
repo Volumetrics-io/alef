@@ -42,8 +42,8 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 					)}
 					{selected && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + center.y + 0.2} />}
 					{rotateHandleProps && (
-						<Handle {...rotateHandleProps}>
-							<mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]}>
+						<Handle targetRef="from-context" {...rotateHandleProps}>
+							<mesh position={[0, 0.1, 0]} rotation={[Math.PI / 2, 0, 0]}>
 								<ringGeometry args={[halfExtents[0] * 1.5, halfExtents[0] * 1.5 + 0.16, 32]} />
 								<meshBasicMaterial color="white" />
 							</mesh>

@@ -9,6 +9,7 @@ import { Container, Root } from '@react-three/uikit';
 import { colors } from '@react-three/uikit-default';
 import { Trash } from '@react-three/uikit-lucide';
 import { useCallback } from 'react';
+import { DoubleSide } from 'three';
 import { FurnitureModel } from './FurnitureModel';
 
 export interface PlacedFurnitureProps {
@@ -45,7 +46,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 						<Handle targetRef="from-context" {...rotateHandleProps}>
 							<mesh position={[0, 0.1, 0]} rotation={[Math.PI / 2, 0, 0]}>
 								<ringGeometry args={[halfExtents[0] * 1.5, halfExtents[0] * 1.5 + 0.16, 32]} />
-								<meshBasicMaterial color="white" />
+								<meshBasicMaterial color="white" side={DoubleSide} />
 							</mesh>
 						</Handle>
 					)}

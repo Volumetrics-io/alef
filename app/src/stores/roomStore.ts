@@ -169,7 +169,6 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 	const snappedTo = useIntersectingPlaneLabels(id);
 	// const snappedTo = [] as string[];
 	const isOnFloor = snappedTo.some((plane) => plane === 'floor');
-	console.log('isOnFloor', isOnFloor, snappedTo);
 
 	const controllerRef = useRef<DragController | null>(null);
 	const { world } = useRapier();
@@ -210,6 +209,7 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 				apply,
 				scale: false,
 				rotate: { x: false, y: true, z: false },
+				translate: 'as-rotate',
 			}
 		: null;
 

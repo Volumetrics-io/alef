@@ -106,7 +106,8 @@ export class DragController {
 	#applyTranslation = (handleState: HandleState) => {
 		if (!handleState.delta || !this.#body) return;
 		// apply object rotation to the delta since the handle is also rotated within it
-		this.#applyTranslationTmpVector.copy(handleState.delta.position).applyQuaternion(this.#rotation);
+		// this.#applyTranslationTmpVector.copy(handleState.delta.position).applyQuaternion(this.#rotation);
+		this.#applyTranslationTmpVector.copy(handleState.delta.position);
 
 		useDebugStore.setState({
 			rawDragDelta: this.#applyTranslationTmpVector,
@@ -170,6 +171,6 @@ export class DragController {
 		if (!handleState.delta || !this.#body) return;
 		// kinematic controller does not accommodate rotation, we just assign it
 		this.#applyRotationTmpQuaternion.copy(this.#rotation).multiply(handleState.delta.quaternion);
-		this.#body?.setRotation(this.#applyRotationTmpQuaternion, true);
+		this.#body?.setRotation(handleState.current.quaternion, true);
 	};
 }

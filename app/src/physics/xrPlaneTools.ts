@@ -19,10 +19,14 @@ export function getClosestPointOnXRPlane(frame: XRFrame, rootSpace: XRReferenceS
 	return getClosestPointOnPlane(normal, center, targetPoint);
 }
 
+const tmpVec1 = new Vector3();
+const tmpVec2 = new Vector3();
 export function getClosestPointOnPlane(planeNormal: Vector3, planePoint: Vector3, targetPoint: Vector3) {
-	const direction = targetPoint.clone().sub(planePoint);
+	const direction = tmpVec1.copy(targetPoint).sub(planePoint);
 	const distance = direction.dot(planeNormal);
-	return targetPoint.clone().sub(planeNormal.clone().multiplyScalar(distance));
+	const scaledNormal = tmpVec2.copy(planeNormal).multiplyScalar(distance);
+	tmpVec1.copy(targetPoint).sub(scaledNormal);
+	return tmpVec1;
 }
 
 /**

@@ -1,11 +1,9 @@
 import { PointerEvent } from '@pmndrs/pointer-events';
 import { isXRInputSourceState, useHover } from '@react-three/xr';
-import { useRef } from 'react';
-import { Group } from 'three';
+import { RefObject } from 'react';
+import { Object3D } from 'three';
 
-export function useVibrateOnHover() {
-	const groupRef = useRef<Group>(null);
-
+export function useVibrateOnHover<Target extends Object3D>(groupRef: RefObject<Target | null>) {
 	useHover(groupRef, (hover: boolean, e: PointerEvent) => {
 		if (hover) {
 			if (isXRInputSourceState(e.pointerState) && e.pointerState.type === 'controller') {
@@ -13,6 +11,4 @@ export function useVibrateOnHover() {
 			}
 		}
 	});
-
-	return groupRef;
 }

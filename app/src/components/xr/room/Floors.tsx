@@ -1,6 +1,6 @@
 import { GroupProps } from '@react-three/fiber';
-import { CuboidCollider, RigidBody } from '@react-three/rapier';
 import { NotInXR, useXRPlanes } from '@react-three/xr';
+import { DemoPlane } from './DemoPlane';
 import { PhysicalXRPlane } from './PhysicalXRPlane';
 export function Floors(props: GroupProps) {
 	const planes = useXRPlanes('floor');
@@ -12,9 +12,7 @@ export function Floors(props: GroupProps) {
 			})}
 			<NotInXR>
 				{/* default floor plane */}
-				<RigidBody type="fixed" colliders={false}>
-					<CuboidCollider args={[100, 0, 100]} />
-				</RigidBody>
+				<DemoPlane label="floor" normal={[0, 1, 0]} center={[0, 0, 0]} dimensions={[10, 10]} debug />
 			</NotInXR>
 		</group>
 	);

@@ -7,9 +7,10 @@ import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { xrStore } from './xrStore';
 
-type PlaneInfo = {
+export type PlaneInfo = {
 	center: Vector3;
 	normal: Vector3;
+	label: string;
 };
 
 // since XRPlanes don't have native IDs, we generate and store them
@@ -24,9 +25,10 @@ export function getPlaneId(plane: XRPlane) {
 
 export type PlanesStore = {
 	planes: Record<string, PlaneInfo>;
-	getClosestPoint: (xrPlane: XRPlane, targetPoint: Vector3) => Vector3;
-	getPlaneInfo: (xrPlane: XRPlane) => PlaneInfo | undefined;
-	updatePlane: (xrPlane: XRPlane, center: Vector3, normal: Vector3) => void;
+	getClosestPoint: (planeId: string, targetPoint: Vector3) => Vector3;
+	getPlaneInfo: (planeId: string) => PlaneInfo | undefined;
+	getPlaneLabel: (planeId: string) => string;
+	updatePlane: (id: string, info: PlaneInfo) => void;
 };
 
 export const usePlanesStore = create<PlanesStore>()(
@@ -52,21 +54,29 @@ export const usePlanesStore = create<PlanesStore>()(
 
 		return {
 			planes: {},
-			getClosestPoint(xrPlane: XRPlane, targetPoint: Vector3) {
-				const planeId = getPlaneId(xrPlane);
+			getClosestPoint(planeId: string, targetPoint: Vector3) {
 				const info = get().planes[planeId];
 				if (!info) {
 					return targetPoint;
 				}
 				return getClosestPointOnPlane(info.normal, info.center, targetPoint);
 			},
-			getPlaneInfo(xrPlane: XRPlane) {
-				const planeId = getPlaneId(xrPlane);
+			getPlaneInfo(planeId: string) {
 				return get().planes[planeId];
 			},
-			updatePlane(xrPlane: XRPlane, center: Vector3, normal: Vector3) {
-				const planeId = getPlaneId(xrPlane);
-				set(O.modify(O.optic<PlanesStore>().prop('planes').prop(planeId))(() => ({ center, normal })));
+			getPlaneLabel(planeId: string) {
+				return get().planes[planeId]?.label ?? 'unknown';
+			},
+			updatePlane(planeId: string, info: PlaneInfo) {
+				set(
+					O.modify(O.optic<PlanesStore>().prop('planes').prop(planeId))((s) => {
+						if (!s) {
+							return info;
+						}
+						Object.assign(s, info);
+						return s;
+					})
+				);
 			},
 		};
 	})
@@ -75,10 +85,14 @@ export const usePlanesStore = create<PlanesStore>()(
 /**
  * Pass the returned ref to the XRSpace for the plane
  */
-export function useRegisterPlane(xrPlane: XRPlane) {
+export function useRegisterXRPlane(xrPlane: XRPlane) {
+	const id = getPlaneId(xrPlane);
+	return useRegisterManualPlane(id, xrPlane.semanticLabel ?? 'unknown');
+}
+
+export function useRegisterManualPlane(id: string, label: string) {
 	const ref = useRef<Object3D>(null);
 	const update = usePlanesStore((s) => s.updatePlane);
-
 	const normal = new Vector3();
 	const center = new Vector3();
 	const quat = new Quaternion();
@@ -88,7 +102,7 @@ export function useRegisterPlane(xrPlane: XRPlane) {
 		ref.current.getWorldQuaternion(quat);
 		normal.set(0, -1, 0).applyQuaternion(quat);
 		ref.current.getWorldPosition(center);
-		update(xrPlane, center, normal);
+		update(id, { label, center, normal });
 	});
 
 	return ref;

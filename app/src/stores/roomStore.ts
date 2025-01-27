@@ -1,7 +1,7 @@
 import { PlaneLabel } from '@/components/xr/anchors';
 import { useVibrateOnHover } from '@/hooks/useVibrateOnHover';
 import { DragController } from '@/physics/DragController';
-import { isXRPlaneUserData } from '@/physics/xrPlaneUserData';
+import { isPlaneUserData } from '@/physics/planeUserData';
 import { id, PrefixedId } from '@alef/common';
 import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
 import { ActiveCollisionTypes } from '@dimforge/rapier3d-compat';
@@ -13,7 +13,7 @@ import { Group } from 'three';
 import { create } from 'zustand';
 import { persist, subscribeWithSelector } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
-import { useEditorStore } from './editorStore';
+import { useEditorStore, useIntersectingPlaneLabels } from './editorStore';
 
 export interface FurniturePlacement {
 	furnitureId: PrefixedId<'f'>;
@@ -166,13 +166,10 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 	const updateIntersectionEnter = useEditorStore((s) => s.onIntersectionEnter);
 	const updateIntersectionExit = useEditorStore((s) => s.onIntersectionExit);
 	// which plane types are we contacting?
-	const snappedTo = useEditorStore(useShallow((s) => s.intersections[id] ?? []));
-	const isOnFloor = snappedTo.some((plane) => plane.semanticLabel === 'floor');
-	console.log(
-		'isOnFloor',
-		isOnFloor,
-		snappedTo.map((s) => s.semanticLabel)
-	);
+	const snappedTo = useIntersectingPlaneLabels(id);
+	// const snappedTo = [] as string[];
+	const isOnFloor = snappedTo.some((plane) => plane === 'floor');
+	console.log('isOnFloor', isOnFloor, snappedTo);
 
 	const controllerRef = useRef<DragController | null>(null);
 	const { world } = useRapier();
@@ -191,8 +188,8 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 	const onIntersectionEnter = useCallback(
 		(intersection: IntersectionEnterPayload) => {
 			const userData = intersection.rigidBody?.userData;
-			if (isXRPlaneUserData(userData)) {
-				updateIntersectionEnter(id, userData.plane);
+			if (isPlaneUserData(userData)) {
+				updateIntersectionEnter(id, userData.planeId);
 			}
 		},
 		[id, updateIntersectionEnter]
@@ -201,8 +198,8 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 	const onIntersectionExit = useCallback(
 		(intersection: IntersectionExitPayload) => {
 			const userData = intersection.rigidBody?.userData;
-			if (isXRPlaneUserData(userData)) {
-				updateIntersectionExit(id, userData.plane);
+			if (isPlaneUserData(userData)) {
+				updateIntersectionExit(id, userData.planeId);
 			}
 		},
 		[id, updateIntersectionExit]

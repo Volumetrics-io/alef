@@ -157,12 +157,12 @@ export class DragController {
 		return useEditorStore.getState().intersections[placementId] ?? [];
 	};
 
-	#getPlaneNormal = (plane: XRPlane) => {
-		return usePlanesStore.getState().getPlaneInfo(plane)?.normal;
+	#getPlaneNormal = (planeId: string) => {
+		return usePlanesStore.getState().getPlaneInfo(planeId)?.normal;
 	};
 
-	#getClosestPlanePoint = (plane: XRPlane, targetPoint: Vector3) => {
-		return usePlanesStore.getState().getClosestPoint(plane, targetPoint);
+	#getClosestPlanePoint = (planeId: string, targetPoint: Vector3) => {
+		return usePlanesStore.getState().getClosestPoint(planeId, targetPoint);
 	};
 
 	#applyRotationTmpQuaternion = new Quaternion();

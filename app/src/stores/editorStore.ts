@@ -4,14 +4,16 @@ import { useThree } from '@react-three/fiber';
 import { useEffect } from 'react';
 import { Object3D, Object3DEventMap } from 'three';
 import { create } from 'zustand';
+import { useShallow } from 'zustand/react/shallow';
+import { usePlanesStore } from './planesStore';
 
 export type EditorStore = {
 	selectedFurniturePlacementId: PrefixedId<'fp'> | null;
 	select: (id: PrefixedId<'fp'>) => void;
 
-	intersections: Record<PrefixedId<'fp'>, XRPlane[]>;
-	onIntersectionEnter: (id: PrefixedId<'fp'>, plane: XRPlane) => void;
-	onIntersectionExit: (id: PrefixedId<'fp'>, plane: XRPlane) => void;
+	intersections: Record<PrefixedId<'fp'>, string[]>;
+	onIntersectionEnter: (id: PrefixedId<'fp'>, planeId: string) => void;
+	onIntersectionExit: (id: PrefixedId<'fp'>, planeId: string) => void;
 };
 
 export const useEditorStore = create<EditorStore>((set) => {
@@ -46,4 +48,10 @@ export function useEditorSelectionReset() {
 		voidObject.addEventListener('click', fn);
 		return () => voidObject.removeEventListener('click', fn);
 	}, [scene]);
+}
+
+export function useIntersectingPlaneLabels(id: PrefixedId<'fp'>) {
+	const intersections = useEditorStore((s) => s.intersections[id]) ?? [];
+	// map to plane info
+	return usePlanesStore(useShallow((s) => intersections.map((i) => s.getPlaneLabel(i))));
 }

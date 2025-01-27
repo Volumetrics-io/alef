@@ -4,16 +4,16 @@ import { useRef } from 'react';
 import { ArrowHelper, Vector3 } from 'three';
 
 export interface DebugPlaneNormalProps {
-	plane: XRPlane;
+	planeId: string;
 }
 
-export function DebugPlaneNormal({ plane }: DebugPlaneNormalProps) {
+export function DebugPlaneNormal({ planeId }: DebugPlaneNormalProps) {
 	const getStuff = usePlanesStore((s) => s.getPlaneInfo);
-	const initial = getStuff(plane) ?? { center: new Vector3(), normal: new Vector3() };
+	const initial = getStuff(planeId) ?? { center: new Vector3(), normal: new Vector3() };
 
 	const ref = useRef<ArrowHelper>(null);
 	useFrame(() => {
-		const stuff = getStuff(plane);
+		const stuff = getStuff(planeId);
 		if (!stuff) return;
 		const { normal, center } = stuff;
 		ref.current?.setDirection(normal);

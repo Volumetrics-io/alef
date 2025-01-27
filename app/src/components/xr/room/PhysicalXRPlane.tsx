@@ -1,6 +1,7 @@
+import { createXRPlaneUserData } from '@/physics/planeUserData';
 import { useEditorStore } from '@/stores/editorStore';
 import { useEnvironmentStore } from '@/stores/environmentStore';
-import { useRegisterPlane } from '@/stores/planesStore';
+import { getPlaneId, useRegisterXRPlane } from '@/stores/planesStore';
 import { useMergedRef } from '@alef/sys';
 import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
 import { useFrame } from '@react-three/fiber';
@@ -55,27 +56,19 @@ export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(functi
 
 	// whether a dragged object is intersecting this plane, which means the object should snap to it.
 	// we render it differently to indicate the detection of the snap
-	const snapped = useEditorStore((s) => (s.selectedFurniturePlacementId ? s.intersections[s.selectedFurniturePlacementId]?.some((value) => value === plane) : false));
+	const snapped = useEditorStore((s) => (s.selectedFurniturePlacementId ? s.intersections[s.selectedFurniturePlacementId]?.some((value) => value === getPlaneId(plane)) : false));
 
-	const register = useRegisterPlane(plane);
+	const register = useRegisterXRPlane(plane);
 
 	const finalRef = useMergedRef(ref, register);
 
 	return (
 		<>
 			<XRSpace space={plane.planeSpace} ref={finalRef}>
-				<RigidBody
-					type="fixed"
-					colliders={false}
-					ref={bodyRef}
-					userData={{
-						type: 'XRPlane',
-						plane,
-					}}
-				>
-					<CuboidCollider args={halfExtents} position={new Vector3(0, 0.01, 0)} />
+				<RigidBody type="fixed" colliders={false} ref={bodyRef} userData={createXRPlaneUserData(plane)}>
+					<CuboidCollider args={halfExtents} position={new Vector3(0, 0, 0)} />
 					{/* A larger Sensor allows us to detect when furniture is close to the wall */}
-					{snapSensor && <CuboidCollider args={sensorHalfExtents} sensor />}
+					{snapSensor && <CuboidCollider args={sensorHalfExtents} position={[0, 0.2, 0]} sensor />}
 				</RigidBody>
 				<XRPlaneModel renderOrder={-1} plane={plane} receiveShadow={true}>
 					<shadowMaterial ref={shadowMaterialRef} side={DoubleSide} shadowSide={DoubleSide} transparent={true} opacity={0} />
@@ -86,7 +79,7 @@ export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(functi
 				</XRPlaneModel>
 			</XRSpace>
 			{/* Shows what our system thinks the center and normal of the plane is */}
-			{debug && <DebugPlaneNormal plane={plane} />}
+			{debug && <DebugPlaneNormal planeId={getPlaneId(plane)} />}
 		</>
 	);
 });

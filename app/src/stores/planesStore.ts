@@ -39,29 +39,15 @@ export const usePlanesStore = create<PlanesStore>()(
 		// and having it available anywhere and everywhere is key.
 		let currentSession: XRSession | null = null;
 		let currentReferenceSpace: XRReferenceSpace | null;
-		let xrPlanes: readonly XRPlane[] = [];
-
-		let rafHandle: number | null = null;
-		function onFrame(_t: DOMHighResTimeStamp, xrFrame: XRFrame) {
-			// keep the loop going.
-			rafHandle = xrFrame.session.requestAnimationFrame(onFrame);
-		}
 
 		xrStore.subscribe((s) => {
 			if (s.session && s.session !== currentSession) {
-				// if we're switching sessions, cancel the old RAF
-				if (rafHandle) {
-					currentSession?.cancelAnimationFrame(rafHandle);
-				}
 				currentSession = s.session;
-				rafHandle = s.session.requestAnimationFrame(onFrame);
 			}
 
 			if (s.originReferenceSpace && s.originReferenceSpace !== currentReferenceSpace) {
 				currentReferenceSpace = s.originReferenceSpace;
 			}
-
-			xrPlanes = s.detectedPlanes;
 		});
 
 		return {

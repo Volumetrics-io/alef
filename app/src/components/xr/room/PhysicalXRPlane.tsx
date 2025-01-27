@@ -17,6 +17,10 @@ export interface PhysicalXRPlaneProps {
 	debug?: boolean;
 }
 
+// amount to add to size of XRPlane when creating the collider. we want to avoid
+// planes not quite touching at the edges which seems to happen by default.
+const PLANE_EXTENSION_BUFFER = 0.1;
+
 export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(function PhysicalXRPlane({ plane, snapSensor = true, debug }, ref) {
 	const { originReferenceSpace } = useXR();
 
@@ -42,7 +46,11 @@ export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(functi
 		bodyRef.current?.setRotation({ x: rotation.x, y: rotation.y, z: rotation.z, w: rotation.w }, false);
 	});
 
-	const halfExtents = [getSizeOfPolygonDimension(plane.polygon, 'x') / 2, 0.02, getSizeOfPolygonDimension(plane.polygon, 'z') / 2] as [number, number, number];
+	const halfExtents = [getSizeOfPolygonDimension(plane.polygon, 'x') / 2 + PLANE_EXTENSION_BUFFER, 0.02, getSizeOfPolygonDimension(plane.polygon, 'z') / 2] as [
+		number,
+		number,
+		number,
+	];
 	const sensorHalfExtents = [halfExtents[0], 0.4, halfExtents[2]] as [number, number, number];
 
 	// whether a dragged object is intersecting this plane, which means the object should snap to it.

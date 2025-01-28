@@ -7,6 +7,7 @@ export const resourceIdTypes = {
 	f: 'Furniture',
 	at: 'Attribute',
 	fp: 'FurniturePlacement',
+	lp: 'LightPlacement',
 } as const;
 export type ResourceIdPrefix = keyof typeof resourceIdTypes;
 export type ResourceTypeName = (typeof resourceIdTypes)[ResourceIdPrefix];

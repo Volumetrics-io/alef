@@ -1,34 +1,38 @@
-import { useLightStore } from '@/stores/lightStore';
+import { useAddLight, useLightPlacementIds } from '@/stores/roomStore';
 import { useStageStore } from '@/stores/stageStore';
 import { ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import { useXR, useXRPlanes } from '@react-three/xr';
 import { useCallback, useRef } from 'react';
 import { Mesh } from 'three';
-import { useShallow } from 'zustand/react/shallow';
 import { CeilingLight } from './CeilingLight';
 import { getLightColor } from './getLightColor';
 
+const DEFAULT_CEILING_HEIGHT = 2.7;
+
 export const RoomLighting = () => {
 	const ceilingPlanes = useXRPlanes('ceiling');
-	const ceilingPlane = ceilingPlanes[0];
+	const xrCeilingPlane = ceilingPlanes[0];
+
 	const meshRef = useRef<Mesh>(null);
-	const addLight = useLightStore((s) => s.addLight);
-	const lightIds = useLightStore(useShallow((s) => Object.keys(s.lightDetails)));
+	const addLight = useAddLight();
+	const lightIds = useLightPlacementIds();
 	const editable = useStageStore((s) => s.mode === 'lighting');
 	const { gl } = useThree();
 
 	const { originReferenceSpace } = useXR();
 
 	useFrame((_s, _d, frame: XRFrame) => {
-		if (!ceilingPlane) return;
+		if (!xrCeilingPlane) return;
 		if (!originReferenceSpace) return;
 		if (!meshRef.current) return;
 		if (!frame) return;
 		// set the height of the plane to the height of the XR ceiling plane used.
-		const pose = frame.getPose(ceilingPlane.planeSpace, originReferenceSpace);
+		const pose = frame.getPose(xrCeilingPlane.planeSpace, originReferenceSpace);
 		const y = pose?.transform.position?.y;
 		if (y !== undefined) {
 			meshRef.current.position.y = y;
+		} else {
+			meshRef.current.position.y = DEFAULT_CEILING_HEIGHT;
 		}
 	});
 
@@ -36,7 +40,7 @@ export const RoomLighting = () => {
 		(event: ThreeEvent<MouseEvent>) => {
 			if (!editable) return;
 			const light = {
-				position: event.point,
+				worldPosition: { x: event.point.x, y: event.point.y, z: event.point.z },
 			};
 
 			addLight(light);

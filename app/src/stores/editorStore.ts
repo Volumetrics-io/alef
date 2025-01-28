@@ -1,4 +1,4 @@
-import { PrefixedId } from '@alef/common';
+import { isPrefixedId, PrefixedId } from '@alef/common';
 import { getVoidObject, PointerEventsMap } from '@pmndrs/pointer-events';
 import { useThree } from '@react-three/fiber';
 import { useEffect } from 'react';
@@ -8,8 +8,8 @@ import { useShallow } from 'zustand/react/shallow';
 import { usePlanesStore } from './planesStore';
 
 export type EditorStore = {
-	selectedFurniturePlacementId: PrefixedId<'fp'> | null;
-	select: (id: PrefixedId<'fp'>) => void;
+	selectedId: PrefixedId<'fp'> | PrefixedId<'lp'> | null;
+	select: (id: PrefixedId<'fp'> | PrefixedId<'lp'> | null) => void;
 
 	/** Actual recorded intersections */
 	liveIntersections: Record<PrefixedId<'fp'>, string[]>;
@@ -25,8 +25,8 @@ export type EditorStore = {
 
 export const useEditorStore = create<EditorStore>((set) => {
 	return {
-		selectedFurniturePlacementId: null,
-		select: (id: PrefixedId<'fp'>) => set({ selectedFurniturePlacementId: id }),
+		selectedId: null,
+		select: (id) => set({ selectedId: id }),
 		liveIntersections: {},
 		stickyIntersections: {},
 		onIntersectionEnter: (id, plane) =>
@@ -56,11 +56,15 @@ export const useEditorStore = create<EditorStore>((set) => {
 	};
 });
 
+export function useSelect() {
+	return useEditorStore((s) => s.select);
+}
+
 export function useEditorSelectionReset() {
 	const scene = useThree((s) => s.scene);
 	useEffect(() => {
 		const voidObject = getVoidObject(scene as any) as Object3D<Object3DEventMap & PointerEventsMap>;
-		const fn = () => useEditorStore.setState({ selectedFurniturePlacementId: null });
+		const fn = () => useEditorStore.setState({ selectedId: null });
 		voidObject.addEventListener('click', fn);
 		return () => voidObject.removeEventListener('click', fn);
 	}, [scene]);
@@ -70,4 +74,12 @@ export function useIntersectingPlaneLabels(id: PrefixedId<'fp'>) {
 	const intersections = useEditorStore((s) => s.stickyIntersections[id]) ?? [];
 	// map to plane info
 	return usePlanesStore(useShallow((s) => intersections.map((i) => s.getPlaneLabel(i))));
+}
+
+export function useSelectedFurniturePlacementId() {
+	return useEditorStore(({ selectedId }) => (selectedId && isPrefixedId(selectedId, 'fp') && selectedId) || null);
+}
+
+export function useSelectedLightPlacementId() {
+	return useEditorStore(({ selectedId }) => (selectedId && isPrefixedId(selectedId, 'lp') && selectedId) || null);
 }

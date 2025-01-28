@@ -1,10 +1,12 @@
-import { useLightStore } from '@/stores/lightStore';
+import { useSelectedLightPlacementId } from '@/stores/editorStore';
+import { useGlobalLighting, useRoomStore } from '@/stores/roomStore';
+import { PrefixedId } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { Button, colors, Slider } from '@react-three/uikit-default';
 import { Trash } from '@react-three/uikit-lucide';
 
 export const Lighting = () => {
-	const { selectedLightId } = useLightStore();
+	const selectedLightId = useSelectedLightPlacementId();
 
 	return (
 		<Container
@@ -25,8 +27,9 @@ export const Lighting = () => {
 	);
 };
 
-const SelectedLightPane = ({ id }: { id: string | null }) => {
-	const { globalIntensity, globalColor, setGlobalIntensity, setGlobalColor, deleteLight } = useLightStore();
+const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
+	const [{ intensity: globalIntensity, color: globalColor }, updateGlobal] = useGlobalLighting();
+	const deleteLight = useRoomStore((s) => s.deleteLight);
 
 	const handleDelete = () => {
 		if (!id) return;
@@ -40,13 +43,13 @@ const SelectedLightPane = ({ id }: { id: string | null }) => {
 					<Text fontSize={16} fontWeight="bold" color={colors.primary}>
 						Intensity
 					</Text>
-					<Slider value={globalIntensity} min={0} max={2} step={0.01} onValueChange={setGlobalIntensity} />
+					<Slider value={globalIntensity} min={0} max={2} step={0.01} onValueChange={(v) => updateGlobal({ intensity: v })} />
 				</Container>
 				<Container flexDirection="column" gap={10} width="100%">
 					<Text fontSize={16} fontWeight="bold" color={colors.primary}>
 						Warmth
 					</Text>
-					<Slider value={globalColor} min={0} max={10} step={0.1} onValueChange={setGlobalColor} />
+					<Slider value={globalColor} min={0} max={10} step={0.1} onValueChange={(v) => updateGlobal({ color: v })} />
 				</Container>
 			</Container>
 

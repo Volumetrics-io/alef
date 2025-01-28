@@ -1,58 +1,48 @@
-import { useLightStore } from '@/stores/lightStore';
+import { useSelect, useSelectedLightPlacementId } from '@/stores/editorStore';
+import { useGlobalLighting, useLightPlacement, useMoveLight, useSubscribeToPlacementPosition } from '@/stores/roomStore';
 import { useStageStore } from '@/stores/stageStore';
+import { PrefixedId } from '@alef/common';
 import { Handle, HandleTarget } from '@react-three/handle';
-import { useCallback, useEffect, useRef } from 'react';
-import { Group } from 'three';
+import { useHover } from '@react-three/xr';
+import { useCallback, useRef } from 'react';
+import { Group, Vector3 } from 'three';
 import { getLightColor } from './getLightColor';
 
-export const CeilingLight = ({ id, ...props }: { id: string }) => {
-	const { selectedLightId, setSelectedLightId, hoveredLightId, setHoveredLightId, setLightPosition } = useLightStore();
+export const CeilingLight = ({ id, ...props }: { id: PrefixedId<'lp'> }) => {
 	const { mode } = useStageStore();
 	const editable = mode === 'lighting';
+	const selectedLightId = useSelectedLightPlacementId();
 	const selected = selectedLightId === id;
-	const hovered = hoveredLightId === id;
-	const globalIntensity = useLightStore((s) => s.globalIntensity);
-	const globalColor = useLightStore((s) => s.globalColor);
+	const select = useSelect();
+	const [{ intensity: globalIntensity, color: globalColor }] = useGlobalLighting();
 
 	const groupRef = useRef<Group>(null);
+	const hovered = useHover(groupRef as any);
 
 	const handleClick = () => {
 		if (!editable) return;
-		setSelectedLightId(id);
+		select(id);
 	};
 
-	const handleHover = useCallback(() => {
-		if (!editable) return;
-		setHoveredLightId(id);
-	}, [editable, setHoveredLightId, id]);
-
-	const handleHoverLeave = useCallback(() => {
-		if (!editable) return;
-		setHoveredLightId(null);
-	}, [editable, setHoveredLightId]);
-
-	const initialPosition = useLightStore((s) => s.lightDetails[id].position);
+	const light = useLightPlacement(id);
+	const initialPosition = new Vector3().copy(light.worldPosition);
+	const move = useMoveLight(id);
 
 	const handlePointerUp = useCallback(() => {
 		if (!groupRef.current) return;
 
-		setLightPosition(id, groupRef.current.position);
-	}, [setLightPosition, id]);
+		move({ position: groupRef.current.position });
+	}, [move]);
 
 	// subscribe to position changes
-	useEffect(() => {
-		return useLightStore.subscribe(
-			(s) => s.lightDetails[id].position,
-			(position) => {
-				if (position) {
-					groupRef.current?.position.copy(position);
-				}
-			}
-		);
+	useSubscribeToPlacementPosition(id, (position) => {
+		if (position) {
+			groupRef.current?.position.copy(position);
+		}
 	});
 
 	return (
-		<HandleTarget targetRef={groupRef as any}>
+		<HandleTarget>
 			<group position={initialPosition} ref={groupRef}>
 				{editable && (
 					<group>
@@ -60,8 +50,8 @@ export const CeilingLight = ({ id, ...props }: { id: string }) => {
 							<ringGeometry args={[0.125, 0.16, 32]} />
 							<meshBasicMaterial color="white" />
 						</mesh>
-						<Handle useTargetFromContext translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
-							<mesh onClick={handleClick} onPointerOver={handleHover} onPointerUp={handlePointerUp} onPointerOut={handleHoverLeave}>
+						<Handle targetRef="from-context" translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
+							<mesh onClick={handleClick} onPointerUp={handlePointerUp}>
 								<sphereGeometry args={[0.1, 32, 32]} />
 								<meshBasicMaterial color={getLightColor(globalColor)} transparent={true} opacity={globalIntensity} />
 							</mesh>

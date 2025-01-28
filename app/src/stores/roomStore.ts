@@ -2,7 +2,7 @@ import { PlaneLabel } from '@/components/xr/anchors';
 import { useVibrateOnHover } from '@/hooks/useVibrateOnHover';
 import { DragController } from '@/physics/DragController';
 import { isPlaneUserData } from '@/physics/planeUserData';
-import { id, PrefixedId } from '@alef/common';
+import { id, isPrefixedId, PrefixedId } from '@alef/common';
 import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
 import { ActiveCollisionTypes } from '@dimforge/rapier3d-compat';
 import { HandleOptions, TransformHandlesProperties } from '@react-three/handle';
@@ -26,10 +26,22 @@ export interface FurniturePlacement {
 	anchorOffset?: number;
 }
 
-export type RoomStoreState = {
-	furniture: Record<string, FurniturePlacement>;
+export interface LightPlacement {
+	worldPosition: { x: number; y: number; z: number };
+}
 
-	addFurniture: (init: FurniturePlacement) => void;
+export interface GlobalLighting {
+	intensity: number;
+	color: number;
+}
+
+export type RoomStoreState = {
+	furniture: Record<PrefixedId<'fp'>, FurniturePlacement>;
+	lights: Record<PrefixedId<'lp'>, LightPlacement>;
+	globalLighting: GlobalLighting;
+
+	// furniture APIs
+	addFurniture: (init: FurniturePlacement) => string;
 	moveFurniture: (
 		id: PrefixedId<'fp'>,
 		transform: {
@@ -38,6 +50,17 @@ export type RoomStoreState = {
 		}
 	) => void;
 	deleteFurniture: (id: PrefixedId<'fp'>) => void;
+
+	// light APIs
+	addLight: (init: LightPlacement) => string;
+	moveLight: (
+		id: PrefixedId<'lp'>,
+		transform: {
+			position?: { x: number; y: number; z: number };
+		}
+	) => void;
+	deleteLight: (id: PrefixedId<'lp'>) => void;
+	updateGlobalLighting: (update: Partial<GlobalLighting>) => void;
 };
 
 export const useRoomStore = create<RoomStoreState>()(
@@ -49,6 +72,7 @@ export const useRoomStore = create<RoomStoreState>()(
 				addFurniture: (init: FurniturePlacement) => {
 					const placementId = id('fp');
 					set(O.modify(O.optic<RoomStoreState>().prop('furniture'))((s) => ({ ...s, [placementId]: init })));
+					return placementId;
 				},
 				moveFurniture: (
 					id,
@@ -75,12 +99,49 @@ export const useRoomStore = create<RoomStoreState>()(
 						})
 					);
 				},
+
+				lights: {},
+				globalLighting: {
+					intensity: 0.8,
+					color: 2.7,
+				},
+
+				addLight: (init: LightPlacement) => {
+					const placementId = id('lp');
+					set(O.modify(O.optic<RoomStoreState>().prop('lights'))((s) => ({ ...s, [placementId]: init })));
+					return placementId;
+				},
+				moveLight: (
+					id,
+					{
+						position,
+					}: {
+						position?: { x: number; y: number; z: number };
+					}
+				) => {
+					if (position) {
+						set(O.modify(O.optic<RoomStoreState>().prop('lights').prop(id).prop('worldPosition'))(() => position));
+					}
+				},
+				deleteLight: (id) => {
+					set(
+						O.modify(O.optic<RoomStoreState>().prop('lights'))((s) => {
+							const { [id]: _, ...rest } = s;
+							return rest;
+						})
+					);
+				},
+				updateGlobalLighting: (update) => {
+					set(O.modify(O.optic<RoomStoreState>().prop('globalLighting'))((s) => ({ ...s, ...update })));
+				},
 			};
 		}),
 		{
 			name: 'testing-roomstore',
 			partialize: (state) => ({
 				furniture: state.furniture,
+				lights: state.lights,
+				globalLighting: state.globalLighting,
 			}),
 		}
 	)
@@ -111,36 +172,16 @@ export function useAddFurniture() {
 	return useRoomStore((s) => s.addFurniture);
 }
 
-export function useSubscribeToPlacementPosition(id: PrefixedId<'fp'>, callback: (position: { x: number; y: number; z: number }) => void) {
+export function useSubscribeToPlacementPosition(id: PrefixedId<'fp'> | PrefixedId<'lp'>, callback: (position: { x: number; y: number; z: number }) => void) {
 	const stableCallback = useRef(callback);
 	stableCallback.current = callback;
 	return useEffect(
 		() =>
 			useRoomStore.subscribe(
-				(s) => s.furniture[id],
+				(s) => (isPrefixedId(id, 'fp') ? s.furniture[id] : s.lights[id]),
 				(placement) => {
 					if (placement) {
 						stableCallback.current(placement.worldPosition);
-					}
-				},
-				{
-					fireImmediately: true,
-				}
-			),
-		[id]
-	);
-}
-
-export function useSubscribeToPlacementRotation(id: PrefixedId<'fp'>, callback: (rotation: { x: number; y: number; z: number; w: number }) => void) {
-	const stableCallback = useRef(callback);
-	stableCallback.current = callback;
-	return useEffect(
-		() =>
-			useRoomStore.subscribe(
-				(s) => s.furniture[id],
-				(placement) => {
-					if (placement) {
-						stableCallback.current(placement.rotation);
 					}
 				},
 				{
@@ -239,4 +280,39 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 			activeCollisionTypes: ActiveCollisionTypes.KINEMATIC_FIXED,
 		} satisfies Partial<RoundCuboidColliderProps>,
 	};
+}
+
+export function useLightPlacementIds() {
+	return useRoomStore(useShallow((s) => Object.keys(s.lights) as PrefixedId<'lp'>[]));
+}
+
+export function useLightPlacement(id: PrefixedId<'lp'>) {
+	return useRoomStore((s) => s.lights[id]);
+}
+
+export function useDeleteLightPlacement(id: PrefixedId<'lp'>) {
+	const deleteFn = useRoomStore((s) => s.deleteLight);
+	return useCallback(() => {
+		deleteFn(id);
+	}, [deleteFn, id]);
+}
+
+export function useAddLight() {
+	return useRoomStore((s) => s.addLight);
+}
+
+export function useMoveLight(id: PrefixedId<'lp'>) {
+	const moveFn = useRoomStore((s) => s.moveLight);
+	return useCallback(
+		(transform: { position?: { x: number; y: number; z: number } }) => {
+			moveFn(id, transform);
+		},
+		[id, moveFn]
+	);
+}
+
+export function useGlobalLighting() {
+	const value = useRoomStore((s) => s.globalLighting);
+	const update = useRoomStore((s) => s.updateGlobalLighting);
+	return [value, update] as const;
 }

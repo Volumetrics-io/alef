@@ -20,7 +20,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	const furnitureId = useFurniturePlacementFurnitureId(furniturePlacementId);
 	const { groupProps, dragHandleProps: handleProps, rotateHandleProps, colliderProps, rigidBodyProps } = useFurniturePlacementDrag(furniturePlacementId);
 	const select = useEditorStore((s) => s.select);
-	const selected = useEditorStore((s) => s.selectedFurniturePlacementId === furniturePlacementId);
+	const selected = useEditorStore((s) => s.selectedId === furniturePlacementId);
 
 	const handleClick = useCallback(() => {
 		select(furniturePlacementId);

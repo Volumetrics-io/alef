@@ -1,5 +1,5 @@
 import { useSelect, useSelectedLightPlacementId } from '@/stores/editorStore';
-import { useGlobalLighting, useLightPlacement, useMoveLight, useSubscribeToPlacementPosition } from '@/stores/roomStore';
+import { useGlobalLighting, useLightPlacement, useMoveLight, useSubscribeToPlacementPosition } from '@/stores/roomStore/roomStore';
 import { useStageStore } from '@/stores/stageStore';
 import { PrefixedId } from '@alef/common';
 import { Handle, HandleTarget } from '@react-three/handle';

@@ -1,5 +1,5 @@
 import { useEditorSelectionReset } from '@/stores/editorStore';
-import { useFurniturePlacementIds } from '@/stores/roomStore';
+import { useFurniturePlacementIds } from '@/stores/roomStore/roomStore';
 import { PlacedFurniture } from '../furniture/PlacedFurniture';
 import { RoomLighting } from '../lighting/RoomLighting';
 import { DebugDisplay } from './DebugDisplay';

@@ -12,6 +12,7 @@ import { noEvents, NotInXR, PointerEvents, XR } from '@react-three/xr';
 import { StagerPanel } from '@/components/xr/panels/StagerPanel';
 import { RoomRenderer } from '@/components/xr/room/RoomRenderer';
 import { useMe } from '@/services/publicApi/userHooks';
+import { RoomStoreProvider } from '@/stores/roomStore';
 import { OrbitHandles } from '@react-three/handle';
 import { Physics } from '@react-three/rapier';
 import { useNavigate } from '@verdant-web/react-router';
@@ -27,8 +28,9 @@ const HomePage = () => {
 			navigate('/complete-signup');
 		}
 	}, [session?.emailVerifiedAt, navigate]);
+
 	return (
-		<>
+		<RoomStoreProvider>
 			<NavBar style={{ position: 'fixed', top: '0' }} />
 			<Main full style={{ height: '100vh' }}>
 				<ErrorBoundary>
@@ -45,7 +47,7 @@ const HomePage = () => {
 						camera={{ position: [-0.5, 0.5, 0.5] }}
 					>
 						<XR store={xrStore}>
-						<DepthShader />
+							<DepthShader />
 							<Physics debug>
 								<NotInXR>
 									<OrbitHandles damping />
@@ -81,7 +83,7 @@ const HomePage = () => {
 			>
 				Enter AR
 			</button>
-		</>
+		</RoomStoreProvider>
 	);
 };
 

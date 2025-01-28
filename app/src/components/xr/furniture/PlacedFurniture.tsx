@@ -1,6 +1,6 @@
 import { useAABB } from '@/hooks/useAABB';
 import { useEditorStore } from '@/stores/editorStore';
-import { useDeleteFurniturePlacement, useFurniturePlacementDrag, useFurniturePlacementFurnitureId } from '@/stores/roomStore';
+import { useDeleteFurniturePlacement, useFurniturePlacementDrag, useFurniturePlacementFurnitureId } from '@/stores/roomStore/roomStore';
 import { PrefixedId } from '@alef/common';
 import { Billboard } from '@react-three/drei';
 import { Handle, HandleTarget } from '@react-three/handle';

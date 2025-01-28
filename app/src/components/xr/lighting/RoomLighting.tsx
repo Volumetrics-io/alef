@@ -1,4 +1,4 @@
-import { useAddLight, useLightPlacementIds } from '@/stores/roomStore';
+import { useAddLight, useLightPlacementIds } from '@/stores/roomStore/roomStore';
 import { useStageStore } from '@/stores/stageStore';
 import { ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import { useXR, useXRPlanes } from '@react-three/xr';

@@ -1,40 +1,23 @@
 import { useSelectedLightPlacementId } from '@/stores/editorStore';
-import { useGlobalLighting, useRoomStore } from '@/stores/roomStore';
+import { useDeleteLightPlacement, useGlobalLighting } from '@/stores/roomStore/roomStore';
 import { PrefixedId } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { Button, colors, Slider } from '@react-three/uikit-default';
 import { Trash } from '@react-three/uikit-lucide';
+import { Surface } from '../../ui/Surface';
 
 export const Lighting = () => {
 	const selectedLightId = useSelectedLightPlacementId();
 
 	return (
-		<Container
-			flexDirection="column"
-			alignItems="center"
-			justifyContent="center"
-			width={350}
-			height={300}
-			gap={3}
-			borderWidth={1}
-			borderColor={colors.border}
-			borderRadius={10}
-			padding={5}
-			backgroundColor={colors.background}
-		>
+		<Surface flexDirection="column" alignItems="center" justifyContent="center" width={350} height={300}>
 			<SelectedLightPane id={selectedLightId} />
-		</Container>
+		</Surface>
 	);
 };
 
 const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
 	const [{ intensity: globalIntensity, color: globalColor }, updateGlobal] = useGlobalLighting();
-	const deleteLight = useRoomStore((s) => s.deleteLight);
-
-	const handleDelete = () => {
-		if (!id) return;
-		deleteLight(id);
-	};
 
 	return (
 		<Container flexDirection="column" width="100%" height="100%" justifyContent="space-between" padding={20}>
@@ -53,13 +36,18 @@ const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
 				</Container>
 			</Container>
 
-			{id && (
-				<Container flexDirection="row" gap={10} alignItems="center">
-					<Button backgroundColor={colors.destructive} onClick={handleDelete}>
-						<Trash color={colors.destructiveForeground} />
-					</Button>
-				</Container>
-			)}
+			{id && <DeleteButton id={id} />}
 		</Container>
 	);
 };
+
+function DeleteButton({ id }: { id: PrefixedId<'lp'> }) {
+	const deleteLight = useDeleteLightPlacement(id);
+	return (
+		<Container flexDirection="row" gap={10} alignItems="center">
+			<Button backgroundColor={colors.destructive} onClick={deleteLight}>
+				<Trash color={colors.destructiveForeground} />
+			</Button>
+		</Container>
+	);
+}

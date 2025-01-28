@@ -1,7 +1,7 @@
 import { useDebugStore } from '@/stores/debugStore';
 import { useEditorStore } from '@/stores/editorStore';
 import { usePlanesStore } from '@/stores/planesStore';
-import { useRoomStore } from '@/stores/roomStore';
+import { RoomStore } from '@/stores/roomStore/roomStore';
 import { PrefixedId } from '@alef/common';
 import type RAPIER from '@dimforge/rapier3d-compat';
 import { KinematicCharacterController, QueryFilterFlags } from '@dimforge/rapier3d-compat';
@@ -29,6 +29,7 @@ export class DragController {
 		private id: PrefixedId<'fp'>,
 		private world: RAPIER.World,
 		private bodyRef: RefObject<RAPIER.RigidBody>,
+		roomStore: RoomStore,
 		private config: {
 			offset?: number;
 			disablePlaneSnap?: boolean;
@@ -45,7 +46,7 @@ export class DragController {
 		// subscribe to changes in position from the store and update as long as it
 		// won't interfere with the current drag operation
 		this.unsubscribes.push(
-			useRoomStore.subscribe(
+			roomStore.subscribe(
 				(s) => s.furniture[id],
 				(placement) => {
 					if (!placement) return;

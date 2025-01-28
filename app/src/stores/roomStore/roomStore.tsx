@@ -10,10 +10,12 @@ import { IntersectionEnterPayload, IntersectionExitPayload, RigidBodyProps, Roun
 import * as O from 'optics-ts';
 import { RefObject, useCallback, useEffect, useRef } from 'react';
 import { Group } from 'three';
-import { create } from 'zustand';
+import { createStore, useStore } from 'zustand';
 import { persist, subscribeWithSelector } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
-import { useEditorStore, useIntersectingPlaneLabels } from './editorStore';
+import { useEditorStore, useIntersectingPlaneLabels } from '../editorStore';
+import { getRoomStoreStorageKey } from './meta';
+import { useRoomStoreContext } from './Provider';
 
 export interface FurniturePlacement {
 	furnitureId: PrefixedId<'f'>;
@@ -36,6 +38,7 @@ export interface GlobalLighting {
 }
 
 export type RoomStoreState = {
+	id: PrefixedId<'rl'>;
 	furniture: Record<PrefixedId<'fp'>, FurniturePlacement>;
 	lights: Record<PrefixedId<'lp'>, LightPlacement>;
 	globalLighting: GlobalLighting;
@@ -63,91 +66,115 @@ export type RoomStoreState = {
 	updateGlobalLighting: (update: Partial<GlobalLighting>) => void;
 };
 
-export const useRoomStore = create<RoomStoreState>()(
-	// temporary - persist store to localStorage
-	persist(
-		subscribeWithSelector((set) => {
-			return {
-				furniture: {},
-				addFurniture: (init: FurniturePlacement) => {
-					const placementId = id('fp');
-					set(O.modify(O.optic<RoomStoreState>().prop('furniture'))((s) => ({ ...s, [placementId]: init })));
-					return placementId;
-				},
-				moveFurniture: (
-					id,
-					{
-						position,
-						rotation,
-					}: {
-						position?: { x: number; y: number; z: number };
-						rotation?: { x: number; y: number; z: number; w: number };
-					}
-				) => {
-					if (position) {
-						set(O.modify(O.optic<RoomStoreState>().prop('furniture').prop(id).prop('worldPosition'))(() => position));
-					}
-					if (rotation) {
-						set(O.modify(O.optic<RoomStoreState>().prop('furniture').prop(id).prop('rotation'))(() => rotation));
-					}
-				},
-				deleteFurniture: (id) => {
-					set(
-						O.modify(O.optic<RoomStoreState>().prop('furniture'))((s) => {
-							const { [id]: _, ...rest } = s;
-							return rest;
-						})
-					);
-				},
+export const makeRoomStore = (roomLayoutId: PrefixedId<'rl'>) =>
+	createStore<RoomStoreState>()(
+		// temporary - persist store to localStorage
+		persist(
+			subscribeWithSelector((set) => {
+				return {
+					id: roomLayoutId,
+					furniture: {},
+					addFurniture: (init: FurniturePlacement) => {
+						const placementId = id('fp');
+						set(O.modify(O.optic<RoomStoreState>().prop('furniture'))((s) => ({ ...s, [placementId]: init })));
+						return placementId;
+					},
+					moveFurniture: (
+						id,
+						{
+							position,
+							rotation,
+						}: {
+							position?: { x: number; y: number; z: number };
+							rotation?: { x: number; y: number; z: number; w: number };
+						}
+					) => {
+						if (position) {
+							set(O.modify(O.optic<RoomStoreState>().prop('furniture').prop(id).prop('worldPosition'))(() => position));
+						}
+						if (rotation) {
+							set(O.modify(O.optic<RoomStoreState>().prop('furniture').prop(id).prop('rotation'))(() => rotation));
+						}
+					},
+					deleteFurniture: (id) => {
+						set(
+							O.modify(O.optic<RoomStoreState>().prop('furniture'))((s) => {
+								const { [id]: _, ...rest } = s;
+								return rest;
+							})
+						);
+					},
 
-				lights: {},
-				globalLighting: {
-					intensity: 0.8,
-					color: 2.7,
-				},
+					lights: {},
+					globalLighting: {
+						intensity: 0.8,
+						color: 2.7,
+					},
 
-				addLight: (init: LightPlacement) => {
-					const placementId = id('lp');
-					set(O.modify(O.optic<RoomStoreState>().prop('lights'))((s) => ({ ...s, [placementId]: init })));
-					return placementId;
-				},
-				moveLight: (
-					id,
-					{
-						position,
-					}: {
-						position?: { x: number; y: number; z: number };
-					}
-				) => {
-					if (position) {
-						set(O.modify(O.optic<RoomStoreState>().prop('lights').prop(id).prop('worldPosition'))(() => position));
-					}
-				},
-				deleteLight: (id) => {
-					set(
-						O.modify(O.optic<RoomStoreState>().prop('lights'))((s) => {
-							const { [id]: _, ...rest } = s;
-							return rest;
-						})
-					);
-				},
-				updateGlobalLighting: (update) => {
-					set(O.modify(O.optic<RoomStoreState>().prop('globalLighting'))((s) => ({ ...s, ...update })));
-				},
-			};
-		}),
-		{
-			name: 'testing-roomstore',
-			partialize: (state) => ({
-				furniture: state.furniture,
-				lights: state.lights,
-				globalLighting: state.globalLighting,
+					addLight: (init: LightPlacement) => {
+						const placementId = id('lp');
+						set(O.modify(O.optic<RoomStoreState>().prop('lights'))((s) => ({ ...s, [placementId]: init })));
+						return placementId;
+					},
+					moveLight: (
+						id,
+						{
+							position,
+						}: {
+							position?: { x: number; y: number; z: number };
+						}
+					) => {
+						if (position) {
+							set(O.modify(O.optic<RoomStoreState>().prop('lights').prop(id).prop('worldPosition'))(() => position));
+						}
+					},
+					deleteLight: (id) => {
+						set(
+							O.modify(O.optic<RoomStoreState>().prop('lights'))((s) => {
+								const { [id]: _, ...rest } = s;
+								return rest;
+							})
+						);
+					},
+					updateGlobalLighting: (update) => {
+						set(O.modify(O.optic<RoomStoreState>().prop('globalLighting'))((s) => ({ ...s, ...update })));
+					},
+				};
 			}),
-		}
-	)
-);
+			{
+				name: getRoomStoreStorageKey(roomLayoutId),
+				partialize: (state) => ({
+					furniture: state.furniture,
+					lights: state.lights,
+					globalLighting: state.globalLighting,
+				}),
+			}
+		)
+	);
+export type RoomStore = ReturnType<typeof makeRoomStore>;
 
-(window as any).roomStore = useRoomStore;
+function useRoomStore<T>(selector: (s: RoomStoreState) => T) {
+	const store = useRoomStoreContext();
+	return useStore(store, selector);
+}
+
+function useRoomStoreSubscribe<T>(selector: (s: RoomStoreState) => T, listener: (state: T) => void, options?: { fireImmediately?: boolean; equalityFn?: (a: T, b: T) => boolean }) {
+	const store = useRoomStoreContext();
+	const stable = useRef({ listener, options });
+	stable.current.listener = listener;
+	stable.current.options = options;
+	useEffect(
+		() =>
+			store.subscribe(
+				selector,
+				(v) => {
+					stable.current.listener(v);
+				},
+				stable.current.options
+			),
+		[store, selector]
+	);
+}
 
 export function useFurniturePlacementIds() {
 	return useRoomStore(useShallow((s) => Object.keys(s.furniture) as PrefixedId<'fp'>[]));
@@ -173,22 +200,16 @@ export function useAddFurniture() {
 }
 
 export function useSubscribeToPlacementPosition(id: PrefixedId<'fp'> | PrefixedId<'lp'>, callback: (position: { x: number; y: number; z: number }) => void) {
-	const stableCallback = useRef(callback);
-	stableCallback.current = callback;
-	return useEffect(
-		() =>
-			useRoomStore.subscribe(
-				(s) => (isPrefixedId(id, 'fp') ? s.furniture[id] : s.lights[id]),
-				(placement) => {
-					if (placement) {
-						stableCallback.current(placement.worldPosition);
-					}
-				},
-				{
-					fireImmediately: true,
-				}
-			),
-		[id]
+	useRoomStoreSubscribe(
+		(s) => (isPrefixedId(id, 'fp') ? s.furniture[id] : s.lights[id]),
+		(placement) => {
+			if (placement) {
+				callback(placement.worldPosition);
+			}
+		},
+		{
+			fireImmediately: true,
+		}
 	);
 }
 
@@ -214,12 +235,14 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 	const controllerRef = useRef<DragController | null>(null);
 	const { world } = useRapier();
 
+	const store = useRoomStoreContext();
+
 	useEffect(() => {
 		console.debug('new drag controller', id);
-		controllerRef.current = new DragController(id, world, rigidBodyRef, {
+		controllerRef.current = new DragController(id, world, rigidBodyRef, store, {
 			onDragEnd: updatePosition,
 		});
-	}, [world, updatePosition, id]);
+	}, [world, updatePosition, id, store]);
 
 	const apply = useCallback((state: HandleState) => {
 		controllerRef.current?.update(state);

@@ -33,7 +33,7 @@ export class DragController {
 		private config: {
 			offset?: number;
 			disablePlaneSnap?: boolean;
-			onDragEnd?: (transform: { position: Vector3; quaternion: Quaternion }) => void;
+			onDragEnd?: (transform: { position: Vector3; rotation: Quaternion }) => void;
 		}
 	) {
 		this.controller = world.createCharacterController(config.offset ?? 0.005);
@@ -85,7 +85,7 @@ export class DragController {
 
 	#updateTmpTransform = {
 		position: new Vector3(),
-		quaternion: new Quaternion(),
+		rotation: new Quaternion(),
 	};
 	update = (handleState: HandleState) => {
 		this.#isDragging = true;
@@ -98,7 +98,7 @@ export class DragController {
 			this.#isDragging = false;
 			// update the store with the final position
 			this.#updateTmpTransform.position.copy(this.#body!.translation());
-			this.#updateTmpTransform.quaternion.copy(this.#body!.rotation());
+			this.#updateTmpTransform.rotation.copy(this.#body!.rotation());
 			this.config.onDragEnd?.(this.#updateTmpTransform);
 		}
 	};

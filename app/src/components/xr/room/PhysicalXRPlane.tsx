@@ -2,6 +2,7 @@ import { createXRPlaneUserData } from '@/physics/planeUserData';
 import { useEditorStore } from '@/stores/editorStore';
 import { useEnvironmentStore } from '@/stores/environmentStore';
 import { getPlaneId, useRegisterXRPlane } from '@/stores/planesStore';
+import { isPrefixedId } from '@alef/common';
 import { useMergedRef } from '@alef/sys';
 import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
 import { useFrame } from '@react-three/fiber';
@@ -56,7 +57,9 @@ export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(functi
 
 	// whether a dragged object is intersecting this plane, which means the object should snap to it.
 	// we render it differently to indicate the detection of the snap
-	const snapped = useEditorStore((s) => (s.selectedId ? s.liveIntersections[s.selectedId]?.some((value) => value === getPlaneId(plane)) : false));
+	const snapped = useEditorStore((s) =>
+		s.selectedId && isPrefixedId(s.selectedId, 'fp') ? s.liveIntersections[s.selectedId]?.some((value) => value === getPlaneId(plane)) : false
+	);
 
 	const register = useRegisterXRPlane(plane);
 
@@ -64,12 +67,12 @@ export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(functi
 
 	return (
 		<>
+			<RigidBody type="fixed" colliders={false} ref={bodyRef} userData={createXRPlaneUserData(plane)}>
+				<CuboidCollider args={halfExtents} position={new Vector3(0, 0, 0)} />
+				{/* A larger Sensor allows us to detect when furniture is close to the wall */}
+				{snapSensor && <CuboidCollider args={sensorHalfExtents} position={[0, 0.2, 0]} sensor />}
+			</RigidBody>
 			<XRSpace space={plane.planeSpace} ref={finalRef}>
-				<RigidBody type="fixed" colliders={false} ref={bodyRef} userData={createXRPlaneUserData(plane)}>
-					<CuboidCollider args={halfExtents} position={new Vector3(0, 0, 0)} />
-					{/* A larger Sensor allows us to detect when furniture is close to the wall */}
-					{snapSensor && <CuboidCollider args={sensorHalfExtents} position={[0, 0.2, 0]} sensor />}
-				</RigidBody>
 				<XRPlaneModel renderOrder={-1} plane={plane} receiveShadow={true}>
 					<shadowMaterial ref={shadowMaterialRef} side={DoubleSide} shadowSide={DoubleSide} transparent={true} opacity={0} />
 				</XRPlaneModel>

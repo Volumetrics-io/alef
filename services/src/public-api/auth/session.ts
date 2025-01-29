@@ -1,4 +1,4 @@
-import { SessionManager } from '@a-type/auth';
+import { honoAdapter, SessionManager } from '@a-type/auth';
 import { AlefError, assertPrefixedId } from '@alef/common';
 import { Context } from 'hono';
 import { Env } from '../config/ctx.js';
@@ -48,11 +48,7 @@ export const sessions = new SessionManager<Context<Env>>({
 		name: 'name',
 		isProductAdmin: 'pad',
 	},
-	adapter: {
-		getRawRequest(ctx) {
-			return ctx.req.raw;
-		},
-	},
+	adapter: honoAdapter,
 });
 
 function getRootDomain(hostname: string) {

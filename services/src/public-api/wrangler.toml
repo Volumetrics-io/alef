@@ -25,3 +25,11 @@ entrypoint = "PublicStore"
 binding = "ADMIN_STORE"
 service = "db-service"
 entrypoint = "AdminStore"
+
+[[durable_objects.bindings]]
+name = "DEVICE_DISCOVERY"
+class_name = "DeviceDiscovery"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["DeviceDiscovery"]

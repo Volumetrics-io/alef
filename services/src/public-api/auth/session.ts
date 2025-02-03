@@ -2,6 +2,7 @@ import { honoAdapter, SessionManager } from '@a-type/auth';
 import { AlefError, assertPrefixedId } from '@alef/common';
 import { Context } from 'hono';
 import { Env } from '../config/ctx.js';
+import { getRootDomain } from './domains.js';
 
 declare module '@a-type/auth' {
 	interface Session {
@@ -13,12 +14,11 @@ declare module '@a-type/auth' {
 
 export const sessions = new SessionManager<Context<Env>>({
 	getSessionConfig(ctx) {
-		const apiUrl = new URL(ctx.env.API_ORIGIN);
 		return {
 			cookieName: 'alef-session',
 			cookieOptions: {
 				sameSite: 'lax',
-				domain: getRootDomain(apiUrl.hostname),
+				domain: getRootDomain(ctx.env.API_ORIGIN),
 			},
 			expiration: ctx.env.NODE_ENV === 'production' ? '1d' : '1m',
 			async createSession(userId) {
@@ -50,11 +50,3 @@ export const sessions = new SessionManager<Context<Env>>({
 	},
 	adapter: honoAdapter,
 });
-
-function getRootDomain(hostname: string) {
-	const domainParts = hostname.split('.');
-	if (domainParts.length > 2) {
-		return domainParts.slice(-2).join('.');
-	}
-	return hostname;
-}

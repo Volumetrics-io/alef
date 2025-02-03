@@ -5,7 +5,7 @@ import { jsonArrayFrom } from 'kysely/helpers/sqlite';
 import { AuthedStore } from './authedStore.js';
 import { Env } from './env.js';
 import { DB, getDatabase } from './kysely/index.js';
-import { Database } from './kysely/tables.js';
+import { Database, NewDevice } from './kysely/tables.js';
 
 export class PublicStore extends WorkerEntrypoint<Env> {
 	#db: DB;
@@ -72,5 +72,35 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 			builder = builder.where('Attribute.key', '=', key).where('Attribute.value', '=', value);
 		}
 		return builder.select((eb) => ['Furniture.id', 'Furniture.name', 'Furniture.modelUpdatedAt', this.selectFurnitureAttributes(eb)]).execute();
+	}
+
+	/**
+	 * Anonymous insertion of device info is allowed, as devices themselves are not
+	 * authenticated at the time of discovery.
+	 *
+	 * TODO: once discovered and claimed, devices can only be modified by their owners
+	 */
+	async ensureDeviceExists(info: Omit<NewDevice, 'displayMode'>, owner?: PrefixedId<'u'>) {
+		await this.#db
+			.insertInto('Device')
+			.values({
+				...info,
+				// this is not modified when upserting.
+				displayMode: 'staging',
+			})
+			.onConflict((cb) => cb.column('id').doUpdateSet(info))
+			.execute();
+
+		if (owner) {
+			await this.#db
+				.insertInto('DeviceAccess')
+				.values({ userId: owner, deviceId: info.id })
+				.onConflict((cb) => cb.columns(['userId', 'deviceId']).doNothing())
+				.execute();
+		}
+	}
+
+	async getDeviceAccess(deviceId: PrefixedId<'d'>) {
+		return this.#db.selectFrom('DeviceAccess').where('deviceId', '=', deviceId).select('userId').execute();
 	}
 }

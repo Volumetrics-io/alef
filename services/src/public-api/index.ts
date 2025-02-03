@@ -5,6 +5,7 @@ import { requestId } from 'hono/request-id';
 import { handleError } from '../middleware/errors.js';
 import { Env } from './config/ctx.js';
 import { authRouter } from './routers/auth.js';
+import { devicesRouter } from './routers/devices.js';
 import { furnitureRouter } from './routers/furniture.js';
 import { usersRouter } from './routers/users.js';
 
@@ -27,9 +28,12 @@ const app = new Hono<Env>()
 	.use(logger())
 	.get('/', (ctx) => ctx.text('Hello, world!'))
 	.route('/users', usersRouter)
-	.route('/furniture', furnitureRouter);
+	.route('/furniture', furnitureRouter)
+	.route('/devices', devicesRouter);
 
 // no need to include these routes in typings
 app.route('/auth', authRouter);
 
 export default app;
+
+export { DeviceDiscovery } from './durableObjects/DeviceDiscovery.js';

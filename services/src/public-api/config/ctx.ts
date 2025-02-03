@@ -1,4 +1,5 @@
 import type { AdminStore, PublicStore } from '../../db/index.js';
+import { DeviceDiscovery } from '../durableObjects/DeviceDiscovery.js';
 
 export interface Bindings {
 	// env
@@ -13,12 +14,14 @@ export interface Bindings {
 	NODE_ENV: string;
 	SESSION_SECRET: string;
 	ADMIN_UI_ORIGIN: string;
+	DEVICE_ID_SIGNING_SECRET: string;
 
 	// services
 	// TODO: use Service<T> wrapper, but this breaks Hono RPC client types
 	// ref: https://github.com/honojs/hono/issues/3811
-	PUBLIC_STORE: PublicStore;
-	ADMIN_STORE: AdminStore;
+	PUBLIC_STORE: Service<PublicStore>;
+	ADMIN_STORE: Service<AdminStore>;
+	DEVICE_DISCOVERY: DurableObjectNamespace<DeviceDiscovery>;
 }
 
 export interface CtxVars {}

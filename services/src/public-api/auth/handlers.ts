@@ -30,8 +30,7 @@ export const authHandlers = createHandlers<Context<Env>>({
 			if (!value) return value;
 			return {
 				...value,
-				// weird shimming required for Dates...
-				expiresAt: value.expiresAt ? new Date(await value.expiresAt.getTime()) : null,
+				expiresAt: value.expiresAt ? new Date(value.expiresAt) : null,
 			};
 		},
 		async getUserByEmail(email) {
@@ -40,7 +39,7 @@ export const authHandlers = createHandlers<Context<Env>>({
 			return {
 				...value,
 				// weird shimming required for Dates...
-				emailVerifiedAt: value.emailVerifiedAt ? new Date(await value.emailVerifiedAt.getTime()) : null,
+				emailVerifiedAt: value.emailVerifiedAt ? new Date(value.emailVerifiedAt) : null,
 			};
 		},
 		insertAccount(account) {
@@ -60,15 +59,19 @@ export const authHandlers = createHandlers<Context<Env>>({
 			if (!value) return value;
 			return {
 				...value,
-				// weird shimming required for Dates...
-				emailVerifiedAt: value.emailVerifiedAt ? new Date(await value.emailVerifiedAt.getTime()) : null,
+				emailVerifiedAt: value.emailVerifiedAt ? new Date(value.emailVerifiedAt) : null,
 			};
 		},
 		insertVerificationCode(data) {
 			return ctx.env.ADMIN_STORE.insertVerificationCode(data);
 		},
-		getVerificationCode(email, code) {
-			return ctx.env.ADMIN_STORE.getVerificationCode(email, code);
+		async getVerificationCode(email, code) {
+			const value = await ctx.env.ADMIN_STORE.getVerificationCode(email, code);
+			if (!value) return value;
+			return {
+				...value,
+				expiresAt: new Date(value.expiresAt),
+			};
 		},
 	}),
 });

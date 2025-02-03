@@ -57,13 +57,13 @@ export const os = getOS();
 export const browser = getBrowser();
 export const deviceType = getDeviceType();
 
-export const supportsXR = 'xr' in window.navigator;
 const emulateHeadset = new URLSearchParams(window.location.search).get('emulateHeadset') || sessionStorage.getItem('emulateHeadset');
 if (emulateHeadset) {
 	// once emulate headset is set, keep it set.
 	sessionStorage.setItem('emulateHeadset', 'true');
 	console.log('emulating headset');
 }
+export const supportsXR = 'xr' in window.navigator || emulateHeadset;
 
 // only Oculus Browser seems to expose a custom name in the UA...
 export const isQuest = userAgent.includes('OculusBrowser') || userAgent.includes('Quest');

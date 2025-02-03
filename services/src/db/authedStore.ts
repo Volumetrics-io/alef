@@ -22,4 +22,17 @@ export class AuthedStore extends RpcTarget {
 	}
 
 	// any authorized user-scoped operations go here
+
+	async getAccessibleDevices() {
+		return this.#db
+			.selectFrom('Device')
+			.innerJoin('DeviceAccess', 'Device.id', 'DeviceAccess.deviceId')
+			.where('DeviceAccess.userId', '=', this.#userId)
+			.selectAll('Device')
+			.execute();
+	}
+
+	async claimDevice(deviceId: PrefixedId<'d'>) {
+		await this.#db.insertInto('DeviceAccess').values({ userId: this.#userId, deviceId }).execute();
+	}
 }

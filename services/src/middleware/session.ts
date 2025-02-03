@@ -1,5 +1,6 @@
 import { AuthError, Session } from '@a-type/auth';
 import { AlefError, assertPrefixedId, PrefixedId } from '@alef/common';
+import { RpcStub } from 'cloudflare:workers';
 import { Context } from 'hono';
 import { createMiddleware } from 'hono/factory';
 import type { AuthedStore } from '../db/index.js';
@@ -48,7 +49,7 @@ export const loggedInMiddleware = createMiddleware<{
 
 export const userStoreMiddleware = createMiddleware<{
 	Variables: {
-		userStore: AuthedStore;
+		userStore: RpcStub<AuthedStore>;
 		session: SessionWithPrefixedIds;
 	};
 	Bindings: Env['Bindings'];
@@ -57,5 +58,31 @@ export const userStoreMiddleware = createMiddleware<{
 	ctx.set('session', session);
 	const userStore = await ctx.env.PUBLIC_STORE.getStoreForUser(session.userId);
 	ctx.set('userStore', userStore);
+	return next();
+});
+
+/**
+ * Only useful for endpoints that may be public or private.
+ * Other middleware exported from this module is more convenient
+ * by ensuring logged in status and/or providing userStore.
+ */
+export const sessionMiddleware = createMiddleware<{
+	Variables: Env['Variables'] & {
+		session: SessionWithPrefixedIds | null;
+	};
+	Bindings: Env['Bindings'];
+}>(async (ctx, next) => {
+	let session: SessionWithPrefixedIds | null = null;
+	try {
+		session = await getRequestSessionOrThrow(ctx);
+	} catch (err) {
+		if (err instanceof AlefError) {
+			if (err.code === AlefError.Code.Unauthorized) {
+				return next();
+			}
+		}
+		throw err;
+	}
+	ctx.set('session', session);
 	return next();
 });

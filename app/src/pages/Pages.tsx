@@ -25,6 +25,20 @@ const routes = makeRoutes([
 		component: lazy(() => import('./CompleteSignupPage.js')),
 	},
 	{
+		path: '/devices',
+		component: Outlet,
+		children: [
+			{
+				index: true,
+				component: lazy(() => import('./devices/DevicesPage.js')),
+			},
+			{
+				path: '/:id',
+				component: lazy(() => import('./devices/DevicePage.js')),
+			},
+		],
+	},
+	{
 		path: '*',
 		component: lazy(() => import('./NotFoundPage.js')),
 	},

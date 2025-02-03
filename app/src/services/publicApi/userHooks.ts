@@ -1,28 +1,24 @@
 import { AlefError } from '@alef/common';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { publicApiClient } from './client';
+import { handleErrors } from './utils';
 
 export function useMe() {
 	return useSuspenseQuery({
 		queryKey: ['me'],
 		queryFn: async () => {
-			const response = await publicApiClient.users.me.$get();
-			const asAlefError = AlefError.fromResponse(response);
-			// our whole app is authorized, so this should always redirect to login
-			if (asAlefError && asAlefError.code === AlefError.Code.Unauthorized) {
-				if (typeof window === 'undefined') {
-					throw asAlefError;
+			try {
+				return await handleErrors(publicApiClient.users.me.$get());
+			} catch (err) {
+				// catch a 401 and return null. it's ok.
+				if (AlefError.isInstance(err) && err.statusCode === 401) {
+					return null;
 				}
-				if (window.location.pathname !== '/login') {
-					window.location.href = '/login';
-					throw asAlefError;
-				} else {
-					throw asAlefError;
-				}
-			} else if (asAlefError) {
-				throw asAlefError;
 			}
-			return response.json();
 		},
 	});
+}
+
+export function useIsLoggedIn() {
+	return !!useMe().data;
 }

@@ -1,7 +1,8 @@
-import { isPrefixedId } from '@alef/common';
+import { AlefError, isPrefixedId } from '@alef/common';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { z } from 'zod';
+import { wrapRpcData } from '../../helpers/wrapRpcData';
 import { loggedInMiddleware } from '../../middleware/session';
 import { Env } from '../config/ctx';
 
@@ -24,10 +25,10 @@ export const furnitureRouter = new Hono<Env>()
 			if (attribute.length) {
 				const keyValues = Object.fromEntries(attribute.map((attr) => attr.split(':')));
 				const filteredFurniture = await ctx.env.PUBLIC_STORE.listFurnitureByAttributes(keyValues);
-				return ctx.json(filteredFurniture);
+				return ctx.json(wrapRpcData(filteredFurniture));
 			}
 			const furniture = await ctx.env.PUBLIC_STORE.listFurniture();
-			return ctx.json(furniture);
+			return ctx.json(wrapRpcData(furniture));
 		}
 	)
 	.get(
@@ -40,7 +41,10 @@ export const furnitureRouter = new Hono<Env>()
 		),
 		async (ctx) => {
 			const furniture = await ctx.env.PUBLIC_STORE.getFurniture(ctx.req.valid('param').id);
-			return ctx.json(furniture);
+			if (!furniture) {
+				throw new AlefError(AlefError.Code.NotFound, 'Furniture not found');
+			}
+			return ctx.json(wrapRpcData(furniture));
 		}
 	)
 	.get(
@@ -52,6 +56,10 @@ export const furnitureRouter = new Hono<Env>()
 			})
 		),
 		async (ctx) => {
-			return ctx.env.PUBLIC_STORE.getFurnitureModelResponse(ctx.req.valid('param').id);
+			const data = await ctx.env.PUBLIC_STORE.getFurnitureModelResponse(ctx.req.valid('param').id);
+			if (!data) {
+				throw new AlefError(AlefError.Code.NotFound, 'Model not found');
+			}
+			return data as unknown as Response;
 		}
 	);

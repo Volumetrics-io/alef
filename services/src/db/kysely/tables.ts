@@ -1,5 +1,5 @@
 import { AttributeKey, PrefixedId } from '@alef/common';
-import { ColumnType, Generated, Insertable, Selectable, Updateable } from 'kysely';
+import { ColumnType, Insertable, Selectable, Updateable } from 'kysely';
 
 export interface Database {
 	User: UserTable;
@@ -8,10 +8,17 @@ export interface Database {
 	Furniture: FurnitureTable;
 	Attribute: AttributeTable;
 	FurnitureAttribute: FurnitureAttributeTable;
+	Device: DeviceTable;
+	DeviceAccess: DeviceAccessTable;
 }
 
-type CreatedAt = Generated<Date>;
-type UpdatedAt = Generated<Date>;
+// date serialization: Dates go in, strings come out.
+type DateColumnRequired = ColumnType<string, Date, Date>;
+type DateColumnOptional = ColumnType<string | null, Date | undefined, Date | null | undefined> | null;
+type DateColumnGenerated = ColumnType<string, Date | undefined, Date | null | undefined>;
+
+type CreatedAt = DateColumnGenerated;
+type UpdatedAt = DateColumnOptional;
 
 export interface UserTable {
 	id: PrefixedId<'u'>;
@@ -21,14 +28,14 @@ export interface UserTable {
 	fullName: string | null;
 	friendlyName: string | null;
 	email: string;
-	emailVerifiedAt: Date | null;
+	emailVerifiedAt: DateColumnOptional;
 	imageUrl: string | null;
 
 	isProductAdmin: ColumnType<boolean, boolean | undefined, boolean | undefined>;
 
 	password: string | null;
 
-	acceptedTosAt: ColumnType<Date, Date | undefined, Date | undefined> | null;
+	acceptedTosAt: DateColumnOptional;
 }
 export type User = Selectable<UserTable>;
 export type NewUser = Insertable<UserTable>;
@@ -46,7 +53,7 @@ export interface AccountTable {
 	providerAccountId: string;
 	accessToken: string | null;
 	refreshToken: string | null;
-	accessTokenExpiresAt: ColumnType<Date, Date | undefined, Date> | null;
+	accessTokenExpiresAt: DateColumnOptional;
 	tokenType: string | null;
 	scope: string | null;
 	idToken: string | null;
@@ -63,7 +70,7 @@ export interface VerificationCodeTable {
 	email: string;
 	code: string;
 	name: string;
-	expiresAt: ColumnType<Date, Date | undefined, Date>;
+	expiresAt: DateColumnRequired;
 }
 export type VerificationCode = Selectable<VerificationCodeTable>;
 export type NewVerificationCode = Insertable<VerificationCodeTable>;
@@ -76,7 +83,7 @@ export interface FurnitureTable {
 
 	name: string;
 
-	modelUpdatedAt: Date | null;
+	modelUpdatedAt: DateColumnOptional;
 }
 export type Furniture = Selectable<FurnitureTable>;
 export type NewFurniture = Insertable<FurnitureTable>;
@@ -101,3 +108,29 @@ export interface FurnitureAttributeTable {
 	furnitureId: string;
 	attributeId: string;
 }
+export type FurnitureAttribute = Selectable<FurnitureAttributeTable>;
+export type NewFurnitureAttribute = Insertable<FurnitureAttributeTable>;
+export type FurnitureAttributeUpdate = Updateable<FurnitureAttributeTable>;
+
+export interface DeviceTable {
+	id: PrefixedId<'d'>;
+	createdAt: CreatedAt;
+	updatedAt: UpdatedAt;
+
+	name: string;
+	displayMode: 'staging' | 'viewing';
+}
+export type Device = Selectable<DeviceTable>;
+export type NewDevice = Insertable<DeviceTable>;
+export type DeviceUpdate = Updateable<DeviceTable>;
+
+export interface DeviceAccessTable {
+	createdAt: CreatedAt;
+	updatedAt: UpdatedAt;
+
+	deviceId: PrefixedId<'d'>;
+	userId: PrefixedId<'u'>;
+}
+export type DeviceAccess = Selectable<DeviceAccessTable>;
+export type NewDeviceAccess = Insertable<DeviceAccessTable>;
+export type DeviceAccessUpdate = Updateable<DeviceAccessTable>;

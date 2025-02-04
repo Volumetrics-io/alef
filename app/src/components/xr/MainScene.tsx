@@ -12,6 +12,7 @@ import { OrbitHandles } from '@react-three/handle';
 import { Physics } from '@react-three/rapier';
 import { PCFSoftShadowMap } from 'three';
 import { HeadsetLogin } from './auth/HeadsetLogin';
+import { XRToaster } from './XRToaster';
 
 export function MainScene() {
 	const isLoggedIn = useIsLoggedIn();
@@ -34,6 +35,7 @@ export function MainScene() {
 
 				{isLoggedIn ? <AppScene /> : <HeadsetLogin />}
 				<DebugHandles />
+				<XRToaster debug />
 			</XR>
 		</Canvas>
 	);

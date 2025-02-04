@@ -5,6 +5,7 @@ import { Container, Root, Text } from '@react-three/uikit';
 import { Button, colors } from '@react-three/uikit-default';
 import { HourglassIcon } from '@react-three/uikit-lucide';
 import { useState } from 'react';
+import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
 import { Surface } from '../ui/Surface';
 
 export function HeadsetLogin() {
@@ -29,12 +30,16 @@ export function HeadsetLogin() {
 	};
 
 	return (
-		<Root>
-			<Surface flexDirection="column" flexWrap="no-wrap" maxWidth={400} padding={8}>
-				<Text fontSize={8}>Pair this device</Text>
-				{selectedDevice ? <WaitingToPair selectedDevice={selectedDevice} onCancel={() => setSelectedDevice(null)} /> : <DeviceList onSelect={pairWithDevice} devices={devices} />}
-			</Surface>
-		</Root>
+		<DraggableBodyAnchor follow position={[0, -0.3, 0.5]} lockY distance={0.15}>
+			<Root pixelSize={0.001} flexDirection="column" gap={10}>
+				<Surface flexDirection="column" flexWrap="no-wrap" maxWidth={400} padding={8}>
+					<Text fontSize={8} color={colors.foreground}>
+						Pair this device
+					</Text>
+					{selectedDevice ? <WaitingToPair selectedDevice={selectedDevice} onCancel={() => setSelectedDevice(null)} /> : <DeviceList onSelect={pairWithDevice} devices={devices} />}
+				</Surface>
+			</Root>
+		</DraggableBodyAnchor>
 	);
 }
 
@@ -61,8 +66,10 @@ function WaitingToPair({ selectedDevice, onCancel }: { selectedDevice: { id: Pre
 	return (
 		<Container flexDirection={'column'} gap={4}>
 			<HourglassIcon />
-			<Text fontSize={8}>Waiting to pair with {selectedDevice.name ?? 'Unknown device'}</Text>
-			<Text>Press "Pair" on your device when prompted.</Text>
+			<Text fontSize={8} color={colors.foreground}>
+				Waiting to pair with {selectedDevice.name ?? 'Unknown device'}
+			</Text>
+			<Text color={colors.foreground}>Press "Pair" on your device when prompted.</Text>
 			<Button onClick={onCancel}>
 				<Text>Cancel</Text>
 			</Button>

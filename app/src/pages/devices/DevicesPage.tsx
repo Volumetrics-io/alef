@@ -1,13 +1,19 @@
 import { NonHeadsetDeviceDiscovery } from '@/components/devices/NonHeadsetDeviceDiscovery';
 import { PairedDeviceList } from '@/components/devices/PairedDeviceList';
-import { Box } from '@alef/sys';
+import { NavBar } from '@/components/NavBar';
+import { Box, Main } from '@alef/sys';
 
 export function DevicesPage() {
 	return (
-		<Box full stacked gapped separated>
-			<NonHeadsetDeviceDiscovery />
-			<PairedDeviceList />
-		</Box>
+		<>
+			<NavBar />
+			<Main full p>
+				<Box stacked gapped>
+					<NonHeadsetDeviceDiscovery />
+					<PairedDeviceList />
+				</Box>
+			</Main>
+		</>
 	);
 }
 

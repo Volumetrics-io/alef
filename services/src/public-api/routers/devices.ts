@@ -37,6 +37,10 @@ export const devicesRouter = new Hono<Env>()
 		async (ctx) => {
 			const { deviceId } = ctx.req.valid('param');
 			await ctx.get('userStore').claimDevice(deviceId);
+			// remove device from claim suggestions
+			const discoveryState = await getDiscoveryState(ctx);
+			const ownId = await assignOrRefreshDeviceId(ctx);
+			await discoveryState.claim(ownId, deviceId);
 			return ctx.json({
 				ok: true,
 			});

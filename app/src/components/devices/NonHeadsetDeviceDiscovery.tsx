@@ -49,7 +49,7 @@ function SuggestedDevice({
 		name?: string;
 	};
 }) {
-	const { mutate } = useClaimDevice({
+	const { mutateAsync } = useClaimDevice({
 		onSuccess: () => {
 			toast.success(`Paired with ${device.name}`);
 		},
@@ -65,7 +65,9 @@ function SuggestedDevice({
 						fontSize: '2rem',
 						padding: '1rem 2rem',
 					}}
-					onClick={() => mutate(device.id)}
+					onClick={async () => {
+						await mutateAsync(device.id);
+					}}
 				>
 					Pair
 				</Button>

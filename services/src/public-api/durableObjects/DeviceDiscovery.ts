@@ -33,4 +33,10 @@ export class DeviceDiscovery extends DurableObject<Bindings> {
 		suggestedIds.add(ownId);
 		this.#suggestions.set(suggestedId, Array.from(suggestedIds));
 	}
+
+	claim(claimerId: PrefixedId<'d'>, claimedId: PrefixedId<'d'>) {
+		const suggestedIds = new Set(this.#suggestions.get(claimerId) ?? []);
+		suggestedIds.delete(claimedId);
+		this.#suggestions.set(claimerId, Array.from(suggestedIds));
+	}
 }

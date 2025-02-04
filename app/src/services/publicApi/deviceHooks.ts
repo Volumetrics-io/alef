@@ -1,5 +1,6 @@
 import { PrefixedId } from '@alef/common';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 import { queryClient } from '../queryClient';
 import { publicApiClient } from './client';
 import { handleErrors } from './utils';
@@ -21,6 +22,7 @@ export function useDeviceDiscovery(description?: string) {
 			// the check for logged in status.
 			if (result.wasAssigned) {
 				queryClient.invalidateQueries({ queryKey: ['me'] });
+				toast.success('Success! Your device is logged in.');
 			}
 			return result;
 		},
@@ -53,6 +55,9 @@ export function useClaimDevice({ onSuccess }: { onSuccess?: () => void } = {}) {
 		onSuccess: () => {
 			queryClient.invalidateQueries({
 				queryKey: ['devices'],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ['deviceDiscovery'],
 			});
 			onSuccess?.();
 		},

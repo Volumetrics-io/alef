@@ -1,3 +1,4 @@
+import { useMergedRef } from '@alef/sys';
 import { ThreeEvent } from '@react-three/fiber';
 import { forwardRef, useCallback, useRef, useState } from 'react';
 import { Group, Vector3 } from 'three';
@@ -34,6 +35,8 @@ export const DraggableBodyAnchor = forwardRef<Group, BodyAnchorProps>(({ childre
 		[isDragging]
 	);
 
+	const finalRef = useMergedRef(ref, groupRef);
+
 	const handlePointerUp = useCallback(() => {
 		if (isDragging) {
 			setIsDragging(false);
@@ -50,7 +53,7 @@ export const DraggableBodyAnchor = forwardRef<Group, BodyAnchorProps>(({ childre
 				},
 			}}
 		>
-			<BodyAnchor ref={groupRef} {...props} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerLeave={handlePointerUp}>
+			<BodyAnchor ref={finalRef} {...props} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerLeave={handlePointerUp}>
 				{children}
 			</BodyAnchor>
 		</DragContext.Provider>

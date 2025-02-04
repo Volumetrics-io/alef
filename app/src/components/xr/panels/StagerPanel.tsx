@@ -11,7 +11,7 @@ import { Furniture } from './staging/Furniture';
 import { Layouts } from './staging/Layouts';
 import { Lighting } from './staging/Lighting';
 
-export function StagerPanel({ onToggle, children }: { onToggle?: () => void; children?: React.ReactNode }) {
+export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 	const { mode, setMode } = useStageStore();
 	const [isOpen, setIsOpen] = useState(false);
 

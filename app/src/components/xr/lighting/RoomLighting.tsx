@@ -19,7 +19,7 @@ export const RoomLighting = () => {
 	const editable = useStageStore((s) => s.mode === 'lighting');
 	const { gl } = useThree();
 
-	const { originReferenceSpace } = useXR();
+	const { originReferenceSpace, session } = useXR();
 
 	useFrame((_s, _d, frame: XRFrame) => {
 		if (!xrCeilingPlane) return;
@@ -54,7 +54,7 @@ export const RoomLighting = () => {
 				<planeGeometry args={[100, 100]} />
 				<meshStandardMaterial transparent={false} colorWrite={false} color="red" />
 			</mesh>
-			<ambientLight intensity={0.1} color={getLightColor(2.7)} />
+			<ambientLight intensity={!session ? 0.5 : 0.1} color={getLightColor(2.7)} />
 			{lightIds.map((id) => {
 				gl.shadowMap.needsUpdate = true;
 				return <CeilingLight key={id} id={id} />;

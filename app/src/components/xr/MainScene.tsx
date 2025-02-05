@@ -45,7 +45,7 @@ function AppScene() {
 	return (
 		<>
 			<DepthShader />
-			<Physics debug>
+			<Physics debug={location.search.includes('debug')}>
 				<StagerPanel />
 				<RoomRenderer />
 			</Physics>

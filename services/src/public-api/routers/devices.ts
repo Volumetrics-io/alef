@@ -131,6 +131,21 @@ export const devicesRouter = new Hono<Env>()
 			await discoveryState.suggest(ownId, deviceId);
 			return ctx.json({ ok: true });
 		}
+	)
+	.delete(
+		'/:deviceId',
+		userStoreMiddleware,
+		zValidator(
+			'param',
+			z.object({
+				deviceId: z.custom<PrefixedId<'d'>>((v) => isPrefixedId(v, 'd')),
+			})
+		),
+		async (ctx) => {
+			const { deviceId } = ctx.req.valid('param');
+			await ctx.get('userStore').deleteDevice(deviceId);
+			return ctx.json({ ok: true });
+		}
 	);
 
 async function getDiscoveryState(ctx: Context<{ Bindings: Bindings; Variables: any }>) {

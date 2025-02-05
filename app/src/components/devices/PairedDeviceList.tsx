@@ -1,8 +1,9 @@
-import { useDevices } from '@/services/publicApi/deviceHooks';
-import { Box, Card, Heading, Text } from '@alef/sys';
+import { useDeleteDevice, useDevices } from '@/services/publicApi/deviceHooks';
+import { Box, Button, Card, Heading, Icon, Text } from '@alef/sys';
 
 export function PairedDeviceList() {
 	const { data: devices } = useDevices();
+	const { mutate: deleteDevice, isPending } = useDeleteDevice();
 
 	return (
 		<Box stacked gapped>
@@ -10,9 +11,14 @@ export function PairedDeviceList() {
 			<Card.Grid>
 				{devices.map((device) => (
 					<Card key={device.id}>
-						<Card.Details>
-							<Card.Title>{device.name}</Card.Title>
-							{device.isSelf && <Text>(this device)</Text>}
+						<Card.Details justify="between">
+							<Box gapped>
+								<Card.Title>{device.name}</Card.Title>
+								{device.isSelf && <Text>(this device)</Text>}
+							</Box>
+							<Button disabled={device.isSelf} color="destructive" loading={isPending} onClick={() => deleteDevice(device.id)}>
+								<Icon name="trash" />
+							</Button>
 						</Card.Details>
 					</Card>
 				))}

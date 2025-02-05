@@ -35,4 +35,15 @@ export class AuthedStore extends RpcTarget {
 	async claimDevice(deviceId: PrefixedId<'d'>) {
 		await this.#db.insertInto('DeviceAccess').values({ userId: this.#userId, deviceId }).execute();
 	}
+
+	async deleteDevice(deviceId: PrefixedId<'d'>) {
+		const deviceAccess = await this.#db.selectFrom('DeviceAccess').where('userId', '=', this.#userId).where('deviceId', '=', deviceId).selectAll().executeTakeFirst();
+
+		if (!deviceAccess) {
+			return;
+		}
+
+		// cascade will also delete access row
+		await this.#db.deleteFrom('Device').where('id', '=', deviceId).execute();
+	}
 }

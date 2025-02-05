@@ -14,7 +14,7 @@ export function Floors(props: GroupProps) {
 			{!isInSession && (
 				<>
 					{/* default floor plane */}
-					<DemoPlane label="floor" normal={[0, 1, 0]} center={[0, 0, 0]} dimensions={[10, 10]} debug />
+					<DemoPlane label="floor" normal={[0, 1, 0]} center={[0, 0, 0]} dimensions={[10, 10]} debug={location.search.includes('debug')} />
 				</>
 			)}
 		</group>

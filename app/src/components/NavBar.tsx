@@ -15,12 +15,12 @@ export const NavBar = forwardRef<HTMLDivElement, NavBarProps>(function NavBar(pr
 				</Link>
 			</SysNavBar.Start>
 			<SysNavBar.End gapped align="center">
-				<Button asChild>
-					<Link to="/devices">Headsets</Link>
-				</Button>
 				{session ? (
 					<>
 						<Text>Hi, {session.friendlyName}</Text>
+						<Button asChild>
+							<Link to="/devices">Headsets</Link>
+						</Button>
 						<LogoutButton />
 					</>
 				) : (

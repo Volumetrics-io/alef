@@ -39,7 +39,7 @@ export function DemoPlane({ normal: rawNormal, center: rawCenter, dimensions, la
 				<group rotation={[Math.PI / 2, 0, 0]}>
 					<mesh rotation={[0, Math.PI, 0]}>
 						<planeGeometry args={dimensions} />
-						<meshBasicMaterial color={0xaaaaaa} />
+						<meshPhysicalMaterial color={0xaaaaaa} />
 					</mesh>
 				</group>
 			</RigidBody>

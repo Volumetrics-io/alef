@@ -77,3 +77,22 @@ export function useDiscoverySuggest() {
 		},
 	});
 }
+
+export function useDeleteDevice() {
+	return useMutation({
+		mutationFn: (deviceId: PrefixedId<'d'>) => {
+			return handleErrors(
+				publicApiClient.devices[':deviceId'].$delete({
+					param: {
+						deviceId,
+					},
+				})
+			);
+		},
+		onSuccess() {
+			queryClient.invalidateQueries({
+				queryKey: ['devices'],
+			});
+		},
+	});
+}

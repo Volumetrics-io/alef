@@ -10,12 +10,12 @@ export async function assignOrRefreshDeviceId(ctx: Context) {
 	const deviceIdCookie = await getSignedCookie(ctx, ctx.env.DEVICE_ID_SIGNING_SECRET, DEVICE_ID_COOKIE_NAME);
 	if (deviceIdCookie) {
 		// refresh cookie
-		assignDeviceId(ctx, deviceIdCookie);
+		await assignDeviceId(ctx, deviceIdCookie);
 		return deviceIdCookie as PrefixedId<'d'>;
 	} else {
 		// assign new cookie
 		const deviceId = id('d');
-		assignDeviceId(ctx, deviceId);
+		await assignDeviceId(ctx, deviceId);
 		return deviceId;
 	}
 }

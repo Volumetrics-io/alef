@@ -1,3 +1,4 @@
+import { usePositionInFrontOfUser } from '@/hooks/usePositionInFrontOfUser';
 import { FurnitureItem, useAllFurniture } from '@/services/publicApi/furnitureHooks';
 import { useAddFurniture } from '@/stores/roomStore/roomStore';
 import { AttributeKey, formatAttribute } from '@alef/common';
@@ -20,6 +21,7 @@ export function Furniture() {
 
 function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }) {
 	const addFurniture = useAddFurniture();
+	const getInitialPosition = usePositionInFrontOfUser();
 	return (
 		<Surface
 			flexDirection="column"
@@ -28,7 +30,7 @@ function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }
 			onClick={() =>
 				addFurniture({
 					furnitureId: furnitureItem.id,
-					worldPosition: { x: 0, y: 0.1, z: 0 },
+					worldPosition: getInitialPosition().setY(0),
 					rotation: { x: 0, y: 0, z: 0, w: 1 },
 				})
 			}

@@ -46,7 +46,7 @@ export function HeadsetLogin() {
 function DeviceList({ devices, onSelect }: { devices: { id: PrefixedId<'d'>; name?: string }[]; onSelect: (id: PrefixedId<'d'>) => void }) {
 	return (
 		<Container flexDirection="column" gap={4}>
-			<Text>Log into Alef on a phone or computer using the same Wifi network as this device, then select it here.</Text>
+			<Text color={colors.foreground}>Log into Alef on a phone or computer using the same Wifi network as this device, then select it here.</Text>
 			<Container flexDirection="column" gap={4} width="100%">
 				{!devices?.length ? (
 					<Text color={colors.mutedForeground}>No devices yet</Text>
@@ -65,7 +65,7 @@ function DeviceList({ devices, onSelect }: { devices: { id: PrefixedId<'d'>; nam
 function WaitingToPair({ selectedDevice, onCancel }: { selectedDevice: { id: PrefixedId<'d'>; name?: string }; onCancel?: () => void }) {
 	return (
 		<Container flexDirection={'column'} gap={4}>
-			<HourglassIcon />
+			<HourglassIcon color={colors.foreground} />
 			<Text fontSize={8} color={colors.foreground}>
 				Waiting to pair with {selectedDevice.name ?? 'Unknown device'}
 			</Text>

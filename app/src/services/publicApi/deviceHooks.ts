@@ -1,5 +1,6 @@
 import { PrefixedId } from '@alef/common';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { InferResponseType } from 'hono';
 import toast from 'react-hot-toast';
 import { queryClient } from '../queryClient';
 import { publicApiClient } from './client';
@@ -96,3 +97,39 @@ export function useDeleteDevice() {
 		},
 	});
 }
+
+export function useUpdateDevice() {
+	return useMutation({
+		mutationFn: ([deviceId, updates]: [
+			PrefixedId<'d'>,
+			{
+				displayMode: 'staging' | 'viewing';
+			},
+		]) => {
+			return handleErrors(
+				publicApiClient.devices[':deviceId'].$put({
+					param: {
+						deviceId,
+					},
+					json: updates,
+				})
+			);
+		},
+		onSuccess() {
+			queryClient.invalidateQueries({
+				queryKey: ['devices'],
+			});
+		},
+	});
+}
+
+export function useCurrentDevice() {
+	return useSuspenseQuery({
+		queryKey: ['currentDevice'],
+		queryFn: () => {
+			return handleErrors(publicApiClient.devices.self.$get());
+		},
+	});
+}
+
+export type DeviceResponseData = InferResponseType<typeof publicApiClient.devices.$get>[number];

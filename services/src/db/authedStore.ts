@@ -1,6 +1,7 @@
 import { PrefixedId } from '@alef/common';
 import { RpcTarget } from 'cloudflare:workers';
 import { DB, userNameSelector } from './kysely/index.js';
+import { DeviceUpdate } from './kysely/tables.js';
 
 export class AuthedStore extends RpcTarget {
 	#userId: PrefixedId<'u'>;
@@ -45,5 +46,19 @@ export class AuthedStore extends RpcTarget {
 
 		// cascade will also delete access row
 		await this.#db.deleteFrom('Device').where('id', '=', deviceId).execute();
+	}
+
+	updateDevice(deviceId: PrefixedId<'d'>, updates: Pick<DeviceUpdate, 'displayMode'>) {
+		return this.#db.updateTable('Device').set(updates).where('id', '=', deviceId).returningAll().executeTakeFirst();
+	}
+
+	async getDevice(deviceId: PrefixedId<'d'>) {
+		return this.#db
+			.selectFrom('Device')
+			.innerJoin('DeviceAccess', 'Device.id', 'DeviceAccess.deviceId')
+			.where('DeviceAccess.userId', '=', this.#userId)
+			.where('id', '=', deviceId)
+			.selectAll('Device')
+			.executeTakeFirst();
 	}
 }

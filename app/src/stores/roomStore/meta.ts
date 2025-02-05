@@ -10,18 +10,19 @@ export function useActiveRoomLayoutId() {
 	const [search] = useSearchParams();
 	let roomLayoutId = search.get('roomLayoutId');
 	const generatedDefaultId = id('rl');
+	const allLayoutIds = useRoomLayouts();
 	let updateQuery = false;
 	if (!roomLayoutId) {
 		updateQuery = true;
-		roomLayoutId = generatedDefaultId;
+		roomLayoutId = allLayoutIds[0] || generatedDefaultId;
 	}
 	assertPrefixedId(roomLayoutId, 'rl');
 	const setRoomLayoutId = useSetRoomLayoutId();
 	useEffect(() => {
 		if (updateQuery) {
-			setRoomLayoutId(generatedDefaultId);
+			setRoomLayoutId(roomLayoutId);
 		}
-	}, [generatedDefaultId, setRoomLayoutId, updateQuery]);
+	}, [roomLayoutId, setRoomLayoutId, updateQuery]);
 	return roomLayoutId;
 }
 

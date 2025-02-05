@@ -103,4 +103,17 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 	async getDeviceAccess(deviceId: PrefixedId<'d'>) {
 		return this.#db.selectFrom('DeviceAccess').where('deviceId', '=', deviceId).select('userId').execute();
 	}
+
+	async getDevice(deviceId: PrefixedId<'d'>) {
+		return this.#db
+			.selectFrom('Device')
+			.where('id', '=', deviceId)
+			.select([
+				// allow access to limited public info.
+				'Device.id',
+				'Device.createdAt',
+				'Device.updatedAt',
+			])
+			.executeTakeFirst();
+	}
 }

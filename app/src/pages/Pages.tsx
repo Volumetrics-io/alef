@@ -32,10 +32,6 @@ const routes = makeRoutes([
 				index: true,
 				component: lazy(() => import('./devices/DevicesPage.js')),
 			},
-			{
-				path: '/:id',
-				component: lazy(() => import('./devices/DevicePage.js')),
-			},
 		],
 	},
 	{

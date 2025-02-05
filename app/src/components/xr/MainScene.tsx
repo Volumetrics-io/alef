@@ -5,13 +5,15 @@ import { reversePainterSortStable } from '@pmndrs/uikit';
 import { Canvas } from '@react-three/fiber';
 import { noEvents, PointerEvents, useXR, XR } from '@react-three/xr';
 
-import { StagerPanel } from '@/components/xr/panels/StagerPanel';
 import { RoomRenderer } from '@/components/xr/room/RoomRenderer';
+import { useCurrentDevice } from '@/services/publicApi/deviceHooks';
 import { useIsLoggedIn } from '@/services/publicApi/userHooks';
 import { OrbitHandles } from '@react-three/handle';
 import { Physics } from '@react-three/rapier';
 import { PCFSoftShadowMap } from 'three';
 import { HeadsetLogin } from './auth/HeadsetLogin';
+import { StagingScene } from './modes/StagingScene';
+import { ViewingScene } from './modes/ViewingScene';
 import { XRToaster } from './XRToaster';
 
 export function MainScene() {
@@ -42,11 +44,13 @@ export function MainScene() {
 }
 
 function AppScene() {
+	const { data: selfDevice } = useCurrentDevice();
+
 	return (
 		<>
 			<DepthShader />
 			<Physics debug={location.search.includes('debug')}>
-				<StagerPanel />
+				{selfDevice?.displayMode === 'staging' ? <StagingScene /> : <ViewingScene />}
 				<RoomRenderer />
 			</Physics>
 		</>

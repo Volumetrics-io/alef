@@ -20,6 +20,22 @@ export const devicesRouter = new Hono<Env>()
 			}))
 		);
 	})
+	.get('/self', sessionMiddleware, async (ctx) => {
+		const ownId = await assignOrRefreshDeviceId(ctx);
+		const session = ctx.get('session');
+		if (!session) {
+			const publicDevice = await ctx.env.PUBLIC_STORE.getDevice(ownId);
+			return ctx.json(
+				wrapRpcData({
+					...publicDevice,
+					displayMode: 'viewing',
+					name: '',
+				})
+			);
+		}
+		const accessedDevice = await ctx.env.PUBLIC_STORE.getStoreForUser(session.userId).getDevice(ownId);
+		return ctx.json(wrapRpcData(accessedDevice));
+	})
 	.get('/refresh', async (ctx) => {
 		// this endpoint just serves to refresh device identity assignment
 		await assignOrRefreshDeviceId(ctx);
@@ -145,6 +161,28 @@ export const devicesRouter = new Hono<Env>()
 			const { deviceId } = ctx.req.valid('param');
 			await ctx.get('userStore').deleteDevice(deviceId);
 			return ctx.json({ ok: true });
+		}
+	)
+	.put(
+		'/:deviceId',
+		userStoreMiddleware,
+		zValidator(
+			'param',
+			z.object({
+				deviceId: z.custom<PrefixedId<'d'>>((v) => isPrefixedId(v, 'd')),
+			})
+		),
+		zValidator(
+			'json',
+			z.object({
+				displayMode: z.enum(['staging', 'viewing']),
+			})
+		),
+		async (ctx) => {
+			const { deviceId } = ctx.req.valid('param');
+			const updates = ctx.req.valid('json');
+			const updated = await ctx.get('userStore').updateDevice(deviceId, updates);
+			return ctx.json(wrapRpcData(updated));
 		}
 	);
 

@@ -193,4 +193,8 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 		const attributeId = attr.id;
 		await this.#db.deleteFrom('FurnitureAttribute').where('furnitureId', '=', furnitureId).where('attributeId', '=', attributeId).execute();
 	}
+
+	async deleteDevice(id: PrefixedId<'d'>) {
+		await this.#db.deleteFrom('Device').where('id', '=', id).execute();
+	}
 }

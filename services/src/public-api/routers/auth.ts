@@ -1,5 +1,6 @@
 import { AuthError } from '@a-type/auth';
 import { Context, Hono } from 'hono';
+import { removeDeviceId } from '../auth/devices.js';
 import { authHandlers } from '../auth/handlers.js';
 import { Env } from '../config/ctx.js';
 
@@ -16,7 +17,21 @@ export const authRouter = new Hono<Env>()
 		const provider = ctx.req.param('provider');
 		return authHandlers.handleOAuthCallbackRequest(ctx, { provider }).catch(routeAuthErrorsToUi('/login', ctx));
 	})
-	.all('/logout', (ctx) => authHandlers.handleLogoutRequest(ctx).catch(routeAuthErrorsToUi('/', ctx)))
+	.all('/logout', async (ctx) => {
+		try {
+			const deviceId = await removeDeviceId(ctx);
+			if (deviceId) {
+				try {
+					await ctx.env.ADMIN_STORE.deleteDevice(deviceId);
+				} catch (err) {
+					console.error('Failed to remove logged out device', err);
+				}
+			}
+			return await authHandlers.handleLogoutRequest(ctx);
+		} catch (err) {
+			return routeAuthErrorsToUi('/login', ctx)(err as Error);
+		}
+	})
 	.post('/begin-email-signup', (ctx) => authHandlers.handleSendEmailVerificationRequest(ctx).catch(routeAuthErrorsToUi('/login', ctx)))
 	.post('/complete-email-signup', (ctx) => authHandlers.handleVerifyEmailRequest(ctx).catch(routeAuthErrorsToUi('/login', ctx)))
 	.post('/email-login', (ctx) => authHandlers.handleEmailLoginRequest(ctx).catch(routeAuthErrorsToUi('/login', ctx)))

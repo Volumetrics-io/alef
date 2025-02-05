@@ -1,4 +1,4 @@
-import { id, PrefixedId } from '@alef/common';
+import { id, isPrefixedId, PrefixedId } from '@alef/common';
 import { Context } from 'hono';
 import { getSignedCookie, setSignedCookie } from 'hono/cookie';
 import { getRootDomain } from './domains';
@@ -28,4 +28,22 @@ async function assignDeviceId(ctx: Context, id: string) {
 		httpOnly: true,
 		secure: ctx.env.NODE_ENV === 'production',
 	});
+}
+
+export async function removeDeviceId(ctx: Context): Promise<PrefixedId<'d'> | null> {
+	const existingId = await getSignedCookie(ctx, ctx.env.DEVICE_ID_SIGNING_SECRET, DEVICE_ID_COOKIE_NAME);
+	if (!existingId) return null;
+
+	await setSignedCookie(ctx, DEVICE_ID_COOKIE_NAME, '', ctx.env.DEVICE_ID_SIGNING_SECRET, {
+		domain: getRootDomain(ctx.env.API_ORIGIN),
+		expires: new Date(0),
+		sameSite: 'lax',
+		httpOnly: true,
+		secure: ctx.env.NODE_ENV === 'production',
+	});
+
+	if (!isPrefixedId(existingId, 'd')) {
+		return null;
+	}
+	return existingId;
 }

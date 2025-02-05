@@ -35,7 +35,7 @@ export function MainScene() {
 
 				{isLoggedIn ? <AppScene /> : <HeadsetLogin />}
 				<DebugHandles />
-				<XRToaster debug />
+				<XRToaster />
 			</XR>
 		</Canvas>
 	);

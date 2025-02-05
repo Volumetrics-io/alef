@@ -5,7 +5,6 @@ import { reversePainterSortStable } from '@pmndrs/uikit';
 import { Canvas } from '@react-three/fiber';
 import { noEvents, PointerEvents, useXR, XR } from '@react-three/xr';
 
-import { RoomRenderer } from '@/components/xr/room/RoomRenderer';
 import { useCurrentDevice } from '@/services/publicApi/deviceHooks';
 import { useIsLoggedIn } from '@/services/publicApi/userHooks';
 import { OrbitHandles } from '@react-three/handle';
@@ -49,10 +48,7 @@ function AppScene() {
 	return (
 		<>
 			<DepthShader />
-			<Physics debug={location.search.includes('debug')}>
-				{selfDevice?.displayMode === 'staging' ? <StagingScene /> : <ViewingScene />}
-				<RoomRenderer />
-			</Physics>
+			<Physics debug={location.search.includes('debug')}>{selfDevice?.displayMode === 'staging' ? <StagingScene /> : <ViewingScene />}</Physics>
 		</>
 	);
 }

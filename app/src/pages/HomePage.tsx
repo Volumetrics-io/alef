@@ -16,12 +16,13 @@ const HomePage = () => {
 	const geoStore = useGeoStore();
 	const { data: session } = useMe();
 	const navigate = useNavigate();
+	const incompleteProfile = session && !session.emailVerifiedAt;
 	useEffect(() => {
 		// don't bother people on headsets with this
-		if (!isHeadset && !session?.emailVerifiedAt) {
+		if (!isHeadset && incompleteProfile) {
 			navigate('/complete-signup');
 		}
-	}, [session?.emailVerifiedAt, navigate]);
+	}, [incompleteProfile, navigate]);
 
 	return (
 		<RoomStoreProvider>

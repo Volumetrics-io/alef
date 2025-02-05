@@ -99,6 +99,7 @@ export class DragController {
 			// update the store with the final position
 			this.#updateTmpTransform.position.copy(this.#body!.translation());
 			this.#updateTmpTransform.rotation.copy(this.#body!.rotation());
+			console.debug('drag end', this.#updateTmpTransform);
 			this.config.onDragEnd?.(this.#updateTmpTransform);
 		}
 	};
@@ -171,7 +172,7 @@ export class DragController {
 	#applyRotation = (handleState: HandleState) => {
 		if (!handleState.delta || !this.#body) return;
 		// kinematic controller does not accommodate rotation, we just assign it
-		this.#applyRotationTmpQuaternion.copy(this.#rotation).multiply(handleState.delta.quaternion);
-		this.#body?.setRotation(handleState.current.quaternion, true);
+		this.#applyRotationTmpQuaternion.copy(this.#rotation).premultiply(handleState.delta.quaternion);
+		this.#body?.setRotation(this.#applyRotationTmpQuaternion, true);
 	};
 }

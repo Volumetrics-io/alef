@@ -9,6 +9,7 @@ const RoomStoreContext = createContext<RoomStore | null>(null);
 export const RoomStoreProvider = ({ children }: { children: ReactNode }) => {
 	const roomLayoutId = useActiveRoomLayoutId();
 	const store = useMemo(() => makeRoomStore(roomLayoutId), [roomLayoutId]);
+	(window as any).roomStore = store;
 	return <RoomStoreContext.Provider value={store}>{children}</RoomStoreContext.Provider>;
 };
 

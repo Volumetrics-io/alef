@@ -4,7 +4,8 @@
 		"dev": "turbo dev",
 		"build": "turbo build",
 		"initialize": "node ./scripts/initialize.mjs",
-		"makeLocalAdmin": "node ./scripts/makeLocalAdmin.mjs"
+		"makeLocalAdmin": "node ./scripts/makeLocalAdmin.mjs",
+		"resetLocal": "node ./scripts/resetLocal.mjs"
 	},
 	"dependencies": {
 		"@clack/prompts": "^0.9.1",

@@ -24,6 +24,12 @@ const app = new Hono<Env>()
 				if (origin === ctx.env.UI_ORIGIN || origin === ctx.env.ADMIN_UI_ORIGIN) {
 					return origin;
 				}
+				if (ctx.env.EXTRA_CORS_ORIGINS) {
+					const origins = ctx.env.EXTRA_CORS_ORIGINS.split(',');
+					if (origins.includes(origin)) {
+						return origin;
+					}
+				}
 				return null;
 			},
 			credentials: true,

@@ -3,6 +3,7 @@ packages:
   - admin
   - packages/*
   - services
+  - homepage
 
 catalog:
   hono: 4.6.19

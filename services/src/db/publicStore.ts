@@ -109,7 +109,6 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 		}
 
 		// fetch device via query; upserts cannot return the full row if a conflict occurs.
-		console.log(this.#db.selectFrom('Device').select(['id', 'name']).where('id', '=', info.id).compile());
 		const device = await this.#db.selectFrom('Device').select(['id', 'name']).where('id', '=', info.id).executeTakeFirstOrThrow();
 
 		return device;

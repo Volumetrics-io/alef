@@ -1,5 +1,4 @@
 import { PrefixedId } from '@alef/common';
-import { Spinner } from '@alef/sys';
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { connectToSocket, PropertySocket } from './socket';
 
@@ -26,9 +25,9 @@ export const PropertySocketProvider = ({ children, propertyId }: { children: Rea
 		};
 	}, [value]);
 
-	// until socket is connected, show spinner
+	// until socket is connected, don't render
 	if (!value) {
-		return <Spinner />;
+		return null;
 	}
 	return <PropertySocketContext.Provider value={value}>{children}</PropertySocketContext.Provider>;
 };

@@ -57,6 +57,9 @@ export const os = getOS();
 export const browser = getBrowser();
 export const deviceType = getDeviceType();
 
+// used for heuristics
+const isTall = window.innerHeight > window.innerWidth;
+
 const emulateHeadset = new URLSearchParams(window.location.search).get('emulateHeadset') || sessionStorage.getItem('emulateHeadset');
 if (emulateHeadset) {
 	// once emulate headset is set, keep it set.
@@ -69,7 +72,7 @@ export const supportsXR = 'xr' in window.navigator || emulateHeadset;
 export const isQuest = userAgent.includes('OculusBrowser') || userAgent.includes('Quest');
 
 /** Best guess as to whether this device is an XR headset */
-export const isHeadset = supportsXR && (emulateHeadset || isQuest || os === 'iOS' || deviceType === 'Mobile');
+export const isHeadset = supportsXR && (emulateHeadset || isQuest || os === 'iOS' || (deviceType === 'Mobile' && !isTall));
 
 /** Best guess as to what to call this device */
 export const deviceName = isHeadset ? (isQuest ? 'Quest' : os === 'iOS' ? 'Vision Pro' : 'Headset') : browser === 'Unknown' ? 'Browser' : browser;

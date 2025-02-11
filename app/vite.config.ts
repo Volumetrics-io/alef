@@ -12,5 +12,13 @@ export default defineConfig({
 	},
 	server: {
 		port: 4200,
+		proxy: {
+			'/public-api': {
+				target: 'http://localhost:4201',
+				changeOrigin: true,
+				rewrite: (path) => path.replace(/^\/public-api/, ''),
+				ws: true,
+			},
+		},
 	},
 });

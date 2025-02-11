@@ -52,3 +52,40 @@ A Github Action is provisioned to automatically redeploy services on push to `ma
 Apps are hosted on Cloudflare Pages. Initial manual deployment is done by building the app files to `dist` first, then running `cloudflare pages deploy`. Because configuration is embedded into web app built files directly, this initial build required altering `.env` to use production configuration values before deploying.
 
 A Github Action is provisioned to automatically redeploy pages on push to `main`. It configures build-time config env values using Github Actions variables.
+
+## Developing in-headset
+
+It can be kind of cumbersome to open your local dev environment in a headset. There are a few ways to do it, with plusses and minuses.
+
+### Via Chrome devtools port forwarding
+
+Connect your headset via USB, then open chrome://inspect#devices. Configure port forwarding for the following ports: 4200, 4201, 4202. After a little while, your headset should request debugging access. Once confirmed, it should show up on the Chrome tab, with green dots for the forwarded ports. Visit localhost:4200 in the headset. Hopefully things work!
+
+The benefit of this approach is you can inspect your headset browser and see console logs, network traffic, etc. The downside is it's wired.
+
+### Via Cloudflare Tunnels
+
+Cloudflare, our infra provider, supports tunneling via their `cloudflared` CLI.
+
+First, [follow their setup guide](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/get-started/create-local-tunnel/). Create your tunnel with a hostname we own, like `yourname-tunnel.volu.dev`.
+
+Then, configure dev environment variables to use the tunnel instead of localhost:
+
+In `./app/.env`, set `VITE_MAIN_UI_ORIGIN` to `https://<your tunnel host>`.
+
+In `./app/.env`, set `VITE_PUBLIC_API_ORIGIN` to `https://<your tunnel host>/public-api`.
+
+In `./services/src/public-api/.dev.vars`, set `EXTRA_CORS_ORIGINS` to `https://<your tunnel host>`.
+
+In `./services/src/public-api/.dev.vars`, set `UI_ORIGIN` to `https://<your tunnel host>`.
+
+In `./services/src/public-api/.dev.vars`, set `API_ORIGIN` to `https://<your tunnel host>/public-api`.
+
+The `/public-api` path is already configured and supported by the frontend and backend in local development, so this should work after configuration as long as your tunnel is set up and running correctly. Visit your tunnel host in your headset.
+
+Some things to note:
+
+- You may have to clear cookies if you have previously used the device on alef.io in any capacity and your tunnel host is on that domain, too. That's why I recommend using a different root domain like volu.dev.
+- To quickly switch between tunnel and not, you can comment out lines in .env or .dev.vars using a # char. You still have to restart the dev script.
+
+Benefit of this approach: wireless headset use. Downside: no debugging, a lot more configuration.

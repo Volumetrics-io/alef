@@ -27,17 +27,18 @@
 		"createUser": "node ./scripts/createUser.mjs"
 	},
 	"dependencies": {
-		"hono": "catalog:",
-		"@alef/common": "workspace:*",
 		"@a-type/auth": "catalog:",
 		"@a-type/auth-email-ses": "2.1.4",
-		"@a-type/utils": "catalog:",
-		"zod": "catalog:",
-		"@hono/zod-validator": "catalog:",
 		"@a-type/kysely": "1.1.1",
+		"@a-type/utils": "catalog:",
+		"@alef/common": "workspace:*",
+		"@hono/zod-validator": "catalog:",
 		"@paralleldrive/cuid2": "2.2.2",
+		"hono": "catalog:",
+		"jose": "^5.9.6",
 		"kysely": "^0.27.5",
 		"kysely-d1": "0.3.0",
-		"kysely-plugin-serialize": "0.7.0"
+		"kysely-plugin-serialize": "0.7.0",
+		"zod": "catalog:"
 	}
 }

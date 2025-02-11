@@ -1,5 +1,6 @@
 import { createPlaneUserData } from '@/physics/planeUserData';
 import { usePlanesStore } from '@/stores/planesStore';
+import { ErrorBoundary } from '@alef/sys';
 import { CuboidCollider, RigidBody } from '@react-three/rapier';
 import { useEffect, useId, useRef } from 'react';
 import { Quaternion, Vector3 } from 'three';
@@ -32,7 +33,7 @@ export function DemoPlane({ normal: rawNormal, center: rawCenter, dimensions, la
 	quat.setFromUnitVectors(new Vector3(0, 1, 0), normal);
 
 	return (
-		<>
+		<ErrorBoundary fallback={null}>
 			<RigidBody type="fixed" colliders={false} userData={createPlaneUserData(id)} position={center} quaternion={quat}>
 				<CuboidCollider args={[dimensions[0] / 2, 0.1, dimensions[1] / 2]} />
 				{snapSensor && <CuboidCollider args={[dimensions[0] / 2, 0.4, dimensions[1] / 2]} position={[0, 0.2, 0]} sensor />}
@@ -44,6 +45,6 @@ export function DemoPlane({ normal: rawNormal, center: rawCenter, dimensions, la
 				</group>
 			</RigidBody>
 			{debug && <DebugPlaneNormal planeId={id} />}
-		</>
+		</ErrorBoundary>
 	);
 }

@@ -6,7 +6,11 @@ import { getRootDomain } from './domains';
 const DEVICE_ID_COOKIE_NAME = 'alef-deviceId';
 
 export async function assignOrRefreshDeviceId(ctx: Context) {
-	console.log(ctx.env.DEVICE_ID_SIGNING_SECRET);
+	// check if device is already in context
+	if (ctx.get('device')) {
+		return ctx.get('device').id;
+	}
+
 	const deviceIdCookie = await getSignedCookie(ctx, ctx.env.DEVICE_ID_SIGNING_SECRET, DEVICE_ID_COOKIE_NAME);
 	if (deviceIdCookie) {
 		// refresh cookie

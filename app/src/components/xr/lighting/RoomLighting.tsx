@@ -40,7 +40,7 @@ export const RoomLighting = () => {
 		(event: ThreeEvent<MouseEvent>) => {
 			if (!editable) return;
 			const light = {
-				worldPosition: { x: event.point.x, y: event.point.y, z: event.point.z },
+				position: { x: event.point.x, y: event.point.y, z: event.point.z },
 			};
 
 			addLight(light);

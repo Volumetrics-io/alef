@@ -10,6 +10,7 @@ export interface Database {
 	FurnitureAttribute: FurnitureAttributeTable;
 	Device: DeviceTable;
 	DeviceAccess: DeviceAccessTable;
+	Property: PropertyTable;
 }
 
 // date serialization: Dates go in, strings come out.
@@ -134,3 +135,12 @@ export interface DeviceAccessTable {
 export type DeviceAccess = Selectable<DeviceAccessTable>;
 export type NewDeviceAccess = Insertable<DeviceAccessTable>;
 export type DeviceAccessUpdate = Updateable<DeviceAccessTable>;
+
+export interface PropertyTable {
+	id: PrefixedId<'p'>;
+	createdAt: CreatedAt;
+	updatedAt: UpdatedAt;
+
+	name: string;
+	ownerId: PrefixedId<'u'>;
+}

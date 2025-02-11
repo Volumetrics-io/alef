@@ -14,6 +14,9 @@ declare module '@a-type/auth' {
 
 export const sessions = new SessionManager<Context<Env>>({
 	getSessionConfig(ctx) {
+		const apiUrl = new URL(ctx.env.API_ORIGIN);
+		// adapt refresh cookie path to any base path on API origin
+		const refreshPath = apiUrl.pathname.replace(/\/$/, '') + '/auth/refresh';
 		return {
 			cookieName: 'alef-session',
 			cookieOptions: {
@@ -39,7 +42,7 @@ export const sessions = new SessionManager<Context<Env>>({
 			audience: ctx.env.UI_ORIGIN,
 			issuer: ctx.env.API_ORIGIN,
 			mode: 'production',
-			refreshPath: '/auth/refresh',
+			refreshPath,
 			refreshTokenCookieName: 'alef-refresh',
 		};
 	},

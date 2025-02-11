@@ -1,14 +1,15 @@
 /* eslint-disable react-refresh/only-export-components */
 
+import { usePropertySocket } from '@/services/publicApi/PropertySocketProvider';
+import { PrefixedId } from '@alef/common';
 import { createContext, ReactNode, useContext, useMemo } from 'react';
-import { useActiveRoomLayoutId } from './meta';
 import { makeRoomStore, RoomStore } from './roomStore';
 
 const RoomStoreContext = createContext<RoomStore | null>(null);
 
-export const RoomStoreProvider = ({ children }: { children: ReactNode }) => {
-	const roomLayoutId = useActiveRoomLayoutId();
-	const store = useMemo(() => makeRoomStore(roomLayoutId), [roomLayoutId]);
+export const RoomStoreProvider = ({ children, roomId }: { children: ReactNode; roomId: PrefixedId<'r'> }) => {
+	const socket = usePropertySocket();
+	const store = useMemo(() => makeRoomStore(socket, roomId), [socket, roomId]);
 	(window as any).roomStore = store;
 	return <RoomStoreContext.Provider value={store}>{children}</RoomStoreContext.Provider>;
 };

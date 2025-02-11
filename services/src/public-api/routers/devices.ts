@@ -2,12 +2,39 @@ import { AlefError, isPrefixedId, PrefixedId } from '@alef/common';
 import { zValidator } from '@hono/zod-validator';
 import { Context, Hono } from 'hono';
 import { getConnInfo } from 'hono/cloudflare-workers';
+import { createMiddleware } from 'hono/factory';
 import { z } from 'zod';
 import { wrapRpcData } from '../../helpers/wrapRpcData';
 import { sessionMiddleware, userStoreMiddleware } from '../../middleware/session';
 import { assignOrRefreshDeviceId } from '../auth/devices';
 import { sessions } from '../auth/session';
 import { Bindings, Env } from '../config/ctx';
+
+/**
+ * Middleware that ensures the connecting device is recorded in the database,
+ * associated with the current user if logged in, and applying a ?description value
+ * if provided.
+ */
+const upsertDeviceMiddleware = createMiddleware<{
+	Variables: Env['Variables'] & {
+		device: { id: PrefixedId<'d'>; name: string };
+	};
+	Bindings: Env['Bindings'];
+}>(async (ctx, next) => {
+	// upsert the device upon connection. if an authenticated user is present, associates the device with them
+	// implicitly.
+	const description = ctx.req.query('description');
+	const userId = ctx.get('session')?.userId;
+	const ownId = await assignOrRefreshDeviceId(ctx);
+	const device = {
+		name: description,
+		id: ownId,
+	};
+	console.log('device id', ownId, 'logged in', userId);
+	const upserted = await ctx.env.PUBLIC_STORE.ensureDeviceExists(device, userId);
+	ctx.set('device', upserted);
+	return next();
+});
 
 export const devicesRouter = new Hono<Env>()
 	.get('/', userStoreMiddleware, async (ctx) => {
@@ -20,22 +47,37 @@ export const devicesRouter = new Hono<Env>()
 			}))
 		);
 	})
-	.get('/self', sessionMiddleware, async (ctx) => {
-		const ownId = await assignOrRefreshDeviceId(ctx);
-		const session = ctx.get('session');
-		if (!session) {
-			const publicDevice = await ctx.env.PUBLIC_STORE.getDevice(ownId);
-			return ctx.json(
-				wrapRpcData({
-					...publicDevice,
-					displayMode: 'viewing',
-					name: '',
-				})
-			);
+	.get(
+		'/self',
+		zValidator(
+			'query',
+			z.object({
+				description: z.string().optional(),
+			})
+		),
+		sessionMiddleware,
+		upsertDeviceMiddleware,
+		async (ctx) => {
+			const ownId = ctx.get('device').id;
+			const session = ctx.get('session');
+			if (!session) {
+				const publicDevice = await ctx.env.PUBLIC_STORE.getDevice(ownId);
+				return ctx.json(
+					wrapRpcData({
+						...publicDevice,
+						displayMode: 'viewing',
+						name: '',
+					})
+				);
+			}
+			// ensure access to the device by refetching it here with the user's authorized store
+			const accessedDevice = await ctx.env.PUBLIC_STORE.getStoreForUser(session.userId).getDevice(ownId);
+			if (!accessedDevice) {
+				throw new AlefError(AlefError.Code.NotFound, 'Could not find device.');
+			}
+			return ctx.json(wrapRpcData(accessedDevice));
 		}
-		const accessedDevice = await ctx.env.PUBLIC_STORE.getStoreForUser(session.userId).getDevice(ownId);
-		return ctx.json(wrapRpcData(accessedDevice));
-	})
+	)
 	.get('/refresh', async (ctx) => {
 		// this endpoint just serves to refresh device identity assignment
 		await assignOrRefreshDeviceId(ctx);
@@ -75,16 +117,12 @@ export const devicesRouter = new Hono<Env>()
 				description: z.string().optional(),
 			})
 		),
+		upsertDeviceMiddleware,
 		async (ctx) => {
-			// upsert the device upon connection. if an authenticated user is present, associates the device with them
-			// implicitly.
-			const deviceInput = ctx.req.valid('query');
 			const userId = ctx.get('session')?.userId;
-			const ownId = await assignOrRefreshDeviceId(ctx);
-			const device = {
-				name: deviceInput.description ?? 'Unnamed Device',
-				id: ownId,
-			};
+			const device = ctx.get('device');
+			const ownId = device.id;
+
 			await ctx.env.PUBLIC_STORE.ensureDeviceExists(device, userId);
 			const discoveryState = await getDiscoveryState(ctx);
 			discoveryState.register(device);

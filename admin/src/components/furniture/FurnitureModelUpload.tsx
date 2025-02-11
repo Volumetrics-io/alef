@@ -31,6 +31,7 @@ export function FurnitureModelUpload({ furnitureId }: FurnitureModelUploadProps)
 							},
 						});
 						queryClient.invalidateQueries({ queryKey: ['furniture'] });
+						toast.success('Model uploaded');
 					} catch (err) {
 						console.error(err);
 						toast.error('Error uploading model, check console');

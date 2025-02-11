@@ -1,5 +1,7 @@
 import type { AdminStore, PublicStore } from '../../db/index.js';
+import { SessionWithPrefixedIds } from '../../middleware/session.js';
 import { DeviceDiscovery } from '../durableObjects/DeviceDiscovery.js';
+import { Property } from '../durableObjects/Property.js';
 
 export interface Bindings {
 	// env
@@ -15,6 +17,8 @@ export interface Bindings {
 	SESSION_SECRET: string;
 	ADMIN_UI_ORIGIN: string;
 	DEVICE_ID_SIGNING_SECRET: string;
+	SOCKET_TOKEN_SECRET: string;
+	EXTRA_CORS_ORIGINS?: string;
 
 	// services
 	// TODO: use Service<T> wrapper, but this breaks Hono RPC client types
@@ -22,9 +26,12 @@ export interface Bindings {
 	PUBLIC_STORE: Service<PublicStore>;
 	ADMIN_STORE: Service<AdminStore>;
 	DEVICE_DISCOVERY: DurableObjectNamespace<DeviceDiscovery>;
+	PROPERTY: DurableObjectNamespace<Property>;
 }
 
-export interface CtxVars {}
+export interface CtxVars {
+	session?: SessionWithPrefixedIds;
+}
 
 export interface Env {
 	Variables: CtxVars;

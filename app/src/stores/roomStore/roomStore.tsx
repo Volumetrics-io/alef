@@ -1,154 +1,264 @@
-import { PlaneLabel } from '@/components/xr/anchors';
 import { useVibrateOnHover } from '@/hooks/useVibrateOnHover';
 import { DragController } from '@/physics/DragController';
 import { isPlaneUserData } from '@/physics/planeUserData';
-import { id, isPrefixedId, PrefixedId } from '@alef/common';
+import { PropertySocket } from '@/services/publicApi/socket';
+import { id, isPrefixedId, PrefixedId, RoomFurniturePlacement, RoomGlobalLighting, RoomLayout, RoomLightPlacement, RoomState } from '@alef/common';
 import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
 import { ActiveCollisionTypes } from '@dimforge/rapier3d-compat';
 import { HandleOptions, TransformHandlesProperties } from '@react-three/handle';
 import { IntersectionEnterPayload, IntersectionExitPayload, RigidBodyProps, RoundCuboidColliderProps, useRapier } from '@react-three/rapier';
-import * as O from 'optics-ts';
 import { RefObject, useCallback, useEffect, useRef } from 'react';
 import { Group } from 'three';
 import { createStore, useStore } from 'zustand';
-import { persist, subscribeWithSelector } from 'zustand/middleware';
+import { subscribeWithSelector } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
 import { useShallow } from 'zustand/react/shallow';
 import { useEditorStore, useIntersectingPlaneLabels } from '../editorStore';
-import { getRoomStoreStorageKey } from './meta';
 import { useRoomStoreContext } from './Provider';
 
-export interface FurniturePlacement {
-	furnitureId: PrefixedId<'f'>;
-	worldPosition: { x: number; y: number; z: number };
-	rotation: { x: number; y: number; z: number; w: number };
-	// these are metadata useful for potential future heuristics,
-	// like correcting world position to re-align with the anchor
-	// used for the original placement.
-	anchorLabel?: PlaneLabel;
-	anchorOffset?: number;
-}
+export type RoomStoreState = RoomState & {
+	// client state
+	viewingLayoutId?: PrefixedId<'rl'>;
 
-export interface LightPlacement {
-	worldPosition: { x: number; y: number; z: number };
-}
-
-export interface GlobalLighting {
-	intensity: number;
-	color: number;
-}
-
-export type RoomStoreState = {
-	id: PrefixedId<'rl'>;
-	furniture: Record<PrefixedId<'fp'>, FurniturePlacement>;
-	lights: Record<PrefixedId<'lp'>, LightPlacement>;
-	globalLighting: GlobalLighting;
+	/**
+	 * Creates an empty new room layout and sets it as the current layout
+	 */
+	createLayout: (data?: { name?: string }) => Promise<void>;
+	setViewingLayoutId: (id: PrefixedId<'rl'>) => void;
+	updateLayout: (data: Pick<RoomLayout, 'id' | 'name' | 'icon'>) => void;
 
 	// furniture APIs
-	addFurniture: (init: FurniturePlacement) => string;
+	addFurniture: (init: Omit<RoomFurniturePlacement, 'id'>) => Promise<string>;
 	moveFurniture: (
 		id: PrefixedId<'fp'>,
 		transform: {
 			position?: { x: number; y: number; z: number };
 			rotation?: { x: number; y: number; z: number; w: number };
 		}
-	) => void;
-	deleteFurniture: (id: PrefixedId<'fp'>) => void;
+	) => Promise<void>;
+	deleteFurniture: (id: PrefixedId<'fp'>) => Promise<void>;
 
 	// light APIs
-	addLight: (init: LightPlacement) => string;
+	addLight: (init: Omit<RoomLightPlacement, 'id'>) => Promise<string>;
 	moveLight: (
 		id: PrefixedId<'lp'>,
 		transform: {
 			position?: { x: number; y: number; z: number };
 		}
-	) => void;
-	deleteLight: (id: PrefixedId<'lp'>) => void;
-	updateGlobalLighting: (update: Partial<GlobalLighting>) => void;
+	) => Promise<void>;
+	deleteLight: (id: PrefixedId<'lp'>) => Promise<void>;
+	updateGlobalLighting: (update: Partial<RoomGlobalLighting>) => Promise<void>;
 };
 
-export const makeRoomStore = (roomLayoutId: PrefixedId<'rl'>) =>
+export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =>
 	createStore<RoomStoreState>()(
-		// temporary - persist store to localStorage
-		persist(
-			subscribeWithSelector((set) => {
-				return {
-					id: roomLayoutId,
-					furniture: {},
-					addFurniture: (init: FurniturePlacement) => {
-						const placementId = id('fp');
-						set(O.modify(O.optic<RoomStoreState>().prop('furniture'))((s) => ({ ...s, [placementId]: init })));
-						return placementId;
-					},
-					moveFurniture: (
-						id,
+		immer(
+			subscribeWithSelector((set, get): RoomStoreState => {
+				// request initial layout state and load into store on creation
+				socket
+					.request(
 						{
-							position,
-							rotation,
-						}: {
-							position?: { x: number; y: number; z: number };
-							rotation?: { x: number; y: number; z: number; w: number };
-						}
-					) => {
-						if (position) {
-							set(O.modify(O.optic<RoomStoreState>().prop('furniture').prop(id).prop('worldPosition'))(() => position));
-						}
-						if (rotation) {
-							set(O.modify(O.optic<RoomStoreState>().prop('furniture').prop(id).prop('rotation'))(() => rotation));
-						}
-					},
-					deleteFurniture: (id) => {
-						set(
-							O.modify(O.optic<RoomStoreState>().prop('furniture'))((s) => {
-								const { [id]: _, ...rest } = s;
-								return rest;
-							})
-						);
-					},
+							type: 'requestRoom',
+							roomId,
+						},
+						'roomUpdate'
+					)
+					.then((response) => {
+						set({
+							...response.data,
+							// pick an arbitrary layout to view
+							viewingLayoutId: Object.keys(response.data.layouts)[0] as PrefixedId<'rl'> | undefined,
+						});
+					});
 
-					lights: {},
+				function getLayoutId() {
+					const id = get().viewingLayoutId;
+					if (!id) {
+						throw new Error('No layout selected');
+					}
+					return id;
+				}
+
+				function updateLayout(updater: (v: RoomLayout) => void) {
+					const layoutId = getLayoutId();
+					set((state) => {
+						const layout = state.layouts[layoutId];
+						if (!layout) {
+							throw new Error(`Cannot update layout ${layoutId}; not found`);
+						}
+						updater(layout);
+					});
+				}
+
+				return {
+					id: roomId,
+					viewingLayoutId: undefined,
+					walls: [],
+					layouts: {},
 					globalLighting: {
 						intensity: 0.8,
 						color: 2.7,
 					},
 
-					addLight: (init: LightPlacement) => {
-						const placementId = id('lp');
-						set(O.modify(O.optic<RoomStoreState>().prop('lights'))((s) => ({ ...s, [placementId]: init })));
+					createLayout: async (data) => {
+						const name = data?.name || `Layout ${Object.keys(get().layouts).length + 1}`;
+						// creates the layout on the server first. this will supply
+						// default values.
+						const response = await socket.request(
+							{
+								type: 'createLayout',
+								roomId,
+								data: { name },
+							},
+							'layoutCreated'
+						);
+						set((state) => {
+							state.layouts[response.data.id] = response.data;
+							state.viewingLayoutId = response.data.id;
+						});
+					},
+					setViewingLayoutId(id) {
+						set({ viewingLayoutId: id });
+					},
+					updateLayout: async (data) => {
+						set((state) => {
+							const layout = state.layouts[data.id];
+							if (!layout) {
+								throw new Error(`Cannot update layout ${data.id}; not found`);
+							}
+							if (data.name) {
+								layout.name = data.name;
+							}
+							if (data.icon) {
+								layout.icon ??= data.icon;
+							}
+						});
+						await socket.request({
+							type: 'updateRoomLayout',
+							roomId,
+							data,
+						});
+					},
+
+					addFurniture: async (init) => {
+						const placementId = id('fp');
+						const layoutId = getLayoutId();
+						const placement = {
+							id: placementId,
+							...init,
+						};
+
+						await socket.request({
+							type: 'addFurniture',
+							roomId,
+							roomLayoutId: layoutId,
+							data: placement,
+						});
+
+						updateLayout((cur) => {
+							cur.furniture[placement.id] = placement;
+						});
+
 						return placementId;
 					},
-					moveLight: (
-						id,
-						{
-							position,
-						}: {
-							position?: { x: number; y: number; z: number };
-						}
-					) => {
-						if (position) {
-							set(O.modify(O.optic<RoomStoreState>().prop('lights').prop(id).prop('worldPosition'))(() => position));
-						}
+					moveFurniture: async (id, { position, rotation }) => {
+						await socket.request({
+							type: 'updateFurniture',
+							roomId,
+							roomLayoutId: getLayoutId(),
+							data: {
+								id,
+								// transform to pojos
+								position: position && { x: position.x, y: position.y, z: position.z },
+								rotation: rotation && { x: rotation.x, y: rotation.y, z: rotation.z, w: rotation.w },
+							},
+						});
+						updateLayout((layout) => {
+							const furniture = layout.furniture[id];
+							if (!furniture) {
+								throw new Error(`Cannot move furniture ${id}; not found`);
+							}
+							if (position) {
+								furniture.position = position;
+							}
+							if (rotation) {
+								furniture.rotation = rotation;
+							}
+						});
 					},
-					deleteLight: (id) => {
-						set(
-							O.modify(O.optic<RoomStoreState>().prop('lights'))((s) => {
-								const { [id]: _, ...rest } = s;
-								return rest;
-							})
-						);
+					deleteFurniture: async (id) => {
+						await socket.request({
+							type: 'removeFurniture',
+							roomId,
+							roomLayoutId: getLayoutId(),
+							id,
+						});
+						updateLayout((layout) => {
+							delete layout.furniture[id];
+						});
 					},
-					updateGlobalLighting: (update) => {
-						set(O.modify(O.optic<RoomStoreState>().prop('globalLighting'))((s) => ({ ...s, ...update })));
+
+					addLight: async (init) => {
+						const placementId = id('lp');
+						const layoutId = getLayoutId();
+						const placement = {
+							id: placementId,
+							...init,
+						};
+						await socket.request({
+							type: 'addLight',
+							roomId,
+							roomLayoutId: layoutId,
+							data: placement,
+						});
+						updateLayout((layout) => {
+							layout.lights[placement.id] = placement;
+						});
+						return placementId;
 					},
-				};
-			}),
-			{
-				name: getRoomStoreStorageKey(roomLayoutId),
-				partialize: (state) => ({
-					furniture: state.furniture,
-					lights: state.lights,
-					globalLighting: state.globalLighting,
-				}),
-			}
+					moveLight: async (id, { position }) => {
+						await socket.request({
+							type: 'updateLight',
+							roomId,
+							roomLayoutId: getLayoutId(),
+							data: {
+								id,
+								position,
+							},
+						});
+						updateLayout((layout) => {
+							const light = layout.lights[id];
+							if (!light) {
+								throw new Error(`Cannot move light ${id}; not found`);
+							}
+							if (position) {
+								light.position = position;
+							}
+						});
+					},
+					deleteLight: async (id) => {
+						await socket.request({
+							type: 'removeLight',
+							roomId,
+							roomLayoutId: getLayoutId(),
+							id,
+						});
+						updateLayout((layout) => {
+							delete layout.lights[id];
+						});
+					},
+					updateGlobalLighting: async (update) => {
+						await socket.request({
+							type: 'updateGlobalLighting',
+							roomId,
+							data: update,
+						});
+						set((state) => {
+							state.globalLighting = { ...state.globalLighting, ...update };
+						});
+					},
+				} satisfies RoomStoreState;
+			})
 		)
 	);
 export type RoomStore = ReturnType<typeof makeRoomStore>;
@@ -177,11 +287,11 @@ function useRoomStoreSubscribe<T>(selector: (s: RoomStoreState) => T, listener: 
 }
 
 export function useFurniturePlacementIds() {
-	return useRoomStore(useShallow((s) => Object.keys(s.furniture) as PrefixedId<'fp'>[]));
+	return useRoomStore(useShallow((s) => Object.keys(s.viewingLayoutId ? s.layouts[s.viewingLayoutId]?.furniture : {}) as PrefixedId<'fp'>[]));
 }
 
 export function useFurniturePlacement(id: PrefixedId<'fp'>) {
-	return useRoomStore((s) => s.furniture[id]);
+	return useRoomStore((s) => (s.viewingLayoutId ? (s.layouts[s.viewingLayoutId]?.furniture[id] ?? null) : null));
 }
 
 export function useDeleteFurniturePlacement(id: PrefixedId<'fp'>) {
@@ -192,7 +302,7 @@ export function useDeleteFurniturePlacement(id: PrefixedId<'fp'>) {
 }
 
 export function useFurniturePlacementFurnitureId(id: PrefixedId<'fp'>) {
-	return useRoomStore((s) => s.furniture[id]?.furnitureId);
+	return useRoomStore((s) => (s.viewingLayoutId ? (s.layouts[s.viewingLayoutId].furniture[id]?.furnitureId ?? null) : null));
 }
 
 export function useAddFurniture() {
@@ -201,10 +311,10 @@ export function useAddFurniture() {
 
 export function useSubscribeToPlacementPosition(id: PrefixedId<'fp'> | PrefixedId<'lp'>, callback: (position: { x: number; y: number; z: number }) => void) {
 	useRoomStoreSubscribe(
-		(s) => (isPrefixedId(id, 'fp') ? s.furniture[id] : s.lights[id]),
+		(s) => (s.viewingLayoutId ? (isPrefixedId(id, 'fp') ? (s.layouts[s.viewingLayoutId]?.furniture[id] ?? null) : (s.layouts[s.viewingLayoutId]?.lights[id] ?? null)) : null),
 		(placement) => {
 			if (placement) {
-				callback(placement.worldPosition);
+				callback(placement.position);
 			}
 		},
 		{
@@ -242,6 +352,10 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 		controllerRef.current = new DragController(id, world, rigidBodyRef, store, {
 			onDragEnd: updatePosition,
 		});
+		return () => {
+			console.debug('destroy drag controller', id);
+			controllerRef.current?.dispose();
+		};
 	}, [world, updatePosition, id, store]);
 
 	const apply = useCallback((state: HandleState) => {
@@ -306,11 +420,11 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 }
 
 export function useLightPlacementIds() {
-	return useRoomStore(useShallow((s) => Object.keys(s.lights) as PrefixedId<'lp'>[]));
+	return useRoomStore(useShallow((s) => (s.viewingLayoutId ? (Object.keys(s.layouts[s.viewingLayoutId]?.lights ?? {}) as PrefixedId<'lp'>[]) : [])));
 }
 
 export function useLightPlacement(id: PrefixedId<'lp'>) {
-	return useRoomStore((s) => s.lights[id]);
+	return useRoomStore((s) => (s.viewingLayoutId ? (s.layouts[s.viewingLayoutId]?.lights[id] ?? null) : null));
 }
 
 export function useDeleteLightPlacement(id: PrefixedId<'lp'>) {
@@ -338,4 +452,24 @@ export function useGlobalLighting() {
 	const value = useRoomStore((s) => s.globalLighting);
 	const update = useRoomStore((s) => s.updateGlobalLighting);
 	return [value, update] as const;
+}
+
+export function useRoomLayoutIds() {
+	return useRoomStore(useShallow((s) => Object.keys(s.layouts) as PrefixedId<'rl'>[]));
+}
+
+export function useRoomLayout(id: PrefixedId<'rl'>) {
+	return useRoomStore((s) => s.layouts[id] ?? null);
+}
+
+export function useCreateRoomLayout() {
+	return useRoomStore((s) => s.createLayout);
+}
+
+export function useActiveRoomLayoutId() {
+	return useRoomStore(useShallow((s) => [s.viewingLayoutId, s.setViewingLayoutId] as const));
+}
+
+export function useUpdateRoomLayout() {
+	return useRoomStore((s) => s.updateLayout);
 }

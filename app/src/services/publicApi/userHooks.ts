@@ -14,6 +14,7 @@ export function useMe() {
 				if (AlefError.isInstance(err) && err.statusCode === 401) {
 					return null;
 				}
+				throw err;
 			}
 		},
 	});

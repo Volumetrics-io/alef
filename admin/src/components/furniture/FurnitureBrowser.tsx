@@ -1,7 +1,7 @@
 import { publicApiClient } from '@/services/publicApi';
 import { Box, Card, Frame, Text } from '@alef/sys';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { startTransition, useState } from 'react';
 import { AttributePicker } from './AttributePicker';
 import { AttributePill } from './AttributePill';
 import { FurnitureModelUpload } from './FurnitureModelUpload';
@@ -28,7 +28,13 @@ export function FurnitureBrowser() {
 	return (
 		<Box stacked gapped full>
 			{/* Filter attributes */}
-			<AttributePicker onSubmit={(attr) => setSelectedAttributes([...selectedAttributes, `${attr.key}:${attr.value}`])} />
+			<AttributePicker
+				onSubmit={(attr) =>
+					startTransition(() => {
+						setSelectedAttributes([...selectedAttributes, `${attr.key}:${attr.value}`]);
+					})
+				}
+			/>
 			<Box>
 				{selectedAttributes.map((attr) => {
 					const [key, value] = attr.split(':');
@@ -39,7 +45,7 @@ export function FurnitureBrowser() {
 				{data?.map((furniture) => (
 					<Card key={furniture.id}>
 						<Card.Main>
-							<FurniturePreview furnitureId={furniture.id} nonce={furniture.modelUpdatedAt} />
+							<FurniturePreview furnitureId={furniture.id} key={furniture.modelUpdatedAt} nonce={furniture.modelUpdatedAt} />
 							<Box float="top-left" gapped>
 								{furniture.attributes.map((attr) => (
 									<Frame key={attr.key} p="squeeze">

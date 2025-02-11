@@ -80,24 +80,39 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 	 *
 	 * TODO: once discovered and claimed, devices can only be modified by their owners
 	 */
-	async ensureDeviceExists(info: Omit<NewDevice, 'displayMode'>, owner?: PrefixedId<'u'>) {
+	async ensureDeviceExists(info: Omit<NewDevice, 'displayMode' | 'name'> & { name?: string }, owner?: PrefixedId<'u'>) {
 		await this.#db
 			.insertInto('Device')
 			.values({
-				...info,
-				// this is not modified when upserting.
+				// provide a default name if none was provided
+				name: 'Unnamed Device',
+				id: info.id,
+				// devices always start in staging mode
 				displayMode: 'staging',
 			})
-			.onConflict((cb) => cb.column('id').doUpdateSet(info))
+			// only name can be updated once the device is present.
+			.onConflict((cb) =>
+				info.name
+					? cb.column('id').doUpdateSet({
+							name: info.name,
+						})
+					: cb.column('id').doNothing()
+			)
 			.execute();
 
 		if (owner) {
+			console.log('claiming device', info.id, 'for user', owner);
 			await this.#db
 				.insertInto('DeviceAccess')
 				.values({ userId: owner, deviceId: info.id })
 				.onConflict((cb) => cb.columns(['userId', 'deviceId']).doNothing())
 				.execute();
 		}
+
+		// fetch device via query; upserts cannot return the full row if a conflict occurs.
+		const device = await this.#db.selectFrom('Device').select(['id', 'name']).where('id', '=', info.id).executeTakeFirstOrThrow();
+
+		return device;
 	}
 
 	async getDeviceAccess(deviceId: PrefixedId<'d'>) {

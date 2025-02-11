@@ -30,6 +30,14 @@ entrypoint = "AdminStore"
 name = "DEVICE_DISCOVERY"
 class_name = "DeviceDiscovery"
 
+[[durable_objects.bindings]]
+name = "PROPERTY"
+class_name = "Property"
+
 [[migrations]]
 tag = "v1"
 new_classes = ["DeviceDiscovery"]
+
+[[migrations]]
+tag = "v2"
+new_classes = ["Property"]

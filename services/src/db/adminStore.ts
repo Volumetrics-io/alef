@@ -163,7 +163,7 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 	async addFurnitureAttribute(furnitureId: string, key: string, value: string) {
 		assertPrefixedId(furnitureId, 'f');
 		assertAttributeKey(key);
-		const { id: attributeId } = await this.#db
+		await this.#db
 			.insertInto('Attribute')
 			.values({
 				id: id('at'),
@@ -171,8 +171,9 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 				value,
 			})
 			.onConflict((cb) => cb.columns(['key', 'value']).doNothing())
-			.returning('id')
-			.executeTakeFirstOrThrow();
+			.execute();
+		// select must be separate as a "do nothing" conflict returns no result rows.
+		const { id: attributeId } = await this.#db.selectFrom('Attribute').where('key', '=', key).where('value', '=', value).select('id').executeTakeFirstOrThrow();
 		await this.#db
 			.insertInto('FurnitureAttribute')
 			.values({

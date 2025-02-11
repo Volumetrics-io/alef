@@ -105,13 +105,13 @@ export class Property extends DurableObject<Bindings> {
 		return this.#rooms[roomId];
 	}
 
-	createLayout(roomId: PrefixedId<'r'>) {
+	createLayout(roomId: PrefixedId<'r'>, data?: Pick<RoomLayout, 'name' | 'icon'>) {
 		const room = this.getRoom(roomId);
 		if (!room) {
 			throw new AlefError(AlefError.Code.NotFound, 'Room not found');
 		}
 		const layoutId = id('rl');
-		room.layouts[layoutId] = { id: layoutId, furniture: {}, lights: {} };
+		room.layouts[layoutId] = { ...data, id: layoutId, furniture: {}, lights: {} };
 		this.#saveState();
 		return room.layouts[layoutId];
 	}

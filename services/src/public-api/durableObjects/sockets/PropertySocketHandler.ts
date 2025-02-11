@@ -96,7 +96,7 @@ export class PropertySocketHandler {
 					ws.send(JSON.stringify({ responseTo: message.messageId, type: 'roomUpdate', data: room } satisfies ServerRoomUpdateMessage));
 					break;
 				case 'createLayout':
-					const layout = await this.#property.createLayout(message.roomId);
+					const layout = await this.#property.createLayout(message.roomId, message.data);
 					ws.send(JSON.stringify({ responseTo: message.messageId, type: 'layoutCreated', data: layout } satisfies ServerLayoutCreatedMessage));
 					break;
 				case 'updateWalls':

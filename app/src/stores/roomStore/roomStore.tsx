@@ -101,7 +101,7 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 					},
 
 					createLayout: async (data) => {
-						const name = data?.name ?? `Layout ${Object.keys(get().layouts).length + 1}`;
+						const name = data?.name || `Layout ${Object.keys(get().layouts).length + 1}`;
 						// creates the layout on the server first. this will supply
 						// default values.
 						const response = await socket.request(

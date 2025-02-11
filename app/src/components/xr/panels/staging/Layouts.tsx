@@ -3,6 +3,7 @@ import { PrefixedId } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { Button, colors } from '@react-three/uikit-default';
 import { CheckIcon } from '@react-three/uikit-lucide';
+import { LayoutIcon } from '../../room/LayoutIcon';
 import { Surface } from '../../ui/Surface';
 
 export function Layouts() {
@@ -27,6 +28,7 @@ function LayoutItem({ layoutId }: { layoutId: PrefixedId<'rl'> }) {
 	return (
 		<Surface padding={10} onClick={() => set(layoutId)} backgroundColor={active === layoutId ? colors.accent : undefined}>
 			{active === layoutId ? <CheckIcon /> : <Container width={24} height={24} />}
+			<LayoutIcon icon={layoutData?.icon ?? 'livingroom'} />
 			<Text>{layoutData?.name ?? 'Unnamed layout'}</Text>
 		</Surface>
 	);

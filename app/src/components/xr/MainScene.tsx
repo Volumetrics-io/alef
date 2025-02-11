@@ -2,18 +2,79 @@ import { DepthShader } from '@/components/xr/shaders/DepthShader';
 // import SunLight from '@/components/xr/lighting/SunLight.tsx';
 
 import { useCurrentDevice } from '@/services/publicApi/deviceHooks';
+import { useAllProperties, useProperty } from '@/services/publicApi/propertyHooks';
+import { PropertySocketProvider } from '@/services/publicApi/PropertySocketProvider';
+import { useMe } from '@/services/publicApi/userHooks';
+import { RoomStoreProvider } from '@/stores/roomStore';
+import { PrefixedId } from '@alef/common';
 import { Physics } from '@react-three/rapier';
+import { ReactNode } from 'react';
+import { HeadsetLogin } from './auth/HeadsetLoginScene';
 import { StagingScene } from './modes/StagingScene';
 import { ViewingScene } from './modes/ViewingScene';
 import { SceneWrapper } from './SceneWrapper';
 
 export function MainScene() {
+	const { data: session } = useMe();
+	const isLoggedIn = !!session;
 	const { data: selfDevice } = useCurrentDevice();
+
+	const debug = location.search.includes('debug');
+
+	let sceneContent: ReactNode = null;
+	if (!isLoggedIn) {
+		// unauthenticated devices must log in with the in-XR UI, which takes you through
+		// device pairing
+		sceneContent = <HeadsetLogin />;
+	} else {
+		if (selfDevice?.displayMode === 'staging') {
+			sceneContent = (
+				<WrappedWithPropertyAndRoom>
+					<StagingScene />
+				</WrappedWithPropertyAndRoom>
+			);
+		} else {
+			sceneContent = (
+				<WrappedWithPropertyAndRoom>
+					<ViewingScene />
+				</WrappedWithPropertyAndRoom>
+			);
+		}
+	}
 
 	return (
 		<SceneWrapper>
 			<DepthShader />
-			<Physics debug={location.search.includes('debug')}>{selfDevice?.displayMode === 'staging' ? <StagingScene /> : <ViewingScene />}</Physics>
+			<Physics debug={debug}>{sceneContent}</Physics>
 		</SceneWrapper>
+	);
+}
+
+// this is a bit cumbersome, but this wrapper component provides the property and room
+// state to the main app XR experience. it has to be separated to this component because
+// the logged-out experience cannot fetch this data.
+function WrappedWithPropertyAndRoom({ children }: { children: ReactNode }) {
+	// determine which Property + Room to show
+	const { data: properties } = useAllProperties();
+	const defaultProperty = properties[0];
+
+	// TODO: as the app evolves we will include actual property management and not
+	// rely on these assumptions. the selected property will come from remote device
+	// configuration from a phone or computer.
+	if (!defaultProperty) {
+		throw new Error(`Expected the server to provision a default property`);
+	}
+
+	const { data: rooms } = useProperty(defaultProperty.id);
+	const defaultRoomId = Object.keys(rooms)[0] as PrefixedId<'r'>;
+
+	if (!defaultRoomId) {
+		throw new Error(`Expected the server to provision a default room`);
+	}
+
+	return (
+		<PropertySocketProvider propertyId={defaultProperty.id}>
+			<RoomStoreProvider roomId={defaultRoomId}>{children}</RoomStoreProvider>
+		</PropertySocketProvider>
 	);
 }

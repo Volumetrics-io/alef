@@ -1,4 +1,4 @@
-import { AlefError, id, PrefixedId, RoomFurniturePlacement, RoomGlobalLighting, RoomLightPlacement, RoomState, Updates } from '@alef/common';
+import { AlefError, id, PrefixedId, RoomFurniturePlacement, RoomGlobalLighting, RoomLayout, RoomLightPlacement, RoomState, Updates } from '@alef/common';
 import { DurableObject } from 'cloudflare:workers';
 import { Bindings } from '../config/ctx';
 import { PropertySocketHandler } from './sockets/PropertySocketHandler';
@@ -114,6 +114,20 @@ export class Property extends DurableObject<Bindings> {
 		room.layouts[layoutId] = { id: layoutId, furniture: {}, lights: {} };
 		this.#saveState();
 		return room.layouts[layoutId];
+	}
+
+	updateLayout(roomId: PrefixedId<'r'>, layoutId: PrefixedId<'rl'>, data: Pick<RoomLayout, 'name' | 'icon'>) {
+		const layout = this.getRoomLayout(roomId, layoutId);
+		if (!layout) {
+			throw new AlefError(AlefError.Code.NotFound, 'Room layout not found');
+		}
+		if (data.name) {
+			layout.name = data.name;
+		}
+		if (data.icon) {
+			layout.icon = data.icon;
+		}
+		this.#saveState();
 	}
 
 	async updateWalls(roomId: PrefixedId<'r'>, walls: RoomState['walls']) {

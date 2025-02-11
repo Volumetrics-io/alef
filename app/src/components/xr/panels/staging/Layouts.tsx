@@ -1,4 +1,4 @@
-import { useActiveRoomLayoutId, useCreateRoomLayout, useRoomLayouts } from '@/stores/roomStore';
+import { useActiveRoomLayoutId, useCreateRoomLayout, useRoomLayout, useRoomLayoutIds } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { Button, colors } from '@react-three/uikit-default';
@@ -6,7 +6,7 @@ import { CheckIcon } from '@react-three/uikit-lucide';
 import { Surface } from '../../ui/Surface';
 
 export function Layouts() {
-	const layoutIds = useRoomLayouts();
+	const layoutIds = useRoomLayoutIds();
 
 	return (
 		<Surface flexDirection="column">
@@ -23,10 +23,11 @@ export function Layouts() {
 
 function LayoutItem({ layoutId }: { layoutId: PrefixedId<'rl'> }) {
 	const [active, set] = useActiveRoomLayoutId();
+	const layoutData = useRoomLayout(layoutId);
 	return (
 		<Surface padding={10} onClick={() => set(layoutId)} backgroundColor={active === layoutId ? colors.accent : undefined}>
 			{active === layoutId ? <CheckIcon /> : <Container width={24} height={24} />}
-			<Text>{layoutId}</Text>
+			<Text>{layoutData?.name ?? 'Unnamed layout'}</Text>
 		</Surface>
 	);
 }
@@ -34,7 +35,7 @@ function LayoutItem({ layoutId }: { layoutId: PrefixedId<'rl'> }) {
 function NewLayoutButton() {
 	const create = useCreateRoomLayout();
 	return (
-		<Button onClick={create}>
+		<Button onClick={() => create()}>
 			<Text>New Layout</Text>
 		</Button>
 	);

@@ -30,6 +30,7 @@ const upsertDeviceMiddleware = createMiddleware<{
 		name: description,
 		id: ownId,
 	};
+	console.log('device id', ownId, 'logged in', userId);
 	const upserted = await ctx.env.PUBLIC_STORE.ensureDeviceExists(device, userId);
 	ctx.set('device', upserted);
 	return next();
@@ -57,7 +58,7 @@ export const devicesRouter = new Hono<Env>()
 		sessionMiddleware,
 		upsertDeviceMiddleware,
 		async (ctx) => {
-			const ownId = await assignOrRefreshDeviceId(ctx);
+			const ownId = ctx.get('device').id;
 			const session = ctx.get('session');
 			if (!session) {
 				const publicDevice = await ctx.env.PUBLIC_STORE.getDevice(ownId);

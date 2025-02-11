@@ -23,8 +23,9 @@ export type RoomStoreState = RoomState & {
 	/**
 	 * Creates an empty new room layout and sets it as the current layout
 	 */
-	createLayout: () => Promise<void>;
+	createLayout: (data?: { name?: string }) => Promise<void>;
 	setViewingLayoutId: (id: PrefixedId<'rl'>) => void;
+	updateLayout: (data: Pick<RoomLayout, 'id' | 'name' | 'icon'>) => void;
 
 	// furniture APIs
 	addFurniture: (init: Omit<RoomFurniturePlacement, 'id'>) => Promise<string>;
@@ -99,13 +100,15 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 						color: 2.7,
 					},
 
-					createLayout: async () => {
+					createLayout: async (data) => {
+						const name = data?.name ?? `Layout ${Object.keys(get().layouts).length + 1}`;
 						// creates the layout on the server first. this will supply
 						// default values.
 						const response = await socket.request(
 							{
 								type: 'createLayout',
 								roomId,
+								data: { name },
 							},
 							'layoutCreated'
 						);
@@ -116,6 +119,25 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 					},
 					setViewingLayoutId(id) {
 						set({ viewingLayoutId: id });
+					},
+					updateLayout: async (data) => {
+						set((state) => {
+							const layout = state.layouts[data.id];
+							if (!layout) {
+								throw new Error(`Cannot update layout ${data.id}; not found`);
+							}
+							if (data.name) {
+								layout.name = data.name;
+							}
+							if (data.icon) {
+								layout.icon ??= data.icon;
+							}
+						});
+						await socket.request({
+							type: 'updateRoomLayout',
+							roomId,
+							data,
+						});
 					},
 
 					addFurniture: async (init) => {
@@ -432,8 +454,12 @@ export function useGlobalLighting() {
 	return [value, update] as const;
 }
 
-export function useRoomLayouts() {
+export function useRoomLayoutIds() {
 	return useRoomStore(useShallow((s) => Object.keys(s.layouts) as PrefixedId<'rl'>[]));
+}
+
+export function useRoomLayout(id: PrefixedId<'rl'>) {
+	return useRoomStore((s) => s.layouts[id] ?? null);
 }
 
 export function useCreateRoomLayout() {
@@ -442,4 +468,8 @@ export function useCreateRoomLayout() {
 
 export function useActiveRoomLayoutId() {
 	return useRoomStore(useShallow((s) => [s.viewingLayoutId, s.setViewingLayoutId] as const));
+}
+
+export function useUpdateRoomLayout() {
+	return useRoomStore((s) => s.updateLayout);
 }

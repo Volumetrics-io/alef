@@ -23,6 +23,8 @@ export interface RoomLayout {
 	id: PrefixedId<'rl'>;
 	furniture: Record<PrefixedId<'fp'>, RoomFurniturePlacement>;
 	lights: Record<PrefixedId<'lp'>, RoomLightPlacement>;
+	icon?: string;
+	name?: string;
 }
 
 export interface RoomWallData {

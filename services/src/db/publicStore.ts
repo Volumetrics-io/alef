@@ -101,6 +101,7 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 			.execute();
 
 		if (owner) {
+			console.log('claiming device', info.id, 'for user', owner);
 			await this.#db
 				.insertInto('DeviceAccess')
 				.values({ userId: owner, deviceId: info.id })

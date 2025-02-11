@@ -1,4 +1,4 @@
-import { PrefixedId } from '@alef/common';
+import { id, PrefixedId } from '@alef/common';
 import { RpcTarget } from 'cloudflare:workers';
 import { DB, userNameSelector } from './kysely/index.js';
 import { DeviceUpdate } from './kysely/tables.js';
@@ -60,5 +60,17 @@ export class AuthedStore extends RpcTarget {
 			.where('id', '=', deviceId)
 			.selectAll('Device')
 			.executeTakeFirst();
+	}
+
+	async getAllProperties() {
+		return this.#db.selectFrom('Property').where('Property.ownerId', '=', this.#userId).selectAll().execute();
+	}
+
+	async insertProperty(name: string) {
+		return this.#db
+			.insertInto('Property')
+			.values({ ownerId: this.#userId, id: id('p'), name })
+			.returningAll()
+			.executeTakeFirstOrThrow();
 	}
 }

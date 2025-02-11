@@ -47,12 +47,12 @@ export class DragController {
 		// won't interfere with the current drag operation
 		this.unsubscribes.push(
 			roomStore.subscribe(
-				(s) => s.furniture[id],
+				(s) => (s.viewingLayoutId ? s.layouts[s.viewingLayoutId].furniture[id] : undefined),
 				(placement) => {
 					if (!placement) return;
 					if (this.isDragging) return;
 					console.log('update from store', placement);
-					this.#body?.setTranslation(placement.worldPosition, false);
+					this.#body?.setTranslation(placement.position, false);
 					this.#body?.setRotation(placement.rotation, false);
 				},
 				// runs upon subscription so we get the initial value

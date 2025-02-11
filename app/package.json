@@ -30,6 +30,7 @@
 		"@verdant-web/react-router": "^0.7.1",
 		"clsx": "2.1.1",
 		"hono": "catalog:",
+		"immer": "^10.1.1",
 		"optics-ts": "^2.4.1",
 		"react": "catalog:",
 		"react-dom": "catalog:",

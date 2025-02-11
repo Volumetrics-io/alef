@@ -3,7 +3,7 @@ import { useEditorStore } from '@/stores/editorStore';
 import { useEnvironmentStore } from '@/stores/environmentStore';
 import { getPlaneId, useRegisterXRPlane } from '@/stores/planesStore';
 import { isPrefixedId } from '@alef/common';
-import { useMergedRef } from '@alef/sys';
+import { ErrorBoundary, useMergedRef } from '@alef/sys';
 import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
 import { useFrame } from '@react-three/fiber';
 import { CuboidCollider, RigidBody } from '@react-three/rapier';
@@ -66,7 +66,7 @@ export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(functi
 	const finalRef = useMergedRef(ref, register);
 
 	return (
-		<>
+		<ErrorBoundary fallback={null}>
 			<RigidBody type="fixed" colliders={false} ref={bodyRef} userData={createXRPlaneUserData(plane)}>
 				<CuboidCollider args={halfExtents} position={new Vector3(0, 0, 0)} />
 				{/* A larger Sensor allows us to detect when furniture is close to the wall */}
@@ -83,7 +83,7 @@ export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(functi
 			</XRSpace>
 			{/* Shows what our system thinks the center and normal of the plane is */}
 			{debug && <DebugPlaneNormal planeId={getPlaneId(plane)} />}
-		</>
+		</ErrorBoundary>
 	);
 });
 

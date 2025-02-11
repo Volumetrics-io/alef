@@ -1,4 +1,5 @@
-import { useActiveRoomLayoutId, useCreateRoomLayout, useRoomLayouts, useSetRoomLayoutId } from '@/stores/roomStore';
+import { useActiveRoomLayoutId, useCreateRoomLayout, useRoomLayouts } from '@/stores/roomStore';
+import { PrefixedId } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { Button, colors } from '@react-three/uikit-default';
 import { CheckIcon } from '@react-three/uikit-lucide';
@@ -20,9 +21,8 @@ export function Layouts() {
 	);
 }
 
-function LayoutItem({ layoutId }: { layoutId: string }) {
-	const set = useSetRoomLayoutId();
-	const active = useActiveRoomLayoutId();
+function LayoutItem({ layoutId }: { layoutId: PrefixedId<'rl'> }) {
+	const [active, set] = useActiveRoomLayoutId();
 	return (
 		<Surface padding={10} onClick={() => set(layoutId)} backgroundColor={active === layoutId ? colors.accent : undefined}>
 			{active === layoutId ? <CheckIcon /> : <Container width={24} height={24} />}

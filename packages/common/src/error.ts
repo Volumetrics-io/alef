@@ -28,6 +28,12 @@ export class AlefError extends Error {
 		if (error) throw error;
 	};
 
+	static wrap = (err: unknown): AlefError => {
+		if (this.isInstance(err)) return err;
+		if (err instanceof Error) return new AlefError(AlefErrorCode.Unknown, err.message, err);
+		return new AlefError(AlefErrorCode.Unknown, String(err), err);
+	};
+
 	constructor(
 		public code: AlefErrorCode,
 		message: string = `AlefError ${code}`,

@@ -35,6 +35,26 @@ const routes = makeRoutes([
 		],
 	},
 	{
+		path: '/properties',
+		component: Outlet,
+		children: [
+			{
+				path: '/:propertyId',
+				component: Outlet,
+				children: [
+					{
+						index: true,
+						component: lazy(() => import('./PropertyPage.js')),
+					},
+					{
+						path: '/rooms/:roomId',
+						component: lazy(() => import('./RoomPage.js')),
+					},
+				],
+			},
+		],
+	},
+	{
 		path: '*',
 		component: lazy(() => import('./NotFoundPage.js')),
 	},

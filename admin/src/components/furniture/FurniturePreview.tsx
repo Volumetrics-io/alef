@@ -21,7 +21,12 @@ export function FurniturePreview({ furnitureId, nonce = 'none' }: FurniturePrevi
 				<Environment preset="city" />
 				<ambientLight intensity={1} />
 				<OrbitControls makeDefault target={[0, 1, 0]} />
-				<Gltf src={modelSrc} />
+				<Gltf
+					src={modelSrc}
+					extendLoader={(loader) => {
+						loader.setWithCredentials(true);
+					}}
+				/>
 			</Canvas>
 		</ErrorBoundary>
 	);

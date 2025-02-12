@@ -11,10 +11,10 @@
 	"dependencies": {
 		"@alef/sys": "workspace:*",
 		"@astrojs/react": "^4.2.0",
-		"@types/react": "^19.0.8",
-		"@types/react-dom": "^19.0.3",
+		"@types/react": "catalog:",
+		"@types/react-dom": "catalog:",
 		"astro": "^5.2.5",
-		"react": "^19.0.0",
-		"react-dom": "^19.0.0"
+		"react": "catalog:",
+		"react-dom": "catalog:"
 	}
 }

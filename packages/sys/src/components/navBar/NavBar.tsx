@@ -1,11 +1,11 @@
-import { forwardRef } from 'react';
-import { Box, BoxProps } from '../box/Box.js';
-import { useMergedRef } from '../../hooks/useMergedRef.js';
-import { withProps } from '../../hocs/withProps.js';
 import clsx from 'clsx';
-import cls from './NavBar.module.css';
-import { Toolbar } from '../toolbar/Toolbar.js';
+import { forwardRef } from 'react';
+import { withProps } from '../../hocs/withProps.js';
 import { useHeightGlobal } from '../../hooks/useHeightGlobal.js';
+import { useMergedRef } from '../../hooks/useMergedRef.js';
+import { Box, BoxProps } from '../box/Box.js';
+import { Toolbar } from '../toolbar/Toolbar.js';
+import cls from './NavBar.module.css';
 
 export interface NavBarProps extends BoxProps {}
 

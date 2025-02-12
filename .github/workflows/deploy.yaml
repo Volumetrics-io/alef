@@ -67,3 +67,11 @@ jobs:
           packageManager: pnpm
           workingDirectory: ./admin
           command: pages deploy dist --project-name=admin
+
+      - name: Deploy homepage
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          packageManager: pnpm
+          workingDirectory: ./homepage
+          command: pages deploy dist --project-name=homepage

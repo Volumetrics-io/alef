@@ -1,17 +1,18 @@
 import { BabyIcon, BedIcon, CircleIcon, CookingPotIcon, LaptopIcon, SofaIcon } from '@react-three/uikit-lucide';
+import { ComponentProps } from 'react';
 
-export interface LayoutIconProps {
+export interface LayoutIconProps extends ComponentProps<typeof CircleIcon> {
 	icon: string;
 }
 
-export function LayoutIcon({ icon }: LayoutIconProps) {
+export function LayoutIcon({ icon, ...rest }: LayoutIconProps) {
 	const Comp = mapping[icon];
 
 	if (!Comp) {
-		return <CircleIcon />;
+		return <CircleIcon {...rest} />;
 	}
 
-	return <Comp />;
+	return <Comp {...rest} />;
 }
 
 const mapping = {

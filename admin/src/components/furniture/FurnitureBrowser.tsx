@@ -1,11 +1,10 @@
 import { publicApiClient } from '@/services/publicApi';
-import { Box, Card, Frame, Text } from '@alef/sys';
+import { Box, Card } from '@alef/sys';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { startTransition, useState } from 'react';
 import { AttributePicker } from './AttributePicker';
 import { AttributePill } from './AttributePill';
-import { FurnitureModelUpload } from './FurnitureModelUpload';
-import { FurniturePreview } from './FurniturePreview';
+import { FurnitureCard } from './FurnitureCard';
 
 export function FurnitureBrowser() {
 	const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
@@ -41,26 +40,7 @@ export function FurnitureBrowser() {
 					return <AttributePill key={attr} attribute={{ key, value }} onRemove={() => setSelectedAttributes((v) => v.filter((a) => a !== attr))} />;
 				})}
 			</Box>
-			<Card.Grid full>
-				{data?.map((furniture) => (
-					<Card key={furniture.id}>
-						<Card.Main>
-							<FurniturePreview furnitureId={furniture.id} key={furniture.modelUpdatedAt} nonce={furniture.modelUpdatedAt} />
-							<Box float="top-left" gapped>
-								{furniture.attributes.map((attr) => (
-									<Frame key={attr.key} p="squeeze">
-										{attr.key}: {attr.value}
-									</Frame>
-								))}
-							</Box>
-						</Card.Main>
-						<Card.Details justify="between">
-							<Text strong>{furniture.name}</Text>
-							<FurnitureModelUpload furnitureId={furniture.id} />
-						</Card.Details>
-					</Card>
-				))}
-			</Card.Grid>
+			<Card.Grid full>{data?.map((furniture) => <FurnitureCard key={furniture.id} furniture={furniture} />)}</Card.Grid>
 		</Box>
 	);
 }

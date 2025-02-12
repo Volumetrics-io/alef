@@ -53,6 +53,27 @@ export const furnitureRouter = new Hono<Env>()
 		}
 	)
 	.put(
+		'/:id',
+		zValidator(
+			'json',
+			z.object({
+				name: z.string(),
+			})
+		),
+		zValidator(
+			'param',
+			z.object({
+				id: z.custom((val) => isPrefixedId(val, 'f')),
+			})
+		),
+		async (ctx) => {
+			const { id } = ctx.req.valid('param');
+			const { name } = ctx.req.valid('json');
+			await ctx.env.ADMIN_STORE.updateFurniture(id, { name });
+			return ctx.json({ ok: true });
+		}
+	)
+	.put(
 		'/:id/attribute',
 		zValidator(
 			'param',

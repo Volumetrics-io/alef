@@ -3,6 +3,7 @@ import { PrefixedId, assertAttributeKey, assertPrefixedId, getFurniturePrimaryMo
 import { WorkerEntrypoint } from 'cloudflare:workers';
 import { Env } from './env.js';
 import { DB, comparePassword, getDatabase, hashPassword } from './kysely/index.js';
+import { FurnitureUpdate } from './kysely/tables.js';
 
 export class AdminStore extends WorkerEntrypoint<Env> {
 	#db: DB;
@@ -146,6 +147,11 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 		}
 
 		return { id: furnitureId };
+	}
+
+	async updateFurniture(id: string, data: Pick<FurnitureUpdate, 'name'>) {
+		assertPrefixedId(id, 'f');
+		await this.#db.updateTable('Furniture').set(data).where('id', '=', id).execute();
 	}
 
 	async uploadFurnitureModel(id: string, modelStream: ReadableStream) {

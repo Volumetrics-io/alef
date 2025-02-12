@@ -11,7 +11,7 @@ export function useAllFurniture(
 	} = {}
 ) {
 	return useSuspenseQuery({
-		queryKey: ['furniture', ...(options.attributeFilter ?? []).map(({ key, value }) => `attr.${key}=${value}`)],
+		queryKey: ['furniture', ...(options.attributeFilter ?? []).map(({ key, value }) => `attr.${key}=${value}`).sort()],
 		queryFn: async () => {
 			const response = await publicApiClient.furniture.$get({
 				query: {

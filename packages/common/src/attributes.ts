@@ -22,3 +22,7 @@ export function assertAttributeKeyValues(map: Record<string, string>): map is Re
 export function formatAttribute(attribute: { key: string; value: string }) {
 	return `${attribute.key}:${attribute.value}`;
 }
+
+/** Officially supported room types */
+export const ROOM_TYPES = ['bedroom', 'living-room', 'nursery', 'office'] as const;
+export type RoomType = (typeof ROOM_TYPES)[number];

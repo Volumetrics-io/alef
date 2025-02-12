@@ -25,7 +25,7 @@ export type RoomStoreState = RoomState & {
 	 */
 	createLayout: (data?: { name?: string }) => Promise<void>;
 	setViewingLayoutId: (id: PrefixedId<'rl'>) => void;
-	updateLayout: (data: Pick<RoomLayout, 'id' | 'name' | 'icon'>) => void;
+	updateLayout: (data: Pick<RoomLayout, 'id' | 'name' | 'icon' | 'type'>) => void;
 
 	// furniture APIs
 	addFurniture: (init: Omit<RoomFurniturePlacement, 'id'>) => Promise<string>;
@@ -469,6 +469,10 @@ export function useCreateRoomLayout() {
 
 export function useActiveRoomLayoutId() {
 	return useRoomStore(useShallow((s) => [s.viewingLayoutId, s.setViewingLayoutId] as const));
+}
+
+export function useActiveRoomLayout() {
+	return useRoomStore((s) => (s.viewingLayoutId ? (s.layouts[s.viewingLayoutId] ?? null) : null));
 }
 
 export function useUpdateRoomLayout() {

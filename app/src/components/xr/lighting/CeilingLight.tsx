@@ -25,8 +25,6 @@ export const CeilingLight = ({ id, ...props }: { id: PrefixedId<'lp'> }) => {
 	};
 
 	const light = useLightPlacement(id);
-	if (!light) return null;
-	const initialPosition = new Vector3().copy(light.position);
 	const move = useMoveLight(id);
 
 	const handlePointerUp = useCallback(() => {
@@ -42,9 +40,13 @@ export const CeilingLight = ({ id, ...props }: { id: PrefixedId<'lp'> }) => {
 		}
 	});
 
+	if (!light) {
+		return null;
+	}
+
 	return (
 		<HandleTarget>
-			<group position={initialPosition} ref={groupRef}>
+			<group position={new Vector3().copy(light.position)} ref={groupRef}>
 				{editable && (
 					<group>
 						<mesh position={[0, -0.01, 0]} visible={hovered || selected} rotation={[Math.PI / 2, 0, 0]}>

@@ -1,0 +1,20 @@
+---
+import { Button, Hero, Logo, NavBar } from '@alef/sys';
+
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+	<NavBar>
+		<NavBar.Start>
+			<Logo />
+		</NavBar.Start>
+		<NavBar.End>
+			<Button color="suggested"> Log in </Button>
+		</NavBar.End>
+	</NavBar>
+	<Hero client:load>
+		<Hero.Title>Alef</Hero.Title>
+		<Hero.Tagline>Dynamic virtual staging for modern agents</Hero.Tagline>
+	</Hero>
+</Layout>

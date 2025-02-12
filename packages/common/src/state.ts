@@ -1,3 +1,4 @@
+import { RoomType } from './attributes';
 import { PrefixedId } from './ids';
 
 export interface SimpleVector3 {
@@ -23,8 +24,11 @@ export interface RoomLayout {
 	id: PrefixedId<'rl'>;
 	furniture: Record<PrefixedId<'fp'>, RoomFurniturePlacement>;
 	lights: Record<PrefixedId<'lp'>, RoomLightPlacement>;
+	/** An icon override. Kind of legacy. */
 	icon?: string;
 	name?: string;
+	/** A specified type for this room layout, if specified */
+	type?: RoomType;
 }
 
 export interface RoomWallData {

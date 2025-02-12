@@ -123,11 +123,17 @@ export function useUpdateDevice() {
 	});
 }
 
-export function useCurrentDevice() {
+export function useCurrentDevice(name?: string) {
 	return useSuspenseQuery({
 		queryKey: ['currentDevice'],
 		queryFn: () => {
-			return handleErrors(publicApiClient.devices.self.$get());
+			return handleErrors(
+				publicApiClient.devices.self.$get({
+					query: {
+						description: name,
+					},
+				})
+			);
 		},
 	});
 }

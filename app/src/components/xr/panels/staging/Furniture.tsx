@@ -1,6 +1,6 @@
 import { usePositionInFrontOfUser } from '@/hooks/usePositionInFrontOfUser';
 import { FurnitureItem, useAllFurniture } from '@/services/publicApi/furnitureHooks';
-import { useAddFurniture } from '@/stores/roomStore/roomStore';
+import { useActiveRoomLayout, useAddFurniture } from '@/stores/roomStore/roomStore';
 import { AttributeKey, formatAttribute } from '@alef/common';
 import { Container, Content, Text } from '@react-three/uikit';
 import { colors } from '@react-three/uikit-default';
@@ -8,7 +8,18 @@ import { FurnitureModel } from '../../furniture/FurnitureModel';
 import { Surface } from '../../ui/Surface';
 
 export function Furniture() {
-	const { data: furniture } = useAllFurniture();
+	const layout = useActiveRoomLayout();
+	console.log(layout);
+	const { data: furniture } = useAllFurniture({
+		attributeFilter: layout?.type
+			? [
+					{
+						key: 'category',
+						value: layout.type,
+					},
+				]
+			: [],
+	});
 
 	return (
 		<Surface maxWidth={1200}>

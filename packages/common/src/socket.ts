@@ -57,7 +57,7 @@ export interface ClientRequestRoomMessage extends BaseClientMessage {
 export interface ClientCreateLayoutMessage extends BaseClientMessage {
 	type: 'createLayout';
 	roomId: PrefixedId<'r'>;
-	data: Pick<RoomLayout, 'name' | 'icon'>;
+	data: Pick<RoomLayout, 'name' | 'icon' | 'type'>;
 }
 
 export interface ClientUpdateWallsMessage extends BaseClientMessage {
@@ -118,7 +118,7 @@ export interface ClientUpdateRoomLayoutMessage extends BaseClientMessage {
 	type: 'updateRoomLayout';
 	roomId: PrefixedId<'r'>;
 	// only some properties are editable with this message.
-	data: Pick<RoomLayout, 'id' | 'name' | 'icon'>;
+	data: Pick<RoomLayout, 'id' | 'name' | 'icon' | 'type'>;
 }
 
 export type ClientMessage =

@@ -116,7 +116,7 @@ export class Property extends DurableObject<Bindings> {
 		return room.layouts[layoutId];
 	}
 
-	updateLayout(roomId: PrefixedId<'r'>, layoutId: PrefixedId<'rl'>, data: Pick<RoomLayout, 'name' | 'icon'>) {
+	updateLayout(roomId: PrefixedId<'r'>, layoutId: PrefixedId<'rl'>, data: Pick<RoomLayout, 'name' | 'icon' | 'type'>) {
 		const layout = this.getRoomLayout(roomId, layoutId);
 		if (!layout) {
 			throw new AlefError(AlefError.Code.NotFound, 'Room layout not found');
@@ -126,6 +126,9 @@ export class Property extends DurableObject<Bindings> {
 		}
 		if (data.icon) {
 			layout.icon = data.icon;
+		}
+		if (data.type) {
+			layout.type = data.type;
 		}
 		this.#saveState();
 	}

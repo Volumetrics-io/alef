@@ -1,10 +1,10 @@
 import { useActiveRoomLayoutId, useCreateRoomLayout, useRoomLayout, useRoomLayoutIds, useUpdateRoomLayout } from '@/stores/roomStore';
-import { PrefixedId } from '@alef/common';
+import { PrefixedId, ROOM_TYPES, RoomType } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { Button, colors, Input } from '@react-three/uikit-default';
 import { CheckIcon, PencilIcon } from '@react-three/uikit-lucide';
 import { useEffect, useState } from 'react';
-import { LayoutIcon, layoutIcons } from '../../room/LayoutIcon';
+import { LayoutIcon } from '../../room/LayoutIcon';
 import { Surface } from '../../ui/Surface';
 
 export function Layouts() {
@@ -34,7 +34,7 @@ function LayoutItem({ layoutId, onEdit }: { layoutId: PrefixedId<'rl'>; onEdit?:
 	return (
 		<Container gap={4} onClick={() => set(layoutId)}>
 			<Button onClick={() => set(layoutId)} flexGrow={1} gap={4} backgroundColor={active === layoutId ? colors.primary : colors.muted}>
-				<LayoutIcon icon={layoutData?.icon ?? 'livingroom'} color={active === layoutId ? colors.primaryForeground : colors.mutedForeground} />
+				<LayoutIcon icon={layoutData?.icon ?? layoutData?.type ?? 'living-room'} color={active === layoutId ? colors.primaryForeground : colors.mutedForeground} />
 				<Text marginRight="auto" color={active === layoutId ? colors.primaryForeground : colors.mutedForeground}>
 					{layoutData?.name ?? 'Unnamed layout'}
 				</Text>
@@ -62,16 +62,16 @@ function EditLayout({ layoutId, onClose }: { layoutId: PrefixedId<'rl'>; onClose
 	const layoutData = useRoomLayout(layoutId);
 
 	const [editingName, setEditingName] = useState(layoutData?.name ?? '');
-	const [editingIcon, setEditingIcon] = useState(layoutData?.icon ?? 'livingroom');
+	const [editingType, setEditingType] = useState<RoomType>(layoutData?.type ?? 'living-room');
 
 	useEffect(() => {
 		setEditingName(layoutData?.name ?? '');
-		setEditingIcon(layoutData?.icon ?? 'livingroom');
+		setEditingType(layoutData?.type ?? 'living-room');
 	}, [layoutData]);
 
 	const updateLayout = useUpdateRoomLayout();
 	const save = () => {
-		updateLayout({ id: layoutId, name: editingName, icon: editingIcon });
+		updateLayout({ id: layoutId, name: editingName, type: editingType });
 		onClose();
 	};
 
@@ -82,8 +82,8 @@ function EditLayout({ layoutId, onClose }: { layoutId: PrefixedId<'rl'>; onClose
 			</Text>
 			<Input value={editingName} onValueChange={(v) => setEditingName(v)} />
 			<Container flexDirection="row" gap={4} alignItems="center">
-				{layoutIcons.map((icon) => (
-					<Button key={icon} onClick={() => setEditingIcon(icon)} backgroundColor={editingIcon === icon ? colors.accent : undefined}>
+				{ROOM_TYPES.map((icon) => (
+					<Button key={icon} onClick={() => setEditingType(icon)} backgroundColor={editingType === icon ? colors.accent : undefined}>
 						<LayoutIcon icon={icon} color={colors.foreground} />
 					</Button>
 				))}

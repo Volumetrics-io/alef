@@ -25,7 +25,8 @@ export const CeilingLight = ({ id, ...props }: { id: PrefixedId<'lp'> }) => {
 	};
 
 	const light = useLightPlacement(id);
-	const initialPosition = new Vector3().copy(light.worldPosition);
+	if (!light) return null;
+	const initialPosition = new Vector3().copy(light.position);
 	const move = useMoveLight(id);
 
 	const handlePointerUp = useCallback(() => {

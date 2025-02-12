@@ -403,6 +403,7 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 			scale: false,
 			rotate: false,
 			alwaysUpdate: true,
+			translate: { x: true, y: false, z: true },
 		} satisfies HandleOptions<unknown>,
 		rotateHandleProps,
 		rigidBodyProps: {

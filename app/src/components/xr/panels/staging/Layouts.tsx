@@ -14,18 +14,20 @@ export function Layouts() {
 	const [editingId, setEditingId] = useState<PrefixedId<'rl'> | null>(null);
 
 	return (
-		<Container flexDirection="row" gap={8} alignItems="flex-start">
-			<Surface flexDirection="column" flexGrow={1} flexShrink={0}>
-				<Text fontSize={14} fontWeight="bold" marginLeft={10} marginBottom={5}>
-					Layouts
-				</Text>
+		<>
+		<Surface flexDirection="column" flexWrap="no-wrap" flexGrow={1} height={300} gap={10} padding={10}>
+			<Text fontSize={18} color={colors.foreground} textAlign="center" margin={10}>
+				Layouts
+			</Text>
+			<Container flexDirection="column" gap={4} overflow="scroll" paddingRight={6} scrollbarWidth={5} scrollbarBorderRadius={2} scrollbarColor={colors.primary}>
 				{layoutIds.map((layoutId) => (
 					<LayoutItem key={layoutId} layoutId={layoutId} onEdit={() => setEditingId(layoutId)} />
 				))}
-				<NewLayoutButton />
-			</Surface>
-			{editingId && <EditLayout layoutId={editingId} onClose={() => setEditingId(null)} />}
-		</Container>
+			</Container>
+			<NewLayoutButton onNew={(id) => setEditingId(id)} />
+		</Surface>
+		{editingId && <EditLayout layoutId={editingId} onClose={() => setEditingId(null)} />}
+		</>
 	);
 }
 
@@ -33,7 +35,7 @@ function LayoutItem({ layoutId, onEdit }: { layoutId: PrefixedId<'rl'>; onEdit?:
 	const [active, set] = useActiveRoomLayoutId();
 	const layoutData = useRoomLayout(layoutId);
 	return (
-		<Container gap={4} onClick={() => set(layoutId)}>
+		<Container flexGrow={1} flexShrink={0} gap={4} onClick={() => set(layoutId)}>
 			<Button onClick={() => set(layoutId)} flexGrow={1} gap={4} backgroundColor={active === layoutId ? colors.primary : colors.muted}>
 				<LayoutIcon icon={layoutData?.icon ?? layoutData?.type ?? 'living-room'} color={active === layoutId ? colors.primaryForeground : colors.mutedForeground} />
 				<Text marginRight="auto" color={active === layoutId ? colors.primaryForeground : colors.mutedForeground}>
@@ -50,10 +52,13 @@ function LayoutItem({ layoutId, onEdit }: { layoutId: PrefixedId<'rl'>; onEdit?:
 	);
 }
 
-function NewLayoutButton() {
+function NewLayoutButton({ onNew }: { onNew: (id: PrefixedId<'rl'>) => void }) {
 	const create = useCreateRoomLayout();
 	return (
-		<Button onClick={() => create()}>
+		<Button onClick={async () => {
+			const id = await create();
+			onNew(id);
+		}}>
 			<Text>New Layout</Text>
 		</Button>
 	);
@@ -62,27 +67,27 @@ function NewLayoutButton() {
 function EditLayout({ layoutId, onClose }: { layoutId: PrefixedId<'rl'>; onClose: () => void }) {
 	const layoutData = useRoomLayout(layoutId);
 
-	const [editingName, setEditingName] = useState(layoutData?.name ?? '');
 	const [editingType, setEditingType] = useState<RoomType>(layoutData?.type ?? 'living-room');
 
 	useEffect(() => {
-		setEditingName(layoutData?.name ?? '');
 		setEditingType(layoutData?.type ?? 'living-room');
 	}, [layoutData]);
 
 	const updateLayout = useUpdateRoomLayout();
 	const save = () => {
-		updateLayout({ id: layoutId, name: editingName, type: editingType });
+		updateLayout({ id: layoutId, name: editingType, type: editingType });
 		onClose();
 	};
 
 	return (
-		<Surface padding={10} flexDirection="column" gap={4} flexGrow={1} flexShrink={0} flexBasis={0}>
-			<Text fontSize={14} fontWeight="bold" marginBottom={5}>
-				Edit Layout
-			</Text>
-			<Input value={editingName} onValueChange={(v) => setEditingName(v)} />
-			<RoomTypePicker value={[editingType]} onValueChange={(v) => setEditingType(v[0])} />
+		<Container positionType="absolute" alignItems="center" justifyContent="center" width="100%" height="100%" padding={10}>
+			<Surface padding={10} zIndexOffset={10} flexDirection="column" gap={4} flexGrow={1} flexShrink={0} flexBasis={0}>
+				<Text fontSize={18} color={colors.foreground} textAlign="center" marginBottom={5}>
+					Choose Layout
+				</Text>
+			<RoomTypePicker value={[editingType]} onValueChange={(v) => {
+				setEditingType(v[0]);
+			}} />
 			<Container flexDirection="row" gap={4} width="100%" justifyContent="flex-end">
 				<Button onClick={onClose} backgroundColor={colors.muted}>
 					<Text color={colors.mutedForeground}>Close</Text>
@@ -91,6 +96,7 @@ function EditLayout({ layoutId, onClose }: { layoutId: PrefixedId<'rl'>; onClose
 					<Text>Save</Text>
 				</Button>
 			</Container>
-		</Surface>
+			</Surface>
+		</Container>
 	);
 }

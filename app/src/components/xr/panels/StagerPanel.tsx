@@ -31,14 +31,14 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 						{isOpen ? <X color={colors.primary} /> : <Menu color={colors.primary} />}
 					</Toggle>
 					<Container display={isOpen ? 'flex' : 'none'} flexDirection="row" alignItems={'center'} gap={10}>
+						<Toggle onClick={() => setMode('layout')}>
+							<HouseIcon color={colors.primary} />
+						</Toggle>
 						<Toggle onClick={() => setMode('furniture')}>
 							<Sofa color={colors.primary} />
 						</Toggle>
 						<Toggle onClick={() => setMode('lighting')}>
 							<LampDesk color={colors.primary} />
-						</Toggle>
-						<Toggle onClick={() => setMode('layout')}>
-							<HouseIcon color={colors.primary} />
 						</Toggle>
 						{canRescan && (
 							<Toggle onClick={() => rescanRoom()}>

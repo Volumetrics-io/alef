@@ -96,6 +96,7 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 					viewingLayoutId: undefined,
 					walls: [],
 					layouts: {},
+					lights: {},
 					globalLighting: {
 						intensity: 0.8,
 						color: 2.7,
@@ -223,8 +224,8 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 							roomLayoutId: layoutId,
 							data: placement,
 						});
-						updateLayout((layout) => {
-							layout.lights[placement.id] = placement;
+						set((state) => {
+							state.lights[placement.id] = placement;
 						});
 						return placementId;
 					},
@@ -238,8 +239,8 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 								position,
 							},
 						});
-						updateLayout((layout) => {
-							const light = layout.lights[id];
+						set((state) => {
+							const light = state.lights[id];
 							if (!light) {
 								throw new Error(`Cannot move light ${id}; not found`);
 							}
@@ -255,8 +256,8 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 							roomLayoutId: getLayoutId(),
 							id,
 						});
-						updateLayout((layout) => {
-							delete layout.lights[id];
+						set((state) => {
+							delete state.lights[id];
 						});
 					},
 					updateGlobalLighting: async (update) => {
@@ -323,7 +324,7 @@ export function useAddFurniture() {
 
 export function useSubscribeToPlacementPosition(id: PrefixedId<'fp'> | PrefixedId<'lp'>, callback: (position: { x: number; y: number; z: number }) => void) {
 	useRoomStoreSubscribe(
-		(s) => (s.viewingLayoutId ? (isPrefixedId(id, 'fp') ? (s.layouts[s.viewingLayoutId]?.furniture[id] ?? null) : (s.layouts[s.viewingLayoutId]?.lights[id] ?? null)) : null),
+		(s) => (s.viewingLayoutId ? (isPrefixedId(id, 'fp') ? (s.layouts[s.viewingLayoutId]?.furniture[id] ?? null) : (s.lights[id] ?? null)) : null),
 		(placement) => {
 			if (placement) {
 				callback(placement.position);
@@ -432,11 +433,11 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 }
 
 export function useLightPlacementIds() {
-	return useRoomStore(useShallow((s) => (s.viewingLayoutId ? (Object.keys(s.layouts[s.viewingLayoutId]?.lights ?? {}) as PrefixedId<'lp'>[]) : [])));
+	return useRoomStore(useShallow((s) => Object.keys(s.lights ?? {}) as PrefixedId<'lp'>[]));
 }
 
 export function useLightPlacement(id: PrefixedId<'lp'>) {
-	return useRoomStore((s) => (s.viewingLayoutId ? (s.layouts[s.viewingLayoutId]?.lights[id] ?? null) : null));
+	return useRoomStore((s) => s.lights[id] ?? null);
 }
 
 export function useDeleteLightPlacement(id: PrefixedId<'lp'>) {

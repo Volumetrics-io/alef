@@ -11,9 +11,9 @@ function createDefaultRoomState(): Omit<RoomState, 'id'> {
 			[defaultLayoutId]: {
 				id: defaultLayoutId,
 				furniture: {},
-				lights: {},
 			},
 		},
+		lights: {},
 		globalLighting: {
 			color: 2.7,
 			intensity: 0.8,
@@ -72,7 +72,7 @@ export class Property extends DurableObject<Bindings> {
 
 	// note: layout ID not currently used, updates are not very granular with
 	// the current protocol, we just send the whole room.
-	#broadcastLayoutChange(roomId: PrefixedId<'r'>, _roomLayoutId: PrefixedId<'rl'>) {
+	#broadcastLayoutChange(roomId: PrefixedId<'r'>, _roomLayoutId?: PrefixedId<'rl'>) {
 		const room = this.getRoom(roomId);
 		if (!room) return;
 		// Notify clients of layout change
@@ -111,7 +111,7 @@ export class Property extends DurableObject<Bindings> {
 			throw new AlefError(AlefError.Code.NotFound, 'Room not found');
 		}
 		const layoutId = id('rl');
-		room.layouts[layoutId] = { ...data, id: layoutId, furniture: {}, lights: {} };
+		room.layouts[layoutId] = { ...data, id: layoutId, furniture: {} };
 		this.#saveState();
 		return room.layouts[layoutId];
 	}
@@ -175,37 +175,38 @@ export class Property extends DurableObject<Bindings> {
 		this.#broadcastLayoutChange(roomId, roomLayoutId);
 	}
 
-	async addLight(roomId: PrefixedId<'r'>, roomLayoutId: PrefixedId<'rl'>, light: RoomLightPlacement) {
-		const layout = this.getRoomLayout(roomId, roomLayoutId);
-		if (!layout) {
+	async addLight(roomId: PrefixedId<'r'>, light: RoomLightPlacement) {
+		const room = this.getRoom(roomId);
+		if (!room) {
 			throw new AlefError(AlefError.Code.NotFound, 'Room layout not found');
 		}
-		layout.lights[light.id] = light;
+		room.lights ??= {};
+		room.lights[light.id] = light;
 		await this.#saveState();
-		this.#broadcastLayoutChange(roomId, roomLayoutId);
+		this.#broadcastLayoutChange(roomId);
 	}
 
-	async updateLight(roomId: PrefixedId<'r'>, roomLayoutId: PrefixedId<'rl'>, light: Updates<RoomLightPlacement>) {
-		const layout = this.getRoomLayout(roomId, roomLayoutId);
-		if (!layout) {
+	async updateLight(roomId: PrefixedId<'r'>, light: Updates<RoomLightPlacement>) {
+		const room = this.getRoom(roomId);
+		if (!room) {
 			throw new AlefError(AlefError.Code.NotFound, 'Room layout not found');
 		}
-		if (!layout.lights[light.id]) {
+		if (!room.lights[light.id]) {
 			throw new AlefError(AlefError.Code.NotFound, 'Light not found');
 		}
-		layout.lights[light.id] = { ...layout.lights[light.id], ...light };
+		room.lights[light.id] = { ...room.lights[light.id], ...light };
 		await this.#saveState();
-		this.#broadcastLayoutChange(roomId, roomLayoutId);
+		this.#broadcastLayoutChange(roomId);
 	}
 
-	async removeLight(roomId: PrefixedId<'r'>, roomLayoutId: PrefixedId<'rl'>, id: RoomLightPlacement['id']) {
-		const layout = this.getRoomLayout(roomId, roomLayoutId);
-		if (!layout) {
+	async removeLight(roomId: PrefixedId<'r'>, id: RoomLightPlacement['id']) {
+		const room = this.getRoom(roomId);
+		if (!room) {
 			throw new AlefError(AlefError.Code.NotFound, 'Room layout not found');
 		}
-		delete layout.lights[id];
+		delete room.lights[id];
 		await this.#saveState();
-		this.#broadcastLayoutChange(roomId, roomLayoutId);
+		this.#broadcastLayoutChange(roomId);
 	}
 
 	async updateGlobalLighting(roomId: PrefixedId<'r'>, data: Partial<RoomGlobalLighting>) {

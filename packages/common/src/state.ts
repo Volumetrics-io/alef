@@ -17,13 +17,13 @@ export interface RoomState {
 	id: PrefixedId<'r'>;
 	walls: RoomWallData[];
 	layouts: Record<PrefixedId<'rl'>, RoomLayout>;
+	lights: Record<PrefixedId<'lp'>, RoomLightPlacement>;
 	globalLighting: RoomGlobalLighting;
 }
 
 export interface RoomLayout {
 	id: PrefixedId<'rl'>;
 	furniture: Record<PrefixedId<'fp'>, RoomFurniturePlacement>;
-	lights: Record<PrefixedId<'lp'>, RoomLightPlacement>;
 	/** An icon override. Kind of legacy. */
 	icon?: string;
 	name?: string;

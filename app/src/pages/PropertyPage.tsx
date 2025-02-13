@@ -34,6 +34,7 @@ const PropertyPage = () => {
 					<Breadcrumbs.Label>{property.name}</Breadcrumbs.Label>
 				</Breadcrumbs>
 				<Heading level={1}>{property.name}</Heading>
+				<div>Property management from phones and tablets is coming soon!</div>
 			</Box>
 		</Main>
 	);

@@ -27,6 +27,7 @@ export type RoomStoreState = RoomState & {
 	setViewingLayoutId: (id: PrefixedId<'rl'>) => void;
 	updateLayout: (data: Pick<RoomLayout, 'id' | 'name' | 'icon' | 'type'>) => void;
 	updateWalls: (walls: RoomWallData[]) => void;
+	deleteLayout: (id: PrefixedId<'rl'>) => void;
 
 	// furniture APIs
 	addFurniture: (init: Omit<RoomFurniturePlacement, 'id'>) => Promise<string>;
@@ -147,9 +148,24 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 							}
 						});
 						await socket.request({
-							type: 'updateRoomLayout',
+							type: 'updateLayout',
 							roomId,
 							data,
+						});
+					},
+
+					deleteLayout: async (id) => {
+						await socket.request({
+							type: 'deleteLayout',
+							roomId,
+							roomLayoutId: id,
+						});
+						set((state) => {
+							delete state.layouts[id];
+							if (state.viewingLayoutId === id) {
+								const newLayoutId = Object.keys(state.layouts)[0] as PrefixedId<'rl'> | undefined;
+								state.viewingLayoutId = newLayoutId;
+							}
 						});
 					},
 
@@ -489,6 +505,10 @@ export function useActiveRoomLayout() {
 
 export function useUpdateRoomLayout() {
 	return useRoomStore((s) => s.updateLayout);
+}
+
+export function useDeleteRoomLayout() {
+	return useRoomStore((s) => s.deleteLayout);
 }
 
 export function useHasWalls() {

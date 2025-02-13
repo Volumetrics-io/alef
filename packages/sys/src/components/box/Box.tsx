@@ -12,7 +12,7 @@ export interface BoxProps extends HTMLAttributes<HTMLElement> {
 	/**
 	 * Take up the full parent space.
 	 */
-	full?: boolean;
+	full?: boolean | 'width' | 'height';
 	/**
 	 * Add padding to the box.
 	 */
@@ -156,7 +156,8 @@ export const Box = forwardRef<HTMLDivElement, BoxProps>(function Box(
 	const classNames = clsx(
 		cls.box,
 		{
-			[cls.full]: full,
+			[cls.fullWidth]: full === 'width' || full === true,
+			[cls.fullHeight]: full === 'height' || full === true,
 			[cls.padded]: p === true,
 			[cls.paddedSqueeze]: p === 'squeeze',
 			[cls.clipped]: clipped,

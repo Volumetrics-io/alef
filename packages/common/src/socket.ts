@@ -60,6 +60,12 @@ export interface ClientCreateLayoutMessage extends BaseClientMessage {
 	data: Pick<RoomLayout, 'name' | 'icon' | 'type'>;
 }
 
+export interface ClientDeleteRoomLayoutMessage extends BaseClientMessage {
+	type: 'deleteLayout';
+	roomId: PrefixedId<'r'>;
+	roomLayoutId: PrefixedId<'rl'>;
+}
+
 export interface ClientUpdateWallsMessage extends BaseClientMessage {
 	type: 'updateWalls';
 	roomId: PrefixedId<'r'>;
@@ -112,7 +118,7 @@ export interface ClientUpdateGlobalLightingMessage extends BaseClientMessage {
 }
 
 export interface ClientUpdateRoomLayoutMessage extends BaseClientMessage {
-	type: 'updateRoomLayout';
+	type: 'updateLayout';
 	roomId: PrefixedId<'r'>;
 	// only some properties are editable with this message.
 	data: Pick<RoomLayout, 'id' | 'name' | 'icon' | 'type'>;
@@ -130,7 +136,8 @@ export type ClientMessage =
 	| ClientUpdateLightMessage
 	| ClientRemoveLightMessage
 	| ClientUpdateGlobalLightingMessage
-	| ClientUpdateRoomLayoutMessage;
+	| ClientUpdateRoomLayoutMessage
+	| ClientDeleteRoomLayoutMessage;
 
 type DistributiveOmit<T, K extends keyof any> = T extends any ? Omit<T, K> : never;
 export type ClientMessageWithoutId = DistributiveOmit<ClientMessage, 'messageId'>;

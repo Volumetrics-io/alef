@@ -123,8 +123,11 @@ export class PropertySocketHandler {
 				case 'updateGlobalLighting':
 					await this.#property.updateGlobalLighting(message.roomId, message.data);
 					break;
-				case 'updateRoomLayout':
+				case 'updateLayout':
 					await this.#property.updateLayout(message.roomId, message.data.id, message.data);
+					break;
+				case 'deleteLayout':
+					await this.#property.deleteLayout(message.roomId, message.roomLayoutId);
 					break;
 				case 'ping':
 					break;

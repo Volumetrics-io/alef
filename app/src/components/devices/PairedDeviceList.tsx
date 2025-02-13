@@ -5,7 +5,7 @@ export function PairedDeviceList() {
 	const { data: devices } = useDevices();
 
 	return (
-		<Box stacked gapped>
+		<Box stacked gapped full="width">
 			<Heading level={3}>Paired devices</Heading>
 			<Card.Grid>
 				{devices.map((device) => (

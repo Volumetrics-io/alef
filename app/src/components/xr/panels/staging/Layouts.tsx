@@ -1,4 +1,4 @@
-import { useActiveRoomLayoutId, useCreateRoomLayout, useRoomLayout, useRoomLayoutIds, useUpdateRoomLayout } from '@/stores/roomStore';
+import { useActiveRoomLayoutId, useCreateRoomLayout, useDeleteRoomLayout, useRoomLayout, useRoomLayoutIds, useUpdateRoomLayout } from '@/stores/roomStore';
 import { PrefixedId, RoomType } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { Button, colors, Input } from '@react-three/uikit-default';
@@ -79,6 +79,19 @@ function EditLayout({ layoutId, onClose }: { layoutId: PrefixedId<'rl'>; onClose
 		onClose();
 	};
 
+	const [confirmRequired, setConfirmRequired] = useState(false);
+	const deleteLayout = useDeleteRoomLayout();
+	const deleteSelf = () => {
+		if (!confirmRequired) {
+			setConfirmRequired(true);
+			return;
+		}
+
+		deleteLayout(layoutId);
+		setConfirmRequired(false);
+		onClose();
+	};
+
 	return (
 		<Container positionType="absolute" alignItems="center" justifyContent="center" width="100%" height="100%" padding={10}>
 			<Surface padding={10} zIndexOffset={10} flexDirection="column" gap={4} flexGrow={1} flexShrink={0} flexBasis={0}>
@@ -89,6 +102,9 @@ function EditLayout({ layoutId, onClose }: { layoutId: PrefixedId<'rl'>; onClose
 				setEditingType(v[0]);
 			}} />
 			<Container flexDirection="row" gap={4} width="100%" justifyContent="flex-end">
+				<Button backgroundColor={colors.destructive} onClick={deleteSelf} marginRight="auto">
+					<Text color={colors.destructiveForeground}>{confirmRequired ? 'Confirm' : 'Delete'}</Text>
+				</Button>
 				<Button onClick={onClose} backgroundColor={colors.muted}>
 					<Text color={colors.mutedForeground}>Close</Text>
 				</Button>

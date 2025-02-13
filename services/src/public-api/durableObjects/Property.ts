@@ -128,6 +128,18 @@ export class Property extends DurableObject<Bindings> {
 		this.#saveState();
 	}
 
+	deleteLayout(roomId: PrefixedId<'r'>, layoutId: PrefixedId<'rl'>) {
+		const room = this.getRoom(roomId);
+		if (!room) {
+			throw new AlefError(AlefError.Code.NotFound, 'Room not found');
+		}
+		if (!room.layouts[layoutId]) {
+			throw new AlefError(AlefError.Code.NotFound, 'Room layout not found');
+		}
+		delete room.layouts[layoutId];
+		this.#saveState();
+	}
+
 	async updateWalls(roomId: PrefixedId<'r'>, walls: RoomState['walls']) {
 		const room = this.getRoom(roomId);
 		if (!room) {

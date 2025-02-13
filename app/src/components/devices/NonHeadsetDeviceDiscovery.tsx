@@ -2,7 +2,7 @@ import { os } from '@/services/os';
 import { useClaimDevice, useCurrentDevice, useDeviceDiscovery, useUpdateDevice } from '@/services/publicApi/deviceHooks';
 import { useMe } from '@/services/publicApi/userHooks';
 import { PrefixedId } from '@alef/common';
-import { Box, Button, Dialog, Form, Heading, Text } from '@alef/sys';
+import { Box, Button, Dialog, Form, Frame, Heading, Text } from '@alef/sys';
 import toast from 'react-hot-toast';
 
 export function NonHeadsetDeviceDiscovery() {
@@ -16,7 +16,7 @@ export function NonHeadsetDeviceDiscovery() {
 	const firstSuggested = suggested[0];
 
 	return (
-		<Box stacked gapped>
+		<Frame padded stacked gapped>
 			<Heading level={3}>Pair a headset</Heading>
 			<Form
 				initialValues={{ name: selfDevice.name }}
@@ -29,12 +29,12 @@ export function NonHeadsetDeviceDiscovery() {
 				<Form.Submit>Change name</Form.Submit>
 			</Form>
 			{firstSuggested && <SuggestedDevice device={firstSuggested} />}
-			{!suggested && (
+			{!suggested.length && (
 				<Box>
-					<Text>Waiting for a pairing request. Open the app on your headset to get started.</Text>
+					<Text>Waiting for a pairing request. Keep this page open and launch the app on your headset to get started.</Text>
 				</Box>
 			)}
-		</Box>
+		</Frame>
 	);
 }
 

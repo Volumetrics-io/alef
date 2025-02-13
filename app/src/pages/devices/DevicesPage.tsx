@@ -8,7 +8,7 @@ export function DevicesPage() {
 		<>
 			<NavBar />
 			<Main full p>
-				<Box stacked gapped>
+				<Box stacked gapped align="center">
 					<NonHeadsetDeviceDiscovery />
 					<PairedDeviceList />
 				</Box>

@@ -39,7 +39,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 					{ready && <RoundCuboidCollider args={roundedArgs} position={center} {...colliderProps} />}
 					<group onClick={handleClick} {...groupProps}>
 						{selected ? (
-							<Handle {...handleProps} targetRef="from-context">
+							<Handle rotate={false} scale={false} translate={{ x: true, y: false, z: true }} targetRef="from-context">
 								<FurnitureModel furnitureId={furnitureId} outline={selected} ref={modelRef} />
 							</Handle>
 						) : (
@@ -65,7 +65,7 @@ function DeleteUI({ furniturePlacementId, height }: { furniturePlacementId: Pref
 	const handleDelete = useDeleteFurniturePlacement(furniturePlacementId);
 
 	return (
-		<Billboard position={[0, height, 0]}>
+		<Billboard lockX lockZ position={[0, height, 0]}>
 			<Root pixelSize={0.005}>
 				<Container padding={2} backgroundColor={colors.destructive} borderRadius={5} onClick={handleDelete}>
 					<Trash />

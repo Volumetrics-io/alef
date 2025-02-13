@@ -22,7 +22,7 @@ export function Furniture() {
 	});
 
 	return (
-		<Surface maxWidth={1200}>
+		<Surface maxWidth={630} justifyContent="space-between">
 			{furniture.map((furnitureItem) => (
 				<FurnitureSelectItem key={furnitureItem.id} furnitureItem={furnitureItem} />
 			))}
@@ -37,7 +37,8 @@ function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }
 		<Surface
 			flexDirection="column"
 			gap={5}
-			width="25%"
+			width={200}
+			marginBottom={5}
 			onClick={() =>
 				addFurniture({
 					furnitureId: furnitureItem.id,

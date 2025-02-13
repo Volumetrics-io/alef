@@ -90,14 +90,8 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 				// devices always start in staging mode
 				displayMode: 'staging',
 			})
-			// only name can be updated once the device is present.
-			.onConflict((cb) =>
-				info.name
-					? cb.column('id').doUpdateSet({
-							name: info.name,
-						})
-					: cb.column('id').doNothing()
-			)
+			// if device already exists, keep existing values.
+			.onConflict((cb) => cb.column('id').doNothing())
 			.execute();
 
 		if (owner) {

@@ -11,20 +11,13 @@ import { Surface } from '../../ui/Surface';
 
 export function Furniture() {
 	const layout = useActiveRoomLayout();
-	const [filters, setFilters] = useState<Attribute[]>(() => {
-		// initial filter selects furniture of the same type as the layout
-		if (layout?.type) {
-			return [{ key: 'category', value: layout.type }];
-		}
-		return [];
-	});
 	const { data: furniture } = useAllFurniture({
-		attributeFilter: filters,
+		attributeFilter: [{ key: 'category', value: layout?.type ?? 'living-room' }],
 	});
 
 	return (
 		<Surface width={630} flexDirection="column" alignItems="flex-start" justifyContent="space-between" gap={8}>
-			<FilterControl filters={filters} setFilters={setFilters} />
+			{/* <FilterControl filters={filters} setFilters={setFilters} /> */}
 			<Container flexDirection="row" gap={8} flexWrap="wrap">
 				{furniture.map((furnitureItem) => (
 					<FurnitureSelectItem key={furnitureItem.id} furnitureItem={furnitureItem} />

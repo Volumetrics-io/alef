@@ -1,8 +1,8 @@
 import { useRescanRoom } from '@/hooks/useRescanRoom';
-import { useStageStore } from '@/stores/stageStore';
+import { StageMode, useStageStore } from '@/stores/stageStore';
 import { Container, Root } from '@react-three/uikit';
-import { colors, Toggle } from '@react-three/uikit-default';
-import { BoxIcon, HouseIcon, LampDesk, Menu, Sofa, X } from '@react-three/uikit-lucide';
+import { Button, colors, Toggle } from '@react-three/uikit-default';
+import { ArrowLeftIcon, ArrowRightIcon, BoxIcon, HouseIcon, LampDesk, Menu, Sofa, X } from '@react-three/uikit-lucide';
 import { Suspense, useState } from 'react';
 import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
 import { DragController } from '../controls/Draggable';
@@ -14,6 +14,16 @@ import { Lighting } from './staging/Lighting';
 export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 	const { mode, setMode } = useStageStore();
 	const [isOpen, setIsOpen] = useState(false);
+
+	const modes: StageMode[] = ['layout', 'furniture', 'lighting'];
+
+	const back = () => {
+		setMode(modes[modes.indexOf(mode) - 1]);
+	};
+
+	const forward = () => {
+		setMode(modes[modes.indexOf(mode) + 1]);
+	};
 
 	const { canRescan, rescanRoom } = useRescanRoom();
 
@@ -58,8 +68,14 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 						{mode === 'layout' && <Layouts />}
 						{mode !== null && (
 							<DragController>
-								<Container flexDirection="row" width="50%" gap={10} alignItems="center">
-									<Container backgroundColor={colors.background} height={15} borderRadius={10} borderColor={colors.border} borderWidth={0.5} flexGrow={1} marginRight={18} />
+								<Container flexDirection="row" width="100%" gap={10} alignItems="center">
+									<Button backgroundColor={colors.background} onClick={back}>
+										<ArrowLeftIcon color={colors.primary} />
+									</Button>
+									<Container backgroundColor={colors.background} height={15} borderRadius={10} borderColor={colors.border} borderWidth={0.5} flexGrow={1} />
+									<Button backgroundColor={colors.background} onClick={forward}>
+										<ArrowRightIcon color={colors.primary} />
+									</Button>
 								</Container>
 							</DragController>
 						)}

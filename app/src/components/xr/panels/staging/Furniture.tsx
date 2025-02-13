@@ -3,25 +3,33 @@ import { FurnitureItem, useAllFurniture } from '@/services/publicApi/furnitureHo
 import { useActiveRoomLayout, useAddFurniture } from '@/stores/roomStore/roomStore';
 import { Attribute, formatAttribute, RoomType } from '@alef/common';
 import { Container, Content, Text } from '@react-three/uikit';
-import { colors } from '@react-three/uikit-default';
-import { useState } from 'react';
+import { Button, colors } from '@react-three/uikit-default';
 import { FurnitureModel } from '../../furniture/FurnitureModel';
 import { RoomTypePicker } from '../../ui/RoomTypePicker';
 import { Surface } from '../../ui/Surface';
+import { ArrowRightIcon, ArrowLeftIcon } from '@react-three/uikit-lucide';
+import { useStageStore } from '@/stores/stageStore';
 
 export function Furniture() {
+	const {setMode} = useStageStore();
 	const layout = useActiveRoomLayout();
 	const { data: furniture } = useAllFurniture({
 		attributeFilter: [{ key: 'category', value: layout?.type ?? 'living-room' }],
 	});
 
 	return (
-		<Surface width={630} flexDirection="column" alignItems="flex-start" justifyContent="space-between" gap={8}>
+		<Surface width={430} height={300} flexDirection="column" flexWrap="no-wrap" gap={10} padding={10}>
 			{/* <FilterControl filters={filters} setFilters={setFilters} /> */}
-			<Container flexDirection="row" gap={8} flexWrap="wrap">
-				{furniture.map((furnitureItem) => (
-					<FurnitureSelectItem key={furnitureItem.id} furnitureItem={furnitureItem} />
-				))}
+			<Container overflow="scroll" flexShrink={1} scrollbarWidth={5} scrollbarBorderRadius={2} paddingRight={6} scrollbarColor={colors.primary} flexDirection="column">
+				<Container flexDirection="row" gap={8} justifyContent="space-evenly" flexWrap="wrap">
+					{furniture.map((furnitureItem) => (
+						<FurnitureSelectItem key={furnitureItem.id} furnitureItem={furnitureItem} />
+					))}
+				</Container>
+			</Container>
+			<Container flexGrow={1} flexShrink={0} flexDirection="row" gap={4} width="100%" paddingRight={6} justifyContent="space-between">
+				<Button onClick={() => setMode('layout')}><ArrowLeftIcon /></Button>
+				<Button onClick={() => setMode('lighting')}><ArrowRightIcon /></Button>
 			</Container>
 		</Surface>
 	);
@@ -34,7 +42,7 @@ function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }
 		<Surface
 			flexDirection="column"
 			gap={5}
-			width={200}
+			width={180}
 			marginBottom={5}
 			onClick={() =>
 				addFurniture({

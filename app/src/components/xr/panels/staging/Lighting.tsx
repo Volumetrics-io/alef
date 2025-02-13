@@ -3,24 +3,25 @@ import { useDeleteLightPlacement, useGlobalLighting } from '@/stores/roomStore/r
 import { PrefixedId } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { Button, colors, Slider } from '@react-three/uikit-default';
-import { Trash } from '@react-three/uikit-lucide';
+import { ArrowLeftIcon, Trash } from '@react-three/uikit-lucide';
 import { Surface } from '../../ui/Surface';
-
+import { useStageStore } from '@/stores/stageStore';
 export const Lighting = () => {
 	const selectedLightId = useSelectedLightPlacementId();
 
 	return (
-		<Surface flexDirection="column" alignItems="center" justifyContent="center" width={350} height={300}>
+		<Surface flexDirection="column" width={430} height={300}>
 			<SelectedLightPane id={selectedLightId} />
 		</Surface>
 	);
 };
 
 const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
+	const {setMode} = useStageStore();
 	const [{ intensity: globalIntensity, color: globalColor }, updateGlobal] = useGlobalLighting();
 
 	return (
-		<Container flexDirection="column" width="100%" height="100%" justifyContent="space-between" padding={20}>
+		<Container flexDirection="column" width="100%" height="100%" justifyContent="space-between" padding={10}>
 			<Container flexDirection="column" gap={20} width="100%">
 				<Container flexDirection="column" gap={10}>
 					<Text fontSize={16} fontWeight="bold" color={colors.primary}>
@@ -36,7 +37,11 @@ const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
 				</Container>
 			</Container>
 
-			{id && <DeleteButton id={id} />}
+			<Container flexDirection="row" gap={4} width="100%" paddingRight={6} justifyContent="space-between">
+				<Button onClick={() => setMode('furniture')}><ArrowLeftIcon /></Button>
+				{id && <DeleteButton id={id} />}	
+			</Container>
+
 		</Container>
 	);
 };

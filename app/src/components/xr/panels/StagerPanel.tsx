@@ -15,16 +15,6 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 	const { mode, setMode } = useStageStore();
 	const [isOpen, setIsOpen] = useState(false);
 
-	const modes: StageMode[] = ['layout', 'furniture', 'lighting'];
-
-	const back = () => {
-		setMode(modes[modes.indexOf(mode) - 1]);
-	};
-
-	const forward = () => {
-		setMode(modes[modes.indexOf(mode) + 1]);
-	};
-
 	const { canRescan, rescanRoom } = useRescanRoom();
 
 	return (
@@ -41,13 +31,13 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 						{isOpen ? <X color={colors.primary} /> : <Menu color={colors.primary} />}
 					</Toggle>
 					<Container display={isOpen ? 'flex' : 'none'} flexDirection="row" alignItems={'center'} gap={10}>
-						<Toggle onClick={() => setMode('layout')}>
+						<Toggle checked={mode === 'layout'} onClick={() => setMode('layout')}>
 							<HouseIcon color={colors.primary} />
 						</Toggle>
-						<Toggle onClick={() => setMode('furniture')}>
+						<Toggle checked={mode === 'furniture'} onClick={() => setMode('furniture')}>
 							<Sofa color={colors.primary} />
 						</Toggle>
-						<Toggle onClick={() => setMode('lighting')}>
+						<Toggle checked={mode === 'lighting'} onClick={() => setMode('lighting')}>
 							<LampDesk color={colors.primary} />
 						</Toggle>
 						{canRescan && (
@@ -68,14 +58,8 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 						{mode === 'layout' && <Layouts />}
 						{mode !== null && (
 							<DragController>
-								<Container flexDirection="row" width="100%" gap={10} alignItems="center">
-									<Button backgroundColor={colors.background} onClick={back}>
-										<ArrowLeftIcon color={colors.primary} />
-									</Button>
+								<Container flexDirection="row" width="70%" gap={10} alignItems="center">
 									<Container backgroundColor={colors.background} height={15} borderRadius={10} borderColor={colors.border} borderWidth={0.5} flexGrow={1} />
-									<Button backgroundColor={colors.background} onClick={forward}>
-										<ArrowRightIcon color={colors.primary} />
-									</Button>
 								</Container>
 							</DragController>
 						)}

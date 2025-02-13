@@ -2,6 +2,7 @@ import './styles/styles.css';
 
 export * from './components/avatar/Avatar.js';
 export * from './components/box/Box.js';
+export * from './components/breadcrumbs/Breadcrumbs.js';
 export * from './components/button/Button.js';
 export * from './components/card/Card.js';
 export * from './components/checkbox/Checkbox.js';

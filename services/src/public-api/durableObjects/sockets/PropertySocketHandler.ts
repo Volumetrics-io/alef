@@ -112,13 +112,13 @@ export class PropertySocketHandler {
 					await this.#property.removeFurniture(message.roomId, message.roomLayoutId, message.id);
 					break;
 				case 'addLight':
-					await this.#property.addLight(message.roomId, message.roomLayoutId, message.data);
+					await this.#property.addLight(message.roomId, message.data);
 					break;
 				case 'updateLight':
-					await this.#property.updateLight(message.roomId, message.roomLayoutId, message.data);
+					await this.#property.updateLight(message.roomId, message.data);
 					break;
 				case 'removeLight':
-					await this.#property.removeLight(message.roomId, message.roomLayoutId, message.id);
+					await this.#property.removeLight(message.roomId, message.id);
 					break;
 				case 'updateGlobalLighting':
 					await this.#property.updateGlobalLighting(message.roomId, message.data);
@@ -137,7 +137,9 @@ export class PropertySocketHandler {
 		} catch (err) {
 			// respond with error
 			const asAlefError = AlefError.wrap(err);
-			ws.send(JSON.stringify({ responseTo: message.messageId, type: 'error', error: asAlefError.message, code: asAlefError.code }));
+			ws.send(
+				JSON.stringify({ responseTo: message.messageId, type: 'error', message: asAlefError.statusCode >= 500 ? 'Unknown error' : asAlefError.message, code: asAlefError.code })
+			);
 		}
 	};
 

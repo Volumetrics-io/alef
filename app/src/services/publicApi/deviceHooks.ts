@@ -100,12 +100,16 @@ export function useDeleteDevice() {
 
 export function useUpdateDevice() {
 	return useMutation({
-		mutationFn: ([deviceId, updates]: [
-			PrefixedId<'d'>,
-			{
-				displayMode: 'staging' | 'viewing';
-			},
-		]) => {
+		mutationFn: ({
+			deviceId,
+			updates,
+		}: {
+			deviceId: PrefixedId<'d'>;
+			updates: {
+				displayMode?: 'staging' | 'viewing';
+				name?: string;
+			};
+		}) => {
 			return handleErrors(
 				publicApiClient.devices[':deviceId'].$put({
 					param: {

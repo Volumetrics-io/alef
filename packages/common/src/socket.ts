@@ -90,21 +90,18 @@ export interface ClientRemoveFurnitureMessage extends BaseClientMessage {
 export interface ClientAddLightMessage extends BaseClientMessage {
 	type: 'addLight';
 	roomId: PrefixedId<'r'>;
-	roomLayoutId: PrefixedId<'rl'>;
 	data: RoomLightPlacement;
 }
 
 export interface ClientUpdateLightMessage extends BaseClientMessage {
 	type: 'updateLight';
 	roomId: PrefixedId<'r'>;
-	roomLayoutId: PrefixedId<'rl'>;
 	data: Updates<RoomLightPlacement>;
 }
 
 export interface ClientRemoveLightMessage extends BaseClientMessage {
 	type: 'removeLight';
 	roomId: PrefixedId<'r'>;
-	roomLayoutId: PrefixedId<'rl'>;
 	id: RoomLightPlacement['id'];
 }
 

@@ -1,21 +1,28 @@
+import { RoomWallData } from '@alef/common';
 import { Vector3 } from 'three';
 
-export function getXRPlaneCenterAndNormal(frame: XRFrame, rootSpace: XRReferenceSpace, plane: XRPlane) {
+export function xrPlaneToRawPlaneData(frame: XRFrame, rootSpace: XRReferenceSpace, plane: XRPlane) {
 	const pose = frame.getPose(plane.planeSpace, rootSpace);
 	if (!pose) {
-		return { center: new Vector3(0, 0, 0), normal: new Vector3(0, 1, 0) };
+		return { center: new Vector3(0, 0, 0), normal: new Vector3(0, 1, 0), extents: [0, 0] as [number, number] };
 	}
 	const orientationQuaternion = pose.transform.orientation;
 	const orientation = new Vector3(orientationQuaternion.x, orientationQuaternion.y, orientationQuaternion.z);
 	const center = new Vector3(pose.transform.position.x, pose.transform.position.y, pose.transform.position.z);
+	const minX = Math.min(...plane.polygon.map((p) => p.x));
+	const maxX = Math.max(...plane.polygon.map((p) => p.x));
+	const minY = Math.min(...plane.polygon.map((p) => p.y));
+	const maxY = Math.max(...plane.polygon.map((p) => p.y));
+	const extents = [maxX - minX, maxY - minY] as [number, number];
 	return {
 		normal: orientation,
 		center,
+		extents,
 	};
 }
 
 export function getClosestPointOnXRPlane(frame: XRFrame, rootSpace: XRReferenceSpace, plane: XRPlane, targetPoint: Vector3) {
-	const { center, normal } = getXRPlaneCenterAndNormal(frame, rootSpace, plane);
+	const { center, normal } = xrPlaneToRawPlaneData(frame, rootSpace, plane);
 	return getClosestPointOnPlane(normal, center, targetPoint);
 }
 
@@ -61,4 +68,14 @@ export function getMostIntentionalPlaneSnappedMovement(movement: Vector3, planeN
 	}
 
 	return matchedIndex;
+}
+
+export function xrPlaneToRoomWallData(frame: XRFrame, rootSpace: XRReferenceSpace, plane: XRPlane) {
+	const { center, normal, extents } = xrPlaneToRawPlaneData(frame, rootSpace, plane);
+	const wallData: RoomWallData = {
+		normal: { x: normal.x, y: normal.y, z: normal.z },
+		origin: { x: center.x, y: center.y, z: center.z },
+		extents,
+	};
+	return wallData;
 }

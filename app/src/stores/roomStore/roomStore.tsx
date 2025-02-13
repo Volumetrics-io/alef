@@ -2,7 +2,7 @@ import { useVibrateOnHover } from '@/hooks/useVibrateOnHover';
 import { DragController } from '@/physics/DragController';
 import { isPlaneUserData } from '@/physics/planeUserData';
 import { PropertySocket } from '@/services/publicApi/socket';
-import { id, isPrefixedId, PrefixedId, RoomFurniturePlacement, RoomGlobalLighting, RoomLayout, RoomLightPlacement, RoomState } from '@alef/common';
+import { id, isPrefixedId, PrefixedId, RoomFurniturePlacement, RoomGlobalLighting, RoomLayout, RoomLightPlacement, RoomState, RoomWallData } from '@alef/common';
 import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
 import { ActiveCollisionTypes } from '@dimforge/rapier3d-compat';
 import { HandleOptions, TransformHandlesProperties } from '@react-three/handle';
@@ -26,6 +26,7 @@ export type RoomStoreState = RoomState & {
 	createLayout: (data?: { name?: string }) => Promise<PrefixedId<'rl'>>;
 	setViewingLayoutId: (id: PrefixedId<'rl'>) => void;
 	updateLayout: (data: Pick<RoomLayout, 'id' | 'name' | 'icon' | 'type'>) => void;
+	updateWalls: (walls: RoomWallData[]) => void;
 
 	// furniture APIs
 	addFurniture: (init: Omit<RoomFurniturePlacement, 'id'>) => Promise<string>;
@@ -95,9 +96,21 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 					viewingLayoutId: undefined,
 					walls: [],
 					layouts: {},
+					lights: {},
 					globalLighting: {
 						intensity: 0.8,
 						color: 2.7,
+					},
+
+					updateWalls: async (walls) => {
+						await socket.request({
+							type: 'updateWalls',
+							roomId,
+							walls,
+						});
+						set((state) => {
+							state.walls = walls;
+						});
 					},
 
 					createLayout: async (data) => {
@@ -216,8 +229,8 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 							roomLayoutId: layoutId,
 							data: placement,
 						});
-						updateLayout((layout) => {
-							layout.lights[placement.id] = placement;
+						set((state) => {
+							state.lights[placement.id] = placement;
 						});
 						return placementId;
 					},
@@ -231,8 +244,8 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 								position,
 							},
 						});
-						updateLayout((layout) => {
-							const light = layout.lights[id];
+						set((state) => {
+							const light = state.lights[id];
 							if (!light) {
 								throw new Error(`Cannot move light ${id}; not found`);
 							}
@@ -248,8 +261,8 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 							roomLayoutId: getLayoutId(),
 							id,
 						});
-						updateLayout((layout) => {
-							delete layout.lights[id];
+						set((state) => {
+							delete state.lights[id];
 						});
 					},
 					updateGlobalLighting: async (update) => {
@@ -316,7 +329,7 @@ export function useAddFurniture() {
 
 export function useSubscribeToPlacementPosition(id: PrefixedId<'fp'> | PrefixedId<'lp'>, callback: (position: { x: number; y: number; z: number }) => void) {
 	useRoomStoreSubscribe(
-		(s) => (s.viewingLayoutId ? (isPrefixedId(id, 'fp') ? (s.layouts[s.viewingLayoutId]?.furniture[id] ?? null) : (s.layouts[s.viewingLayoutId]?.lights[id] ?? null)) : null),
+		(s) => (s.viewingLayoutId ? (isPrefixedId(id, 'fp') ? (s.layouts[s.viewingLayoutId]?.furniture[id] ?? null) : (s.lights[id] ?? null)) : null),
 		(placement) => {
 			if (placement) {
 				callback(placement.position);
@@ -426,11 +439,11 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 }
 
 export function useLightPlacementIds() {
-	return useRoomStore(useShallow((s) => (s.viewingLayoutId ? (Object.keys(s.layouts[s.viewingLayoutId]?.lights ?? {}) as PrefixedId<'lp'>[]) : [])));
+	return useRoomStore(useShallow((s) => Object.keys(s.lights ?? {}) as PrefixedId<'lp'>[]));
 }
 
 export function useLightPlacement(id: PrefixedId<'lp'>) {
-	return useRoomStore((s) => (s.viewingLayoutId ? (s.layouts[s.viewingLayoutId]?.lights[id] ?? null) : null));
+	return useRoomStore((s) => s.lights[id] ?? null);
 }
 
 export function useDeleteLightPlacement(id: PrefixedId<'lp'>) {
@@ -482,4 +495,12 @@ export function useActiveRoomLayout() {
 
 export function useUpdateRoomLayout() {
 	return useRoomStore((s) => s.updateLayout);
+}
+
+export function useHasWalls() {
+	return useRoomStore((s) => s.walls.length > 0);
+}
+
+export function useUpdateWalls() {
+	return useRoomStore((s) => s.updateWalls);
 }

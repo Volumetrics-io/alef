@@ -144,3 +144,6 @@ export interface PropertyTable {
 	name: string;
 	ownerId: PrefixedId<'u'>;
 }
+export type Property = Selectable<PropertyTable>;
+export type NewProperty = Insertable<PropertyTable>;
+export type PropertyUpdate = Updateable<PropertyTable>;

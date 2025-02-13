@@ -30,7 +30,6 @@ const upsertDeviceMiddleware = createMiddleware<{
 		name: description,
 		id: ownId,
 	};
-	console.log('device id', ownId, 'logged in', userId);
 	const upserted = await ctx.env.PUBLIC_STORE.ensureDeviceExists(device, userId);
 	ctx.set('device', upserted);
 	return next();
@@ -213,7 +212,8 @@ export const devicesRouter = new Hono<Env>()
 		zValidator(
 			'json',
 			z.object({
-				displayMode: z.enum(['staging', 'viewing']),
+				displayMode: z.enum(['staging', 'viewing']).optional(),
+				name: z.string().optional(),
 			})
 		),
 		async (ctx) => {

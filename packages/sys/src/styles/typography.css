@@ -43,7 +43,7 @@
 	--weight-bold: 600;
 	--weight-black: 900;
 	/* FONTS */
-	--font-head: 'Bricolage', system-ui, sans-serif;
+	--font-head: 'IBM Plex', system-ui, sans-serif;
 	--font-body: 'IBM Plex', system-ui, sans-serif;
 	--font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }

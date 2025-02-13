@@ -4,7 +4,7 @@ import { ComponentType, ElementType, forwardRef, HTMLAttributes, useMemo } from 
 import cls from './Box.module.css';
 
 export type FloatAnchor = 'top-right' | 'top-left' | 'none';
-export type SupportedAlignment = 'center' | 'stretch' | 'start';
+export type SupportedAlignment = 'center' | 'stretch' | 'start' | 'end';
 export type SupportedJustification = 'center' | 'start' | 'stretch' | 'between';
 
 export interface BoxProps extends HTMLAttributes<HTMLElement> {
@@ -180,6 +180,7 @@ export const Box = forwardRef<HTMLDivElement, BoxProps>(function Box(
 			[cls.alignCenter]: appliedAlign === 'center',
 			[cls.alignStart]: appliedAlign === 'start',
 			[cls.alignStretch]: appliedAlign === 'stretch',
+			[cls.alignEnd]: appliedAlign === 'end',
 
 			[cls.justifyCenter]: appliedJustify === 'center',
 			[cls.justifyStart]: appliedJustify === 'start',

@@ -29,7 +29,7 @@ function PairedDeviceItem({ device }: { device: DeviceResponseData }) {
 					<Switch
 						checked={device.displayMode === 'viewing'}
 						disabled={isPending}
-						onCheckedChange={(checked) => updateDevice([device.id, { displayMode: checked ? 'viewing' : 'staging' }])}
+						onCheckedChange={(checked) => updateDevice({ deviceId: device.id, updates: { displayMode: checked ? 'viewing' : 'staging' } })}
 					/>
 				</Label>
 			</Card.Main>

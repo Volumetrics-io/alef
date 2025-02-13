@@ -1,19 +1,17 @@
 import { os } from '@/services/os';
-import { useClaimDevice, useDeviceDiscovery } from '@/services/publicApi/deviceHooks';
+import { useClaimDevice, useCurrentDevice, useDeviceDiscovery, useUpdateDevice } from '@/services/publicApi/deviceHooks';
 import { useMe } from '@/services/publicApi/userHooks';
 import { PrefixedId } from '@alef/common';
 import { Box, Button, Dialog, Form, Heading, Text } from '@alef/sys';
-import { startTransition, useState } from 'react';
 import toast from 'react-hot-toast';
 
 export function NonHeadsetDeviceDiscovery() {
 	const { data: me } = useMe();
-	const [name, setName] = useState(() => {
-		return `${me?.friendlyName}'s ${os} device`;
-	});
 	const {
 		data: { suggested },
-	} = useDeviceDiscovery(name);
+	} = useDeviceDiscovery(`${me?.friendlyName}'s ${os} device`);
+	const { data: selfDevice } = useCurrentDevice();
+	const updateDevice = useUpdateDevice();
 
 	const firstSuggested = suggested[0];
 
@@ -21,11 +19,10 @@ export function NonHeadsetDeviceDiscovery() {
 		<Box stacked gapped>
 			<Heading level={3}>Pair a headset</Heading>
 			<Form
-				initialValues={{ name }}
-				onSubmit={({ name }) => {
-					startTransition(() => {
-						setName(name);
-					});
+				initialValues={{ name: selfDevice.name }}
+				enableReinitialize
+				onSubmit={async ({ name }) => {
+					await updateDevice.mutateAsync({ deviceId: selfDevice.id, updates: { name } });
 				}}
 			>
 				<Form.TextField name="name" label="This device" />

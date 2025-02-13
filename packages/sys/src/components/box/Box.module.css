@@ -64,6 +64,9 @@
 	.alignStretch {
 		align-items: stretch;
 	}
+	.alignEnd {
+		align-items: flex-end;
+	}
 
 	.justifyCenter {
 		justify-content: center;

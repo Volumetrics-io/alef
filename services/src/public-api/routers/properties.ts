@@ -3,6 +3,7 @@ import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { createMiddleware } from 'hono/factory';
 import { z } from 'zod';
+import { Property as PropertyData } from '../../db/kysely/tables';
 import { wrapRpcData } from '../../helpers/wrapRpcData';
 import { loggedInMiddleware, userStoreMiddleware } from '../../middleware/session';
 import { getSocketToken } from '../auth/socketTokens';
@@ -10,7 +11,7 @@ import { Env, EnvWith } from '../config/ctx';
 import { Property } from '../durableObjects/Property';
 
 const loadPropertyStore = createMiddleware<{
-	Variables: Env['Variables'] & { property: DurableObjectStub<Property>; propertyId: PrefixedId<'p'> };
+	Variables: Env['Variables'] & { property: DurableObjectStub<Property>; propertyId: PrefixedId<'p'>; propertyMetadata: PropertyData };
 	Bindings: Env['Bindings'];
 }>(async (ctx, next) => {
 	const propertyId = ctx.req.param('id');
@@ -20,6 +21,19 @@ const loadPropertyStore = createMiddleware<{
 	if (!isPrefixedId(propertyId, 'p')) {
 		throw new AlefError(AlefError.Code.BadRequest, 'Invalid property ID');
 	}
+
+	// ensure user access
+	const session = ctx.get('session');
+	if (!session) {
+		throw new AlefError(AlefError.Code.Unauthorized, 'Not logged in');
+	}
+	const userStore = await ctx.env.PUBLIC_STORE.getStoreForUser(session.userId);
+	const propertyMetadata = await userStore.getProperty(propertyId);
+	if (!propertyMetadata) {
+		throw new AlefError(AlefError.Code.NotFound, 'property not found');
+	}
+	ctx.set('propertyMetadata', propertyMetadata);
+
 	const propertyDOId = ctx.env.PROPERTY.idFromName(propertyId);
 	const property = ctx.env.PROPERTY.get(propertyDOId);
 	ctx.set('property', property);
@@ -32,8 +46,12 @@ const propertyRouter = new Hono<EnvWith<'session'>>()
 	.use(loadPropertyStore)
 	.get('/', async (ctx) => {
 		const property = ctx.get('property');
-		const state = await property.getAllRooms();
-		return ctx.json(wrapRpcData(state));
+		const meta = ctx.get('propertyMetadata');
+		const rooms = wrapRpcData(await property.getAllRooms());
+		return ctx.json({
+			...meta,
+			rooms,
+		});
 	})
 	.get('/rooms/:roomId', zValidator('param', z.object({ roomId: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')) })), async (ctx) => {
 		const property = ctx.get('property');

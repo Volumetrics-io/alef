@@ -23,7 +23,7 @@ export function Furniture() {
 	});
 
 	return (
-		<Surface width={800} flexDirection="column" alignItems="flex-start" gap={8}>
+		<Surface width={630} flexDirection="column" alignItems="flex-start" justifyContent="space-between" gap={8}>
 			<FilterControl filters={filters} setFilters={setFilters} />
 			<Container flexDirection="row" gap={8} flexWrap="wrap">
 				{furniture.map((furnitureItem) => (
@@ -41,7 +41,8 @@ function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }
 		<Surface
 			flexDirection="column"
 			gap={5}
-			width={100}
+			width={200}
+			marginBottom={5}
 			onClick={() =>
 				addFurniture({
 					furnitureId: furnitureItem.id,

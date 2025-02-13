@@ -1,31 +1,35 @@
 import { usePositionInFrontOfUser } from '@/hooks/usePositionInFrontOfUser';
 import { FurnitureItem, useAllFurniture } from '@/services/publicApi/furnitureHooks';
 import { useActiveRoomLayout, useAddFurniture } from '@/stores/roomStore/roomStore';
-import { AttributeKey, formatAttribute } from '@alef/common';
+import { Attribute, formatAttribute, RoomType } from '@alef/common';
 import { Container, Content, Text } from '@react-three/uikit';
 import { colors } from '@react-three/uikit-default';
+import { useState } from 'react';
 import { FurnitureModel } from '../../furniture/FurnitureModel';
+import { RoomTypePicker } from '../../ui/RoomTypePicker';
 import { Surface } from '../../ui/Surface';
 
 export function Furniture() {
 	const layout = useActiveRoomLayout();
-	console.log(layout);
+	const [filters, setFilters] = useState<Attribute[]>(() => {
+		// initial filter selects furniture of the same type as the layout
+		if (layout?.type) {
+			return [{ key: 'category', value: layout.type }];
+		}
+		return [];
+	});
 	const { data: furniture } = useAllFurniture({
-		attributeFilter: layout?.type
-			? [
-					{
-						key: 'category',
-						value: layout.type,
-					},
-				]
-			: [],
+		attributeFilter: filters,
 	});
 
 	return (
-		<Surface maxWidth={1200}>
-			{furniture.map((furnitureItem) => (
-				<FurnitureSelectItem key={furnitureItem.id} furnitureItem={furnitureItem} />
-			))}
+		<Surface width={800} flexDirection="column" alignItems="flex-start" gap={8}>
+			<FilterControl filters={filters} setFilters={setFilters} />
+			<Container flexDirection="row" gap={8} flexWrap="wrap">
+				{furniture.map((furnitureItem) => (
+					<FurnitureSelectItem key={furnitureItem.id} furnitureItem={furnitureItem} />
+				))}
+			</Container>
 		</Surface>
 	);
 }
@@ -37,7 +41,7 @@ function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }
 		<Surface
 			flexDirection="column"
 			gap={5}
-			width="25%"
+			width={100}
 			onClick={() =>
 				addFurniture({
 					furnitureId: furnitureItem.id,
@@ -46,7 +50,7 @@ function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }
 				})
 			}
 		>
-			<Text fontSize={18} color={colors.primary}>
+			<Text fontSize={14} color={colors.primary}>
 				{furnitureItem.name}
 			</Text>
 			<Container flexDirection="row" gap={2} flexWrap="wrap">
@@ -65,7 +69,7 @@ function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }
 }
 
 interface FurnitureAttributeTagProps {
-	value: { key: AttributeKey; value: string };
+	value: Attribute;
 }
 function FurnitureAttributeTag({ value }: FurnitureAttributeTagProps) {
 	return (
@@ -76,6 +80,22 @@ function FurnitureAttributeTag({ value }: FurnitureAttributeTagProps) {
 			<Text fontSize={8} color={colors.primary}>
 				{value.value}
 			</Text>
+		</Container>
+	);
+}
+
+function FilterControl({ filters, setFilters }: { filters: Attribute[]; setFilters: (filters: Attribute[]) => void }) {
+	const selectedRoomTypes = filters.filter((f) => f.key === 'category').map((f) => f.value as RoomType);
+
+	return (
+		<Container flexDirection="column" gap={4} alignItems="flex-start" alignSelf="center">
+			<RoomTypePicker
+				multiple
+				value={selectedRoomTypes}
+				onValueChange={(newSelectedCategories) => {
+					setFilters(filters.filter((f) => f.key !== 'category').concat(newSelectedCategories.map((category) => ({ key: 'category', value: category }))));
+				}}
+			/>
 		</Container>
 	);
 }

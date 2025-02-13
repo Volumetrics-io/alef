@@ -1,10 +1,11 @@
 import { useActiveRoomLayoutId, useCreateRoomLayout, useRoomLayout, useRoomLayoutIds, useUpdateRoomLayout } from '@/stores/roomStore';
-import { PrefixedId, ROOM_TYPES, RoomType } from '@alef/common';
+import { PrefixedId, RoomType } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { Button, colors, Input } from '@react-three/uikit-default';
 import { CheckIcon, PencilIcon } from '@react-three/uikit-lucide';
 import { useEffect, useState } from 'react';
 import { LayoutIcon } from '../../room/LayoutIcon';
+import { RoomTypePicker } from '../../ui/RoomTypePicker';
 import { Surface } from '../../ui/Surface';
 
 export function Layouts() {
@@ -81,13 +82,7 @@ function EditLayout({ layoutId, onClose }: { layoutId: PrefixedId<'rl'>; onClose
 				Edit Layout
 			</Text>
 			<Input value={editingName} onValueChange={(v) => setEditingName(v)} />
-			<Container flexDirection="row" gap={4} alignItems="center">
-				{ROOM_TYPES.map((icon) => (
-					<Button key={icon} onClick={() => setEditingType(icon)} backgroundColor={editingType === icon ? colors.accent : undefined}>
-						<LayoutIcon icon={icon} color={colors.foreground} />
-					</Button>
-				))}
-			</Container>
+			<RoomTypePicker value={[editingType]} onValueChange={(v) => setEditingType(v[0])} />
 			<Container flexDirection="row" gap={4} width="100%" justifyContent="flex-end">
 				<Button onClick={onClose} backgroundColor={colors.muted}>
 					<Text color={colors.mutedForeground}>Close</Text>

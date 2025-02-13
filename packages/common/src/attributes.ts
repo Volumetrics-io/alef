@@ -1,6 +1,7 @@
 export const attributeKeys = ['type', 'category', 'style'] as const;
 
 export type AttributeKey = (typeof attributeKeys)[number];
+export type Attribute = { key: AttributeKey; value: string };
 
 export function isAttributeKey(key: string): key is AttributeKey {
 	return attributeKeys.includes(key as any);

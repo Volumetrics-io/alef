@@ -1,4 +1,6 @@
-import { GroupProps } from '@react-three/fiber';
+import { xrPlaneToRoomWallData } from '@/physics/xrPlaneTools';
+import { useHasWalls, useUpdateWalls } from '@/stores/roomStore';
+import { GroupProps, useFrame } from '@react-three/fiber';
 import { useXR, useXRPlanes } from '@react-three/xr';
 import { DemoPlane } from './DemoPlane';
 import { PhysicalXRPlane } from './PhysicalXRPlane';
@@ -6,6 +8,9 @@ import { PhysicalXRPlane } from './PhysicalXRPlane';
 export function Walls(props: GroupProps) {
 	const planes = useXRPlanes('wall');
 	const isInSession = useXR((s) => !!s.session);
+
+	useUpdateWallsIfNeeded(planes, isInSession);
+
 	return (
 		<group {...props}>
 			{planes.map((plane, index) => {
@@ -28,4 +33,18 @@ export interface WallProps {
 
 export function Wall({ plane }: WallProps) {
 	return <PhysicalXRPlane plane={plane} debug={location.search.includes('debug')} />;
+}
+
+/** Update the backend's room walls if they are not already set */
+function useUpdateWallsIfNeeded(planes: readonly XRPlane[], isInSession: boolean) {
+	const hasWalls = useHasWalls();
+	const updateWalls = useUpdateWalls();
+	const referenceSpace = useXR((s) => s.originReferenceSpace);
+	useFrame((_, __, xrFrame: XRFrame) => {
+		if (!isInSession) return;
+		if (hasWalls) return;
+		if (!referenceSpace) return;
+		const asRoomWalls = planes.map((plane) => xrPlaneToRoomWallData(xrFrame, referenceSpace, plane));
+		updateWalls(asRoomWalls);
+	});
 }

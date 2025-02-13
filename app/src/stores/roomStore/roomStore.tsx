@@ -2,7 +2,7 @@ import { useVibrateOnHover } from '@/hooks/useVibrateOnHover';
 import { DragController } from '@/physics/DragController';
 import { isPlaneUserData } from '@/physics/planeUserData';
 import { PropertySocket } from '@/services/publicApi/socket';
-import { id, isPrefixedId, PrefixedId, RoomFurniturePlacement, RoomGlobalLighting, RoomLayout, RoomLightPlacement, RoomState } from '@alef/common';
+import { id, isPrefixedId, PrefixedId, RoomFurniturePlacement, RoomGlobalLighting, RoomLayout, RoomLightPlacement, RoomState, RoomWallData } from '@alef/common';
 import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
 import { ActiveCollisionTypes } from '@dimforge/rapier3d-compat';
 import { HandleOptions, TransformHandlesProperties } from '@react-three/handle';
@@ -26,6 +26,7 @@ export type RoomStoreState = RoomState & {
 	createLayout: (data?: { name?: string }) => Promise<void>;
 	setViewingLayoutId: (id: PrefixedId<'rl'>) => void;
 	updateLayout: (data: Pick<RoomLayout, 'id' | 'name' | 'icon' | 'type'>) => void;
+	updateWalls: (walls: RoomWallData[]) => void;
 
 	// furniture APIs
 	addFurniture: (init: Omit<RoomFurniturePlacement, 'id'>) => Promise<string>;
@@ -98,6 +99,17 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 					globalLighting: {
 						intensity: 0.8,
 						color: 2.7,
+					},
+
+					updateWalls: async (walls) => {
+						await socket.request({
+							type: 'updateWalls',
+							roomId,
+							walls,
+						});
+						set((state) => {
+							state.walls = walls;
+						});
 					},
 
 					createLayout: async (data) => {
@@ -476,4 +488,12 @@ export function useActiveRoomLayout() {
 
 export function useUpdateRoomLayout() {
 	return useRoomStore((s) => s.updateLayout);
+}
+
+export function useHasWalls() {
+	return useRoomStore((s) => s.walls.length > 0);
+}
+
+export function useUpdateWalls() {
+	return useRoomStore((s) => s.updateWalls);
 }

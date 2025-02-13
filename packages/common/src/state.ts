@@ -34,6 +34,7 @@ export interface RoomLayout {
 export interface RoomWallData {
 	origin: SimpleVector3;
 	normal: SimpleVector3;
+	extents: [number, number];
 }
 
 export interface RoomFurniturePlacement {

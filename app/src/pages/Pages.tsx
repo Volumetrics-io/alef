@@ -1,5 +1,6 @@
+import { Spinner } from '@alef/sys';
 import { makeRoutes, Outlet, Router } from '@verdant-web/react-router';
-import { lazy } from 'react';
+import { lazy, Suspense } from 'react';
 import HomePage from './HomePage.js';
 
 const routes = makeRoutes([
@@ -56,6 +57,19 @@ const routes = makeRoutes([
 
 export const Pages = () => (
 	<Router routes={routes}>
-		<Outlet />
+		<Suspense
+			fallback={
+				<Spinner
+					style={{
+						position: 'fixed',
+						top: '50%',
+						left: '50%',
+						transform: 'translate(-50%, -50%)',
+					}}
+				/>
+			}
+		>
+			<Outlet />
+		</Suspense>
 	</Router>
 );

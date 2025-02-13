@@ -1,6 +1,6 @@
 @layer components {
 	.root {
-		gap: calc(4vw + 2rem);
+		gap: calc(1vmin + 2rem);
 		flex: 1 0 auto;
 		/*
 			Main content naturally takes up the full page height available,

@@ -6,6 +6,7 @@ import cls from './Main.module.css';
 export const Main = withClassName(
 	withProps(Box, {
 		stacked: true,
+		background: 'paper',
 	}),
 	cls.root
 );

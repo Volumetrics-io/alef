@@ -1,14 +1,19 @@
 import { LogoutButton } from '@/components/auth/LogoutButton';
 import { UpdatePasswordButton } from '@/components/auth/UpdatePasswordButton';
+import { Redirect } from '@/components/Redirect';
 import { useMe } from '@/services/publicApi/userHooks';
 import { Frame, Heading, Hero, Main, Text } from '@alef/sys';
 
 const CompleteSignupPage = () => {
 	const { data } = useMe();
 
+	if (data?.emailVerifiedAt) {
+		return <Redirect to="/" />;
+	}
+
 	if (!data) {
 		return (
-			<Main>
+			<Main p="squeeze">
 				<Hero>
 					<Hero.Title>Finish Your Account</Hero.Title>
 				</Hero>
@@ -24,7 +29,7 @@ const CompleteSignupPage = () => {
 	const { name, email } = data;
 
 	return (
-		<Main>
+		<Main p="squeeze">
 			<Hero>
 				<Hero.Title>Finish Your Account</Hero.Title>
 			</Hero>

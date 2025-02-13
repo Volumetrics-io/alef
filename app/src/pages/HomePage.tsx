@@ -1,5 +1,6 @@
 // import SunLight from '@/components/xr/lighting/SunLight.tsx';
 
+import { Redirect } from '@/components/Redirect';
 import { MainScene } from '@/components/xr/MainScene';
 import { isHeadset } from '@/services/os';
 import { useMe } from '@/services/publicApi/userHooks';
@@ -23,19 +24,12 @@ const HomePage = () => {
 			return <Redirect to="/login" />;
 		}
 
-		// properties page is default 2D UI homepage
-		return <Redirect to="/properties" />;
+		// devices page is default 2D UI homepage while properties isn't very useful
+		// on 2D UI yets
+		return <Redirect to="/devices" />;
 	}
 
 	return <MainScene />;
 };
 
 export default HomePage;
-
-function Redirect({ to }: { to: string }) {
-	const navigate = useNavigate();
-	useEffect(() => {
-		navigate(to);
-	}, [navigate, to]);
-	return null;
-}

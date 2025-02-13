@@ -1,0 +1,5 @@
+.root {
+	aspect-ratio: 1/1;
+	flex-shrink: 0;
+	width: auto;
+}

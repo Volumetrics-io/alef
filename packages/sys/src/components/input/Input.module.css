@@ -1,5 +1,5 @@
 .default:not([data-disabled='true']) {
-	--color-background: var(--paper);
+	--color-background: var(--track);
 	--color-text: var(--ink);
 }
 .default {

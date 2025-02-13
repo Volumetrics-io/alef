@@ -21,11 +21,6 @@ function createDefaultRoomState(): Omit<RoomState, 'id'> {
 	};
 }
 
-export interface PropertyMeta {
-	id: PrefixedId<'p'>;
-	name: string;
-}
-
 export class Property extends DurableObject<Bindings> {
 	#rooms: Record<PrefixedId<'r'>, RoomState> = {};
 	#socketHandler;

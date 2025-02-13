@@ -65,7 +65,9 @@ function WrappedWithPropertyAndRoom({ children }: { children: ReactNode }) {
 		throw new Error(`Expected the server to provision a default property`);
 	}
 
-	const { data: rooms } = useProperty(defaultProperty.id);
+	const {
+		data: { rooms },
+	} = useProperty(defaultProperty.id);
 	const defaultRoomId = Object.keys(rooms)[0] as PrefixedId<'r'>;
 
 	if (!defaultRoomId) {

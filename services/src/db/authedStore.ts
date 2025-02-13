@@ -73,4 +73,8 @@ export class AuthedStore extends RpcTarget {
 			.returningAll()
 			.executeTakeFirstOrThrow();
 	}
+
+	async getProperty(propertyId: PrefixedId<'p'>) {
+		return this.#db.selectFrom('Property').where('id', '=', propertyId).selectAll().executeTakeFirst();
+	}
 }

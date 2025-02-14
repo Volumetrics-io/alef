@@ -8,7 +8,7 @@ import { LayoutIcon } from '../../room/LayoutIcon';
 import { RoomTypePicker } from '../../ui/RoomTypePicker';
 import { Surface } from '../../ui/Surface';
 
-export function Layouts() {
+export function Layouts({ readonly }: { readonly?: boolean }) {
 	const layoutIds = useRoomLayoutIds();
 
 	const [editingId, setEditingId] = useState<PrefixedId<'rl'> | null>(null);
@@ -20,11 +20,11 @@ export function Layouts() {
 					Layouts
 				</Text>
 				{layoutIds.map((layoutId) => (
-					<LayoutItem key={layoutId} layoutId={layoutId} onEdit={() => setEditingId(layoutId)} />
+					<LayoutItem key={layoutId} layoutId={layoutId} onEdit={readonly ? undefined : () => setEditingId(layoutId)} />
 				))}
-				<NewLayoutButton />
+				{!readonly && <NewLayoutButton />}
 			</Surface>
-			{editingId && <EditLayout layoutId={editingId} onClose={() => setEditingId(null)} />}
+			{!readonly && editingId && <EditLayout layoutId={editingId} onClose={() => setEditingId(null)} />}
 		</Container>
 	);
 }

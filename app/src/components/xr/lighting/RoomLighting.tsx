@@ -1,5 +1,5 @@
+import { useIsEditorStageMode } from '@/stores/editorStore';
 import { useAddLight, useLightPlacementIds } from '@/stores/roomStore/roomStore';
-import { useStageStore } from '@/stores/stageStore';
 import { ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import { useXR, useXRPlanes } from '@react-three/xr';
 import { useCallback, useRef } from 'react';
@@ -16,7 +16,7 @@ export const RoomLighting = () => {
 	const meshRef = useRef<Mesh>(null);
 	const addLight = useAddLight();
 	const lightIds = useLightPlacementIds();
-	const editable = useStageStore((s) => s.mode === 'lighting');
+	const editable = useIsEditorStageMode('lighting');
 	const { gl } = useThree();
 
 	const { originReferenceSpace, session } = useXR();

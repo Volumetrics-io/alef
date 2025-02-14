@@ -1,5 +1,5 @@
 import { useAABB } from '@/hooks/useAABB';
-import { useEditorStore } from '@/stores/editorStore';
+import { useEditorStore, useIsEditorStageMode } from '@/stores/editorStore';
 import { useDeleteFurniturePlacement, useFurniturePlacementDrag, useFurniturePlacementFurnitureId } from '@/stores/roomStore/roomStore';
 import { PrefixedId } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
@@ -30,6 +30,8 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	const { halfExtents, center, ref: modelRef, ready } = useAABB();
 	const roundedArgs = [...halfExtents.map((v) => v - 0.1), 0.1] as [number, number, number, number];
 
+	const isEditable = useIsEditorStageMode('furniture') && selected;
+
 	if (!furnitureId) return null;
 
 	return (
@@ -38,15 +40,15 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 				<RigidBody {...rigidBodyProps} colliders={false}>
 					{ready && <RoundCuboidCollider args={roundedArgs} position={center} {...colliderProps} />}
 					<group onClick={handleClick} {...groupProps}>
-						{selected ? (
+						{isEditable ? (
 							<Handle {...handleProps} targetRef="from-context">
 								<FurnitureModel furnitureId={furnitureId} outline={selected} ref={modelRef} />
 							</Handle>
 						) : (
 							<FurnitureModel furnitureId={furnitureId} ref={modelRef} />
 						)}
-						{selected && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + center.y + 0.2} />}
-						{rotateHandleProps && (
+						{isEditable && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + center.y + 0.2} />}
+						{isEditable && rotateHandleProps && (
 							<Handle targetRef="from-context" {...rotateHandleProps}>
 								<mesh position={[0, 0.1, 0]} rotation={[Math.PI / 2, 0, 0]}>
 									<ringGeometry args={[halfExtents[0] * 1.5, halfExtents[0] * 1.5 + 0.16, 32]} />

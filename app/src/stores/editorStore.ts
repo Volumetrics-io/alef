@@ -7,7 +7,12 @@ import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 import { usePlanesStore } from './planesStore';
 
+export type StageMode = 'lighting' | 'furniture' | 'layout' | null;
+
 export type EditorStore = {
+	mode: StageMode;
+	setMode: (mode: StageMode) => void;
+
 	selectedId: PrefixedId<'fp'> | PrefixedId<'lp'> | null;
 	select: (id: PrefixedId<'fp'> | PrefixedId<'lp'> | null) => void;
 
@@ -25,6 +30,8 @@ export type EditorStore = {
 
 export const useEditorStore = create<EditorStore>((set) => {
 	return {
+		mode: null,
+		setMode: (mode: StageMode) => set({ mode }),
 		selectedId: null,
 		select: (id) => set({ selectedId: id }),
 		liveIntersections: {},
@@ -82,4 +89,12 @@ export function useSelectedFurniturePlacementId() {
 
 export function useSelectedLightPlacementId() {
 	return useEditorStore(({ selectedId }) => (selectedId && isPrefixedId(selectedId, 'lp') && selectedId) || null);
+}
+
+export function useEditorStageMode() {
+	return useEditorStore(useShallow((s) => [s.mode, s.setMode] as const));
+}
+
+export function useIsEditorStageMode(value: StageMode) {
+	return useEditorStore((s) => s.mode === value);
 }

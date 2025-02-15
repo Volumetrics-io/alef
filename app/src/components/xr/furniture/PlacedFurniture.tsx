@@ -27,7 +27,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 		select(furniturePlacementId);
 	}, [select, furniturePlacementId]);
 
-	const { halfExtents, center, ref: modelRef, ready } = useAABB();
+	const { halfExtents, size, center, ref: modelRef, ready } = useAABB();
 	const roundedArgs = [...halfExtents.map((v) => v - 0.1), 0.1] as [number, number, number, number];
 
 	if (!furnitureId) return null;
@@ -38,15 +38,18 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 				<RigidBody {...rigidBodyProps} colliders={false}>
 					{ready && <RoundCuboidCollider args={roundedArgs} position={center} {...colliderProps} />}
 					<group onClick={handleClick} {...groupProps}>
-						{selected ? (
-							<Handle rotate={false} scale={false} translate={{ x: true, y: false, z: true }} targetRef="from-context">
-								<FurnitureModel furnitureId={furnitureId} outline={selected} ref={modelRef} />
+						{selected && (
+							<Handle {...handleProps} targetRef="from-context">
+								<mesh position={center}>
+									<boxGeometry args={[size.x, size.y, size.z]} />
+									<meshBasicMaterial opacity={0} transparent={true} />
+								</mesh>
 							</Handle>
-						) : (
-							<FurnitureModel furnitureId={furnitureId} ref={modelRef} />
 						)}
+						<FurnitureModel furnitureId={furnitureId} ref={modelRef} />
+
 						{selected && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + center.y + 0.2} />}
-						{rotateHandleProps && (
+						{selected && (
 							<Handle targetRef="from-context" {...rotateHandleProps}>
 								<mesh position={[0, 0.1, 0]} rotation={[Math.PI / 2, 0, 0]}>
 									<ringGeometry args={[halfExtents[0] * 1.5, halfExtents[0] * 1.5 + 0.16, 32]} />

@@ -126,6 +126,10 @@
 			top: 0.75rem;
 			left: 0.75rem;
 		}
+		&[data-float='bottom-right'] {
+			bottom: 0.75rem;
+			right: 0.75rem;
+		}
 	}
 
 	.wrap {

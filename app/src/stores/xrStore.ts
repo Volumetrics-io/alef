@@ -4,7 +4,7 @@ import { createXRStore, XRStore } from '@react-three/xr';
 export const xrStore: XRStore = createXRStore({
 	depthSensing: true,
 	bounded: false,
-	emulate: false,
+	// emulate: false,
 	hand: {
 		// disabled since it triggers moving furniture if your hand just intersects
 		// the furniture and can't be cancelled

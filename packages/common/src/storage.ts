@@ -6,3 +6,7 @@ import { PrefixedId } from './ids';
 export function getFurniturePrimaryModelPath(id: PrefixedId<'f'>) {
 	return `${id}/original.gltf`;
 }
+
+export function getFurniturePreviewImagePath(id: PrefixedId<'f'>) {
+	return `${id}/preview.jpg`;
+}

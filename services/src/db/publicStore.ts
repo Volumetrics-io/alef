@@ -1,4 +1,4 @@
-import { AlefError, assertAttributeKey, assertPrefixedId, getFurniturePrimaryModelPath, PrefixedId } from '@alef/common';
+import { AlefError, assertAttributeKey, assertPrefixedId, Attribute, getFurniturePreviewImagePath, getFurniturePrimaryModelPath, PrefixedId } from '@alef/common';
 import { WorkerEntrypoint } from 'cloudflare:workers';
 import { ExpressionBuilder } from 'kysely';
 import { jsonArrayFrom } from 'kysely/helpers/sqlite';
@@ -40,6 +40,17 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 		return new Response(object.body, { headers });
 	}
 
+	async getFurnitureImageResponse(id: PrefixedId<'f'>) {
+		const object = await this.env.FURNITURE_MODELS_BUCKET.get(getFurniturePreviewImagePath(id));
+		if (!object) {
+			return new AlefError(AlefError.Code.NotFound, 'Image not found').toResponse();
+		}
+		const headers = new Headers();
+		object.writeHttpMetadata(headers);
+		headers.set('etag', object.httpEtag);
+		return new Response(object.body, { headers });
+	}
+
 	private selectFurnitureAttributes(eb: ExpressionBuilder<Database, 'Furniture'>) {
 		return jsonArrayFrom(
 			eb
@@ -62,15 +73,24 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 		return this.#db.selectFrom('Attribute').where('key', '=', key).select('value').execute();
 	}
 
-	async listFurnitureByAttributes(attributes: Record<string, string>) {
+	async listFurnitureByAttributes(attributes: Attribute[]) {
 		let builder = this.#db
 			.selectFrom('Furniture')
+			.distinct()
 			.innerJoin('FurnitureAttribute', 'FurnitureAttribute.furnitureId', 'Furniture.id')
 			.innerJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id');
-		for (const [key, value] of Object.entries(attributes)) {
-			assertAttributeKey(key);
-			builder = builder.where('Attribute.key', '=', key).where('Attribute.value', '=', value);
+
+		if (attributes.length) {
+			builder.where((eb) =>
+				eb.or(
+					attributes.map(({ key, value }) => {
+						assertAttributeKey(key);
+						return eb.and([eb('Attribute.key', '=', key), eb('Attribute.value', '=', value)]);
+					})
+				)
+			);
 		}
+
 		return builder.select((eb) => ['Furniture.id', 'Furniture.name', 'Furniture.modelUpdatedAt', this.selectFurnitureAttributes(eb)]).execute();
 	}
 

@@ -32,23 +32,12 @@ export function FurnitureCard({ furniture }: FurnitureCardProps) {
 		},
 	});
 
-	const { mutateAsync: updateAttributes } = useMutation({
-		mutationFn: async (data: { key: string; value: string }[]) => {
-			await Promise.all(data.map((attribute) => handleErrors(adminApiClient.furniture[':id'].attribute.$put({ param: { id: furniture.id }, json: attribute }))));
-		},
-		onSuccess: () => {
-			queryClient.invalidateQueries({
-				queryKey: ['furniture'],
-			});
-		},
-	});
-
 	return (
 		<Card key={furniture.id}>
 			<Card.Main>
 				<FurniturePreview furnitureId={furniture.id} key={furniture.modelUpdatedAt} nonce={furniture.modelUpdatedAt} />
 				<Box float="top-left" gapped align="center">
-					<AttributesEditor value={furniture.attributes} onChange={updateAttributes} />
+					<AttributesEditor furniture={furniture} />
 					{furniture.attributes.map((attr) => (
 						<Frame key={attr.key} p="squeeze">
 							{attr.key}: {attr.value}
@@ -86,8 +75,32 @@ function NameEditor({ value, onChange, disabled }: { value: string; onChange: (v
 	);
 }
 
-function AttributesEditor({ value, onChange }: { value: { key: string; value: string }[]; onChange: (value: { key: string; value: string }[]) => Promise<void> }) {
+function AttributesEditor({ furniture }: { furniture: FurnitureData }) {
 	const [open, setOpen] = useState(false);
+
+	const value = furniture.attributes;
+
+	const { mutateAsync: updateAttributes } = useMutation({
+		mutationFn: async (data: { key: string; value: string }[]) => {
+			await Promise.all(
+				data.map((attribute) => {
+					return handleErrors(adminApiClient.furniture[':id'].attribute.$put({ param: { id: furniture.id }, json: attribute }));
+				})
+			);
+			// remove any attributes that are not in the new list
+			for (const oldAttribute of value) {
+				if (!data.find((newAttribute) => newAttribute.key === oldAttribute.key && newAttribute.value === oldAttribute.value)) {
+					await handleErrors(adminApiClient.furniture[':id'].attribute.$delete({ param: { id: furniture.id }, json: oldAttribute }));
+				}
+			}
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: ['furniture'],
+			});
+		},
+	});
+
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<Dialog.Trigger asChild>
@@ -99,7 +112,7 @@ function AttributesEditor({ value, onChange }: { value: { key: string; value: st
 				<Form
 					initialValues={{ attributes: value }}
 					onSubmit={async (values) => {
-						await onChange(values.attributes);
+						await updateAttributes(values.attributes);
 						setOpen(false);
 					}}
 				>

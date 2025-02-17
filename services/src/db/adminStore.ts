@@ -1,5 +1,5 @@
 import { AuthAccount, AuthUser, AuthVerificationCode } from '@a-type/auth';
-import { PrefixedId, assertAttributeKey, assertPrefixedId, getFurniturePrimaryModelPath, id } from '@alef/common';
+import { PrefixedId, assertAttributeKey, assertPrefixedId, getFurniturePreviewImagePath, getFurniturePrimaryModelPath, id } from '@alef/common';
 import { WorkerEntrypoint } from 'cloudflare:workers';
 import { Env } from './env.js';
 import { DB, comparePassword, getDatabase, hashPassword } from './kysely/index.js';
@@ -160,6 +160,11 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 		await this.#db.updateTable('Furniture').set({ modelUpdatedAt: new Date() }).where('id', '=', id).execute();
 	}
 
+	async uploadFurnitureImage(id: string, imageStream: ReadableStream) {
+		assertPrefixedId(id, 'f');
+		await this.env.FURNITURE_MODELS_BUCKET.put(getFurniturePreviewImagePath(id), imageStream);
+	}
+
 	async deleteFurniture(id: string) {
 		assertPrefixedId(id, 'f');
 		await this.#db.deleteFrom('Furniture').where('id', '=', id).execute();
@@ -186,6 +191,7 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 				furnitureId,
 				attributeId,
 			})
+			.onConflict((cb) => cb.columns(['furnitureId', 'attributeId']).doNothing())
 			.execute();
 	}
 

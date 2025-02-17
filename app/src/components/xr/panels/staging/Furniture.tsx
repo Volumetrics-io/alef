@@ -1,13 +1,11 @@
-import { usePositionInFrontOfUser } from '@/hooks/usePositionInFrontOfUser';
 import { FurnitureItem, useAllFurniture } from '@/services/publicApi/furnitureHooks';
 import { useEditorStageMode } from '@/stores/editorStore';
 import { useActiveRoomLayout, useAddFurniture } from '@/stores/roomStore/roomStore';
 import { Attribute, formatAttribute, RoomType } from '@alef/common';
-import { Container, Content, Text } from '@react-three/uikit';
+import { Container, Image, Text } from '@react-three/uikit';
 import { Button, colors } from '@react-three/uikit-default';
 import { ArrowLeftIcon, ArrowRightIcon } from '@react-three/uikit-lucide';
 import { useState } from 'react';
-import { FurnitureModel } from '../../furniture/FurnitureModel';
 import { RoomTypePicker } from '../../ui/RoomTypePicker';
 import { Surface } from '../../ui/Surface';
 
@@ -72,10 +70,18 @@ function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }
 					<FurnitureAttributeTag key={formatAttribute(attr)} value={attr} />
 				))}
 			</Container>
-			<Container flexDirection="column" flexGrow={1} flexShrink={0} backgroundColor={colors.accent} borderRadius={5} padding={4} height={120}>
-				<Content marginY="auto">
-					<FurnitureModel furnitureId={furnitureItem.id} />
-				</Content>
+			<Container
+				flexDirection="column"
+				flexGrow={1}
+				flexShrink={0}
+				alignItems="center"
+				justifyContent="center"
+				backgroundColor={colors.accent}
+				borderRadius={5}
+				width="100%"
+				height={120}
+			>
+				<Image src={`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureItem.id}/image.jpg`} width="100%" height="100%" objectFit="cover" />
 			</Container>
 		</Surface>
 	);

@@ -1,5 +1,5 @@
 import { useIsEditorStageMode } from '@/stores/editorStore';
-import { useAddLight, useLightPlacementIds } from '@/stores/roomStore/roomStore';
+import { useAddLight, useGlobalLighting, useLightPlacementIds } from '@/stores/roomStore/roomStore';
 import { ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import { useXR, useXRPlanes } from '@react-three/xr';
 import { useCallback, useRef } from 'react';
@@ -16,6 +16,7 @@ export const RoomLighting = () => {
 	const meshRef = useRef<Mesh>(null);
 	const addLight = useAddLight();
 	const lightIds = useLightPlacementIds();
+	const [{ intensity: globalIntensity, color: globalColor }] = useGlobalLighting();
 	const editable = useIsEditorStageMode('lighting');
 	const { gl } = useThree();
 
@@ -54,7 +55,7 @@ export const RoomLighting = () => {
 				<planeGeometry args={[100, 100]} />
 				<meshStandardMaterial transparent={false} colorWrite={false} color="red" />
 			</mesh>
-			<ambientLight intensity={!session ? 0.5 : 0.1} color={getLightColor(2.7)} />
+			<ambientLight intensity={globalIntensity * 0.2} color={getLightColor(globalColor)} />
 			{lightIds.map((id) => {
 				gl.shadowMap.needsUpdate = true;
 				return <CeilingLight key={id} id={id} />;

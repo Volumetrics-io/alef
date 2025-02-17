@@ -10,7 +10,7 @@ import { Trash } from '@react-three/uikit-lucide';
 import { useCallback, useRef } from 'react';
 import { DoubleSide, Group } from 'three';
 import { FurnitureModel } from './FurnitureModel';
-
+import { useThree } from '@react-three/fiber';
 export interface PlacedFurnitureProps {
 	furniturePlacementId: PrefixedId<'fp'>;
 }
@@ -21,6 +21,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	if (!placement) return null;	
 	const select = useEditorStore((s) => s.select);
 	const selected = useEditorStore((s) => s.selectedId === furniturePlacementId);
+	const { gl } = useThree();
 
 	const groupRef = useRef<Group>(null);
 	const move = useUpdateFurniturePlacementTransform(furniturePlacementId);
@@ -29,7 +30,8 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	}, [select, furniturePlacementId]);
 
 	const handlePointerUpDrag = useCallback(() => {
-		if (!groupRef.current) return;		
+		if (!groupRef.current) return;
+		gl.shadowMap.needsUpdate = true;
 
 		move({ position: groupRef.current.position, rotation: groupRef.current.quaternion });
 	}, [move, groupRef]);
@@ -37,24 +39,25 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 
 	const handlePointerUpRotate = useCallback(() => {
 		if (!groupRef.current) return;
-
+		gl.shadowMap.needsUpdate = true;
+		
 		move({ position: groupRef.current.position, rotation: groupRef.current.quaternion });
 	}, [move, groupRef]);
 
 
 
 
-	const { halfExtents, size, center, ref: modelRef } = useAABB();
+	const { halfExtents, size, center, ref: modelRef, ready } = useAABB();
 
-	const isEditable = useIsEditorStageMode('furniture') && selected;
+	const isEditable = useIsEditorStageMode('furniture') && ready;
 
 	if (!furnitureId) return null;
 
 	return (
-			<group onClick={handleClick} ref={groupRef} position={[placement.position.x, placement.position.y, placement.position.z]} quaternion={[placement.rotation.x, placement.rotation.y, placement.rotation.z, placement.rotation.w]}>
+			<group pointerEvents="auto" onClick={handleClick} ref={groupRef} position={[placement.position.x, placement.position.y, placement.position.z]} quaternion={[placement.rotation.x, placement.rotation.y, placement.rotation.z, placement.rotation.w]}>
 				{isEditable && (
 					<Handle targetRef={groupRef} translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
-						<mesh position={center} onPointerUp={handlePointerUpDrag} onPointerOut={handlePointerUpDrag} onPointerLeave={handlePointerUpDrag}>
+						<mesh pointerEvents="auto" position={center} onPointerUp={handlePointerUpDrag} onPointerOut={handlePointerUpDrag} onPointerLeave={handlePointerUpDrag}>
 							<boxGeometry args={[size.x, size.y, size.z]} />
 							<meshBasicMaterial opacity={0} transparent={true} />
 						</mesh>
@@ -62,8 +65,8 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 				)}
 				<FurnitureModel furnitureId={furnitureId} ref={modelRef} />
 
-				{isEditable && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + center.y + 0.2} />}
-				{isEditable && (
+				{isEditable && selected && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + center.y + 0.2} />}
+				{isEditable && selected && (
 					<Handle targetRef={groupRef} rotate={{ x: false, y: true, z: false }} translate="as-rotate">
 						<mesh onPointerUp={handlePointerUpRotate} onPointerOut={handlePointerUpRotate} onPointerLeave={handlePointerUpRotate} position={[0, 0.1, 0]} rotation={[Math.PI / 2, 0, 0]}>
 							<ringGeometry args={[halfExtents[0] * 1.5, halfExtents[0] * 1.5 + 0.16, 32]} />

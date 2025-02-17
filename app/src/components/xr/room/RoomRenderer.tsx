@@ -13,14 +13,14 @@ export function RoomRenderer() {
 
 	return (
 		<>
-			<Floors />
-			<Walls />
+			{/* <Floors />
+			<Walls /> */}
 			<PlaneAnchor label="floor">
+				<RoomLighting />
 				{furniturePlacementIds.map((furniturePlacementId) => {
 					return <PlacedFurniture key={furniturePlacementId} furniturePlacementId={furniturePlacementId} />;
 				})}
 			</PlaneAnchor>
-			<RoomLighting />
 		</>
 	);
 }

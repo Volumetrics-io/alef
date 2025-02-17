@@ -47,7 +47,7 @@ export const CeilingLight = ({ id, ...props }: { id: PrefixedId<'lp'> }) => {
 			<group position={new Vector3().copy(light.position)} ref={groupRef}>
 				{editable && (
 					<group>
-						<mesh position={[0, -0.01, 0]} visible={hovered || selected} rotation={[Math.PI / 2, 0, 0]}>
+						<mesh position={[0, 0, 0.01]} visible={hovered || selected}>
 							<ringGeometry args={[0.125, 0.16, 32]} />
 							<meshBasicMaterial color="white" />
 						</mesh>

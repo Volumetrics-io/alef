@@ -1,16 +1,14 @@
 import { useAABB } from '@/hooks/useAABB';
 import { useEditorStore, useIsEditorStageMode } from '@/stores/editorStore';
-import { useDeleteFurniturePlacement, useFurniturePlacementDrag, useFurniturePlacementFurnitureId } from '@/stores/roomStore/roomStore';
+import { useDeleteFurniturePlacement, useFurniturePlacement, useFurniturePlacementFurnitureId, useUpdateFurniturePlacementTransform } from '@/stores/roomStore/roomStore';
 import { PrefixedId } from '@alef/common';
-import { ErrorBoundary } from '@alef/sys';
 import { Billboard } from '@react-three/drei';
-import { Handle, HandleTarget } from '@react-three/handle';
-import { RigidBody, RoundCuboidCollider } from '@react-three/rapier';
+import { Handle } from '@react-three/handle';
 import { Container, Root } from '@react-three/uikit';
 import { colors } from '@react-three/uikit-default';
 import { Trash } from '@react-three/uikit-lucide';
-import { useCallback } from 'react';
-import { DoubleSide } from 'three';
+import { useCallback, useRef } from 'react';
+import { DoubleSide, Group } from 'three';
 import { FurnitureModel } from './FurnitureModel';
 
 export interface PlacedFurnitureProps {
@@ -19,50 +17,61 @@ export interface PlacedFurnitureProps {
 
 export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) {
 	const furnitureId = useFurniturePlacementFurnitureId(furniturePlacementId);
-	const { groupProps, dragHandleProps: handleProps, rotateHandleProps, colliderProps, rigidBodyProps } = useFurniturePlacementDrag(furniturePlacementId);
+	const placement = useFurniturePlacement(furniturePlacementId);
+	if (!placement) return null;	
 	const select = useEditorStore((s) => s.select);
 	const selected = useEditorStore((s) => s.selectedId === furniturePlacementId);
 
+	const groupRef = useRef<Group>(null);
+	const move = useUpdateFurniturePlacementTransform(furniturePlacementId);
 	const handleClick = useCallback(() => {
 		select(furniturePlacementId);
 	}, [select, furniturePlacementId]);
 
-	const { halfExtents, size, center, ref: modelRef, ready } = useAABB();
-	const roundedArgs = [...halfExtents.map((v) => v - 0.1), 0.1] as [number, number, number, number];
+	const handlePointerUpDrag = useCallback(() => {
+		if (!groupRef.current) return;		
+
+		move({ position: groupRef.current.position, rotation: groupRef.current.quaternion });
+	}, [move, groupRef]);
+
+
+	const handlePointerUpRotate = useCallback(() => {
+		if (!groupRef.current) return;
+
+		move({ position: groupRef.current.position, rotation: groupRef.current.quaternion });
+	}, [move, groupRef]);
+
+
+
+
+	const { halfExtents, size, center, ref: modelRef } = useAABB();
 
 	const isEditable = useIsEditorStageMode('furniture') && selected;
 
 	if (!furnitureId) return null;
 
 	return (
-		<ErrorBoundary fallback={null}>
-			<HandleTarget>
-				<RigidBody {...rigidBodyProps} colliders={false}>
-					{ready && <RoundCuboidCollider args={roundedArgs} position={center} {...colliderProps} />}
-					<group onClick={handleClick} {...groupProps}>
-						{isEditable && (
-							<Handle {...handleProps} targetRef="from-context">
-								<mesh position={center}>
-									<boxGeometry args={[size.x, size.y, size.z]} />
-									<meshBasicMaterial opacity={0} transparent={true} />
-								</mesh>
-							</Handle>
-						)}
-						<FurnitureModel furnitureId={furnitureId} ref={modelRef} />
-						{isEditable && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + center.y + 0.2} />}
+			<group onClick={handleClick} ref={groupRef} position={[placement.position.x, placement.position.y, placement.position.z]} quaternion={[placement.rotation.x, placement.rotation.y, placement.rotation.z, placement.rotation.w]}>
+				{isEditable && (
+					<Handle targetRef={groupRef} translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
+						<mesh position={center} onPointerUp={handlePointerUpDrag} onPointerOut={handlePointerUpDrag} onPointerLeave={handlePointerUpDrag}>
+							<boxGeometry args={[size.x, size.y, size.z]} />
+							<meshBasicMaterial opacity={0} transparent={true} />
+						</mesh>
+					</Handle>
+				)}
+				<FurnitureModel furnitureId={furnitureId} ref={modelRef} />
 
-						{isEditable && rotateHandleProps && (
-							<Handle targetRef="from-context" {...rotateHandleProps}>
-								<mesh position={[0, 0.1, 0]} rotation={[Math.PI / 2, 0, 0]}>
-									<ringGeometry args={[halfExtents[0] * 1.5, halfExtents[0] * 1.5 + 0.16, 32]} />
-									<meshBasicMaterial color="white" side={DoubleSide} />
-								</mesh>
-							</Handle>
-						)}
-					</group>
-				</RigidBody>
-			</HandleTarget>
-		</ErrorBoundary>
+				{isEditable && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + center.y + 0.2} />}
+				{isEditable && (
+					<Handle targetRef={groupRef} rotate={{ x: false, y: true, z: false }} translate="as-rotate">
+						<mesh onPointerUp={handlePointerUpRotate} onPointerOut={handlePointerUpRotate} onPointerLeave={handlePointerUpRotate} position={[0, 0.1, 0]} rotation={[Math.PI / 2, 0, 0]}>
+							<ringGeometry args={[halfExtents[0] * 1.5, halfExtents[0] * 1.5 + 0.16, 32]} />
+							<meshBasicMaterial color="white" side={DoubleSide} />
+						</mesh>
+					</Handle>
+				)}
+			</group>
 	);
 }
 

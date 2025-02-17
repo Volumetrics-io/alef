@@ -37,7 +37,6 @@ export function Furniture() {
 
 function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }) {
 	const addFurniture = useAddFurniture();
-	const getInitialPosition = usePositionInFrontOfUser();
 	return (
 		<Surface
 			flexDirection="column"
@@ -47,7 +46,7 @@ function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }
 			onClick={() =>
 				addFurniture({
 					furnitureId: furnitureItem.id,
-					position: getInitialPosition().setY(0),
+					position: { x: 0, y: 0, z: 0 },
 					rotation: { x: 0, y: 0, z: 0, w: 1 },
 				})
 			}

@@ -1,8 +1,8 @@
 import { useRescanRoom } from '@/hooks/useRescanRoom';
-import { StageMode, useStageStore } from '@/stores/stageStore';
+import { useEditorStageMode } from '@/stores/editorStore';
 import { Container, Root } from '@react-three/uikit';
-import { Button, colors, Toggle } from '@react-three/uikit-default';
-import { ArrowLeftIcon, ArrowRightIcon, BoxIcon, HouseIcon, LampDesk, Menu, Sofa, X } from '@react-three/uikit-lucide';
+import { colors, Toggle } from '@react-three/uikit-default';
+import { BoxIcon, HouseIcon, LampDesk, Menu, Sofa, X } from '@react-three/uikit-lucide';
 import { Suspense, useState } from 'react';
 import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
 import { DragController } from '../controls/Draggable';
@@ -12,7 +12,7 @@ import { Layouts } from './staging/Layouts';
 import { Lighting } from './staging/Lighting';
 
 export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
-	const { mode, setMode } = useStageStore();
+	const [mode, setMode] = useEditorStageMode();
 	const [isOpen, setIsOpen] = useState(false);
 
 	const { canRescan, rescanRoom } = useRescanRoom();

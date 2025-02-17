@@ -5,7 +5,7 @@ import { reversePainterSortStable } from '@pmndrs/uikit';
 import { Canvas } from '@react-three/fiber';
 import { OrbitHandles } from '@react-three/handle';
 import { noEvents, PointerEvents, useXR, XR } from '@react-three/xr';
-import { ReactNode } from 'react';
+import { ReactNode, Suspense } from 'react';
 import { PCFSoftShadowMap } from 'three';
 import { XRToaster } from './XRToaster';
 
@@ -36,7 +36,7 @@ export function SceneWrapper({ children }: SceneWrapperProps) {
 				>
 					<XR store={xrStore}>
 						<PointerEvents />
-						{children}
+						<Suspense>{children}</Suspense>
 						<NonXRCameraControls />
 						<XRToaster />
 					</XR>
@@ -71,6 +71,5 @@ export function SceneWrapper({ children }: SceneWrapperProps) {
 
 function NonXRCameraControls() {
 	const isInSession = useXR((s) => !!s.session);
-	if (isInSession) return null;
-	return <OrbitHandles damping />;
+	return <OrbitHandles enabled={!isInSession} />;
 }

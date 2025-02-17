@@ -10,8 +10,10 @@ import { PrefixedId } from '@alef/common';
 import { Physics } from '@react-three/rapier';
 import { ReactNode } from 'react';
 import { HeadsetLogin } from './auth/HeadsetLoginScene';
-import { StagingScene } from './modes/StagingScene';
-import { ViewingScene } from './modes/ViewingScene';
+import { ModeProvider } from './modes/ModeContext';
+import { StagerPanel } from './panels/StagerPanel';
+import { ViewerPanel } from './panels/ViewerPanel';
+import { RoomRenderer } from './room/RoomRenderer';
 import { SceneWrapper } from './SceneWrapper';
 
 export function MainScene() {
@@ -27,19 +29,16 @@ export function MainScene() {
 		// device pairing
 		sceneContent = <HeadsetLogin />;
 	} else {
-		if (selfDevice?.displayMode === 'staging') {
-			sceneContent = (
-				<WrappedWithPropertyAndRoom>
-					<StagingScene />
-				</WrappedWithPropertyAndRoom>
-			);
-		} else {
-			sceneContent = (
-				<WrappedWithPropertyAndRoom>
-					<ViewingScene />
-				</WrappedWithPropertyAndRoom>
-			);
-		}
+		const mode = selfDevice?.displayMode ?? 'staging';
+
+		sceneContent = (
+			<WrappedWithPropertyAndRoom>
+				<ModeProvider value={mode}>
+					{mode === 'staging' ? <StagerPanel /> : <ViewerPanel />}
+					<RoomRenderer />
+				</ModeProvider>
+			</WrappedWithPropertyAndRoom>
+		);
 	}
 
 	return (

@@ -1,5 +1,5 @@
 import { useAABB } from '@/hooks/useAABB';
-import { useEditorStore } from '@/stores/editorStore';
+import { useEditorStore, useIsEditorStageMode } from '@/stores/editorStore';
 import { useDeleteFurniturePlacement, useFurniturePlacement, useFurniturePlacementFurnitureId, useUpdateFurniturePlacementTransform } from '@/stores/roomStore/roomStore';
 import { PrefixedId } from '@alef/common';
 import { Billboard } from '@react-three/drei';
@@ -46,13 +46,15 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 
 	const { halfExtents, size, center, ref: modelRef } = useAABB();
 
+	const isEditable = useIsEditorStageMode('furniture') && selected;
+
 	if (!furnitureId) return null;
 
 	return (
 			<group onClick={handleClick} ref={groupRef} position={[placement.position.x, placement.position.y, placement.position.z]} quaternion={[placement.rotation.x, placement.rotation.y, placement.rotation.z, placement.rotation.w]}>
-				{selected && (
+				{isEditable && (
 					<Handle targetRef={groupRef} translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
-						<mesh position={center} onPointerUp={handlePointerUpDrag} onPointerLeave={handlePointerUpDrag}>
+						<mesh position={center} onPointerUp={handlePointerUpDrag} onPointerOut={handlePointerUpDrag} onPointerLeave={handlePointerUpDrag}>
 							<boxGeometry args={[size.x, size.y, size.z]} />
 							<meshBasicMaterial opacity={0} transparent={true} />
 						</mesh>
@@ -60,10 +62,10 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 				)}
 				<FurnitureModel furnitureId={furnitureId} ref={modelRef} />
 
-				{selected && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + center.y + 0.2} />}
-				{selected && (
+				{isEditable && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + center.y + 0.2} />}
+				{isEditable && (
 					<Handle targetRef={groupRef} rotate={{ x: false, y: true, z: false }} translate="as-rotate">
-						<mesh onPointerUp={handlePointerUpRotate} onPointerLeave={handlePointerUpRotate} position={[0, 0.1, 0]} rotation={[Math.PI / 2, 0, 0]}>
+						<mesh onPointerUp={handlePointerUpRotate} onPointerOut={handlePointerUpRotate} onPointerLeave={handlePointerUpRotate} position={[0, 0.1, 0]} rotation={[Math.PI / 2, 0, 0]}>
 							<ringGeometry args={[halfExtents[0] * 1.5, halfExtents[0] * 1.5 + 0.16, 32]} />
 							<meshBasicMaterial color="white" side={DoubleSide} />
 						</mesh>

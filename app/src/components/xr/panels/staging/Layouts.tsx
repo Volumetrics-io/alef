@@ -1,36 +1,41 @@
+import { useEditorStageMode } from '@/stores/editorStore';
 import { useActiveRoomLayoutId, useCreateRoomLayout, useDeleteRoomLayout, useRoomLayout, useRoomLayoutIds, useUpdateRoomLayout } from '@/stores/roomStore';
 import { PrefixedId, RoomType } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
-import { Button, colors, Input } from '@react-three/uikit-default';
+import { Button, colors } from '@react-three/uikit-default';
 import { ArrowRightIcon, CheckIcon, PencilIcon } from '@react-three/uikit-lucide';
 import { useEffect, useState } from 'react';
 import { LayoutIcon } from '../../room/LayoutIcon';
 import { RoomTypePicker } from '../../ui/RoomTypePicker';
 import { Surface } from '../../ui/Surface';
-import { useStageStore } from '@/stores/stageStore';
-export function Layouts() {
+
+export function Layouts({ readonly }: { readonly?: boolean }) {
 	const layoutIds = useRoomLayoutIds();
-	const {setMode} = useStageStore();
+	const [_mode, setMode] = useEditorStageMode();
 
 	const [editingId, setEditingId] = useState<PrefixedId<'rl'> | null>(null);
 
 	return (
 		<>
-		<Surface flexDirection="column" flexWrap="no-wrap" flexGrow={1} height={300} width={430} gap={10} padding={10}>
-			<Text fontSize={18} color={colors.foreground} textAlign="center" margin={10}>
-				Layouts
-			</Text>
-			<Container flexDirection="column" gap={4} overflow="scroll" paddingRight={6} scrollbarWidth={5} scrollbarBorderRadius={2} scrollbarColor={colors.primary}>
-				{layoutIds.map((layoutId) => (
-					<LayoutItem key={layoutId} layoutId={layoutId} onEdit={() => setEditingId(layoutId)} />
-				))}
-			</Container>
-			<Container flexDirection="row" gap={4} width="100%" paddingRight={6} justifyContent="space-between">
-				<NewLayoutButton onNew={(id) => setEditingId(id)} />
-				<Button onClick={() => setMode('furniture')}><ArrowRightIcon /></Button>
-			</Container>
-		</Surface>
-		{editingId && <EditLayout layoutId={editingId} onClose={() => setEditingId(null)} />}
+			<Surface flexDirection="column" flexWrap="no-wrap" flexGrow={1} height={300} width={430} gap={10} padding={10}>
+				<Text fontSize={18} color={colors.foreground} textAlign="center" margin={10}>
+					Layouts
+				</Text>
+				<Container flexDirection="column" gap={4} overflow="scroll" paddingRight={6} scrollbarWidth={5} scrollbarBorderRadius={2} scrollbarColor={colors.primary}>
+					{layoutIds.map((layoutId) => (
+						<LayoutItem key={layoutId} layoutId={layoutId} onEdit={readonly ? undefined : () => setEditingId(layoutId)} />
+					))}
+				</Container>
+				{!readonly && (
+					<Container flexDirection="row" gap={4} width="100%" paddingRight={6} justifyContent="space-between">
+						<NewLayoutButton onNew={(id) => setEditingId(id)} />
+						<Button onClick={() => setMode('furniture')}>
+							<ArrowRightIcon />
+						</Button>
+					</Container>
+				)}
+			</Surface>
+			{!readonly && editingId && <EditLayout layoutId={editingId} onClose={() => setEditingId(null)} />}
 		</>
 	);
 }
@@ -59,10 +64,12 @@ function LayoutItem({ layoutId, onEdit }: { layoutId: PrefixedId<'rl'>; onEdit?:
 function NewLayoutButton({ onNew }: { onNew: (id: PrefixedId<'rl'>) => void }) {
 	const create = useCreateRoomLayout();
 	return (
-		<Button onClick={async () => {
-			const id = await create();
-			onNew(id);
-		}}>
+		<Button
+			onClick={async () => {
+				const id = await create();
+				onNew(id);
+			}}
+		>
 			<Text>New Layout</Text>
 		</Button>
 	);
@@ -102,20 +109,23 @@ function EditLayout({ layoutId, onClose }: { layoutId: PrefixedId<'rl'>; onClose
 				<Text fontSize={18} color={colors.foreground} textAlign="center" marginBottom={5}>
 					Choose Layout
 				</Text>
-			<RoomTypePicker value={[editingType]} onValueChange={(v) => {
-				setEditingType(v[0]);
-			}} />
-			<Container flexDirection="row" gap={4} width="100%" justifyContent="flex-end">
-				<Button backgroundColor={colors.destructive} onClick={deleteSelf} marginRight="auto">
-					<Text color={colors.destructiveForeground}>{confirmRequired ? 'Confirm' : 'Delete'}</Text>
-				</Button>
-				<Button onClick={onClose} backgroundColor={colors.muted}>
-					<Text color={colors.mutedForeground}>Close</Text>
-				</Button>
-				<Button onClick={save}>
-					<Text>Save</Text>
-				</Button>
-			</Container>
+				<RoomTypePicker
+					value={[editingType]}
+					onValueChange={(v) => {
+						setEditingType(v[0]);
+					}}
+				/>
+				<Container flexDirection="row" gap={4} width="100%" justifyContent="flex-end">
+					<Button backgroundColor={colors.destructive} onClick={deleteSelf} marginRight="auto">
+						<Text color={colors.destructiveForeground}>{confirmRequired ? 'Confirm' : 'Delete'}</Text>
+					</Button>
+					<Button onClick={onClose} backgroundColor={colors.muted}>
+						<Text color={colors.mutedForeground}>Close</Text>
+					</Button>
+					<Button onClick={save}>
+						<Text>Save</Text>
+					</Button>
+				</Container>
 			</Surface>
 		</Container>
 	);

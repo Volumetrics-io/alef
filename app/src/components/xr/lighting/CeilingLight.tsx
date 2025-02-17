@@ -1,6 +1,5 @@
-import { useSelect, useSelectedLightPlacementId } from '@/stores/editorStore';
+import { useIsEditorStageMode, useSelect, useSelectedLightPlacementId } from '@/stores/editorStore';
 import { useGlobalLighting, useLightPlacement, useMoveLight, useSubscribeToPlacementPosition } from '@/stores/roomStore/roomStore';
-import { useStageStore } from '@/stores/stageStore';
 import { PrefixedId } from '@alef/common';
 import { Handle, HandleTarget } from '@react-three/handle';
 import { useHover } from '@react-three/xr';
@@ -9,8 +8,7 @@ import { Group, Vector3 } from 'three';
 import { getLightColor } from './getLightColor';
 
 export const CeilingLight = ({ id, ...props }: { id: PrefixedId<'lp'> }) => {
-	const { mode } = useStageStore();
-	const editable = mode === 'lighting';
+	const editable = useIsEditorStageMode('lighting');
 	const selectedLightId = useSelectedLightPlacementId();
 	const selected = selectedLightId === id;
 	const select = useSelect();

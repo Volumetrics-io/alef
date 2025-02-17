@@ -1,11 +1,11 @@
-import { useSelectedLightPlacementId } from '@/stores/editorStore';
+import { useEditorStageMode, useSelectedLightPlacementId } from '@/stores/editorStore';
 import { useDeleteLightPlacement, useGlobalLighting } from '@/stores/roomStore/roomStore';
 import { PrefixedId } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { Button, colors, Slider } from '@react-three/uikit-default';
 import { ArrowLeftIcon, Trash } from '@react-three/uikit-lucide';
 import { Surface } from '../../ui/Surface';
-import { useStageStore } from '@/stores/stageStore';
+
 export const Lighting = () => {
 	const selectedLightId = useSelectedLightPlacementId();
 
@@ -17,7 +17,7 @@ export const Lighting = () => {
 };
 
 const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
-	const {setMode} = useStageStore();
+	const [, setMode] = useEditorStageMode();
 	const [{ intensity: globalIntensity, color: globalColor }, updateGlobal] = useGlobalLighting();
 
 	return (
@@ -38,10 +38,11 @@ const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
 			</Container>
 
 			<Container flexDirection="row" gap={4} width="100%" paddingRight={6} justifyContent="space-between">
-				<Button onClick={() => setMode('furniture')}><ArrowLeftIcon /></Button>
-				{id && <DeleteButton id={id} />}	
+				<Button onClick={() => setMode('furniture')}>
+					<ArrowLeftIcon />
+				</Button>
+				{id && <DeleteButton id={id} />}
 			</Container>
-
 		</Container>
 	);
 };

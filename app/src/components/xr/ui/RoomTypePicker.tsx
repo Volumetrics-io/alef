@@ -1,37 +1,49 @@
 import { ROOM_TYPES, RoomType } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { Button, colors } from '@react-three/uikit-default';
+import { sentenceCase } from 'change-case';
 import { LayoutIcon } from '../room/LayoutIcon';
 
 export interface RoomTypePickerProps {
 	value?: RoomType[];
 	onValueChange?: (value: RoomType[]) => void;
 	multiple?: boolean;
+	direction?: 'row' | 'column';
+	wrap?: boolean;
+	size?: 'small' | 'medium';
 }
 
-export function RoomTypePicker({ value = [], onValueChange, multiple }: RoomTypePickerProps) {
+export function RoomTypePicker({ value = [], onValueChange, multiple, direction = 'column', wrap, size = 'medium' }: RoomTypePickerProps) {
 	return (
-		<Container flexDirection="column" gap={4}>
-			{ROOM_TYPES.map((icon) => (
+		<Container flexDirection={direction} flexWrap={wrap ? 'wrap' : 'no-wrap'} gap={4} flexShrink={0}>
+			{ROOM_TYPES.map((roomType) => (
 				<Button
-					key={icon}
+					key={roomType}
 					onClick={() => {
 						if (multiple) {
-							if (value?.includes(icon)) {
-								onValueChange?.(value.filter((v) => v !== icon));
+							if (value?.includes(roomType)) {
+								onValueChange?.(value.filter((v) => v !== roomType));
 							} else {
-								onValueChange?.([...(value ?? []), icon]);
+								onValueChange?.([...(value ?? []), roomType]);
 							}
-						} else {							
-							onValueChange?.([icon]);
+						} else {
+							onValueChange?.([roomType]);
 						}
 					}}
-					backgroundColor={value.includes(icon) ? colors.accent : undefined}
+					backgroundColor={value.includes(roomType) ? colors.accent : undefined}
+					alignItems="center"
+					flexDirection="row"
+					width={wrap ? 'auto' : '100%'}
+					paddingY={size === 'small' ? 4 : 10}
+					paddingX={size === 'small' ? 8 : 16}
+					height="auto"
+					gap={size === 'small' ? 4 : 8}
+					justifyContent="flex-start"
 				>
-					<Container width="100%" flexDirection="row" gap={20} paddingX={10}>
-						<LayoutIcon icon={icon} color={colors.foreground} />
-						<Text color={colors.foreground}>{icon}</Text>
-					</Container>
+					<LayoutIcon icon={roomType} color={colors.foreground} width={size === 'small' ? 12 : 20} height={size === 'small' ? 12 : 20} />
+					<Text fontSize={size === 'small' ? 10 : 16} color={colors.foreground}>
+						{sentenceCase(roomType)}
+					</Text>
 				</Button>
 			))}
 		</Container>

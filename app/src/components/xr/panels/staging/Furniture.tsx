@@ -1,25 +1,33 @@
 import { usePositionInFrontOfUser } from '@/hooks/usePositionInFrontOfUser';
 import { FurnitureItem, useAllFurniture } from '@/services/publicApi/furnitureHooks';
+import { useEditorStageMode } from '@/stores/editorStore';
 import { useActiveRoomLayout, useAddFurniture } from '@/stores/roomStore/roomStore';
 import { Attribute, formatAttribute, RoomType } from '@alef/common';
 import { Container, Content, Text } from '@react-three/uikit';
 import { Button, colors } from '@react-three/uikit-default';
+import { ArrowLeftIcon, ArrowRightIcon } from '@react-three/uikit-lucide';
+import { useState } from 'react';
 import { FurnitureModel } from '../../furniture/FurnitureModel';
 import { RoomTypePicker } from '../../ui/RoomTypePicker';
 import { Surface } from '../../ui/Surface';
-import { ArrowRightIcon, ArrowLeftIcon } from '@react-three/uikit-lucide';
-import { useStageStore } from '@/stores/stageStore';
 
 export function Furniture() {
-	const {setMode} = useStageStore();
+	const [, setMode] = useEditorStageMode();
 	const layout = useActiveRoomLayout();
+	const [filters, setFilters] = useState<Attribute[]>(() => {
+		// initial filter selects furniture of the same type as the layout
+		if (layout?.type) {
+			return [{ key: 'category', value: layout.type }];
+		}
+		return [];
+	});
 	const { data: furniture } = useAllFurniture({
-		attributeFilter: [{ key: 'category', value: layout?.type ?? 'living-room' }],
+		attributeFilter: filters,
 	});
 
 	return (
 		<Surface width={430} height={300} flexDirection="column" flexWrap="no-wrap" gap={10} padding={10}>
-			{/* <FilterControl filters={filters} setFilters={setFilters} /> */}
+			<FilterControl filters={filters} setFilters={setFilters} />
 			<Container overflow="scroll" flexShrink={1} scrollbarWidth={5} scrollbarBorderRadius={2} paddingRight={6} scrollbarColor={colors.primary} flexDirection="column">
 				<Container flexDirection="row" gap={8} justifyContent="space-evenly" flexWrap="wrap">
 					{furniture.map((furnitureItem) => (
@@ -28,8 +36,12 @@ export function Furniture() {
 				</Container>
 			</Container>
 			<Container flexGrow={1} flexShrink={0} flexDirection="row" gap={4} width="100%" paddingRight={6} justifyContent="space-between">
-				<Button onClick={() => setMode('layout')}><ArrowLeftIcon /></Button>
-				<Button onClick={() => setMode('lighting')}><ArrowRightIcon /></Button>
+				<Button onClick={() => setMode('layout')}>
+					<ArrowLeftIcon />
+				</Button>
+				<Button onClick={() => setMode('lighting')}>
+					<ArrowRightIcon />
+				</Button>
 			</Container>
 		</Surface>
 	);
@@ -90,14 +102,15 @@ function FilterControl({ filters, setFilters }: { filters: Attribute[]; setFilte
 	const selectedRoomTypes = filters.filter((f) => f.key === 'category').map((f) => f.value as RoomType);
 
 	return (
-		<Container flexDirection="column" gap={4} alignItems="flex-start" alignSelf="center">
-			<RoomTypePicker
-				multiple
-				value={selectedRoomTypes}
-				onValueChange={(newSelectedCategories) => {
-					setFilters(filters.filter((f) => f.key !== 'category').concat(newSelectedCategories.map((category) => ({ key: 'category', value: category }))));
-				}}
-			/>
-		</Container>
+		<RoomTypePicker
+			multiple
+			value={selectedRoomTypes}
+			onValueChange={(newSelectedCategories) => {
+				setFilters(filters.filter((f) => f.key !== 'category').concat(newSelectedCategories.map((category) => ({ key: 'category', value: category }))));
+			}}
+			direction="row"
+			wrap
+			size="small"
+		/>
 	);
 }

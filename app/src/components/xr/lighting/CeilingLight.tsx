@@ -51,7 +51,7 @@ export const CeilingLight = ({ id, ...props }: { id: PrefixedId<'lp'> }) => {
 							<ringGeometry args={[0.125, 0.16, 32]} />
 							<meshBasicMaterial color="white" />
 						</mesh>
-						<Handle targetRef="from-context" translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
+						<Handle targetRef="from-context" translate={{ x: true, y: true, z: false }} scale={false} rotate={false}>
 							<mesh onClick={handleClick} onPointerUp={handlePointerUp}>
 								<sphereGeometry args={[0.1, 32, 32]} />
 								<meshBasicMaterial color={getLightColor(globalColor)} transparent={true} opacity={globalIntensity} />

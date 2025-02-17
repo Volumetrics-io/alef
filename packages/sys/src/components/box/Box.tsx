@@ -3,7 +3,7 @@ import { clsx } from 'clsx';
 import { ComponentType, ElementType, forwardRef, HTMLAttributes, useMemo } from 'react';
 import cls from './Box.module.css';
 
-export type FloatAnchor = 'top-right' | 'top-left' | 'none';
+export type FloatAnchor = 'top-right' | 'top-left' | 'bottom-right' | 'none';
 export type SupportedAlignment = 'center' | 'stretch' | 'start' | 'end';
 export type SupportedJustification = 'center' | 'start' | 'stretch' | 'between';
 

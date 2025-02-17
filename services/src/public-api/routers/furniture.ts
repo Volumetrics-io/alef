@@ -1,4 +1,4 @@
-import { AlefError, isPrefixedId } from '@alef/common';
+import { AlefError, Attribute, isPrefixedId } from '@alef/common';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { z } from 'zod';
@@ -9,9 +9,9 @@ import { Env } from '../config/ctx';
 const formattedAttrSchema = z.string().regex(/^[^:]+:[^:]+$/);
 
 export const furnitureRouter = new Hono<Env>()
-	.use(loggedInMiddleware)
 	.get(
 		'/',
+		loggedInMiddleware,
 		zValidator(
 			'query',
 			z.object({
@@ -23,7 +23,7 @@ export const furnitureRouter = new Hono<Env>()
 			// easier to work with...
 			const attribute = ctx.req.queries('attribute') || [];
 			if (attribute.length) {
-				const keyValues = Object.fromEntries(attribute.map((attr) => attr.split(':')));
+				const keyValues = attribute.map((attr) => attr.split(':')).map(([key, value]) => ({ key, value }) as Attribute);
 				const filteredFurniture = await ctx.env.PUBLIC_STORE.listFurnitureByAttributes(keyValues);
 				return ctx.json(wrapRpcData(filteredFurniture));
 			}
@@ -33,6 +33,7 @@ export const furnitureRouter = new Hono<Env>()
 	)
 	.get(
 		'/:id',
+		loggedInMiddleware,
 		zValidator(
 			'param',
 			z.object({
@@ -59,6 +60,22 @@ export const furnitureRouter = new Hono<Env>()
 			const data = await ctx.env.PUBLIC_STORE.getFurnitureModelResponse(ctx.req.valid('param').id);
 			if (!data) {
 				throw new AlefError(AlefError.Code.NotFound, 'Model not found');
+			}
+			return data as unknown as Response;
+		}
+	)
+	.get(
+		'/:id/image.jpg',
+		zValidator(
+			'param',
+			z.object({
+				id: z.custom((val) => isPrefixedId(val, 'f')),
+			})
+		),
+		async (ctx) => {
+			const data = await ctx.env.PUBLIC_STORE.getFurnitureImageResponse(ctx.req.valid('param').id);
+			if (!data) {
+				throw new AlefError(AlefError.Code.NotFound, 'Image not found');
 			}
 			return data as unknown as Response;
 		}

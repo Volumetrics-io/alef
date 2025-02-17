@@ -53,6 +53,28 @@ export const furnitureRouter = new Hono<Env>()
 		}
 	)
 	.put(
+		'/:id/image',
+		zValidator(
+			'param',
+			z.object({
+				id: z.custom((val) => isPrefixedId(val, 'f')),
+			})
+		),
+		zValidator(
+			'form',
+			z.object({
+				file: z.instanceof(File),
+			})
+		),
+		async (ctx) => {
+			const { id } = ctx.req.valid('param');
+			const { file } = ctx.req.valid('form');
+			const fileStream = file.stream();
+			await ctx.env.ADMIN_STORE.uploadFurnitureImage(id, fileStream);
+			return ctx.json({ ok: true });
+		}
+	)
+	.put(
 		'/:id',
 		zValidator(
 			'json',

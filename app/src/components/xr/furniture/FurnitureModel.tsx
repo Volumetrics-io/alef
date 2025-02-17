@@ -14,5 +14,5 @@ export const FurnitureModel = forwardRef<Group, FurnitureModelProps>(function Fu
 
 	if (!model) return null;
 
-	return <Clone object={model.scene as any} castShadow receiveShadow ref={ref} inject={outline ? <Outlines thickness={1} color="hotpink" /> : null} />;
+	return <Clone object={model.scene as any} deep={true} castShadow receiveShadow ref={ref} inject={outline ? <Outlines thickness={1} color="hotpink" /> : null} />;
 });

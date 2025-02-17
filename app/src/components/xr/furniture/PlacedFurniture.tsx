@@ -54,10 +54,10 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	if (!furnitureId) return null;
 
 	return (
-			<group pointerEvents="auto" onClick={handleClick} ref={groupRef} position={[placement.position.x, placement.position.y, placement.position.z]} quaternion={[placement.rotation.x, placement.rotation.y, placement.rotation.z, placement.rotation.w]}>
+			<group onClick={handleClick} ref={groupRef} position={[placement.position.x, placement.position.y, placement.position.z]} quaternion={[placement.rotation.x, placement.rotation.y, placement.rotation.z, placement.rotation.w]}>
 				{isEditable && (
 					<Handle targetRef={groupRef} translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
-						<mesh pointerEvents="auto" position={center} onPointerUp={handlePointerUpDrag} onPointerOut={handlePointerUpDrag} onPointerLeave={handlePointerUpDrag}>
+						<mesh position={center} onPointerUp={handlePointerUpDrag} onPointerOut={handlePointerUpDrag} onPointerLeave={handlePointerUpDrag}>
 							<boxGeometry args={[size.x, size.y, size.z]} />
 							<meshBasicMaterial opacity={0} transparent={true} />
 						</mesh>
@@ -68,8 +68,8 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 				{isEditable && selected && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + center.y + 0.2} />}
 				{isEditable && selected && (
 					<Handle targetRef={groupRef} rotate={{ x: false, y: true, z: false }} translate="as-rotate">
-						<mesh onPointerUp={handlePointerUpRotate} onPointerOut={handlePointerUpRotate} onPointerLeave={handlePointerUpRotate} position={[0, 0.1, 0]} rotation={[Math.PI / 2, 0, 0]}>
-							<ringGeometry args={[halfExtents[0] * 1.5, halfExtents[0] * 1.5 + 0.16, 32]} />
+						<mesh onPointerUp={handlePointerUpRotate} onPointerOut={handlePointerUpRotate} onPointerLeave={handlePointerUpRotate} position={[0, 0.01, 0]} rotation={[Math.PI / 2, 0, 0]}>
+							<ringGeometry args={[halfExtents[0] * 1.5, halfExtents[0] * 1.5 + 0.16,64]} />
 							<meshBasicMaterial color="white" side={DoubleSide} />
 						</mesh>
 					</Handle>

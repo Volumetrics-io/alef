@@ -18,7 +18,7 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 	const { canRescan, rescanRoom } = useRescanRoom();
 
 	return (
-		<DraggableBodyAnchor follow={!isOpen} position={[0, isOpen ? -0.1 : -0.3, isOpen ? 0.8 : 0.5]} lockY={true} distance={0.15}>
+		<DraggableBodyAnchor follow={!isOpen} position={[0, isOpen ? 0.01 : 0.3, isOpen ? 0.8 : 0.5]} lockY={true} distance={0.15}>
 			<Root pixelSize={0.001} flexDirection="column" gap={10}>
 				<Surface flexGrow={0} flexShrink={0} marginX="auto">
 					<Toggle
@@ -31,14 +31,14 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 						{isOpen ? <X color={colors.primary} /> : <Menu color={colors.primary} />}
 					</Toggle>
 					<Container display={isOpen ? 'flex' : 'none'} flexDirection="row" alignItems={'center'} gap={10}>
-						<Toggle onClick={() => setMode('furniture')}>
+						<Toggle checked={mode === 'layout'} onClick={() => setMode('layout')}>
+							<HouseIcon color={colors.primary} />
+						</Toggle>
+						<Toggle checked={mode === 'furniture'} onClick={() => setMode('furniture')}>
 							<Sofa color={colors.primary} />
 						</Toggle>
-						<Toggle onClick={() => setMode('lighting')}>
+						<Toggle checked={mode === 'lighting'} onClick={() => setMode('lighting')}>
 							<LampDesk color={colors.primary} />
-						</Toggle>
-						<Toggle onClick={() => setMode('layout')}>
-							<HouseIcon color={colors.primary} />
 						</Toggle>
 						{canRescan && (
 							<Toggle onClick={() => rescanRoom()}>
@@ -58,8 +58,8 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 						{mode === 'layout' && <Layouts />}
 						{mode !== null && (
 							<DragController>
-								<Container flexDirection="row" width="50%" gap={10} alignItems="center">
-									<Container backgroundColor={colors.background} height={15} borderRadius={10} borderColor={colors.border} borderWidth={0.5} flexGrow={1} marginRight={18} />
+								<Container flexDirection="row" width="70%" gap={10} alignItems="center">
+									<Container backgroundColor={colors.background} height={15} borderRadius={10} borderColor={colors.border} borderWidth={0.5} flexGrow={1} />
 								</Container>
 							</DragController>
 						)}

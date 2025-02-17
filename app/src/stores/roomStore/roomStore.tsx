@@ -23,7 +23,7 @@ export type RoomStoreState = RoomState & {
 	/**
 	 * Creates an empty new room layout and sets it as the current layout
 	 */
-	createLayout: (data?: { name?: string }) => Promise<void>;
+	createLayout: (data?: { name?: string }) => Promise<PrefixedId<'rl'>>;
 	setViewingLayoutId: (id: PrefixedId<'rl'>) => void;
 	updateLayout: (data: Pick<RoomLayout, 'id' | 'name' | 'icon' | 'type'>) => void;
 	updateWalls: (walls: RoomWallData[]) => void;
@@ -130,6 +130,8 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 							state.layouts[response.data.id] = response.data;
 							state.viewingLayoutId = response.data.id;
 						});
+
+						return response.data.id;
 					},
 					setViewingLayoutId(id) {
 						set({ viewingLayoutId: id });
@@ -145,6 +147,9 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 							}
 							if (data.icon) {
 								layout.icon ??= data.icon;
+							}
+							if (data.type) {
+								layout.type = data.type;
 							}
 						});
 						await socket.request({
@@ -432,6 +437,7 @@ export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
 			scale: false,
 			rotate: false,
 			alwaysUpdate: true,
+			translate: { x: true, y: false, z: true },
 		} satisfies HandleOptions<unknown>,
 		rotateHandleProps,
 		rigidBodyProps: {

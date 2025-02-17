@@ -27,7 +27,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 		select(furniturePlacementId);
 	}, [select, furniturePlacementId]);
 
-	const { halfExtents, center, ref: modelRef, ready } = useAABB();
+	const { halfExtents, size, center, ref: modelRef, ready } = useAABB();
 	const roundedArgs = [...halfExtents.map((v) => v - 0.1), 0.1] as [number, number, number, number];
 
 	const isEditable = useIsEditorStageMode('furniture') && selected;
@@ -40,14 +40,17 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 				<RigidBody {...rigidBodyProps} colliders={false}>
 					{ready && <RoundCuboidCollider args={roundedArgs} position={center} {...colliderProps} />}
 					<group onClick={handleClick} {...groupProps}>
-						{isEditable ? (
+						{isEditable && (
 							<Handle {...handleProps} targetRef="from-context">
-								<FurnitureModel furnitureId={furnitureId} outline={selected} ref={modelRef} />
+								<mesh position={center}>
+									<boxGeometry args={[size.x, size.y, size.z]} />
+									<meshBasicMaterial opacity={0} transparent={true} />
+								</mesh>
 							</Handle>
-						) : (
-							<FurnitureModel furnitureId={furnitureId} ref={modelRef} />
 						)}
+						<FurnitureModel furnitureId={furnitureId} ref={modelRef} />
 						{isEditable && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + center.y + 0.2} />}
+
 						{isEditable && rotateHandleProps && (
 							<Handle targetRef="from-context" {...rotateHandleProps}>
 								<mesh position={[0, 0.1, 0]} rotation={[Math.PI / 2, 0, 0]}>
@@ -67,7 +70,7 @@ function DeleteUI({ furniturePlacementId, height }: { furniturePlacementId: Pref
 	const handleDelete = useDeleteFurniturePlacement(furniturePlacementId);
 
 	return (
-		<Billboard position={[0, height, 0]}>
+		<Billboard lockX lockZ position={[0, height, 0]}>
 			<Root pixelSize={0.005}>
 				<Container padding={2} backgroundColor={colors.destructive} borderRadius={5} onClick={handleDelete}>
 					<Trash />

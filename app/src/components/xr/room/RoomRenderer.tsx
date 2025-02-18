@@ -5,6 +5,7 @@ import { RoomLighting } from '../lighting/RoomLighting';
 import { Floors } from './Floors';
 import { Walls } from './Walls';
 import { PlaneAnchor } from '../anchors';
+import { Suspense } from 'react';
 
 export function RoomRenderer() {
 	const furniturePlacementIds = useFurniturePlacementIds();
@@ -18,7 +19,11 @@ export function RoomRenderer() {
 			<PlaneAnchor label="floor">
 				<RoomLighting />
 				{furniturePlacementIds.map((furniturePlacementId) => {
-					return <PlacedFurniture key={furniturePlacementId} furniturePlacementId={furniturePlacementId} />;
+					return (
+						<Suspense key={furniturePlacementId}>
+							<PlacedFurniture furniturePlacementId={furniturePlacementId} />
+						</Suspense>
+					);	
 				})}
 			</PlaneAnchor>
 		</>

@@ -63,16 +63,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 					</mesh>
 				</Handle>
 			)}
-			<Suspense
-				fallback={
-					<mesh position={center} onPointerUp={handlePointerUpDrag} onPointerOut={handlePointerUpDrag} onPointerLeave={handlePointerUpDrag}>
-						<boxGeometry args={[size.x, size.y, size.z]} />
-						<meshBasicMaterial opacity={0.3} transparent={true} />
-					</mesh>
-				}
-			>
-				<FurnitureModel furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} receiveShadow={size.y < 0.2} />
-			</Suspense>
+			<FurnitureModel furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} receiveShadow={size.y < 0.2} />
 
 			{isEditable && selected && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + center.y + 0.2} />}
 			{isEditable && selected && (

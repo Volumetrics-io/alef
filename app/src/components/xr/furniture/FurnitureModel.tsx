@@ -16,5 +16,16 @@ export const FurnitureModel = forwardRef<Group, FurnitureModelProps>(function Fu
 
 	if (!model) return null;
 
-	return <Clone pointerEvents="none" object={model.scene as any} deep={true} castShadow={castShadow} receiveShadow={receiveShadow} ref={ref} inject={outline ? <Outlines thickness={1} color="hotpink" /> : null} />;
+	return (
+		<Clone
+			//@ts-expect-error - prop not typed
+			pointerEvents="none"
+			object={model.scene as any}
+			deep={true}
+			castShadow={castShadow}
+			receiveShadow={receiveShadow}
+			ref={ref}
+			inject={outline ? <Outlines thickness={1} color="hotpink" /> : null}
+		/>
+	);
 });

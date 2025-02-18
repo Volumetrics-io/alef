@@ -1,6 +1,6 @@
 import { useIsEditorStageMode } from '@/stores/editorStore';
 import { useAddLight, useGlobalLighting, useLightPlacementIds } from '@/stores/roomStore/roomStore';
-import { ThreeEvent, useFrame, useThree } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { useXR, useXRPlanes } from '@react-three/xr';
 import { useCallback, useRef } from 'react';
 import { Group, Vector3 } from 'three';
@@ -38,7 +38,7 @@ export const RoomLighting = () => {
 	});
 
 	const handleClick = useCallback(
-		(event: ThreeEvent<MouseEvent>) => {
+		(event: any) => {
 			if (!editable) return;
 			const position = new Vector3(event.localPoint.x, event.localPoint.y, event.localPoint.z);
 

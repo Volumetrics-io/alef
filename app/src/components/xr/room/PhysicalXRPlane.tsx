@@ -1,8 +1,6 @@
 import { createXRPlaneUserData } from '@/physics/planeUserData';
-import { useEditorStore } from '@/stores/editorStore';
 import { useEnvironmentStore } from '@/stores/environmentStore';
 import { getPlaneId, useRegisterXRPlane } from '@/stores/planesStore';
-import { isPrefixedId } from '@alef/common';
 import { ErrorBoundary, useMergedRef } from '@alef/sys';
 import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
 import { useFrame } from '@react-three/fiber';
@@ -57,9 +55,9 @@ export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(functi
 
 	// whether a dragged object is intersecting this plane, which means the object should snap to it.
 	// we render it differently to indicate the detection of the snap
-	const snapped = useEditorStore((s) =>
-		s.selectedId && isPrefixedId(s.selectedId, 'fp') ? s.liveIntersections[s.selectedId]?.some((value) => value === getPlaneId(plane)) : false
-	);
+	// const snapped = useEditorStore((s) =>
+	// 	s.selectedId && isPrefixedId(s.selectedId, 'fp') ? s.liveIntersections[s.selectedId]?.some((value) => value === getPlaneId(plane)) : false
+	// );
 
 	const register = useRegisterXRPlane(plane);
 

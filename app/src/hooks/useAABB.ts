@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { Box3, Group, Object3D, Vector3 } from 'three';
 
-export function useAABB({ precise = false }: { precise?: boolean } = {}) {
+export function useAABB({ precise = true }: { precise?: boolean } = {}) {
 	const boxRef = useRef(new Box3());
 	const boxSizeRef = useRef(new Vector3());
 	const boxCenterRef = useRef(new Vector3());

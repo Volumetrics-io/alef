@@ -47,11 +47,11 @@ export const CeilingLight = ({ id, ...props }: { id: PrefixedId<'lp'> }) => {
 			<group position={new Vector3().copy(light.position)} ref={groupRef}>
 				{editable && (
 					<group>
-						<mesh position={[0, -0.01, 0]} visible={hovered || selected} rotation={[Math.PI / 2, 0, 0]}>
+						<mesh position={[0, 0, 0.01]} visible={hovered || selected}>
 							<ringGeometry args={[0.125, 0.16, 32]} />
 							<meshBasicMaterial color="white" />
 						</mesh>
-						<Handle targetRef="from-context" translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
+						<Handle targetRef="from-context" translate={{ x: true, y: true, z: false }} scale={false} rotate={false}>
 							<mesh onClick={handleClick} onPointerUp={handlePointerUp}>
 								<sphereGeometry args={[0.1, 32, 32]} />
 								<meshBasicMaterial color={getLightColor(globalColor)} transparent={true} opacity={globalIntensity} />

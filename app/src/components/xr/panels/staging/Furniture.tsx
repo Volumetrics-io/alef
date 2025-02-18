@@ -26,6 +26,7 @@ export function Furniture() {
 	return (
 		<Surface width={430} height={300} flexDirection="column" flexWrap="no-wrap" gap={10} padding={10}>
 			<FilterControl filters={filters} setFilters={setFilters} />
+			{/* <ambientLight intensity={0.5} /> */}
 			<Container overflow="scroll" flexShrink={1} scrollbarWidth={5} scrollbarBorderRadius={2} paddingRight={6} scrollbarColor={colors.primary} flexDirection="column">
 				<Container flexDirection="row" gap={8} justifyContent="space-evenly" flexWrap="wrap">
 					{furniture.map((furnitureItem) => (

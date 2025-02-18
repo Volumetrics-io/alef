@@ -78,7 +78,7 @@ export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(functi
 				</XRPlaneModel>
 				<XRPlaneModel renderOrder={-1} plane={plane} position={[0, 0.01, 0]}>
 					{/* temp debug - render plane color when snapping */}
-					<meshBasicMaterial colorWrite={snapped} transparent opacity={0.01} color={0x002040} side={DoubleSide} />
+					<meshBasicMaterial colorWrite={false} color={0x002040} side={DoubleSide} />
 				</XRPlaneModel>
 			</XRSpace>
 			{/* Shows what our system thinks the center and normal of the plane is */}

@@ -18,7 +18,7 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 	const { canRescan, rescanRoom } = useRescanRoom();
 
 	return (
-		<DraggableBodyAnchor follow={!isOpen} position={[0, isOpen ? 0.01 : 0.3, isOpen ? 0.8 : 0.5]} lockY={true} distance={0.15}>
+		<DraggableBodyAnchor follow={!isOpen} position={[0, isOpen ? -0.01 : 0.2, isOpen ? 0.6 : 0.5]} lockY={true} distance={0.15}>
 			<Root pixelSize={0.001} flexDirection="column" gap={10}>
 				<Surface flexGrow={0} flexShrink={0} marginX="auto">
 					<Toggle

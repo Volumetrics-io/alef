@@ -8,7 +8,7 @@ import { Handle } from '@react-three/handle';
 import { Container, Root } from '@react-three/uikit';
 import { colors } from '@react-three/uikit-default';
 import { Trash } from '@react-three/uikit-lucide';
-import { Suspense, useCallback, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { DoubleSide, Group } from 'three';
 import { FurnitureModel } from './FurnitureModel';
 export interface PlacedFurnitureProps {

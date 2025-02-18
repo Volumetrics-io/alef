@@ -7,7 +7,7 @@ import { Handle } from '@react-three/handle';
 import { Container, Root } from '@react-three/uikit';
 import { colors } from '@react-three/uikit-default';
 import { Trash } from '@react-three/uikit-lucide';
-import { useCallback, useRef } from 'react';
+import { Suspense, useCallback, useRef } from 'react';
 import { DoubleSide, Group } from 'three';
 import { FurnitureModel } from './FurnitureModel';
 import { useThree } from '@react-three/fiber';
@@ -63,7 +63,14 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 						</mesh>
 					</Handle>
 				)}
-				<FurnitureModel furnitureId={furnitureId} ref={modelRef} />
+				<Suspense fallback={
+					<mesh position={center} onPointerUp={handlePointerUpDrag} onPointerOut={handlePointerUpDrag} onPointerLeave={handlePointerUpDrag}>
+						<boxGeometry args={[size.x, size.y, size.z]} />
+						<meshBasicMaterial opacity={0.3} transparent={true} />
+					</mesh>
+				}>
+					<FurnitureModel furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} receiveShadow={size.y < 0.2} />
+				</Suspense>
 
 				{isEditable && selected && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + center.y + 0.2} />}
 				{isEditable && selected && (

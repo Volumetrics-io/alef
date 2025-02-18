@@ -7,12 +7,14 @@ import { Group } from 'three';
 export interface FurnitureModelProps {
 	furnitureId: PrefixedId<'f'>;
 	outline?: boolean;
+	receiveShadow?: boolean;
+	castShadow?: boolean;
 }
 
-export const FurnitureModel = forwardRef<Group, FurnitureModelProps>(function FurnitureModel({ furnitureId, outline }: FurnitureModelProps, ref) {
+export const FurnitureModel = forwardRef<Group, FurnitureModelProps>(function FurnitureModel({ furnitureId, outline, castShadow, receiveShadow }: FurnitureModelProps, ref) {
 	const model = useFurnitureModel(furnitureId);
 
 	if (!model) return null;
 
-	return <Clone pointerEvents="none" object={model.scene as any} deep={true} castShadow receiveShadow ref={ref} inject={outline ? <Outlines thickness={1} color="hotpink" /> : null} />;
+	return <Clone pointerEvents="none" object={model.scene as any} deep={true} castShadow={castShadow} receiveShadow={receiveShadow} ref={ref} inject={outline ? <Outlines thickness={1} color="hotpink" /> : null} />;
 });

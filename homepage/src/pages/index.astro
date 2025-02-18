@@ -1,20 +1,39 @@
 ---
-import { Button, Hero, Logo, NavBar } from '@alef/sys';
-
+import { Box, Heading, Hero, Logo, Main, NavBar, Text } from '@alef/sys';
+import { EmailCollector } from '../components/EmailCollector.tsx';
+import { Footer } from '../components/Footer.tsx';
+import { LoginButton } from '../components/LoginButton.tsx';
 import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout>
-	<NavBar>
+	<NavBar client:load>
 		<NavBar.Start>
 			<Logo />
 		</NavBar.Start>
 		<NavBar.End>
-			<Button color="suggested"> Log in </Button>
+			<LoginButton />
 		</NavBar.End>
 	</NavBar>
-	<Hero client:load>
-		<Hero.Title>Alef</Hero.Title>
-		<Hero.Tagline>Dynamic virtual staging for modern agents</Hero.Tagline>
+	<Hero client:load forceNav big>
+		<Box style={{ zIndex: 10 }} gapped align="center"><Logo /> <Heading level={2} as="h1">Alef</Heading></Box>
+		<Hero.Title>Dynamic virtual staging for modern real estate</Hero.Title>
+		<Hero.Dimmer />
+		<Hero.Backdrop>
+			<video autoPlay loop muted playsInline>
+				<source src="https://public-assets.alef.io/alef-demo-1-compressed.mp4" type="video/mp4" />
+			</video>
+		</Hero.Backdrop>
 	</Hero>
+	<Main gapped stacked p>
+		<Box p="squeeze" stacked gapped constrained="large">
+			<Heading level={1}> Stop spending thousands on staging. Start selling faster. </Heading>
+			<Text>
+				With state-of-the-art immersive tools, Alef lets you stage your property in minutes, not days. Our AI-powered platform lets you customize every detail, from furniture to
+				lighting, so you can envision the perfect space for each buyer.
+			</Text>
+			<EmailCollector client:load />
+		</Box>
+	</Main>
+	<Footer />
 </Layout>

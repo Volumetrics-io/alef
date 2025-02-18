@@ -21,7 +21,7 @@ const app = new Hono<Env>()
 	.use(
 		cors({
 			origin: (origin, ctx) => {
-				if (origin === ctx.env.UI_ORIGIN || origin === ctx.env.ADMIN_UI_ORIGIN) {
+				if (origin === ctx.env.UI_ORIGIN || origin === ctx.env.ADMIN_UI_ORIGIN || origin === ctx.env.HOMEPAGE_ORIGIN) {
 					return origin;
 				}
 				if (ctx.env.EXTRA_CORS_ORIGINS) {

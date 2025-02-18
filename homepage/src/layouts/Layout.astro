@@ -1,5 +1,7 @@
 ---
-import { Main } from '@alef/sys';
+import { Box, SysProvider } from '@alef/sys';
+
+const { pathname } = Astro.url;
 ---
 
 <!doctype html>
@@ -12,9 +14,11 @@ import { Main } from '@alef/sys';
 		<title>Alef</title>
 	</head>
 	<body>
-		<Main>
-			<slot />
-		</Main>
+		<SysProvider pathname={pathname} client:load>
+			<Box full stacked>
+				<slot />
+			</Box>
+		</SysProvider>
 	</body>
 </html>
 

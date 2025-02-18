@@ -20,7 +20,7 @@ export const RoomLighting = () => {
 	const editable = useIsEditorStageMode('lighting');
 	const { gl } = useThree();
 
-	const { originReferenceSpace, session } = useXR();
+	const { originReferenceSpace } = useXR();
 
 	useFrame((_s, _d, frame: XRFrame) => {
 		if (!xrCeilingPlane) return;

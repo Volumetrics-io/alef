@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { AttributesField } from './AttributesField';
 import { FurnitureModelUpload } from './FurnitureModelUpload';
 import { FurniturePreview } from './FurniturePreview';
+import { FurnitureSnapshot } from './FurnitureSnapshot';
 
 export interface FurnitureCardProps {
 	furniture: FurnitureData;
@@ -34,17 +35,24 @@ export function FurnitureCard({ furniture }: FurnitureCardProps) {
 
 	return (
 		<Card key={furniture.id}>
-			<Card.Main>
-				<FurniturePreview furnitureId={furniture.id} key={furniture.modelUpdatedAt} nonce={furniture.modelUpdatedAt} />
-				<Box float="top-left" gapped align="center">
-					<AttributesEditor furniture={furniture} />
-					{furniture.attributes.map((attr) => (
-						<Frame key={attr.key} p="squeeze">
-							{attr.key}: {attr.value}
-						</Frame>
-					))}
-				</Box>
-			</Card.Main>
+			<Dialog>
+				<Dialog.Trigger asChild>
+					<Card.Main align="center">
+						<FurnitureSnapshot furnitureId={furniture.id} />
+						<Box float="top-left" gapped align="center">
+							{furniture.attributes.map((attr) => (
+								<Frame key={attr.key} p="squeeze">
+									{attr.key}: {attr.value}
+								</Frame>
+							))}
+						</Box>
+					</Card.Main>
+				</Dialog.Trigger>
+				<Dialog.Content title={furniture.name}>
+					<FurnitureEditorContent furniture={furniture} />
+					<FurniturePreview furnitureId={furniture.id} key={furniture.modelUpdatedAt} nonce={furniture.modelUpdatedAt} />
+				</Dialog.Content>
+			</Dialog>
 			<Card.Details justify="between">
 				<NameEditor value={furniture.name} onChange={(name) => updateSelf({ name })} disabled={isUpdating} />
 				<Box gapped>
@@ -76,8 +84,6 @@ function NameEditor({ value, onChange, disabled }: { value: string; onChange: (v
 }
 
 function AttributesEditor({ furniture }: { furniture: FurnitureData }) {
-	const [open, setOpen] = useState(false);
-
 	const value = furniture.attributes;
 
 	const { mutateAsync: updateAttributes } = useMutation({
@@ -102,29 +108,27 @@ function AttributesEditor({ furniture }: { furniture: FurnitureData }) {
 	});
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
-			<Dialog.Trigger asChild>
-				<Button color="ghost">
-					<Icon name="pencil" />
-				</Button>
-			</Dialog.Trigger>
-			<Dialog.Content title="Edit attributes">
-				<Form
-					initialValues={{ attributes: value }}
-					onSubmit={async (values) => {
-						await updateAttributes(values.attributes);
-						setOpen(false);
-					}}
-				>
-					<AttributesField name="attributes" />
-					<Dialog.Actions>
-						<Dialog.Close asChild>
-							<Button>Cancel</Button>
-						</Dialog.Close>
-						<Form.Submit>Save</Form.Submit>
-					</Dialog.Actions>
-				</Form>
-			</Dialog.Content>
-		</Dialog>
+		<Form
+			initialValues={{ attributes: value }}
+			onSubmit={async (values) => {
+				await updateAttributes(values.attributes);
+			}}
+		>
+			<AttributesField name="attributes" />
+			<Dialog.Actions>
+				<Dialog.Close asChild>
+					<Button>Cancel</Button>
+				</Dialog.Close>
+				<Form.Submit>Save</Form.Submit>
+			</Dialog.Actions>
+		</Form>
+	);
+}
+
+function FurnitureEditorContent({ furniture }: { furniture: FurnitureData }) {
+	return (
+		<Box stacked>
+			<AttributesEditor furniture={furniture} />
+		</Box>
 	);
 }

@@ -1,18 +1,21 @@
 import { adminApiClient } from '@/services/adminApi';
+import { setSnapshotNonce, useSnapshotNonce } from '@/state/snapshotNonces';
+import { PrefixedId } from '@alef/common';
 import { Box, Control, ErrorBoundary, Icon } from '@alef/sys';
 import { Environment, Gltf, OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { FurnitureSnapshot } from './FurnitureSnapshot';
 
 export interface FurniturePreviewProps {
-	furnitureId: string;
+	furnitureId: PrefixedId<'f'>;
 	nonce?: string | null;
 }
 
 export function FurniturePreview({ furnitureId, nonce = 'none' }: FurniturePreviewProps) {
 	const modelSrc = `${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureId}/model?nonce=${nonce}`;
 
-	const { ref: canvasRef, triggerScreenshot, nonce: screenshotNonce } = useScreenshot(furnitureId);
+	const { ref: canvasRef, triggerScreenshot } = useScreenshot(furnitureId);
 
 	return (
 		<ErrorBoundary
@@ -44,16 +47,7 @@ export function FurniturePreview({ furnitureId, nonce = 'none' }: FurniturePrevi
 					/>
 				</Canvas>
 				<Control float="bottom-right" onClick={() => triggerScreenshot()}>
-					<img
-						src={`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureId}/image.jpg?nonce=${screenshotNonce}`}
-						crossOrigin="anonymous"
-						style={{
-							aspectRatio: '1/1',
-							width: 200,
-							height: 'auto',
-							objectFit: 'contain',
-						}}
-					/>
+					<FurnitureSnapshot furnitureId={furnitureId} />
 					<Box float="bottom-right">
 						<Icon name="refresh-cw" />
 					</Box>
@@ -75,13 +69,13 @@ function useHasImage(imageSrc: string) {
 	return hasImage;
 }
 
-function useScreenshot(furnitureId: string) {
+function useScreenshot(furnitureId: PrefixedId<'f'>) {
 	const ref = useRef<HTMLCanvasElement>(null);
-	const [lastScreenshotAt, setLastScreenshotAt] = useState<Date | null>(null);
-	const imageSrc = `${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureId}/image.jpg?nonce=${lastScreenshotAt?.toISOString()}`;
+	const nonce = useSnapshotNonce(furnitureId);
+	const imageSrc = `${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureId}/image.jpg?nonce=${nonce}`;
 	const hasImage = useHasImage(imageSrc);
 
-	const needsScreenshot = hasImage === false && !lastScreenshotAt;
+	const needsScreenshot = hasImage === false && !nonce;
 
 	const triggerScreenshot = useCallback(
 		async (abortSignal?: AbortSignal) => {
@@ -103,7 +97,7 @@ function useScreenshot(furnitureId: string) {
 					param: { id: furnitureId },
 					form: { file },
 				});
-				setLastScreenshotAt(new Date());
+				setSnapshotNonce(furnitureId, new Date().toUTCString());
 			} catch (err) {
 				if (err instanceof Error && err.name === 'AbortError') {
 					return;
@@ -128,6 +122,5 @@ function useScreenshot(furnitureId: string) {
 	return {
 		ref,
 		triggerScreenshot,
-		nonce: lastScreenshotAt?.toISOString(),
 	};
 }

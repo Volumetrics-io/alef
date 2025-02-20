@@ -48,6 +48,7 @@ export function FurniturePreview({ furnitureId, nonce = 'none' }: FurniturePrevi
 						src={`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureId}/image.jpg?nonce=${screenshotNonce}`}
 						crossOrigin="anonymous"
 						style={{
+							aspectRatio: '1/1',
 							width: 200,
 							height: 'auto',
 							objectFit: 'contain',

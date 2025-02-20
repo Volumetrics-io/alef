@@ -2,14 +2,14 @@ import { useAABB } from '@/hooks/useAABB';
 import { useEditorStore, useIsEditorStageMode } from '@/stores/editorStore';
 import { useDeleteFurniturePlacement, useFurniturePlacement, useFurniturePlacementFurnitureId, useUpdateFurniturePlacementTransform } from '@/stores/roomStore/roomStore';
 import { PrefixedId } from '@alef/common';
-import { Billboard } from '@react-three/drei';
+import { Billboard, Bvh } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { Handle } from '@react-three/handle';
 import { Container, Root } from '@react-three/uikit';
 import { colors } from '@react-three/uikit-default';
 import { Trash } from '@react-three/uikit-lucide';
 import { useCallback, useRef } from 'react';
-import { DoubleSide, Group } from 'three';
+import { Group } from 'three';
 import { FurnitureModel } from './FurnitureModel';
 export interface PlacedFurnitureProps {
 	furniturePlacementId: PrefixedId<'fp'>;
@@ -44,6 +44,8 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 
 	const { halfExtents, size, center, ref: modelRef, ready } = useAABB();
 
+	const maxExtent = Math.max(halfExtents[0], halfExtents[2])
+
 	const isEditable = useIsEditorStageMode('furniture') && ready;
 
 	if (!furnitureId || !placement) return null;
@@ -55,15 +57,15 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 			position={[placement.position.x, placement.position.y, placement.position.z]}
 			quaternion={[placement.rotation.x, placement.rotation.y, placement.rotation.z, placement.rotation.w]}
 		>
-			{isEditable && (
+			{isEditable && selected ? (
 				<Handle targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
-					<mesh position={center} onPointerUp={handlePointerUpDrag} onPointerOut={handlePointerUpDrag} onPointerLeave={handlePointerUpDrag}>
-						<boxGeometry args={[size.x, size.y, size.z]} />
-						<meshBasicMaterial opacity={0} transparent={true} />
-					</mesh>
+					<Bvh firstHitOnly={true} onPointerUp={handlePointerUpDrag} onPointerOut={handlePointerUpDrag} onPointerLeave={handlePointerUpDrag}>
+						<FurnitureModel furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} />
+					</Bvh>
 				</Handle>
+			) : (
+				<FurnitureModel furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} receiveShadow={size.y < 0.2} pointerEvents="none" />
 			)}
-			<FurnitureModel furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} receiveShadow={size.y < 0.2} />
 
 			{isEditable && selected && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + center.y + 0.2} />}
 			{isEditable && selected && (
@@ -72,11 +74,13 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 						onPointerUp={handlePointerUpRotate}
 						onPointerOut={handlePointerUpRotate}
 						onPointerLeave={handlePointerUpRotate}
-						position={[0, 0.01, 0]}
+						position={[0, 0.2, 0]}
 						rotation={[Math.PI / 2, 0, 0]}
+						renderOrder={-2}
+						
 					>
-						<ringGeometry args={[halfExtents[0] * 1.5, halfExtents[0] * 1.5 + 0.16, 64]} />
-						<meshBasicMaterial color="white" side={DoubleSide} />
+						<torusGeometry args={[maxExtent + 0.2, 0.025, 64]} />
+						<meshPhongMaterial color="#1d7e7f" emissive="#1d7e7f" emissiveIntensity={0.5} />
 					</mesh>
 				</Handle>
 			)}

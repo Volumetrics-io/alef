@@ -10,7 +10,7 @@ export const Lighting = () => {
 	const selectedLightId = useSelectedLightPlacementId();
 
 	return (
-		<Surface flexDirection="column" width={430} height={300}>
+		<Surface flexDirection="column" width={500} height={420}>
 			<SelectedLightPane id={selectedLightId} />
 		</Surface>
 	);
@@ -21,22 +21,24 @@ const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
 	const [{ intensity: globalIntensity, color: globalColor }, updateGlobal] = useGlobalLighting();
 
 	return (
-		<Container flexDirection="column" width="100%" height="100%" justifyContent="space-between" padding={10}>
-			<Container flexDirection="column" gap={20} width="100%">
-				<Container flexDirection="column" gap={10}>
-					<Text fontSize={16} fontWeight="bold" color={colors.primary}>
+		<Container flexDirection="column" width="100%" height="100%" padding={10} gap={10}>
+			<Text fontSize={20} fontWeight="semi-bold" color={colors.primary} textAlign="center">
+				Lighting
+			</Text>
+			<Container flexDirection="column" gap={50} flexGrow={1}>
+				<Container flexDirection="column" gap={30}>
+					<Text fontSize={18} fontWeight="bold" color={colors.primary}>
 						Intensity
 					</Text>
 					<Slider value={globalIntensity} min={0} max={2} step={0.01} onValueChange={(v) => updateGlobal({ intensity: v })} />
 				</Container>
-				<Container flexDirection="column" gap={10} width="100%">
-					<Text fontSize={16} fontWeight="bold" color={colors.primary}>
+				<Container flexDirection="column" gap={30} width="100%">
+					<Text fontSize={18} fontWeight="bold" color={colors.primary}>
 						Warmth
 					</Text>
 					<Slider value={globalColor} min={0} max={10} step={0.1} onValueChange={(v) => updateGlobal({ color: v })} />
 				</Container>
 			</Container>
-
 			<Container flexDirection="row" gap={4} width="100%" paddingRight={6} justifyContent="space-between">
 				<Button onClick={() => setMode('furniture')}>
 					<ArrowLeftIcon />

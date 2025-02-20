@@ -7,11 +7,12 @@ import { Group } from 'three';
 export interface FurnitureModelProps {
 	furnitureId: PrefixedId<'f'>;
 	outline?: boolean;
+	pointerEvents?: 'none' | 'auto';
 	receiveShadow?: boolean;
 	castShadow?: boolean;
 }
 
-export const FurnitureModel = forwardRef<Group, FurnitureModelProps>(function FurnitureModel({ furnitureId, outline, castShadow, receiveShadow }: FurnitureModelProps, ref) {
+export const FurnitureModel = forwardRef<Group, FurnitureModelProps>(function FurnitureModel({ furnitureId, outline, castShadow, receiveShadow, pointerEvents = 'auto' }: FurnitureModelProps, ref) {
 	const model = useFurnitureModel(furnitureId);
 
 	if (!model) return null;
@@ -19,7 +20,7 @@ export const FurnitureModel = forwardRef<Group, FurnitureModelProps>(function Fu
 	return (
 		<Clone
 			//@ts-expect-error - prop not typed
-			pointerEvents="none"
+			pointerEvents={pointerEvents}
 			object={model.scene as any}
 			deep={true}
 			castShadow={castShadow}

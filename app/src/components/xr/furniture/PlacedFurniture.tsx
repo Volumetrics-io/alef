@@ -9,7 +9,7 @@ import { Container, Root } from '@react-three/uikit';
 import { colors } from '@react-three/uikit-default';
 import { Trash } from '@react-three/uikit-lucide';
 import { useCallback, useRef } from 'react';
-import { BackSide, DoubleSide, Group } from 'three';
+import { Group } from 'three';
 import { FurnitureModel } from './FurnitureModel';
 export interface PlacedFurnitureProps {
 	furniturePlacementId: PrefixedId<'fp'>;
@@ -57,9 +57,9 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 			position={[placement.position.x, placement.position.y, placement.position.z]}
 			quaternion={[placement.rotation.x, placement.rotation.y, placement.rotation.z, placement.rotation.w]}
 		>
-			{isEditable ? (
+			{isEditable && selected ? (
 				<Handle targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
-					<Bvh firstHitOnly={true}>
+					<Bvh firstHitOnly={true} onPointerUp={handlePointerUpDrag} onPointerOut={handlePointerUpDrag} onPointerLeave={handlePointerUpDrag}>
 						<FurnitureModel furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} />
 					</Bvh>
 				</Handle>

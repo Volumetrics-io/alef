@@ -59,7 +59,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 		>
 			{isEditable ? (
 				<Handle targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
-					<Bvh firstHitOnly={true} onClick={handleClick} onPointerUp={handlePointerUpDrag} onPointerOut={handlePointerUpDrag} onPointerLeave={handlePointerUpDrag}>
+					<Bvh firstHitOnly={true} onClick={handleClick} onPointerDown={handleClick} onPointerUp={handlePointerUpDrag} onPointerOut={handlePointerUpDrag} onPointerLeave={handlePointerUpDrag}>
 						<FurnitureModel furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} />
 					</Bvh>
 				</Handle>

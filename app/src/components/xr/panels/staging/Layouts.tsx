@@ -17,23 +17,25 @@ export function Layouts({ readonly }: { readonly?: boolean }) {
 
 	return (
 		<>
-			<Surface flexDirection="column" flexWrap="no-wrap" flexGrow={1} height={300} width={430} gap={10} padding={10}>
-				<Text fontSize={18} color={colors.foreground} textAlign="center" margin={10}>
+			<Surface flexDirection="column" flexWrap="no-wrap" flexGrow={1} height={420} width={500} gap={10} padding={10}>
+				<Text fontSize={20} fontWeight="semi-bold" color={colors.foreground} textAlign="center" margin={10}>
 					Layouts
 				</Text>
-				<Container flexDirection="column" gap={4} overflow="scroll" paddingRight={6} scrollbarWidth={5} scrollbarBorderRadius={2} scrollbarColor={colors.primary}>
-					{layoutIds.map((layoutId) => (
-						<LayoutItem key={layoutId} layoutId={layoutId} onEdit={readonly ? undefined : () => setEditingId(layoutId)} />
-					))}
-				</Container>
-				{!readonly && (
-					<Container flexDirection="row" gap={4} width="100%" paddingRight={6} justifyContent="space-between">
-						<NewLayoutButton onNew={(id) => setEditingId(id)} />
-						<Button onClick={() => setMode('furniture')}>
-							<ArrowRightIcon />
-						</Button>
+				<Container flexDirection="column" flexGrow={1} flexShrink={0} justifyContent="space-between">
+					<Container flexDirection="column" gap={4} overflow="scroll" paddingRight={6} scrollbarWidth={5} scrollbarBorderRadius={2} scrollbarColor={colors.primary}>
+						{layoutIds.map((layoutId) => (
+							<LayoutItem key={layoutId} layoutId={layoutId} onEdit={readonly ? undefined : () => setEditingId(layoutId)} />
+						))}
+						{!readonly && <NewLayoutButton onNew={(id) => setEditingId(id)} />}
 					</Container>
-				)}
+					{!readonly && (
+						<Container flexDirection="row" gap={4} width="100%" paddingRight={6} justifyContent="flex-end">
+							<Button onClick={() => setMode('furniture')}>
+								<ArrowRightIcon />
+							</Button>
+						</Container>
+					)}
+				</Container>
 			</Surface>
 			{!readonly && editingId && <EditLayout layoutId={editingId} onClose={() => setEditingId(null)} />}
 		</>
@@ -45,11 +47,13 @@ function LayoutItem({ layoutId, onEdit }: { layoutId: PrefixedId<'rl'>; onEdit?:
 	const layoutData = useRoomLayout(layoutId);
 	return (
 		<Container flexGrow={1} flexShrink={0} gap={4} onClick={() => set(layoutId)}>
-			<Button onClick={() => set(layoutId)} flexGrow={1} gap={4} backgroundColor={active === layoutId ? colors.primary : colors.muted}>
-				<LayoutIcon icon={layoutData?.icon ?? layoutData?.type ?? 'living-room'} color={active === layoutId ? colors.primaryForeground : colors.mutedForeground} />
-				<Text marginRight="auto" color={active === layoutId ? colors.primaryForeground : colors.mutedForeground}>
-					{layoutData?.name ?? 'Unnamed layout'}
-				</Text>
+			<Button onClick={() => set(layoutId)} justifyContent="space-between" flexGrow={1} gap={4} backgroundColor={active === layoutId ? colors.primary : colors.muted}>
+				<Container margin="auto" flexDirection="row" gap={4} alignItems="center">
+					<LayoutIcon icon={layoutData?.icon ?? layoutData?.type ?? 'living-room'} color={active === layoutId ? colors.primaryForeground : colors.mutedForeground} />
+					<Text color={active === layoutId ? colors.primaryForeground : colors.mutedForeground}>
+						{layoutData?.name ?? 'Unnamed layout'}
+					</Text>
+				</Container>
 				{active === layoutId ? <CheckIcon /> : <Container width={24} height={24} />}
 			</Button>
 			{onEdit && (

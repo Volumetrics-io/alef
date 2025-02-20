@@ -24,17 +24,16 @@ export function Furniture() {
 	});
 
 	return (
-		<Surface width={430} height={300} flexDirection="column" flexWrap="no-wrap" gap={10} padding={10}>
+		<Surface height={600} width={500} flexDirection="column" justifyContent="space-between" flexWrap="no-wrap" gap={10} padding={10}>
 			<FilterControl filters={filters} setFilters={setFilters} />
-			{/* <ambientLight intensity={0.5} /> */}
-			<Container overflow="scroll" flexShrink={1} scrollbarWidth={5} scrollbarBorderRadius={2} paddingRight={6} scrollbarColor={colors.primary} flexDirection="column">
-				<Container flexDirection="row" gap={8} justifyContent="space-evenly" flexWrap="wrap">
+			<Container overflow="scroll" flexShrink={1} scrollbarWidth={10} scrollbarBorderRadius={1} paddingRight={6} scrollbarColor={colors.primary} flexDirection="column">
+				<Container flexDirection="row" gap={8} flexWrap="wrap">
 					{furniture.map((furnitureItem) => (
 						<FurnitureSelectItem key={furnitureItem.id} furnitureItem={furnitureItem} />
 					))}
 				</Container>
 			</Container>
-			<Container flexGrow={1} flexShrink={0} flexDirection="row" gap={4} width="100%" paddingRight={6} justifyContent="space-between">
+			<Container flexShrink={0} flexDirection="row" gap={4} width="100%" paddingRight={6} justifyContent="space-between">
 				<Button onClick={() => setMode('layout')}>
 					<ArrowLeftIcon />
 				</Button>
@@ -51,9 +50,11 @@ function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }
 	return (
 		<Surface
 			flexDirection="column"
-			gap={5}
-			width={180}
+			flexWrap="no-wrap"
+			gap={3}
+			width="48%"
 			marginBottom={5}
+			alignItems="center"
 			onClick={() =>
 				addFurniture({
 					furnitureId: furnitureItem.id,
@@ -62,27 +63,26 @@ function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }
 				})
 			}
 		>
-			<Text fontSize={14} color={colors.primary}>
-				{furnitureItem.name}
-			</Text>
-			<Container flexDirection="row" gap={2} flexWrap="wrap">
+			
+			{/* <Container flexDirection="row" gap={2} flexWrap="wrap">
 				{furnitureItem.attributes.map((attr) => (
 					<FurnitureAttributeTag key={formatAttribute(attr)} value={attr} />
 				))}
-			</Container>
+			</Container> */}
 			<Container
 				flexDirection="column"
-				flexGrow={1}
-				flexShrink={0}
 				alignItems="center"
 				justifyContent="center"
 				backgroundColor={colors.accent}
 				borderRadius={5}
 				width="100%"
-				height={120}
+				height={200}
 			>
 				<Image src={`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureItem.id}/image.jpg`} width="100%" height="100%" objectFit="cover" />
 			</Container>
+			<Text fontSize={18} fontWeight="semi-bold" color={colors.primary}>
+				{furnitureItem.name}
+			</Text>
 		</Surface>
 	);
 }
@@ -115,7 +115,7 @@ function FilterControl({ filters, setFilters }: { filters: Attribute[]; setFilte
 			}}
 			direction="row"
 			wrap
-			size="small"
+			size="medium"
 		/>
 	);
 }

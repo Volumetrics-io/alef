@@ -34,10 +34,10 @@ export function RoomTypePicker({ value = [], onValueChange, multiple, direction 
 					alignItems="center"
 					flexDirection="row"
 					width={wrap ? 'auto' : '100%'}
-					paddingY={size === 'small' ? 4 : 10}
-					paddingX={size === 'small' ? 8 : 16}
+					paddingY={size === 'small' ? 4 : 8}
+					paddingX={size === 'small' ? 8 : 12}
 					height="auto"
-					gap={size === 'small' ? 4 : 8}
+					gap={4}
 					justifyContent="flex-start"
 				>
 					<LayoutIcon icon={roomType} color={colors.foreground} width={size === 'small' ? 12 : 20} height={size === 'small' ? 12 : 20} />

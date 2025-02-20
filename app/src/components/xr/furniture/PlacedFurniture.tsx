@@ -25,6 +25,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	const groupRef = useRef<Group>(null);
 	const move = useUpdateFurniturePlacementTransform(furniturePlacementId);
 	const handleClick = useCallback(() => {
+		if (selected) return;
 		select(furniturePlacementId);
 	}, [select, furniturePlacementId]);
 
@@ -44,7 +45,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 
 	const { halfExtents, size, center, ref: modelRef, ready } = useAABB();
 
-	const maxExtent = Math.max(halfExtents[0], halfExtents[2])
+	const hypotenuse = Math.sqrt(halfExtents[0] * halfExtents[0] + halfExtents[2] * halfExtents[2])
 
 	const isEditable = useIsEditorStageMode('furniture') && ready;
 
@@ -52,14 +53,13 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 
 	return (
 		<group
-			onClick={handleClick}
 			ref={groupRef}
 			position={[placement.position.x, placement.position.y, placement.position.z]}
 			quaternion={[placement.rotation.x, placement.rotation.y, placement.rotation.z, placement.rotation.w]}
 		>
-			{isEditable && selected ? (
+			{isEditable ? (
 				<Handle targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
-					<Bvh firstHitOnly={true} onPointerUp={handlePointerUpDrag} onPointerOut={handlePointerUpDrag} onPointerLeave={handlePointerUpDrag}>
+					<Bvh firstHitOnly={true} onClick={handleClick} onPointerUp={handlePointerUpDrag} onPointerOut={handlePointerUpDrag} onPointerLeave={handlePointerUpDrag}>
 						<FurnitureModel furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} />
 					</Bvh>
 				</Handle>
@@ -79,7 +79,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 						renderOrder={-2}
 						
 					>
-						<torusGeometry args={[maxExtent + 0.2, 0.025, 64]} />
+						<torusGeometry args={[hypotenuse + 0.1, 0.025, 64]} />
 						<meshPhongMaterial color="#1d7e7f" emissive="#1d7e7f" emissiveIntensity={0.5} />
 					</mesh>
 				</Handle>

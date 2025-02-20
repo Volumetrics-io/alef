@@ -1,7 +1,7 @@
 import { FurnitureItem, useAllFurniture } from '@/services/publicApi/furnitureHooks';
 import { useEditorStageMode } from '@/stores/editorStore';
 import { useActiveRoomLayout, useAddFurniture } from '@/stores/roomStore/roomStore';
-import { Attribute, formatAttribute, RoomType } from '@alef/common';
+import { Attribute, RoomType } from '@alef/common';
 import { Container, Image, Text } from '@react-three/uikit';
 import { Button, colors } from '@react-three/uikit-default';
 import { ArrowLeftIcon, ArrowRightIcon } from '@react-three/uikit-lucide';
@@ -87,21 +87,22 @@ function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }
 	);
 }
 
-interface FurnitureAttributeTagProps {
-	value: Attribute;
-}
-function FurnitureAttributeTag({ value }: FurnitureAttributeTagProps) {
-	return (
-		<Container borderWidth={1} borderRadius={12} borderColor={colors.border} paddingX={8} paddingY={2}>
-			<Text fontSize={8} color={colors.primary}>
-				{value.key}:
-			</Text>
-			<Text fontSize={8} color={colors.primary}>
-				{value.value}
-			</Text>
-		</Container>
-	);
-}
+// interface FurnitureAttributeTagProps {
+// 	value: Attribute;
+// }
+
+// function FurnitureAttributeTag({ value }: FurnitureAttributeTagProps) {
+// 	return (
+// 		<Container borderWidth={1} borderRadius={12} borderColor={colors.border} paddingX={8} paddingY={2}>
+// 			<Text fontSize={8} color={colors.primary}>
+// 				{value.key}:
+// 			</Text>
+// 			<Text fontSize={8} color={colors.primary}>
+// 				{value.value}
+// 			</Text>
+// 		</Container>
+// 	);
+// }
 
 function FilterControl({ filters, setFilters }: { filters: Attribute[]; setFilters: (filters: Attribute[]) => void }) {
 	const selectedRoomTypes = filters.filter((f) => f.key === 'category').map((f) => f.value as RoomType);

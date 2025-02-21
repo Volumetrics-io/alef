@@ -36,6 +36,11 @@ export default defineConfig({
 				start_url: '/?directLaunch=true',
 			},
 
+			injectManifest: {
+				// 10MB
+				maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
+			},
+
 			workbox: {
 				sourcemap: true,
 			},

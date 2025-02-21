@@ -1,11 +1,12 @@
 // import SunLight from '@/components/xr/lighting/SunLight.tsx';
 
 import { Redirect } from '@/components/Redirect';
-import { MainScene } from '@/components/xr/MainScene';
 import { isHeadset } from '@/services/os';
 import { useMe } from '@/services/publicApi/userHooks';
 import { useNavigate } from '@verdant-web/react-router';
-import { useEffect } from 'react';
+import { lazy, useEffect } from 'react';
+
+const LazyMainScene = lazy(() => import('@/components/xr/MainScene'));
 
 const HomePage = () => {
 	const { data: session } = useMe();
@@ -29,7 +30,7 @@ const HomePage = () => {
 		return <Redirect to="/devices" />;
 	}
 
-	return <MainScene />;
+	return <LazyMainScene />;
 };
 
 export default HomePage;

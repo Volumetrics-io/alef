@@ -49,6 +49,8 @@ export function MainScene() {
 	);
 }
 
+export default MainScene;
+
 // this is a bit cumbersome, but this wrapper component provides the property and room
 // state to the main app XR experience. it has to be separated to this component because
 // the logged-out experience cannot fetch this data.

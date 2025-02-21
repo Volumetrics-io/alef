@@ -11,6 +11,6 @@
 			hero height will include nav height if hero is present -- so we
 			fallback from hero to nav, to nothing.
 		*/
-		flex-basis: calc(100dvh - var(--hero-height, var(--nav-height, 0)) - 1rem);
+		/* flex-basis: calc(100dvh - var(--hero-height, var(--nav-height, 0)) - 1rem); */
 	}
 }

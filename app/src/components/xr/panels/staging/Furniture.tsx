@@ -44,7 +44,6 @@ export function Furniture() {
 }
 
 function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }) {
-	const addFurniture = useAddFurniture();
 	const [hovered, setHovered] = useState(false);
 	return (
 		<Surface

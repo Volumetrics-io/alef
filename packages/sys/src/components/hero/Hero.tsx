@@ -25,6 +25,10 @@ export const HeroTitle = forwardRef<HTMLHeadingElement, HeadingProps>(function H
 	return <Heading ref={ref} {...props} className={clsx(cls.title, className)} />;
 });
 
+export const HeroBox = forwardRef<HTMLDivElement, BoxProps>(function HeroBox({ className, ...props }, ref) {
+	return <Box ref={ref} {...props} className={clsx(cls.box, className)} />;
+});
+
 export const HeroTagline = withClassName(withProps(Text, { as: 'p' }), cls.tagline);
 
 export const HeroBackdrop = withClassName('div', cls.backdrop);
@@ -33,6 +37,7 @@ export const HeroDimmer = withClassName('div', cls.dimmer);
 
 export const Hero = Object.assign(HeroRoot, {
 	Title: HeroTitle,
+	Box: HeroBox,
 	Tagline: HeroTagline,
 	Backdrop: HeroBackdrop,
 	Dimmer: HeroDimmer,

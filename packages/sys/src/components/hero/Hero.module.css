@@ -3,22 +3,23 @@
 		position: relative;
 		overflow: hidden;
 		width: 100%;
-		margin-top: calc(var(--nav-height, 0) * -1);
 		padding: var(--nav-height, 4rem) 2rem 4rem 2rem;
 		gap: 2rem;
-		min-height: 20vh;
+		min-height: 30vh;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 	}
 
+
+
 	.noPadding {
 		padding: 0;
 	}
 
 	.big {
-		min-height: 65vh;
+		min-height: 90vh;
 	}
 
 	.backdrop {
@@ -44,11 +45,17 @@
 		--start-color: color-mix(in hsl, var(--paper), transparent 30%);
 		--middle-color: color-mix(in hsl, var(--paper), transparent 50%);
 		--end-color: color-mix(in hsl, var(--paper), transparent 0%);
-		background: linear-gradient(var(--start-color) 0%, var(--middle-color) 50%, var(--end-color) 90%, var(--end-color) 100%);
+		background: linear-gradient(
+			var(--end-color) 0%,
+			var(--start-color) 25%,
+			var(--middle-color) 50%,
+			var(--start-color) 75%,
+			var(--end-color) 100%);
 	}
 
 	.forceNav {
 		--nav-height: 82px;
+		margin-top: calc(var(--nav-height, 0) * -1);
 	}
 }
 @layer variants {
@@ -61,6 +68,11 @@
 		text-align: center;
 		align-self: center;
 
+		position: relative;
+		z-index: 10;
+	}
+
+	.box {
 		position: relative;
 		z-index: 10;
 	}

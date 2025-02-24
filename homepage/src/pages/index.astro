@@ -10,14 +10,34 @@ import Layout from '../layouts/Layout.astro';
 	<NavBar client:load>
 		<NavBar.Start>
 			<Logo />
+			<Text>alef.io</Text>
 		</NavBar.Start>
 		<NavBar.End>
 			<LoginButton />
 		</NavBar.End>
 	</NavBar>
-	<Hero client:load forceNav big>
-		<Box style={{ zIndex: 10 }} gapped align="center"><Logo /> <Heading level={2} as="h1">Alef</Heading></Box>
-		<Hero.Title>Dynamic virtual staging for modern real estate</Hero.Title>
+	<Hero client:load forceNav big padded>
+		<Hero.Title>One space, endless possibilities.</Hero.Title>
+		<Hero.Dimmer />
+		<Hero.Backdrop>
+			<video autoPlay loop muted playsInline>
+				<source src="https://public-assets.alef.io/alef-tour.mp4" type="video/mp4" />
+			</video>
+		</Hero.Backdrop>
+	</Hero>
+	<Main gapped stacked padded>
+		<Box stacked gapped constrained="large" padded>
+			<Heading level={2}>Design your space without lifting a finger.</Heading>
+			<Text tall>
+				With state-of-the-art immersive tools, Alef unlocks the full potential of your home. Our AI-powered platform lets you customize every detail, from furniture to
+				lighting, so you can envision the perfect space without all the heavy lifting.
+			</Text>
+		</Box>
+	</Main>
+	<Hero client:load big padded>
+		<Hero.Box>
+			<EmailCollector client:load />
+		</Hero.Box>
 		<Hero.Dimmer />
 		<Hero.Backdrop>
 			<video autoPlay loop muted playsInline>
@@ -25,15 +45,5 @@ import Layout from '../layouts/Layout.astro';
 			</video>
 		</Hero.Backdrop>
 	</Hero>
-	<Main gapped stacked p>
-		<Box p="squeeze" stacked gapped constrained="large">
-			<Heading level={1}> Stop spending thousands on staging. Start selling faster. </Heading>
-			<Text>
-				With state-of-the-art immersive tools, Alef lets you stage your property in minutes, not days. Our AI-powered platform lets you customize every detail, from furniture to
-				lighting, so you can envision the perfect space for each buyer.
-			</Text>
-			<EmailCollector client:load />
-		</Box>
-	</Main>
 	<Footer />
 </Layout>

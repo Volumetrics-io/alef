@@ -1,10 +1,14 @@
 import { PrefixedId } from './ids';
 
-/**
- * Returns the path of the source GLTF model in the storage bucket.
- */
-export function getFurniturePrimaryModelPath(id: PrefixedId<'f'>) {
-	return `${id}/original.gltf`;
+export enum FurnitureModelQuality {
+	Original = 'original',
+	Medium = 'medium',
+	Low = 'low',
+	Collision = 'collision',
+}
+
+export function getFurnitureModelPath(id: PrefixedId<'f'>, quality: FurnitureModelQuality) {
+	return `${id}/${quality}.gltf`;
 }
 
 export function getFurniturePreviewImagePath(id: PrefixedId<'f'>) {

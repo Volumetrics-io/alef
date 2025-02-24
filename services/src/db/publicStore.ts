@@ -1,4 +1,4 @@
-import { AlefError, assertAttributeKey, assertPrefixedId, Attribute, getFurniturePreviewImagePath, getFurniturePrimaryModelPath, PrefixedId } from '@alef/common';
+import { AlefError, assertAttributeKey, assertPrefixedId, Attribute, FurnitureModelQuality, getFurnitureModelPath, getFurniturePreviewImagePath, PrefixedId } from '@alef/common';
 import { WorkerEntrypoint } from 'cloudflare:workers';
 import { ExpressionBuilder } from 'kysely';
 import { jsonArrayFrom } from 'kysely/helpers/sqlite';
@@ -29,8 +29,8 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 			.executeTakeFirst();
 	}
 
-	async getFurnitureModelResponse(id: PrefixedId<'f'>) {
-		const object = await this.env.FURNITURE_MODELS_BUCKET.get(getFurniturePrimaryModelPath(id));
+	async getFurnitureModelResponse(id: PrefixedId<'f'>, quality = FurnitureModelQuality.Original) {
+		const object = await this.env.FURNITURE_MODELS_BUCKET.get(getFurnitureModelPath(id, quality));
 		if (!object) {
 			return new AlefError(AlefError.Code.NotFound, 'Model not found').toResponse();
 		}

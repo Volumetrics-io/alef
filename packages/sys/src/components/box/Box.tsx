@@ -16,11 +16,11 @@ export interface BoxProps extends HTMLAttributes<HTMLElement> {
 	/**
 	 * Add padding to the box.
 	 */
-	padded?: boolean | 'squeeze';
+	padded?: boolean | 'squeeze' | 'small';
 	/**
 	 * Shorthand for 'padded'
 	 */
-	p?: boolean | 'squeeze';
+	p?: boolean | 'squeeze' | 'small';
 	/**
 	 * Clip the box's children to the box's bounds.
 	 */
@@ -160,6 +160,7 @@ export const Box = forwardRef<HTMLDivElement, BoxProps>(function Box(
 			[cls.fullHeight]: full === 'height' || full === true,
 			[cls.padded]: p === true,
 			[cls.paddedSqueeze]: p === 'squeeze',
+			[cls.paddedSmall]: p === 'small',
 			[cls.clipped]: clipped,
 			[cls.elevated]: elevated,
 			[cls.rounded]: rounded === true,

@@ -2,7 +2,7 @@ import { adminApiClient } from '@/services/adminApi';
 import { FurnitureData } from '@/services/publicApi';
 import { queryClient } from '@/services/queryClient';
 import { handleErrors } from '@/services/utils';
-import { Box, Button, Card, Dialog, Form, Frame, Icon, Input } from '@alef/sys';
+import { Box, Button, Card, Dialog, Form, Frame, Icon, Input, ScrollArea } from '@alef/sys';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { AttributesField } from './AttributesField';
@@ -49,8 +49,10 @@ export function FurnitureCard({ furniture }: FurnitureCardProps) {
 					</Card.Main>
 				</Dialog.Trigger>
 				<Dialog.Content title={furniture.name}>
-					<FurnitureEditorContent furniture={furniture} />
-					<FurniturePreview furnitureId={furniture.id} key={furniture.modelUpdatedAt} nonce={furniture.modelUpdatedAt} />
+					<ScrollArea>
+						<FurnitureEditorContent furniture={furniture} />
+						<FurniturePreview furnitureId={furniture.id} key={furniture.modelUpdatedAt} nonce={furniture.modelUpdatedAt} />
+					</ScrollArea>
 				</Dialog.Content>
 			</Dialog>
 			<Card.Details justify="between">

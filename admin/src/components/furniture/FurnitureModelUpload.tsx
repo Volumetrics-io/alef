@@ -1,4 +1,5 @@
 import { adminApiClient } from '@/services/adminApi';
+import { FurnitureModelQuality } from '@alef/common';
 import { Button, Icon } from '@alef/sys';
 import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
@@ -28,6 +29,7 @@ export function FurnitureModelUpload({ furnitureId }: FurnitureModelUploadProps)
 							},
 							form: {
 								file,
+								quality: FurnitureModelQuality.Original,
 							},
 						});
 						queryClient.invalidateQueries({ queryKey: ['furniture'] });

@@ -1,5 +1,5 @@
 import { AuthAccount, AuthUser, AuthVerificationCode } from '@a-type/auth';
-import { PrefixedId, assertAttributeKey, assertPrefixedId, getFurniturePreviewImagePath, getFurniturePrimaryModelPath, id } from '@alef/common';
+import { FurnitureModelQuality, PrefixedId, assertAttributeKey, assertPrefixedId, getFurnitureModelPath, getFurniturePreviewImagePath, id } from '@alef/common';
 import { WorkerEntrypoint } from 'cloudflare:workers';
 import { Env } from './env.js';
 import { DB, comparePassword, getDatabase, hashPassword } from './kysely/index.js';
@@ -154,9 +154,9 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 		await this.#db.updateTable('Furniture').set(data).where('id', '=', id).execute();
 	}
 
-	async uploadFurnitureModel(id: string, modelStream: ReadableStream) {
+	async uploadFurnitureModel(id: string, modelStream: ReadableStream, quality: FurnitureModelQuality = FurnitureModelQuality.Original) {
 		assertPrefixedId(id, 'f');
-		await this.env.FURNITURE_MODELS_BUCKET.put(getFurniturePrimaryModelPath(id), modelStream);
+		await this.env.FURNITURE_MODELS_BUCKET.put(getFurnitureModelPath(id, quality), modelStream);
 		await this.#db.updateTable('Furniture').set({ modelUpdatedAt: new Date() }).where('id', '=', id).execute();
 	}
 

@@ -1,4 +1,5 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+import clsx from 'clsx';
 import { XIcon } from 'lucide-react';
 import { forwardRef } from 'react';
 import { withClassName } from '../../hocs/withClassName.js';
@@ -18,16 +19,17 @@ export const DialogDescription = withClassName(DialogPrimitive.Description, cls.
 
 export interface DialogContentProps extends DialogPrimitive.DialogContentProps {
 	title: string;
+	width?: 'medium' | 'large';
 }
 
-export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(function DialogContent(props, ref) {
+export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(function DialogContent({ width, title, ...props }, ref) {
 	return (
 		<DialogPrimitive.Portal>
 			<DialogPrimitive.Overlay className={cls.overlay} />
 			<Frame asChild padded stacked gapped elevated ref={ref}>
-				<DialogPrimitive.Content className={cls.content}>
+				<DialogPrimitive.Content className={clsx(cls.content, width === 'large' && cls.contentLarge)} {...props}>
 					<Box spread>
-						<DialogTitle>{props.title}</DialogTitle>
+						<DialogTitle>{title}</DialogTitle>
 					</Box>
 					<DialogClose asChild>
 						<Button variant="action" float="top-right">

@@ -1,4 +1,4 @@
-import { AlefError, Attribute, isPrefixedId } from '@alef/common';
+import { AlefError, Attribute, FurnitureModelQuality, isPrefixedId } from '@alef/common';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { z } from 'zod';
@@ -56,8 +56,15 @@ export const furnitureRouter = new Hono<Env>()
 				id: z.custom((val) => isPrefixedId(val, 'f')),
 			})
 		),
+		zValidator(
+			'query',
+			z.object({
+				quality: z.nativeEnum(FurnitureModelQuality).optional(),
+			})
+		),
 		async (ctx) => {
-			const data = await ctx.env.PUBLIC_STORE.getFurnitureModelResponse(ctx.req.valid('param').id);
+			const quality = ctx.req.valid('query').quality || FurnitureModelQuality.Original;
+			const data = await ctx.env.PUBLIC_STORE.getFurnitureModelResponse(ctx.req.valid('param').id, quality);
 			if (!data) {
 				throw new AlefError(AlefError.Code.NotFound, 'Model not found');
 			}

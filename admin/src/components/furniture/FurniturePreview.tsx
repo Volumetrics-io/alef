@@ -1,7 +1,7 @@
 import { adminApiClient } from '@/services/adminApi';
 import { setSnapshotNonce, useSnapshotNonce } from '@/state/snapshotNonces';
-import { PrefixedId } from '@alef/common';
-import { Box, Control, ErrorBoundary, Icon } from '@alef/sys';
+import { FurnitureModelQuality, PrefixedId } from '@alef/common';
+import { Box, Control, ErrorBoundary, Icon, Select } from '@alef/sys';
 import { Environment, Gltf, OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -13,19 +13,27 @@ export interface FurniturePreviewProps {
 }
 
 export function FurniturePreview({ furnitureId, nonce = 'none' }: FurniturePreviewProps) {
-	const modelSrc = `${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureId}/model?nonce=${nonce}`;
+	const [quality, setQuality] = useState<FurnitureModelQuality>(FurnitureModelQuality.Original);
+	const modelSrc = `${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureId}/model?nonce=${nonce}&quality=${quality}`;
 
 	const { ref: canvasRef, triggerScreenshot } = useScreenshot(furnitureId);
 
 	return (
-		<ErrorBoundary
-			fallback={
-				<Box full layout="center center">
-					No model
-				</Box>
-			}
-		>
-			<Box>
+		<Box stacked>
+			<Select value={quality} onValueChange={(v) => setQuality(v as FurnitureModelQuality)}>
+				<Select.Item value={FurnitureModelQuality.Original}>LOD: Original</Select.Item>
+				<Select.Item value={FurnitureModelQuality.Medium}>LOD: Medium</Select.Item>
+				<Select.Item value={FurnitureModelQuality.Low}>LOD: Low</Select.Item>
+				<Select.Item value={FurnitureModelQuality.Collision}>LOD: Collision</Select.Item>
+			</Select>
+			<ErrorBoundary
+				fallback={
+					<Box full layout="center center">
+						No model
+					</Box>
+				}
+				key={quality}
+			>
 				<Canvas
 					camera={{ position: [0, 1.5, 2] }}
 					ref={canvasRef}
@@ -46,14 +54,14 @@ export function FurniturePreview({ furnitureId, nonce = 'none' }: FurniturePrevi
 						}}
 					/>
 				</Canvas>
-				<Control float="bottom-right" onClick={() => triggerScreenshot()}>
-					<FurnitureSnapshot furnitureId={furnitureId} />
-					<Box float="bottom-right">
-						<Icon name="refresh-cw" />
-					</Box>
-				</Control>
-			</Box>
-		</ErrorBoundary>
+			</ErrorBoundary>
+			<Control float="bottom-right" onClick={() => triggerScreenshot()}>
+				<FurnitureSnapshot furnitureId={furnitureId} />
+				<Box float="bottom-right">
+					<Icon name="refresh-cw" />
+				</Box>
+			</Control>
+		</Box>
 	);
 }
 

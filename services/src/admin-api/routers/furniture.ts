@@ -1,4 +1,4 @@
-import { isPrefixedId } from '@alef/common';
+import { FurnitureModelQuality, isPrefixedId } from '@alef/common';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { z } from 'zod';
@@ -42,13 +42,14 @@ export const furnitureRouter = new Hono<Env>()
 			'form',
 			z.object({
 				file: z.instanceof(File),
+				quality: z.nativeEnum(FurnitureModelQuality),
 			})
 		),
 		async (ctx) => {
 			const { id } = ctx.req.valid('param');
-			const { file } = ctx.req.valid('form');
+			const { file, quality } = ctx.req.valid('form');
 			const fileStream = file.stream();
-			await ctx.env.ADMIN_STORE.uploadFurnitureModel(id, fileStream);
+			await ctx.env.ADMIN_STORE.uploadFurnitureModel(id, fileStream, quality);
 			return ctx.json({ ok: true });
 		}
 	)

@@ -1,5 +1,5 @@
 import { publicApiOrigin } from '@/env';
-import { AlefError, AttributeKey, formatAttribute } from '@alef/common';
+import { AlefError, AttributeKey, formatAttribute, FurnitureModelQuality } from '@alef/common';
 import { useGLTF } from '@react-three/drei';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import type { InferResponseType } from 'hono/client';
@@ -24,8 +24,8 @@ export function useAllFurniture(
 	});
 }
 
-export function useFurnitureModel(furnitureId: string) {
-	const src = `${publicApiOrigin}/furniture/${furnitureId}/model`;
+export function useFurnitureModel(furnitureId: string, quality: FurnitureModelQuality = FurnitureModelQuality.Original) {
+	const src = `${publicApiOrigin}/furniture/${furnitureId}/model?quality=${quality}`;
 	return useGLTF(src, true, true, (loader) => {
 		loader.setWithCredentials(true);
 	});

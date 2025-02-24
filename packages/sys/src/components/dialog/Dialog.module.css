@@ -17,6 +17,7 @@
 		max-width: min(42rem, 90vw);
 		animation: contentShow 0.5s var(--bounce);
 		z-index: 10000;
+		max-height: 90vh;
 	}
 
 	.title {
@@ -41,5 +42,11 @@
 			opacity: 1;
 			transform: translate(-50%, -50%) scale(1);
 		}
+	}
+}
+
+@layer variants {
+	.contentLarge {
+		max-width: 90vw;
 	}
 }

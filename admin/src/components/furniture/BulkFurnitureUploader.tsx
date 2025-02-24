@@ -63,7 +63,7 @@ export function BulkFurnitureUploader() {
 		const byQuality = dir.reduce(
 			(acc, file) => {
 				const filename = file.name.split('.')[0];
-				if (filename === 'original' || filename === 'medium' || filename === 'low') acc[filename as FurnitureModelQuality] = file;
+				if (Object.values(FurnitureModelQuality).includes(filename as any)) acc[filename as FurnitureModelQuality] = file;
 				return acc;
 			},
 			{} as Record<FurnitureModelQuality, File>

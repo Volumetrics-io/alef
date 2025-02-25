@@ -35,7 +35,7 @@ export function FurniturePreview({ furnitureId, nonce = 'none' }: FurniturePrevi
 				key={quality}
 			>
 				<Canvas
-					camera={{ position: [0, 1.5, 2] }}
+					camera={{ position: [1, 1.5, 2] }}
 					ref={canvasRef}
 					style={{
 						aspectRatio: '1/1',
@@ -46,7 +46,7 @@ export function FurniturePreview({ furnitureId, nonce = 'none' }: FurniturePrevi
 				>
 					<Environment preset="city" />
 					<ambientLight intensity={1} />
-					<OrbitControls makeDefault target={[0, 1, 0]} />
+					<OrbitControls makeDefault target={[0, 0, 0]} />
 					<Gltf
 						src={modelSrc}
 						extendLoader={(loader) => {

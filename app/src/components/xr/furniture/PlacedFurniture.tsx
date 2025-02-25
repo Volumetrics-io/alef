@@ -10,7 +10,7 @@ import { colors } from '@react-three/uikit-default';
 import { Trash } from '@react-three/uikit-lucide';
 import { useCallback, useRef } from 'react';
 import { Group } from 'three';
-import { FurnitureModel } from './FurnitureModel';
+import { CollisionModel, FurnitureModel } from './FurnitureModel';
 export interface PlacedFurnitureProps {
 	furniturePlacementId: PrefixedId<'fp'>;
 }
@@ -57,15 +57,14 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 			position={[placement.position.x, placement.position.y, placement.position.z]}
 			quaternion={[placement.rotation.x, placement.rotation.y, placement.rotation.z, placement.rotation.w]}
 		>
-			{isEditable ? (
+			{isEditable && (
 				<Handle targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
 					<Bvh firstHitOnly={true} onClick={handleClick} onPointerDown={handleClick} onPointerUp={handlePointerUpDrag} onPointerOut={handlePointerUpDrag} onPointerLeave={handlePointerUpDrag}>
-						<FurnitureModel furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} />
+						<CollisionModel furnitureId={furnitureId} />
 					</Bvh>
 				</Handle>
-			) : (
-				<FurnitureModel furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} receiveShadow={size.y < 0.2} pointerEvents="none" />
 			)}
+			<FurnitureModel furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} receiveShadow={size.y < 0.2} pointerEvents="none" />
 
 			{isEditable && selected && <DeleteUI furniturePlacementId={furniturePlacementId} height={halfExtents[1] + center.y + 0.2} />}
 			{isEditable && selected && (

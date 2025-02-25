@@ -9,12 +9,14 @@ import { AttributesField } from './AttributesField';
 import { FurnitureModelUpload } from './FurnitureModelUpload';
 import { FurniturePreview } from './FurniturePreview';
 import { FurnitureSnapshot } from './FurnitureSnapshot';
-
+import { useFurnitureStore } from '@/stores/furnitureStore';
 export interface FurnitureCardProps {
 	furniture: FurnitureData;
 }
 
 export function FurnitureCard({ furniture }: FurnitureCardProps) {
+	const { focusedFurniture } = useFurnitureStore();
+	const [open, setOpen] = useState(focusedFurniture === furniture.id);
 	const { mutate: deleteSelf, isPending: isDeleting } = useMutation({
 		mutationFn: () => handleErrors(adminApiClient.furniture[':id'].$delete({ param: { id: furniture.id } })),
 		onSuccess: () => {
@@ -23,6 +25,10 @@ export function FurnitureCard({ furniture }: FurnitureCardProps) {
 			});
 		},
 	});
+
+	useEffect(() => {
+		setOpen(focusedFurniture === furniture.id);
+	}, [focusedFurniture]);
 
 	const { mutate: updateSelf, isPending: isUpdating } = useMutation({
 		mutationFn: (data: { name: string }) => handleErrors(adminApiClient.furniture[':id'].$put({ param: { id: furniture.id }, json: data })),
@@ -35,7 +41,7 @@ export function FurnitureCard({ furniture }: FurnitureCardProps) {
 
 	return (
 		<Card key={furniture.id}>
-			<Dialog>
+			<Dialog open={open} onOpenChange={setOpen}>
 				<Dialog.Trigger asChild>
 					<Card.Main align="center">
 						<FurnitureSnapshot furnitureId={furniture.id} />

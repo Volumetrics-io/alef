@@ -5,7 +5,6 @@ import { startTransition, useState } from 'react';
 import { AttributePicker } from './AttributePicker';
 import { AttributePill } from './AttributePill';
 import { FurnitureCard } from './FurnitureCard';
-
 export function FurnitureBrowser() {
 	const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
 	const { data } = useSuspenseQuery({

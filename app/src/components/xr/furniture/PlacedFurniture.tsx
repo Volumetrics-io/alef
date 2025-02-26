@@ -2,7 +2,7 @@ import { useAABB } from '@/hooks/useAABB';
 import { useEditorStore, useIsEditorStageMode } from '@/stores/editorStore';
 import { useDeleteFurniturePlacement, useFurniturePlacement, useFurniturePlacementFurnitureId, useUpdateFurniturePlacementTransform } from '@/stores/roomStore/roomStore';
 import { PrefixedId } from '@alef/common';
-import { Billboard, Bvh } from '@react-three/drei';
+import { Bvh } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { Handle } from '@react-three/handle';
 import { Container, Root } from '@react-three/uikit';
@@ -11,6 +11,10 @@ import { Trash } from '@react-three/uikit-lucide';
 import { useCallback, useRef } from 'react';
 import { Group } from 'three';
 import { CollisionModel, FurnitureModel } from './FurnitureModel';
+import { Billboard } from '../Billboard';
+
+
+
 export interface PlacedFurnitureProps {
 	furniturePlacementId: PrefixedId<'fp'>;
 }

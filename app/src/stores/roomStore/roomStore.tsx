@@ -100,8 +100,8 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 					layouts: {},
 					lights: {},
 					globalLighting: {
-						intensity: 0.8,
-						color: 2.7,
+						intensity: 1.5,
+						color: 6.3,
 					},
 
 					updateWalls: async (walls) => {
@@ -302,6 +302,7 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 						});
 					},
 					updateGlobalLighting: async (update) => {
+						console.log('updateGlobalLighting', update);
 						await socket.request({
 							type: 'updateGlobalLighting',
 							roomId,

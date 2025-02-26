@@ -7,7 +7,7 @@ import { Group, Vector3 } from 'three';
 import { CeilingLight } from './CeilingLight';
 import { getLightColor } from './getLightColor';
 
-const DEFAULT_CEILING_HEIGHT = 2.7;
+const DEFAULT_CEILING_HEIGHT = 6.3;
 
 export const RoomLighting = () => {
 	const ceilingPlanes = useXRPlanes('ceiling');
@@ -57,7 +57,7 @@ export const RoomLighting = () => {
 				<planeGeometry args={[100, 100]} />
 				<meshStandardMaterial transparent={false} colorWrite={false} color="red" />
 			</mesh>
-			<ambientLight intensity={globalIntensity * 0.2} color={getLightColor(globalColor)} />
+			<ambientLight intensity={globalIntensity * 0.3} color={getLightColor(globalColor)} />
 			{lightIds.map((id) => {
 				gl.shadowMap.needsUpdate = true;
 				return <CeilingLight key={id} id={id} />;

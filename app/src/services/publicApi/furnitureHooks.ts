@@ -43,6 +43,16 @@ export function useFurnitureAttributes(key: AttributeKey) {
 		},
 	});
 }
+
+export function useFurnitureDetails(furnitureId: string) {
+	return useSuspenseQuery({
+		queryKey: ['id', furnitureId],
+		queryFn: async () => {
+			const response = await publicApiClient.furniture[':id'].$get({ param: { id: furnitureId } });
+			return response.json();
+		},
+	});
+}
 export function useFurnitureModel(furnitureId: string, quality: FurnitureModelQuality = FurnitureModelQuality.Original) {
 	const src = `${publicApiOrigin}/furniture/${furnitureId}/model?quality=${quality}`;
 	return useGLTF(src, true, true, (loader) => {

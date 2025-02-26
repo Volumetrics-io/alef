@@ -24,6 +24,25 @@ export function useAllFurniture(
 	});
 }
 
+export function useAllFurnitureAttributes() {
+	return useSuspenseQuery({
+		queryKey: ['attributes', null],
+		queryFn: async () => {
+			const response = await publicApiClient.furniture.attributes.$get({ query: { key: undefined } });
+			return response.json();
+		},
+	});
+}
+
+export function useFurnitureAttributes(key: AttributeKey) {
+	return useSuspenseQuery({
+		queryKey: ['attributes', key],
+		queryFn: async () => {
+			const response = await publicApiClient.furniture.attributes.$get({ query: { key } });
+			return response.json();
+		},
+	});
+}
 export function useFurnitureModel(furnitureId: string, quality: FurnitureModelQuality = FurnitureModelQuality.Original) {
 	const src = `${publicApiOrigin}/furniture/${furnitureId}/model?quality=${quality}`;
 	return useGLTF(src, true, true, (loader) => {

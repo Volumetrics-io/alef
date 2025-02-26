@@ -70,26 +70,72 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 
 	async getAttributeValues(key: string) {
 		assertAttributeKey(key);
-		return this.#db.selectFrom('Attribute').where('key', '=', key).select('value').execute();
+		return this.#db.selectFrom('Attribute').where('key', '=', key).select(['key', 'value']).execute();
+	}
+
+	async listAttributes() {
+		return this.#db.selectFrom('Attribute').select(['key', 'value']).execute();
 	}
 
 	async listFurnitureByAttributes(attributes: Attribute[]) {
+		// Start with the base query
 		let builder = this.#db
 			.selectFrom('Furniture')
-			.distinct()
-			.innerJoin('FurnitureAttribute', 'FurnitureAttribute.furnitureId', 'Furniture.id')
-			.innerJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id');
+			.distinct();
 
-		if (attributes.length) {
-			builder.where((eb) =>
-				eb.or(
-					attributes.map(({ key, value }) => {
-						assertAttributeKey(key);
-						return eb.and([eb('Attribute.key', '=', key), eb('Attribute.value', '=', value)]);
+		// Separate attributes by key
+		const categorizedAttributes = attributes.reduce<Record<string, Attribute[]>>((acc, attr) => {
+			assertAttributeKey(attr.key);
+			if (!acc[attr.key]) {
+				acc[attr.key] = [];
+			}
+			acc[attr.key].push(attr);
+			return acc;
+		}, {});
+
+		// First, handle categories with OR logic (if any)
+		if (categorizedAttributes['category'] && categorizedAttributes['category'].length > 0) {
+			const categoryAttributes = categorizedAttributes['category'];
+			console.log('Processing categories:', categoryAttributes);
+			
+			// Add a condition that matches any of the categories
+			builder = builder.where(eb => {
+				// Create an OR condition for all categories
+				return eb.or(
+					categoryAttributes.map(({ key, value }) => {
+						return eb.exists(
+							eb.selectFrom('FurnitureAttribute')
+								.innerJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id')
+								.whereRef('FurnitureAttribute.furnitureId', '=', 'Furniture.id')
+								.where('Attribute.key', '=', key)
+								.where('Attribute.value', '=', value)
+								.select('FurnitureAttribute.furnitureId')
+						);
 					})
-				)
-			);
+				);
+			});
 		}
+
+		// Then, handle all other attribute types with AND logic
+		Object.entries(categorizedAttributes).forEach(([key, attrs]) => {
+			// Skip categories as they've already been handled
+			if (key === 'category') return;
+			if (attrs.some(({ key, value }) => key === 'type' && value === 'all')) return;
+						
+			// For each attribute of this type, add an EXISTS condition
+			attrs.forEach(({ key, value }) => {
+				builder = builder.where(eb => 
+					eb.exists(
+						eb.selectFrom('FurnitureAttribute')
+							.innerJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id')
+							.whereRef('FurnitureAttribute.furnitureId', '=', 'Furniture.id')
+							.where('Attribute.key', '=', key)
+							.where('Attribute.value', '=', value)
+							.select('FurnitureAttribute.furnitureId')
+					)
+				);
+			});
+		});
 
 		return builder.select((eb) => ['Furniture.id', 'Furniture.name', 'Furniture.modelUpdatedAt', this.selectFurnitureAttributes(eb)]).execute();
 	}

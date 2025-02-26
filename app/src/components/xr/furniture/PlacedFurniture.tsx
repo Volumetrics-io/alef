@@ -1,6 +1,13 @@
 import { useAABB } from '@/hooks/useAABB';
-import { useEditorStore, useIsEditorStageMode } from '@/stores/editorStore';
-import { useDeleteFurniturePlacement, useFurniturePlacement, useFurniturePlacementFurnitureId, useSetFurniturePlacementFurnitureId, useUpdateFurniturePlacementTransform } from '@/stores/roomStore/roomStore';
+import { useAllFurniture, useFurnitureDetails } from '@/services/publicApi/furnitureHooks';
+import { useEditorStore } from '@/stores/editorStore';
+import {
+	useDeleteFurniturePlacement,
+	useFurniturePlacement,
+	useFurniturePlacementFurnitureId,
+	useSetFurniturePlacementFurnitureId,
+	useUpdateFurniturePlacementTransform,
+} from '@/stores/roomStore/roomStore';
 import { PrefixedId } from '@alef/common';
 import { Bvh } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
@@ -8,12 +15,10 @@ import { Handle } from '@react-three/handle';
 import { Container, Root } from '@react-three/uikit';
 import { Button, colors } from '@react-three/uikit-default';
 import { ArrowLeft, ArrowRight, Trash } from '@react-three/uikit-lucide';
-import { useCallback, useEffect, useRef } from 'react';
+import { ComponentPropsWithoutRef, useCallback, useRef } from 'react';
 import { Group } from 'three';
-import { CollisionModel, FurnitureModel } from './FurnitureModel';
 import { Billboard } from '../Billboard';
-import { Surface } from '../ui/Surface';
-import { useFurnitureDetails, useAllFurniture } from '@/services/publicApi/furnitureHooks';
+import { CollisionModel, FurnitureModel } from './FurnitureModel';
 
 export interface PlacedFurnitureProps {
 	furniturePlacementId: PrefixedId<'fp'>;
@@ -30,29 +35,30 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	const groupRef = useRef<Group>(null);
 	const move = useUpdateFurniturePlacementTransform(furniturePlacementId);
 	const handleClick = useCallback(() => {
+		console.log('CLICKKK');
 		if (selected) return;
 		select(furniturePlacementId);
-	}, [select, furniturePlacementId]);
+	}, [select, furniturePlacementId, selected]);
 
 	const handlePointerUpDrag = useCallback(() => {
 		if (!groupRef.current) return;
 		gl.shadowMap.needsUpdate = true;
 
 		move({ position: groupRef.current.position, rotation: groupRef.current.quaternion });
-	}, [move, groupRef]);
+	}, [move, groupRef, gl]);
 
 	const handlePointerUpRotate = useCallback(() => {
 		if (!groupRef.current) return;
 		gl.shadowMap.needsUpdate = true;
 
 		move({ position: groupRef.current.position, rotation: groupRef.current.quaternion });
-	}, [move, groupRef]);
+	}, [move, groupRef, gl]);
 
 	const { halfExtents, size, center, ref: modelRef, ready } = useAABB();
 
-	const hypotenuse = Math.sqrt(halfExtents[0] * halfExtents[0] + halfExtents[2] * halfExtents[2])
+	const hypotenuse = Math.sqrt(halfExtents[0] * halfExtents[0] + halfExtents[2] * halfExtents[2]);
 
-	const isEditable = useIsEditorStageMode('furniture') && ready;
+	const isEditable = ready;
 
 	if (!furnitureId || !placement) return null;
 
@@ -63,15 +69,24 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 			quaternion={[placement.rotation.x, placement.rotation.y, placement.rotation.z, placement.rotation.w]}
 		>
 			{isEditable && (
-				<Handle targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
-					<Bvh firstHitOnly={true} onClick={handleClick} onPointerDown={handleClick} onPointerUp={handlePointerUpDrag} onPointerOut={handlePointerUpDrag} onPointerLeave={handlePointerUpDrag}>
+				<ConditionalHandle enabled={selected} targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
+					<Bvh
+						firstHitOnly
+						onPointerUp={handlePointerUpDrag}
+						onPointerOut={handlePointerUpDrag}
+						onPointerLeave={handlePointerUpDrag}
+						onClick={handleClick}
+						onPointerDown={handleClick}
+					>
 						<CollisionModel furnitureId={furnitureId} />
 					</Bvh>
-				</Handle>
+				</ConditionalHandle>
 			)}
 			<FurnitureModel furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} receiveShadow={size.y < 0.2} pointerEvents="none" />
 
-			{isEditable && selected && <PlaceFurnitureUI furniturePlacementId={furniturePlacementId} furnitureId={furnitureId} setFurnitureId={setFurnitureId} height={halfExtents[1] + center.y + 0.2} />}
+			{isEditable && selected && (
+				<PlaceFurnitureUI furniturePlacementId={furniturePlacementId} furnitureId={furnitureId} setFurnitureId={setFurnitureId} height={halfExtents[1] + center.y + 0.2} />
+			)}
 			{isEditable && selected && (
 				<Handle targetRef={groupRef as any} rotate={{ x: false, y: true, z: false }} translate="as-rotate">
 					<mesh
@@ -81,7 +96,6 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 						position={[0, 0.2, 0]}
 						rotation={[Math.PI / 2, 0, 0]}
 						renderOrder={-2}
-						
 					>
 						<torusGeometry args={[hypotenuse + 0.1, 0.025, 64]} />
 						<meshPhongMaterial color="#1d7e7f" emissive="#1d7e7f" emissiveIntensity={0.5} />
@@ -92,7 +106,22 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	);
 }
 
-function PlaceFurnitureUI({ furniturePlacementId, furnitureId, setFurnitureId, height }: { furniturePlacementId: PrefixedId<'fp'>; furnitureId: PrefixedId<'f'>; setFurnitureId: (id: PrefixedId<'fp'>, furnitureId: PrefixedId<'f'>) => Promise<string>; height: number }) {
+function ConditionalHandle({ enabled, ...props }: ComponentPropsWithoutRef<typeof Handle> & { enabled: boolean }) {
+	if (!enabled) return <>{props.children}</>;
+	return <Handle {...props} />;
+}
+
+function PlaceFurnitureUI({
+	furniturePlacementId,
+	furnitureId,
+	setFurnitureId,
+	height,
+}: {
+	furniturePlacementId: PrefixedId<'fp'>;
+	furnitureId: PrefixedId<'f'>;
+	setFurnitureId: (id: PrefixedId<'fp'>, furnitureId: PrefixedId<'f'>) => Promise<void>;
+	height: number;
+}) {
 	const handleDelete = useDeleteFurniturePlacement(furniturePlacementId);
 
 	const { data: currentFurniture } = useFurnitureDetails(furnitureId);
@@ -101,7 +130,7 @@ function PlaceFurnitureUI({ furniturePlacementId, furnitureId, setFurnitureId, h
 	});
 
 	const furnitureIds = furniture.map((f) => f.id).sort();
-	
+
 	const handlePrevious = () => {
 		const index = furnitureIds.findIndex((f) => f === furnitureId);
 		if (index > 0) {

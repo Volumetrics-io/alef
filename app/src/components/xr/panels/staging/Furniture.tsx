@@ -145,24 +145,37 @@ function FurnitureCollection({ attributes }: { type: string | null; attributes: 
 }
 
 function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }) {
+	const addFurniture = useAddFurniture();
 	const [hovered, setHovered] = useState(false);
 	return (
-		<Surface height="48%" flexDirection="column" flexWrap="no-wrap" gap={3} flexShrink={0} alignItems="center" onHoverChange={(hovered) => setHovered(hovered)}>
+		<Surface
+			height="48%"
+			flexDirection="column"
+			flexWrap="no-wrap"
+			gap={3}
+			flexShrink={0}
+			alignItems="center"
+			onHoverChange={(hovered) => setHovered(hovered)}
+			onClick={() => {
+				addFurniture({
+					furnitureId: furnitureItem.id,
+					position: { x: 0, y: 0, z: 0 },
+					rotation: { x: 0, y: 0, z: 0, w: 1 },
+				});
+			}}
+		>
 			<Container flexDirection="column" alignItems="center" justifyContent="center" backgroundColor={colors.accent} borderRadius={5} width="100%">
-				{hovered && <FurnitureAddButton furnitureItem={furnitureItem} />}
+				{hovered && <AddIndicator />}
 				<Image src={`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureItem.id}/image.jpg`} width="100%" height="100%" objectFit="cover" />
 			</Container>
 		</Surface>
 	);
 }
 
-function FurnitureAddButton({ furnitureItem }: { furnitureItem: FurnitureItem }) {
-	const addFurniture = useAddFurniture();
-	const [hovered, setHovered] = useState(false);
+function AddIndicator() {
 	return (
-		<Button
-			onHoverChange={(hovered) => setHovered(hovered)}
-			zIndexOffset={hovered ? 10 : 0}
+		<Container
+			zIndexOffset={10}
 			height={30}
 			width={30}
 			padding={4}
@@ -170,16 +183,10 @@ function FurnitureAddButton({ furnitureItem }: { furnitureItem: FurnitureItem })
 			positionType="absolute"
 			positionBottom={10}
 			positionRight={10}
-			onClick={() =>
-				addFurniture({
-					furnitureId: furnitureItem.id,
-					position: { x: 0, y: 0, z: 0 },
-					rotation: { x: 0, y: 0, z: 0, w: 1 },
-				})
-			}
+			backgroundColor={colors.primary}
 		>
-			<PlusIcon />
-		</Button>
+			<PlusIcon color={colors.primaryForeground} />
+		</Container>
 	);
 }
 

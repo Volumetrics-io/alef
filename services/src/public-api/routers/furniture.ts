@@ -32,6 +32,23 @@ export const furnitureRouter = new Hono<Env>()
 		}
 	)
 	.get(
+		'/attributes',
+		loggedInMiddleware,
+		zValidator(
+			'query',
+			z.object({
+				key: z.string().optional(),
+			})
+		),
+		async (ctx) => {
+			const key = ctx.req.valid('query').key;
+			if (key) {
+				return ctx.json(wrapRpcData(await ctx.env.PUBLIC_STORE.getAttributeValues(key)));
+			}
+			return ctx.json(wrapRpcData(await ctx.env.PUBLIC_STORE.listAttributes()));
+		}
+	)
+	.get(
 		'/:id',
 		loggedInMiddleware,
 		zValidator(

@@ -31,6 +31,7 @@ export type RoomStoreState = RoomState & {
 
 	// furniture APIs
 	addFurniture: (init: Omit<RoomFurniturePlacement, 'id'>) => Promise<string>;
+	updateFurnitureId: (id: PrefixedId<'fp'>, furnitureId: PrefixedId<'f'>) => Promise<string>;
 	moveFurniture: (
 		id: PrefixedId<'fp'>,
 		transform: {
@@ -99,8 +100,8 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 					layouts: {},
 					lights: {},
 					globalLighting: {
-						intensity: 0.8,
-						color: 2.7,
+						intensity: 1.5,
+						color: 6.3,
 					},
 
 					updateWalls: async (walls) => {
@@ -195,6 +196,25 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 
 						return placementId;
 					},
+					updateFurnitureId: async (id, furnitureId) => {
+						await socket.request({
+							type: 'updateFurniture',
+							roomId,
+							roomLayoutId: getLayoutId(),
+							data: {
+								id,
+								furnitureId,
+							},
+						});
+						updateLayout((layout) => {
+							const furniture = layout.furniture[id];
+							if (!furniture) {
+								throw new Error(`Cannot update furniture ${id}; not found`);
+							}
+							furniture.furnitureId = furnitureId;
+						});
+						return furnitureId;
+					},
 					moveFurniture: async (id, { position, rotation }) => {
 						await socket.request({
 							type: 'updateFurniture',
@@ -282,6 +302,7 @@ export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =
 						});
 					},
 					updateGlobalLighting: async (update) => {
+						console.log('updateGlobalLighting', update);
 						await socket.request({
 							type: 'updateGlobalLighting',
 							roomId,
@@ -337,6 +358,10 @@ export function useDeleteFurniturePlacement(id: PrefixedId<'fp'>) {
 
 export function useFurniturePlacementFurnitureId(id: PrefixedId<'fp'>) {
 	return useRoomStore((s) => (s.viewingLayoutId ? (s.layouts[s.viewingLayoutId].furniture[id]?.furnitureId ?? null) : null));
+}
+
+export function useSetFurniturePlacementFurnitureId() {
+	return useRoomStore((s) => s.updateFurnitureId);
 }
 
 export function useAddFurniture() {

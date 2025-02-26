@@ -3,7 +3,7 @@ import { useDeleteLightPlacement, useGlobalLighting } from '@/stores/roomStore/r
 import { PrefixedId } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { Button, colors, Slider } from '@react-three/uikit-default';
-import { ArrowLeftIcon, Trash } from '@react-three/uikit-lucide';
+import { ArrowLeftIcon, SunIcon, Trash } from '@react-three/uikit-lucide';
 import { Surface } from '../../ui/Surface';
 
 export const Lighting = () => {
@@ -22,9 +22,12 @@ const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
 
 	return (
 		<Container flexDirection="column" width="100%" height="100%" padding={10} gap={10}>
-			<Text fontSize={20} fontWeight="semi-bold" color={colors.primary} textAlign="center">
-				Lighting
-			</Text>
+			<Container marginX="auto" flexDirection="row" gap={4} alignItems="center" justifyContent="center">
+				<SunIcon color={colors.foreground} width={20} height={20} />
+				<Text fontSize={20} color={colors.foreground}>
+					Lighting
+				</Text>
+			</Container>
 			<Container flexDirection="column" gap={50} flexGrow={1}>
 				<Container flexDirection="column" gap={30}>
 					<Text fontSize={18} fontWeight="bold" color={colors.primary}>

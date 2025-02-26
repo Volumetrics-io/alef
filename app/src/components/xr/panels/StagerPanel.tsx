@@ -2,23 +2,38 @@ import { useRescanRoom } from '@/hooks/useRescanRoom';
 import { useEditorStageMode } from '@/stores/editorStore';
 import { Container, Root } from '@react-three/uikit';
 import { colors, Toggle } from '@react-three/uikit-default';
-import { BoxIcon, HouseIcon, LampDesk, Menu, Sofa, X } from '@react-three/uikit-lucide';
-import { Suspense, useState } from 'react';
+import { BoxIcon, HouseIcon, Menu, Sofa, SunIcon, X } from '@react-three/uikit-lucide';
+import { Suspense, useMemo, useState } from 'react';
 import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
 import { DragController } from '../controls/Draggable';
 import { Surface } from '../ui/Surface';
 import { Furniture } from './staging/Furniture';
 import { Layouts } from './staging/Layouts';
 import { Lighting } from './staging/Lighting';
-
+import { useXR } from '@react-three/xr';
+import { Vector3 } from 'three';
 export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 	const [mode, setMode] = useEditorStageMode();
 	const [isOpen, setIsOpen] = useState(false);
+	const isInXR = useXR((s) => !!s.session);
+
+
+	const position = useMemo(() => {
+		if (!isInXR) {
+			return new Vector3(-0.27, 0, 0.75);
+		}
+		if (isOpen) {
+			return new Vector3(0, -0.15, 0.75);
+		}
+		return new Vector3(0, 0.2, 0.75);
+	}, [isOpen, isInXR]);
 
 	const { canRescan, rescanRoom } = useRescanRoom();
 
+
+
 	return (
-		<DraggableBodyAnchor follow={!isOpen} position={[0, isOpen ? -0.15 : 0.2, 0.75]} lockY={true} distance={0.15}>
+		<DraggableBodyAnchor follow={!isOpen} position={position} lockY={true} distance={0.15}>
 			<Root pixelSize={0.001} flexDirection="column" gap={10}>
 				<Surface flexGrow={0} flexShrink={0} marginX="auto">
 					<Toggle
@@ -38,7 +53,7 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 							<Sofa color={colors.primary} />
 						</Toggle>
 						<Toggle checked={mode === 'lighting'} onClick={() => setMode('lighting')}>
-							<LampDesk color={colors.primary} />
+							<SunIcon color={colors.primary} />
 						</Toggle>
 						{canRescan && (
 							<Toggle onClick={() => rescanRoom()}>

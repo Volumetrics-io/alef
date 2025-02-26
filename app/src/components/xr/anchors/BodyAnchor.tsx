@@ -117,9 +117,9 @@ const XRBodyAnchor = forwardRef<Group, BodyAnchorProps>(({ position = [0, -0.2, 
 const TwoDBodyAnchor = forwardRef<Group, BodyAnchorProps>(({ position = [0, -0.2, -0.8], children, ...groupProps }, ref) => {
 	return (
 		<ScreenSpace depth={1} {...groupProps} ref={ref}>
-			<Billboard scale={0.5} position={position}>
+			<group scale={0.5} position={position}>
 				{children}
-			</Billboard>
+			</group>
 		</ScreenSpace>
 	);
 });

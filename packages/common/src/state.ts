@@ -102,6 +102,22 @@ export function updateRoom(state: RoomState, change: Operation) {
 		case 'deleteLayout':
 			delete state.layouts[change.roomLayoutId];
 			return state;
+		case 'createLayout':
+			if (state.layouts[change.data.id]) {
+				throw new AlefError(AlefError.Code.Conflict, `Room layout ${change.data.id} already exists`);
+			}
+			state.layouts[change.data.id] = {
+				furniture: {},
+				name: 'New layout',
+				...change.data,
+			};
+			return state;
+		case 'updateLayout':
+			if (!state.layouts[change.data.id]) {
+				throw new AlefError(AlefError.Code.NotFound, `Room layout ${change.data.id} not found`);
+			}
+			state.layouts[change.data.id] = { ...state.layouts[change.data.id], ...change.data };
+			return state;
 		default:
 			return state;
 	}

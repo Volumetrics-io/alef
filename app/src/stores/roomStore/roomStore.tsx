@@ -205,6 +205,9 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 								roomId,
 								data: { id: layoutId, name },
 							});
+							if (!get().viewingLayoutId) {
+								set({ viewingLayoutId: layoutId });
+							}
 
 							return layoutId;
 						},
@@ -335,6 +338,14 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 						messageBacklog,
 						walls,
 						viewingLayoutId,
+					};
+				},
+				onRehydrateStorage() {
+					// if no layouts exist, create a default one
+					return (state) => {
+						if (state?.layouts && Object.keys(state.layouts).length === 0) {
+							state.createLayout();
+						}
 					};
 				},
 			}

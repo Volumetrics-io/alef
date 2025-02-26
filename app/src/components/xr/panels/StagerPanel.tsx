@@ -1,9 +1,9 @@
 import { useRescanRoom } from '@/hooks/useRescanRoom';
 import { useMe } from '@/services/publicApi/userHooks';
 import { useEditorStageMode } from '@/stores/editorStore';
-import { Container, Root, Text } from '@react-three/uikit';
+import { Container, Root } from '@react-three/uikit';
 import { colors, Toggle } from '@react-three/uikit-default';
-import { BoxIcon, CircleFadingArrowUpIcon, HouseIcon, Menu, Sofa, SunIcon, X } from '@react-three/uikit-lucide';
+import { BoxIcon, HouseIcon, Menu, SettingsIcon, Sofa, SunIcon, X } from '@react-three/uikit-lucide';
 import { useXR } from '@react-three/xr';
 import { Suspense, useMemo, useState } from 'react';
 import { Vector3 } from 'three';
@@ -13,7 +13,7 @@ import { Surface } from '../ui/Surface';
 import { Furniture } from './staging/Furniture';
 import { Layouts } from './staging/Layouts';
 import { Lighting } from './staging/Lighting';
-import { UpgradePanel } from './staging/UpgradePanel';
+import { SettingsPanel } from './staging/SettingsPanel';
 
 export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 	const [mode, setMode] = useEditorStageMode();
@@ -22,7 +22,7 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 
 	const position = useMemo(() => {
 		if (!isInXR) {
-			return new Vector3(-0.27, 0, 0.75);
+			return new Vector3(0, -0.1, 0.75);
 		}
 		if (isOpen) {
 			return new Vector3(0, -0.15, 0.75);
@@ -64,9 +64,8 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 							</Toggle>
 						)}
 						{!isLoggedIn && (
-							<Toggle onClick={() => setMode('pair')} backgroundColor={colors.secondary}>
-								<CircleFadingArrowUpIcon color={colors.secondaryForeground} />
-								<Text color={colors.secondaryForeground}>Upgrade</Text>
+							<Toggle onClick={() => setMode('settings')}>
+								<SettingsIcon color={colors.secondaryForeground} />
 							</Toggle>
 						)}
 					</Container>
@@ -80,7 +79,7 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 							</Suspense>
 						)}
 						{mode === 'layout' && <Layouts />}
-						{mode === 'pair' && <UpgradePanel />}
+						{mode === 'settings' && <SettingsPanel />}
 						{mode !== null && (
 							<DragController>
 								<Container flexDirection="row" width="70%" gap={10} alignItems="center">

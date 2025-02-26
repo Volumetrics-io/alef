@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { HeadsetLogin } from '../../auth/HeadsetLogin';
 import { Surface } from '../../ui/Surface';
 
-export function UpgradePanel() {
+export function SettingsPanel() {
 	const [isPairing, setIsPairing] = useState(false);
 	return (
 		<Surface flexDirection="column" flexWrap="no-wrap" width={300} gap={10} marginX="auto">
@@ -16,14 +16,11 @@ export function UpgradePanel() {
 function Explainer({ onPair }: { onPair: () => void }) {
 	return (
 		<>
-			<Text fontSize={20} fontWeight="semi-bold" color={colors.foreground} textAlign="center">
-				Upgrade to Pro
+			<Text fontSize={14} fontWeight="semi-bold" color={colors.foreground}>
+				Device pairing
 			</Text>
-			<Text fontSize={14} color={colors.foreground}>
-				Unlock unlimited rooms, new furniture, and more.
-			</Text>
-			<Text fontSize={14} color={colors.foreground}>
-				Start by vising alef.io on your phone or computer to sign up. Then put your headset back on to pair it to your account.
+			<Text fontSize={12} color={colors.foreground}>
+				Start from a logged in device, then return to your headset to pair it to your account.
 			</Text>
 			<Button onClick={onPair} backgroundColor={colors.primary}>
 				<Text color={colors.primaryForeground}>Pair This Headset</Text>

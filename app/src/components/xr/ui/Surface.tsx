@@ -9,6 +9,6 @@ export const Surface = withProps(Container, {
 	borderWidth: 1,
 	borderColor: colors.border,
 	borderRadius: 10,
-	padding: 5,
+	padding: 10,
 	backgroundColor: colors.background,
 });

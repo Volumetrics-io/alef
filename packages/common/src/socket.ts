@@ -1,6 +1,7 @@
 import { AlefErrorCode } from './error';
 import { PrefixedId } from './ids';
-import { RoomFurniturePlacement, RoomGlobalLighting, RoomLayout, RoomLightPlacement, RoomState, RoomWallData, Updates } from './state';
+import { Operation } from './operations';
+import { RoomLayout, RoomState } from './state';
 
 export interface BaseServerMessage {
 	/**
@@ -54,90 +55,12 @@ export interface ClientRequestRoomMessage extends BaseClientMessage {
 	roomId: PrefixedId<'r'>;
 }
 
-export interface ClientCreateLayoutMessage extends BaseClientMessage {
-	type: 'createLayout';
-	roomId: PrefixedId<'r'>;
-	data: Pick<RoomLayout, 'name' | 'icon' | 'type'>;
+export interface ClientApplyOperationsMessage extends BaseClientMessage {
+	type: 'applyOperations';
+	operations: Operation[];
 }
 
-export interface ClientDeleteRoomLayoutMessage extends BaseClientMessage {
-	type: 'deleteLayout';
-	roomId: PrefixedId<'r'>;
-	roomLayoutId: PrefixedId<'rl'>;
-}
-
-export interface ClientUpdateWallsMessage extends BaseClientMessage {
-	type: 'updateWalls';
-	roomId: PrefixedId<'r'>;
-	walls: RoomWallData[];
-}
-
-export interface ClientAddFurnitureMessage extends BaseClientMessage {
-	type: 'addFurniture';
-	roomId: PrefixedId<'r'>;
-	roomLayoutId: PrefixedId<'rl'>;
-	data: RoomFurniturePlacement;
-}
-
-export interface ClientUpdateFurnitureMessage extends BaseClientMessage {
-	type: 'updateFurniture';
-	roomId: PrefixedId<'r'>;
-	roomLayoutId: PrefixedId<'rl'>;
-	data: Updates<RoomFurniturePlacement>;
-}
-
-export interface ClientRemoveFurnitureMessage extends BaseClientMessage {
-	type: 'removeFurniture';
-	roomId: PrefixedId<'r'>;
-	roomLayoutId: PrefixedId<'rl'>;
-	id: RoomFurniturePlacement['id'];
-}
-
-export interface ClientAddLightMessage extends BaseClientMessage {
-	type: 'addLight';
-	roomId: PrefixedId<'r'>;
-	data: RoomLightPlacement;
-}
-
-export interface ClientUpdateLightMessage extends BaseClientMessage {
-	type: 'updateLight';
-	roomId: PrefixedId<'r'>;
-	data: Updates<RoomLightPlacement>;
-}
-
-export interface ClientRemoveLightMessage extends BaseClientMessage {
-	type: 'removeLight';
-	roomId: PrefixedId<'r'>;
-	id: RoomLightPlacement['id'];
-}
-
-export interface ClientUpdateGlobalLightingMessage extends BaseClientMessage {
-	type: 'updateGlobalLighting';
-	roomId: PrefixedId<'r'>;
-	data: Partial<RoomGlobalLighting>;
-}
-
-export interface ClientUpdateRoomLayoutMessage extends BaseClientMessage {
-	type: 'updateLayout';
-	roomId: PrefixedId<'r'>;
-	// only some properties are editable with this message.
-	data: Pick<RoomLayout, 'id' | 'name' | 'icon' | 'type'>;
-}
-
-export type ClientMessage =
-	| ClientPingMessage
-	| ClientCreateLayoutMessage
-	| ClientRequestRoomMessage
-	| ClientUpdateWallsMessage
-	| ClientAddFurnitureMessage
-	| ClientUpdateFurnitureMessage
-	| ClientRemoveFurnitureMessage
-	| ClientAddLightMessage
-	| ClientUpdateLightMessage
-	| ClientRemoveLightMessage
-	| ClientUpdateGlobalLightingMessage
-	| ClientUpdateRoomLayoutMessage
-	| ClientDeleteRoomLayoutMessage;
+export type ClientMessage = ClientPingMessage | ClientRequestRoomMessage | ClientApplyOperationsMessage;
 
 type DistributiveOmit<T, K extends keyof any> = T extends any ? Omit<T, K> : never;
 export type ClientMessageWithoutId = DistributiveOmit<ClientMessage, 'messageId'>;

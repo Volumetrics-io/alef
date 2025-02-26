@@ -1,22 +1,24 @@
 import { useRescanRoom } from '@/hooks/useRescanRoom';
+import { useMe } from '@/services/publicApi/userHooks';
 import { useEditorStageMode } from '@/stores/editorStore';
-import { Container, Root } from '@react-three/uikit';
+import { Container, Root, Text } from '@react-three/uikit';
 import { colors, Toggle } from '@react-three/uikit-default';
-import { BoxIcon, HouseIcon, Menu, Sofa, SunIcon, X } from '@react-three/uikit-lucide';
+import { BoxIcon, CircleFadingArrowUpIcon, HouseIcon, Menu, Sofa, SunIcon, X } from '@react-three/uikit-lucide';
+import { useXR } from '@react-three/xr';
 import { Suspense, useMemo, useState } from 'react';
+import { Vector3 } from 'three';
 import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
 import { DragController } from '../controls/Draggable';
 import { Surface } from '../ui/Surface';
 import { Furniture } from './staging/Furniture';
 import { Layouts } from './staging/Layouts';
 import { Lighting } from './staging/Lighting';
-import { useXR } from '@react-three/xr';
-import { Vector3 } from 'three';
+import { UpgradePanel } from './staging/UpgradePanel';
+
 export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 	const [mode, setMode] = useEditorStageMode();
 	const [isOpen, setIsOpen] = useState(false);
 	const isInXR = useXR((s) => !!s.session);
-
 
 	const position = useMemo(() => {
 		if (!isInXR) {
@@ -30,7 +32,8 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 
 	const { canRescan, rescanRoom } = useRescanRoom();
 
-
+	const { data: session } = useMe();
+	const isLoggedIn = !!session;
 
 	return (
 		<DraggableBodyAnchor follow={!isOpen} position={position} lockY={true} distance={0.15}>
@@ -60,6 +63,12 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 								<BoxIcon color={colors.primary} />
 							</Toggle>
 						)}
+						{!isLoggedIn && (
+							<Toggle onClick={() => setMode('pair')} backgroundColor={colors.secondary}>
+								<CircleFadingArrowUpIcon color={colors.secondaryForeground} />
+								<Text color={colors.secondaryForeground}>Upgrade</Text>
+							</Toggle>
+						)}
 					</Container>
 				</Surface>
 				{isOpen && (
@@ -71,6 +80,7 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 							</Suspense>
 						)}
 						{mode === 'layout' && <Layouts />}
+						{mode === 'pair' && <UpgradePanel />}
 						{mode !== null && (
 							<DragController>
 								<Container flexDirection="row" width="70%" gap={10} alignItems="center">

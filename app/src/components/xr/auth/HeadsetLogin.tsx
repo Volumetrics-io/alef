@@ -1,11 +1,10 @@
 import { isQuest } from '@/services/os';
 import { useDeviceDiscovery, useDiscoverySuggest } from '@/services/publicApi/deviceHooks';
 import { PrefixedId } from '@alef/common';
-import { Container, Root, Text } from '@react-three/uikit';
+import { Container, Text } from '@react-three/uikit';
 import { Button, colors } from '@react-three/uikit-default';
 import { HourglassIcon } from '@react-three/uikit-lucide';
 import { useState } from 'react';
-import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
 import { Surface } from '../ui/Surface';
 
 export function HeadsetLogin() {
@@ -30,16 +29,12 @@ export function HeadsetLogin() {
 	};
 
 	return (
-		<DraggableBodyAnchor follow position={[0, -0.3, 0.5]} lockY distance={0.15}>
-			<Root pixelSize={0.001} flexDirection="column" gap={10}>
-				<Surface flexDirection="column" flexWrap="no-wrap" maxWidth={400} padding={8}>
-					<Text fontSize={8} color={colors.foreground}>
-						Pair this device
-					</Text>
-					{selectedDevice ? <WaitingToPair selectedDevice={selectedDevice} onCancel={() => setSelectedDevice(null)} /> : <DeviceList onSelect={pairWithDevice} devices={devices} />}
-				</Surface>
-			</Root>
-		</DraggableBodyAnchor>
+		<Surface flexDirection="column" flexWrap="no-wrap" maxWidth={400} padding={8}>
+			<Text fontSize={8} color={colors.foreground}>
+				Pair this device
+			</Text>
+			{selectedDevice ? <WaitingToPair selectedDevice={selectedDevice} onCancel={() => setSelectedDevice(null)} /> : <DeviceList onSelect={pairWithDevice} devices={devices} />}
+		</Surface>
 	);
 }
 

@@ -6,10 +6,7 @@ const PropertySocketContext = createContext<PropertySocket | null>(null);
 
 export function usePropertySocket() {
 	const value = useContext(PropertySocketContext);
-	if (value === null) {
-		throw new Error('usePropertySocket must be used within a PropertySocketProvider');
-	}
-	return value;
+	return value || null;
 }
 
 export const PropertySocketProvider = ({ children, propertyId }: { children: ReactNode; propertyId: PrefixedId<'p'> }) => {

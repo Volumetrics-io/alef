@@ -7,7 +7,7 @@ import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
 import { usePlanesStore } from './planesStore';
 
-export type StageMode = 'lighting' | 'furniture' | 'layout' | null;
+export type StageMode = 'lighting' | 'furniture' | 'layout' | 'pair' | null;
 
 export type EditorStore = {
 	mode: StageMode;

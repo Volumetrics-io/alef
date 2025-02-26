@@ -3,7 +3,7 @@ import { useActiveRoomLayoutId, useCreateRoomLayout, useDeleteRoomLayout, useRoo
 import { PrefixedId, RoomType } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { Button, colors } from '@react-three/uikit-default';
-import { ArrowRightIcon, CheckIcon, PencilIcon } from '@react-three/uikit-lucide';
+import { ArrowRightIcon, CheckIcon, HouseIcon, PencilIcon } from '@react-three/uikit-lucide';
 import { useEffect, useState } from 'react';
 import { LayoutIcon } from '../../room/LayoutIcon';
 import { RoomTypePicker } from '../../ui/RoomTypePicker';
@@ -18,9 +18,12 @@ export function Layouts({ readonly }: { readonly?: boolean }) {
 	return (
 		<>
 			<Surface flexDirection="column" flexWrap="no-wrap" flexGrow={1} height={420} width={500} gap={10} padding={10}>
-				<Text fontSize={20} fontWeight="semi-bold" color={colors.foreground} textAlign="center" margin={10}>
-					Layouts
-				</Text>
+				<Container marginX="auto" flexDirection="row" gap={4} alignItems="center" justifyContent="center">
+					<HouseIcon color={colors.foreground} width={20} height={20} />
+					<Text fontSize={20} color={colors.foreground}>
+						Layouts
+					</Text>
+				</Container>
 				<Container flexDirection="column" flexGrow={1} flexShrink={0} justifyContent="space-between">
 					<Container flexDirection="column" gap={4} overflow="scroll" paddingRight={6} scrollbarWidth={5} scrollbarBorderRadius={2} scrollbarColor={colors.primary}>
 						{layoutIds.map((layoutId) => (

@@ -25,7 +25,7 @@ export function Furniture() {
 				</SmallButton>
 				<Container marginX="auto" flexDirection="row" gap={4} alignItems="center" justifyContent="center">
 					<SofaIcon color={colors.primary} width={20} height={20} />
-					<Text fontSize={18} color={colors.primary}>Furniture</Text>
+					<Text fontSize={20} color={colors.primary}>Furniture</Text>
 				</Container>
 			</Container>
 			<FurnitureCollection key={type?.value ?? 'all'} type={type?.value ?? null} attributes={type ? [...filters, type] : filters} />

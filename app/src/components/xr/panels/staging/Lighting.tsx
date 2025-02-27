@@ -29,14 +29,14 @@ const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
 				</Text>
 			</Container>
 			<Container flexDirection="column" gap={50} flexGrow={1}>
-				<Container flexDirection="column" gap={30}>
-					<Text fontSize={18} fontWeight="bold" color={colors.primary}>
+				<Container flexDirection="column" gap={10}>
+					<Text fontSize={18} color={colors.primary}>
 						Intensity
 					</Text>
 					<Slider value={globalIntensity} min={0} max={2} step={0.01} onValueChange={(v) => updateGlobal({ intensity: v })} />
 				</Container>
-				<Container flexDirection="column" gap={30} width="100%">
-					<Text fontSize={18} fontWeight="bold" color={colors.primary}>
+				<Container flexDirection="column" gap={10} width="100%">
+					<Text fontSize={18} color={colors.primary}>
 						Warmth
 					</Text>
 					<Slider value={globalColor} min={0} max={10} step={0.1} onValueChange={(v) => updateGlobal({ color: v })} />

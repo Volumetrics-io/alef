@@ -53,7 +53,7 @@ function LayoutItem({ layoutId, onEdit }: { layoutId: PrefixedId<'rl'>; onEdit?:
 			<Button onClick={() => set(layoutId)} justifyContent="space-between" flexGrow={1} gap={4} backgroundColor={active === layoutId ? colors.primary : colors.muted}>
 				<Container margin="auto" flexDirection="row" gap={4} alignItems="center">
 					<LayoutIcon icon={layoutData?.icon ?? layoutData?.type ?? 'living-room'} color={active === layoutId ? colors.primaryForeground : colors.mutedForeground} />
-					<Text color={active === layoutId ? colors.primaryForeground : colors.mutedForeground}>
+					<Text fontFamily="ibm-plex-sans" color={active === layoutId ? colors.primaryForeground : colors.mutedForeground}>
 						{layoutData?.name ?? 'Unnamed layout'}
 					</Text>
 				</Container>
@@ -77,7 +77,7 @@ function NewLayoutButton({ onNew }: { onNew: (id: PrefixedId<'rl'>) => void }) {
 				onNew(id);
 			}}
 		>
-			<Text>New Layout</Text>
+			<Text fontFamily="ibm-plex-sans">Add Layout</Text>
 		</Button>
 	);
 }

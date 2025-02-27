@@ -1,6 +1,6 @@
 import { useRescanRoom } from '@/hooks/useRescanRoom';
 import { useEditorStageMode } from '@/stores/editorStore';
-import { Container, Root } from '@react-three/uikit';
+import { Container, FontFamilyProvider, Root } from '@react-three/uikit';
 import { colors, Toggle } from '@react-three/uikit-default';
 import { BoxIcon, HouseIcon, Menu, Sofa, SunIcon, X } from '@react-three/uikit-lucide';
 import { Suspense, useMemo, useState } from 'react';
@@ -35,6 +35,28 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 	return (
 		<DraggableBodyAnchor follow={!isOpen} position={position} lockY={true} distance={0.15}>
 			<Root pixelSize={0.001} flexDirection="column" gap={10}>
+			<FontFamilyProvider
+						bricolage-grotesque={{
+							thin: './fonts/msdf/bricolage/BricolageGrotesque-Thin.json',
+							'extra-light': './fonts/msdf/bricolage/BricolageGrotesque-ExtraLight.json',
+							light: './fonts/msdf/bricolage/BricolageGrotesque-Light.json',
+							medium: './fonts/msdf/bricolage/BricolageGrotesque-Medium.json',
+							normal: './fonts/msdf/bricolage/BricolageGrotesque-Regular.json',
+							'semi-bold': './fonts/msdf/bricolage/BricolageGrotesque-SemiBold.json',
+							bold: './fonts/msdf/bricolage/BricolageGrotesque-Bold.json',
+							'extra-bold': './fonts/msdf/bricolage/BricolageGrotesque-ExtraBold.json',
+						}}
+						ibm-plex-sans={{
+							thin: './fonts/msdf/ibm-plex/IBMPlexSans-Thin.json',
+							'extra-light': './fonts/msdf/ibm-plex/IBMPlexSans-ExtraLight.json',
+							light: './fonts/msdf/ibm-plex/IBMPlexSans-Light.json',
+							medium: './fonts/msdf/ibm-plex/IBMPlexSans-Medium.json',
+							normal: './fonts/msdf/ibm-plex/IBMPlexSans-Regular.json',
+							'semi-bold': './fonts/msdf/ibm-plex/IBMPlexSans-SemiBold.json',
+							bold: './fonts/msdf/ibm-plex/IBMPlexSans-Bold.json',
+							'extra-bold': './fonts/msdf/ibm-plex/IBMPlexSans-ExtraBold.json',
+						}}
+					>
 				<Surface flexGrow={0} flexShrink={0} marginX="auto">
 					<Toggle
 						onClick={() => {
@@ -80,6 +102,7 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 						)}
 					</>
 				)}
+			</FontFamilyProvider>
 			</Root>
 		</DraggableBodyAnchor>
 	);

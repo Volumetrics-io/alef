@@ -8,11 +8,10 @@ import { Handle } from '@react-three/handle';
 import { Container, Root } from '@react-three/uikit';
 import { Button, colors } from '@react-three/uikit-default';
 import { ArrowLeft, ArrowRight, Trash } from '@react-three/uikit-lucide';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { Group } from 'three';
 import { CollisionModel, FurnitureModel } from './FurnitureModel';
 import { Billboard } from '../Billboard';
-import { Surface } from '../ui/Surface';
 import { useFurnitureDetails, useAllFurniture } from '@/services/publicApi/furnitureHooks';
 
 export interface PlacedFurnitureProps {

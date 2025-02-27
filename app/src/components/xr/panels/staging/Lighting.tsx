@@ -2,9 +2,11 @@ import { useEditorStageMode, useSelectedLightPlacementId } from '@/stores/editor
 import { useDeleteLightPlacement, useGlobalLighting } from '@/stores/roomStore/roomStore';
 import { PrefixedId } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
-import { Button, colors, Slider } from '@react-three/uikit-default';
+import { Slider } from '@react-three/uikit-default';
 import { ArrowLeftIcon, SunIcon, Trash } from '@react-three/uikit-lucide';
 import { Surface } from '../../ui/Surface';
+import { Button } from '../../ui/Button';
+import { colors } from '../../ui/theme';
 
 export const Lighting = () => {
 	const selectedLightId = useSelectedLightPlacementId();
@@ -23,20 +25,20 @@ const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
 	return (
 		<Container flexDirection="column" width="100%" height="100%" padding={10} gap={10}>
 			<Container marginX="auto" flexDirection="row" gap={4} alignItems="center" justifyContent="center">
-				<SunIcon color={colors.foreground} width={20} height={20} />
-				<Text fontSize={20} color={colors.foreground}>
+				<SunIcon width={20} height={20} />
+				<Text fontSize={20}>
 					Lighting
 				</Text>
 			</Container>
 			<Container flexDirection="column" gap={50} flexGrow={1}>
 				<Container flexDirection="column" gap={10}>
-					<Text fontSize={18} color={colors.primary}>
+					<Text fontSize={18}>
 						Intensity
 					</Text>
 					<Slider value={globalIntensity} min={0} max={2} step={0.01} onValueChange={(v) => updateGlobal({ intensity: v })} />
 				</Container>
 				<Container flexDirection="column" gap={10} width="100%">
-					<Text fontSize={18} color={colors.primary}>
+					<Text fontSize={18}>
 						Warmth
 					</Text>
 					<Slider value={globalColor} min={0} max={10} step={0.1} onValueChange={(v) => updateGlobal({ color: v })} />
@@ -56,8 +58,8 @@ function DeleteButton({ id }: { id: PrefixedId<'lp'> }) {
 	const deleteLight = useDeleteLightPlacement(id);
 	return (
 		<Container flexDirection="row" gap={10} alignItems="center">
-			<Button backgroundColor={colors.destructive} onClick={deleteLight}>
-				<Trash color={colors.destructiveForeground} />
+			<Button variant="destructive" onClick={deleteLight}>
+				<Trash />
 			</Button>
 		</Container>
 	);

@@ -1,5 +1,5 @@
 import { Root, Text } from '@react-three/uikit';
-import { colors } from '@react-three/uikit-default';
+import { colors } from './ui/theme';
 import { CircleAlertIcon, CircleCheckIcon, HourglassIcon, InfoIcon } from '@react-three/uikit-lucide';
 import { useEffect } from 'react';
 import toast, { useToaster } from 'react-hot-toast';
@@ -26,7 +26,7 @@ export function XRToaster({ debug }: { debug?: boolean }) {
 					return (
 						<Surface key={toast.id} flexDirection="row" flexWrap="wrap" maxWidth={400} padding={8} onPointerOver={handlers.startPause} onPointerOut={handlers.endPause}>
 							{toastIcons[toast.type] ?? <InfoIcon />}
-							<Text color={colors.foreground}>{toast.message}</Text>
+							<Text>{toast.message}</Text>
 						</Surface>
 					);
 				})}
@@ -36,10 +36,10 @@ export function XRToaster({ debug }: { debug?: boolean }) {
 }
 
 const toastIcons = {
-	error: <CircleAlertIcon color={colors.destructive} />,
-	info: <InfoIcon color={colors.primary} />,
-	success: <CircleCheckIcon color={colors.primary} />,
-	loading: <HourglassIcon color={colors.foreground} />,
+	error: <CircleAlertIcon color={colors.destructiveInk} />,
+	info: <InfoIcon color={colors.attentionInk} />,
+	success: <CircleCheckIcon color={colors.ink} />,
+	loading: <HourglassIcon color={colors.ink} />,
 	blank: null,
 	custom: null,
 };

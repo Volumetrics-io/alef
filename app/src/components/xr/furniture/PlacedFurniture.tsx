@@ -6,13 +6,14 @@ import { Bvh } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { Handle } from '@react-three/handle';
 import { Container, Root } from '@react-three/uikit';
-import { Button, colors } from '@react-three/uikit-default';
+import { colors } from '../ui/theme';
 import { ArrowLeft, ArrowRight, Trash } from '@react-three/uikit-lucide';
 import { useCallback, useRef } from 'react';
 import { Group } from 'three';
 import { CollisionModel, FurnitureModel } from './FurnitureModel';
 import { Billboard } from '../Billboard';
 import { useFurnitureDetails, useAllFurniture } from '@/services/publicApi/furnitureHooks';
+import { Button } from '../ui/Button';
 
 export interface PlacedFurnitureProps {
 	furniturePlacementId: PrefixedId<'fp'>;
@@ -119,13 +120,13 @@ function PlaceFurnitureUI({ furniturePlacementId, furnitureId, setFurnitureId, h
 		<Billboard lockX lockZ position={[0, height, 0]}>
 			<Root pixelSize={0.005}>
 				<Container width="100%" height="100%" gap={20}>
-					<Button borderRadius={5} onClick={handlePrevious}>
+					<Button onClick={handlePrevious}>
 						<ArrowLeft />
 					</Button>
-					<Button backgroundColor={colors.destructive} borderRadius={5} onClick={handleDelete}>
+					<Button variant="destructive" onClick={handleDelete}>
 						<Trash />
 					</Button>
-					<Button borderRadius={5} onClick={handleNext}>
+					<Button onClick={handleNext}>
 						<ArrowRight />
 					</Button>
 				</Container>

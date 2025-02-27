@@ -1,7 +1,7 @@
 import { useRescanRoom } from '@/hooks/useRescanRoom';
 import { useEditorStageMode } from '@/stores/editorStore';
-import { Container, FontFamilyProvider, Root } from '@react-three/uikit';
-import { colors, Toggle } from '@react-three/uikit-default';
+import { Container, FontFamilyProvider, Root, setPreferredColorScheme } from '@react-three/uikit';
+import { colors, Defaults, Toggle } from '@react-three/uikit-default';
 import { BoxIcon, HouseIcon, Menu, Sofa, SunIcon, X } from '@react-three/uikit-lucide';
 import { Suspense, useMemo, useState } from 'react';
 import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
@@ -31,11 +31,11 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 	const { canRescan, rescanRoom } = useRescanRoom();
 
 
-
 	return (
 		<DraggableBodyAnchor follow={!isOpen} position={position} lockY={true} distance={0.15}>
 			<Root pixelSize={0.001} flexDirection="column" gap={10}>
-			<FontFamilyProvider
+				<Defaults>
+					<FontFamilyProvider
 						bricolage-grotesque={{
 							thin: './fonts/msdf/bricolage/BricolageGrotesque-Thin.json',
 							'extra-light': './fonts/msdf/bricolage/BricolageGrotesque-ExtraLight.json',
@@ -102,7 +102,8 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 						)}
 					</>
 				)}
-			</FontFamilyProvider>
+				</FontFamilyProvider>
+				</Defaults>
 			</Root>
 		</DraggableBodyAnchor>
 	);

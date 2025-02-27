@@ -10,7 +10,7 @@ import { Vector3 } from 'three';
 import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
 import { DragController } from '../controls/Draggable';
 import { Surface } from '../ui/Surface';
-import { Furniture } from './staging/Furniture';
+import { FurniturePanel } from './staging/furniture/FurniturePanel';
 import { Layouts } from './staging/Layouts';
 import { Lighting } from './staging/Lighting';
 import { SettingsPanel } from './staging/SettingsPanel';
@@ -75,7 +75,7 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 						{mode === 'lighting' && <Lighting />}
 						{mode === 'furniture' && (
 							<Suspense>
-								<Furniture />
+								<FurniturePanel />
 							</Suspense>
 						)}
 						{mode === 'layout' && <Layouts />}

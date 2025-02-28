@@ -75,6 +75,10 @@ registerRoute(
 			return true;
 		}
 
+		if (url.pathname.startsWith('/properties')) {
+			return true;
+		}
+
 		return false;
 	},
 	// try network first if available -- we only want cached versions

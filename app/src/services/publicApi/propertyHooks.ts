@@ -1,13 +1,13 @@
 import { PrefixedId } from '@alef/common';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { publicApiClient } from './client';
-import { handleErrors } from './utils';
+import { fallbackWhenOfflineOrError, handleErrors } from './utils';
 
 export function useAllProperties() {
 	return useSuspenseQuery({
 		queryKey: ['properties'],
 		queryFn: async () => {
-			return handleErrors(publicApiClient.properties.$get());
+			return fallbackWhenOfflineOrError(publicApiClient.properties.$get(), []);
 		},
 	});
 }

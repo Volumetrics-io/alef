@@ -37,7 +37,7 @@ const buttonVariants = {
     secondary: { 
       containerHoverProps: {
         backgroundColor: colors.secondaryHover,
-        borderColor: colors.secondaryFaded,
+        borderColor: colors.secondaryFaded
       },
       containerProps: {
           backgroundColor: colors.secondarySurface,
@@ -90,10 +90,10 @@ const buttonVariants = {
   }
 
   const buttonSizes = {
-    default: { height: 40, paddingX: 16, paddingY: 8 },
+    default: { height: 40, paddingX: 16},
     sm: { height: 36, paddingX: 12 },
     lg: { height: 42, paddingX: 32 },
-    icon: { height: 40, width: 40 },
+    icon: { height: 42, width: 42 },
   } satisfies { [Key in string]: ContainerProperties }
   
   export type ButtonProperties = ContainerProperties & {

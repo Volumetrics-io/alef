@@ -52,7 +52,7 @@ const DARK_HUE = {
     selection: 285
 }
 
-const theme = {
+export const theme = {
     light: {
         focus: oklch(66, 50, 284),
         required: hsl(0, 100, 70),

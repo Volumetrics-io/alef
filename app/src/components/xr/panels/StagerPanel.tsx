@@ -1,7 +1,7 @@
 import { useRescanRoom } from '@/hooks/useRescanRoom';
 import { useEditorStageMode } from '@/stores/editorStore';
-import { Container, FontFamilyProvider, Root, setPreferredColorScheme } from '@react-three/uikit';
-import { colors, Defaults, Toggle } from '@react-three/uikit-default';
+import { Container, FontFamilyProvider, Root } from '@react-three/uikit';
+import { colors, Defaults } from '@react-three/uikit-default';
 import { BoxIcon, HouseIcon, Menu, Sofa, SunIcon, X } from '@react-three/uikit-lucide';
 import { Suspense, useMemo, useState } from 'react';
 import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
@@ -12,6 +12,9 @@ import { Layouts } from './staging/Layouts';
 import { Lighting } from './staging/Lighting';
 import { useXR } from '@react-three/xr';
 import { Vector3 } from 'three';
+import { Selector, SelectorItem } from '../ui/Selector';
+import { Button } from '../ui/Button';
+
 export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 	const [mode, setMode] = useEditorStageMode();
 	const [isOpen, setIsOpen] = useState(false);
@@ -57,33 +60,34 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 							'extra-bold': './fonts/msdf/ibm-plex/IBMPlexSans-ExtraBold.json',
 						}}
 					>
-				<Surface flexGrow={0} flexShrink={0} marginX="auto">
-					<Toggle
+				<Container alignItems="center" flexGrow={0} flexShrink={0} gap={4} marginX="auto">
+					<Button size="icon" variant={isOpen ? 'destructive' : 'default'}
 						onClick={() => {
 							setMode(null);
 							setIsOpen(!isOpen);
-							onToggle?.();
 						}}
 					>
-						{isOpen ? <X color={colors.primary} /> : <Menu color={colors.primary} />}
-					</Toggle>
-					<Container display={isOpen ? 'flex' : 'none'} flexDirection="row" alignItems={'center'} gap={10}>
-						<Toggle checked={mode === 'layout'} onClick={() => setMode('layout')}>
-							<HouseIcon color={colors.primary} />
-						</Toggle>
-						<Toggle checked={mode === 'furniture'} onClick={() => setMode('furniture')}>
-							<Sofa color={colors.primary} />
-						</Toggle>
-						<Toggle checked={mode === 'lighting'} onClick={() => setMode('lighting')}>
-							<SunIcon color={colors.primary} />
-						</Toggle>
-						{canRescan && (
-							<Toggle onClick={() => rescanRoom()}>
-								<BoxIcon color={colors.primary} />
-							</Toggle>
-						)}
-					</Container>
-				</Surface>
+						{isOpen ? <X /> : <Menu />}
+					</Button>
+					{isOpen && (
+						<>
+						<Selector flexDirection="row" size="small">
+							<SelectorItem selected={mode === 'layout'} onClick={() => setMode('layout')}>
+								<HouseIcon />
+							</SelectorItem>
+							<SelectorItem selected={mode === 'furniture'} onClick={() => setMode('furniture')}>
+								<Sofa />
+							</SelectorItem>
+							<SelectorItem selected={mode === 'lighting'} onClick={() => setMode('lighting')}>
+								<SunIcon />
+							</SelectorItem>
+						</Selector>
+						<Button size="icon" onClick={() => rescanRoom()}>
+							<BoxIcon />
+						</Button>
+						</>
+					)}
+				</Container>
 				{isOpen && (
 					<>
 						{mode === 'lighting' && <Lighting />}

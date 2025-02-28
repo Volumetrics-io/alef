@@ -126,10 +126,10 @@ function EditLayout({ layoutId, onClose }: { layoutId: PrefixedId<'rl'>; onClose
 					<Button variant="destructive" onClick={deleteSelf} marginRight="auto">
 						<Text>{confirmRequired ? 'Confirm' : 'Delete'}</Text>
 					</Button>
-					<Button variant="secondary" onClick={onClose}>
+					<Button onClick={onClose}>
 						<Text>Close</Text>
 					</Button>
-					<Button variant="link" onClick={save}>
+					<Button variant="secondary" onClick={save}>
 						<Text>Save</Text>
 					</Button>
 				</Container>

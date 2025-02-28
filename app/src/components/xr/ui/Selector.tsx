@@ -4,20 +4,19 @@ import { borderRadius } from '@react-three/uikit-default';
 import { useState } from 'react';
 
 export interface SelectorProps {
-	direction?: 'row' | 'column';
 	wrap?: boolean;
 	size?: 'small' | 'medium';
 }
 
 const selectorSizeVariants = {
     small: {
-        paddingY: 4,
-        paddingX: 8,
+        paddingY: 8,
+        paddingX: 12,
         gap: 4,
     },
     medium: {
-        paddingY: 8,
-        paddingX: 12,
+        paddingY: 12,
+        paddingX: 16,
         gap: 8,
         
     },
@@ -27,6 +26,7 @@ export function Selector({ size = 'medium', children, ...props }: SelectorProps 
 
 	return (
 		<Container 
+        backgroundColor={colors.selectionSurface}
         flexShrink={0}
         borderRadius={borderRadius.md}
         borderWidth={1}

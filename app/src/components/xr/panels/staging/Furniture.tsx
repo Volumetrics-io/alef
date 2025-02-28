@@ -168,15 +168,15 @@ function FurnitureAddButton({ furnitureItem }: { furnitureItem: FurnitureItem })
 	const [hovered, setHovered] = useState(false);
 	return (
 		<Button
+			variant="link"
+			width={30}
+			height={30}
+			padding={4}
 			onHoverChange={(hovered) => setHovered(hovered)}
 			zIndexOffset={hovered ? 10 : 0}
-			height={30}
-			width={30}
-			padding={4}
-			borderRadius={25}
 			positionType="absolute"
-			positionBottom={10}
-			positionRight={10}
+			positionBottom={6}
+			positionRight={6}
 			onClick={() =>
 				addFurniture({
 					furnitureId: furnitureItem.id,

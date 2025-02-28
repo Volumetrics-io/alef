@@ -12,7 +12,7 @@ import type { Attribute } from '@alef/common';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
 import { NavigationRoute, registerRoute } from 'workbox-routing';
-import { StaleWhileRevalidate } from 'workbox-strategies';
+import { NetworkFirst, StaleWhileRevalidate } from 'workbox-strategies';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -54,13 +54,44 @@ registerRoute(
 	})
 );
 
+// route API requests needed for offline mode to a special cache,
+// some of which are prepopulated on install below.
+// Other offline requirement queries can be added here.
+registerRoute(
+	({ url }) => {
+		if (url.origin !== import.meta.env.VITE_PUBLIC_API_ORIGIN) {
+			return false;
+		}
+		// offline furniture core query
+		if (url.pathname === '/furniture' && url.searchParams.has('package') && url.searchParams.get('package') === 'core') {
+			return true;
+		}
+
+		if (url.pathname === '/devices/self') {
+			return true;
+		}
+
+		if (url.pathname === '/users/me') {
+			return true;
+		}
+
+		return false;
+	},
+	// try network first if available -- we only want cached versions
+	// when we're really offline.
+	new NetworkFirst({
+		cacheName: 'offline-requirements',
+		plugins: [new ExpirationPlugin({ maxEntries: 50 })],
+	})
+);
+
 /**
  * On load, preload all 'starter pack' furniture into a special cache if not already
  * present.
  */
 self.addEventListener('install', (event) => {
 	event.waitUntil(
-		caches.open('starter-pack').then(async (cache) => {
+		caches.open('offline-requirements').then(async (cache) => {
 			// precache this query too
 			await cache.add(`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture?${new URLSearchParams({ attribute: `package:core` })}`);
 			const coreFurniture = await fetch(

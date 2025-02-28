@@ -19,7 +19,13 @@ export function SceneWrapper({ children }: SceneWrapperProps) {
 		<Box full style={{ height: '100vh' }}>
 			<ErrorBoundary
 				fallback={
-					<Icon name="triangle-alert" style={{ width: '30vmin', height: '30vmin', transform: 'translate(-50%,-50%)', position: 'absolute', left: '50%', top: '50%' }} color="red" />
+					<ErrorBoundary fallback={<div>Something went wrong</div>}>
+						<Icon
+							name="triangle-alert"
+							style={{ width: '30vmin', height: '30vmin', transform: 'translate(-50%,-50%)', position: 'absolute', left: '50%', top: '50%' }}
+							color="red"
+						/>
+					</ErrorBoundary>
 				}
 			>
 				<Canvas

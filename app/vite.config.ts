@@ -39,6 +39,8 @@ export default defineConfig({
 			injectManifest: {
 				// 10MB
 				maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
+
+				globIgnores: ['**/node_modules/**/*', '**/assets/icon-*.js'],
 			},
 
 			workbox: {
@@ -46,6 +48,20 @@ export default defineConfig({
 			},
 		}),
 	],
+	build: {
+		rollupOptions: {
+			output: {
+				chunkFileNames(chunkInfo) {
+					// mark dynamically imported icon chunks with a filename prefix so they can be handled differently
+					// by the PWA precache -- there are a lot of them.
+					if (chunkInfo.moduleIds.some((id) => id.includes('lucide-react/dist/esm/icons/'))) {
+						return 'assets/icon-[name]-[hash].js';
+					}
+					return 'assets/[name]-[hash].js';
+				},
+			},
+		},
+	},
 	resolve: {
 		alias: {
 			'@': '/src',

@@ -61,6 +61,8 @@ registerRoute(
 self.addEventListener('install', (event) => {
 	event.waitUntil(
 		caches.open('starter-pack').then(async (cache) => {
+			// precache this query too
+			await cache.add(`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture?${new URLSearchParams({ attribute: `package:core` })}`);
 			const coreFurniture = await fetch(
 				`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture?${new URLSearchParams({
 					attribute: `package:core`,

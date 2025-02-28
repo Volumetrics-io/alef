@@ -16,6 +16,7 @@ export function useMe() {
 					return null;
 				}
 				// otherwise show error toast but still proceed
+				console.error(err);
 				toast.error(`Server error! Running in offline mode. Please try again in a moment.`);
 				return null;
 			}

@@ -9,7 +9,6 @@ import { RoomStoreProvider } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
 import { Physics } from '@react-three/rapier';
 import { ReactNode } from 'react';
-import { HeadsetLogin } from './auth/HeadsetLoginScene';
 import { ModeProvider } from './modes/ModeContext';
 import { StagerPanel } from './panels/StagerPanel';
 import { ViewerPanel } from './panels/ViewerPanel';
@@ -25,9 +24,17 @@ export function MainScene() {
 
 	let sceneContent: ReactNode = null;
 	if (!isLoggedIn) {
-		// unauthenticated devices must log in with the in-XR UI, which takes you through
-		// device pairing
-		sceneContent = <HeadsetLogin />;
+		// unauthenticated devices do not have access to Properties or the API, they run a single
+		// room locally. Internally, we provide a Stager experience with an extra option to pair
+		// a device with a user account.
+		sceneContent = (
+			<RoomStoreProvider roomId="r-local">
+				<ModeProvider value="staging">
+					<StagerPanel />
+					<RoomRenderer />
+				</ModeProvider>
+			</RoomStoreProvider>
+		);
 	} else {
 		const mode = selfDevice?.displayMode ?? 'staging';
 

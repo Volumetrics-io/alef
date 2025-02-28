@@ -9,7 +9,7 @@ const RoomStoreContext = createContext<RoomStore | null>(null);
 
 export const RoomStoreProvider = ({ children, roomId }: { children: ReactNode; roomId: PrefixedId<'r'> }) => {
 	const socket = usePropertySocket();
-	const store = useMemo(() => makeRoomStore(socket, roomId), [socket, roomId]);
+	const store = useMemo(() => makeRoomStore(roomId, socket), [socket, roomId]);
 	(window as any).roomStore = store;
 	return <RoomStoreContext.Provider value={store}>{children}</RoomStoreContext.Provider>;
 };

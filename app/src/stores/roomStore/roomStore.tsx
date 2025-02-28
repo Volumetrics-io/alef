@@ -2,7 +2,20 @@ import { useVibrateOnHover } from '@/hooks/useVibrateOnHover';
 import { DragController } from '@/physics/DragController';
 import { isPlaneUserData } from '@/physics/planeUserData';
 import { PropertySocket } from '@/services/publicApi/socket';
-import { id, isPrefixedId, PrefixedId, RoomFurniturePlacement, RoomGlobalLighting, RoomLayout, RoomLightPlacement, RoomState, RoomWallData } from '@alef/common';
+import {
+	getUndo,
+	id,
+	isPrefixedId,
+	Operation,
+	PrefixedId,
+	RoomFurniturePlacement,
+	RoomGlobalLighting,
+	RoomLayout,
+	RoomLightPlacement,
+	RoomState,
+	RoomWallData,
+	updateRoom,
+} from '@alef/common';
 import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
 import { ActiveCollisionTypes } from '@dimforge/rapier3d-compat';
 import { HandleOptions, TransformHandlesProperties } from '@react-three/handle';
@@ -10,7 +23,7 @@ import { IntersectionEnterPayload, IntersectionExitPayload, RigidBodyProps, Roun
 import { RefObject, useCallback, useEffect, useRef } from 'react';
 import { Group } from 'three';
 import { createStore, useStore } from 'zustand';
-import { subscribeWithSelector } from 'zustand/middleware';
+import { persist, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { useShallow } from 'zustand/react/shallow';
 import { useEditorStore, useIntersectingPlaneLabels } from '../editorStore';
@@ -19,6 +32,12 @@ import { useRoomStoreContext } from './Provider';
 export type RoomStoreState = RoomState & {
 	// client state
 	viewingLayoutId?: PrefixedId<'rl'>;
+	operationBacklog: Operation[];
+	undoStack: Operation[];
+	redoStack: Operation[];
+
+	undo(): void;
+	redo(): void;
 
 	/**
 	 * Creates an empty new room layout and sets it as the current layout
@@ -31,7 +50,7 @@ export type RoomStoreState = RoomState & {
 
 	// furniture APIs
 	addFurniture: (init: Omit<RoomFurniturePlacement, 'id'>) => Promise<string>;
-	updateFurnitureId: (id: PrefixedId<'fp'>, furnitureId: PrefixedId<'f'>) => Promise<string>;
+	updateFurnitureId: (id: PrefixedId<'fp'>, furnitureId: PrefixedId<'f'>) => Promise<void>;
 	moveFurniture: (
 		id: PrefixedId<'fp'>,
 		transform: {
@@ -53,267 +72,283 @@ export type RoomStoreState = RoomState & {
 	updateGlobalLighting: (update: Partial<RoomGlobalLighting>) => Promise<void>;
 };
 
-export const makeRoomStore = (socket: PropertySocket, roomId: PrefixedId<'r'>) =>
+export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | null) =>
 	createStore<RoomStoreState>()(
-		immer(
-			subscribeWithSelector((set, get): RoomStoreState => {
-				// request initial layout state and load into store on creation
-				socket
-					.request(
-						{
-							type: 'requestRoom',
-							roomId,
-						},
-						'roomUpdate'
-					)
-					.then((response) => {
-						set({
-							...response.data,
-							// pick an arbitrary layout to view
-							viewingLayoutId: Object.keys(response.data.layouts)[0] as PrefixedId<'rl'> | undefined,
+		persist(
+			immer(
+				subscribeWithSelector((set, get): RoomStoreState => {
+					// request initial layout state and load into store on creation
+					if (socket) {
+						(async () => {
+							const response = await socket.request(
+								{
+									type: 'requestRoom',
+									roomId,
+								},
+								'roomUpdate'
+							);
+							set({
+								...response.data,
+								// pick an arbitrary layout to view
+								viewingLayoutId: Object.keys(response.data.layouts)[0] as PrefixedId<'rl'> | undefined,
+							});
+						})();
+						socket.onMessage('roomUpdate', (data) => {
+							// apply incoming room updates
+							set((state) => {
+								Object.assign(state, data);
+							});
 						});
-					});
-
-				function getLayoutId() {
-					const id = get().viewingLayoutId;
-					if (!id) {
-						throw new Error('No layout selected');
+						// apply backlog on connect
+						socket.onConnect(async () => {
+							const backlog = get().operationBacklog;
+							if (backlog.length) {
+								await socket.request({
+									type: 'applyOperations',
+									operations: backlog,
+								});
+								// clear backlog on success
+								set((state) => {
+									state.operationBacklog = [];
+								});
+							}
+						});
 					}
-					return id;
-				}
 
-				function updateLayout(updater: (v: RoomLayout) => void) {
-					const layoutId = getLayoutId();
-					set((state) => {
-						const layout = state.layouts[layoutId];
-						if (!layout) {
-							throw new Error(`Cannot update layout ${layoutId}; not found`);
+					function getLayoutId() {
+						const id = get().viewingLayoutId;
+						if (!id) {
+							throw new Error('No layout selected');
 						}
-						updater(layout);
-					});
-				}
+						return id;
+					}
 
-				return {
-					id: roomId,
-					viewingLayoutId: undefined,
-					walls: [],
-					layouts: {},
-					lights: {},
-					globalLighting: {
-						intensity: 1.5,
-						color: 6.3,
-					},
-
-					updateWalls: async (walls) => {
-						await socket.request({
-							type: 'updateWalls',
-							roomId,
-							walls,
-						});
+					async function applyChange(op: Operation, { historyStack = 'undoStack' }: { historyStack?: 'undoStack' | 'redoStack' } = {}): Promise<void> {
+						// apply change and add to undo stack
 						set((state) => {
-							state.walls = walls;
+							const undo = getUndo(state, op);
+							updateRoom(state, op);
+							if (undo) {
+								state[historyStack].push(undo);
+							}
 						});
-					},
 
-					createLayout: async (data) => {
-						const name = data?.name || `Layout ${Object.keys(get().layouts).length + 1}`;
-						// creates the layout on the server first. this will supply
-						// default values.
-						const response = await socket.request(
-							{
+						// send to server
+						// client-only -- don't bother keeping a backlog.
+						if (!socket) return;
+
+						if (socket?.isClosed) {
+							set((state) => {
+								state.operationBacklog.push(op);
+								state.redoStack = [];
+							});
+						} else {
+							try {
+								await socket.request({
+									type: 'applyOperations',
+									operations: [op],
+								});
+								set((state) => {
+									state.redoStack = [];
+								});
+							} catch (e) {
+								if (e instanceof Error && e.message === 'Request timed out') {
+									set((state) => {
+										state.operationBacklog.push(op);
+										state.redoStack = [];
+									});
+								}
+							}
+						}
+					}
+
+					return {
+						id: roomId,
+						operationBacklog: [],
+						undoStack: [],
+						redoStack: [],
+						viewingLayoutId: undefined,
+						walls: [],
+						layouts: {},
+						lights: {},
+						globalLighting: {
+							intensity: 1.5,
+							color: 6.3,
+						},
+
+						undo: () => {
+							const undo = get().undoStack.pop();
+							if (undo) {
+								applyChange(undo, { historyStack: 'redoStack' });
+							}
+						},
+						redo: () => {
+							const redo = get().redoStack.pop();
+							if (redo) {
+								applyChange(redo, { historyStack: 'undoStack' });
+							}
+						},
+
+						updateWalls: async (walls) => {
+							await applyChange({
+								type: 'updateWalls',
+								roomId,
+								walls,
+							});
+						},
+
+						createLayout: async (data) => {
+							const name = data?.name || `Layout ${Object.keys(get().layouts).length + 1}`;
+							const layoutId = id('rl');
+							await applyChange({
 								type: 'createLayout',
 								roomId,
-								data: { name },
-							},
-							'layoutCreated'
-						);
-						set((state) => {
-							state.layouts[response.data.id] = response.data;
-							state.viewingLayoutId = response.data.id;
-						});
-
-						return response.data.id;
-					},
-					setViewingLayoutId(id) {
-						set({ viewingLayoutId: id });
-					},
-					updateLayout: async (data) => {
-						set((state) => {
-							const layout = state.layouts[data.id];
-							if (!layout) {
-								throw new Error(`Cannot update layout ${data.id}; not found`);
+								data: { id: layoutId, name },
+							});
+							if (!get().viewingLayoutId) {
+								set({ viewingLayoutId: layoutId });
 							}
-							if (data.name) {
-								layout.name = data.name;
-							}
-							if (data.icon) {
-								layout.icon ??= data.icon;
-							}
-							if (data.type) {
-								layout.type = data.type;
-							}
-						});
-						await socket.request({
-							type: 'updateLayout',
-							roomId,
-							data,
-						});
-					},
 
-					deleteLayout: async (id) => {
-						await socket.request({
-							type: 'deleteLayout',
-							roomId,
-							roomLayoutId: id,
-						});
-						set((state) => {
-							delete state.layouts[id];
-							if (state.viewingLayoutId === id) {
-								const newLayoutId = Object.keys(state.layouts)[0] as PrefixedId<'rl'> | undefined;
-								state.viewingLayoutId = newLayoutId;
-							}
-						});
-					},
+							return layoutId;
+						},
+						setViewingLayoutId(id) {
+							set({ viewingLayoutId: id });
+						},
+						updateLayout: async (data) => {
+							await applyChange({
+								type: 'updateLayout',
+								roomId,
+								data,
+							});
+						},
 
-					addFurniture: async (init) => {
-						const placementId = id('fp');
-						const layoutId = getLayoutId();
-						const placement = {
-							id: placementId,
-							...init,
-						};
+						deleteLayout: async (id) => {
+							await applyChange({
+								type: 'deleteLayout',
+								roomId,
+								roomLayoutId: id,
+							});
+							set((state) => {
+								if (state.viewingLayoutId === id) {
+									const newLayoutId = Object.keys(state.layouts)[0] as PrefixedId<'rl'> | undefined;
+									state.viewingLayoutId = newLayoutId;
+								}
+							});
+						},
 
-						await socket.request({
-							type: 'addFurniture',
-							roomId,
-							roomLayoutId: layoutId,
-							data: placement,
-						});
+						addFurniture: async (init) => {
+							const placementId = id('fp');
+							const layoutId = getLayoutId();
+							const placement = {
+								id: placementId,
+								...init,
+							};
 
-						updateLayout((cur) => {
-							cur.furniture[placement.id] = placement;
-						});
+							await applyChange({
+								type: 'addFurniture',
+								roomId,
+								roomLayoutId: layoutId,
+								data: placement,
+							});
 
-						return placementId;
-					},
-					updateFurnitureId: async (id, furnitureId) => {
-						await socket.request({
-							type: 'updateFurniture',
-							roomId,
-							roomLayoutId: getLayoutId(),
-							data: {
+							return placementId;
+						},
+						moveFurniture: async (id, { position, rotation }) => {
+							await applyChange({
+								type: 'updateFurniture',
+								roomId,
+								roomLayoutId: getLayoutId(),
+								data: {
+									id,
+									// transform to pojos
+									position: position && { x: position.x, y: position.y, z: position.z },
+									rotation: rotation && { x: rotation.x, y: rotation.y, z: rotation.z, w: rotation.w },
+								},
+							});
+						},
+						updateFurnitureId: async (id, furnitureId) => {
+							await applyChange({
+								type: 'updateFurniture',
+								roomId,
+								roomLayoutId: getLayoutId(),
+								data: {
+									id,
+									furnitureId,
+								},
+							});
+						},
+						deleteFurniture: async (id) => {
+							await applyChange({
+								type: 'removeFurniture',
+								roomId,
+								roomLayoutId: getLayoutId(),
 								id,
-								furnitureId,
-							},
-						});
-						updateLayout((layout) => {
-							const furniture = layout.furniture[id];
-							if (!furniture) {
-								throw new Error(`Cannot update furniture ${id}; not found`);
-							}
-							furniture.furnitureId = furnitureId;
-						});
-						return furnitureId;
-					},
-					moveFurniture: async (id, { position, rotation }) => {
-						await socket.request({
-							type: 'updateFurniture',
-							roomId,
-							roomLayoutId: getLayoutId(),
-							data: {
-								id,
-								// transform to pojos
-								position: position && { x: position.x, y: position.y, z: position.z },
-								rotation: rotation && { x: rotation.x, y: rotation.y, z: rotation.z, w: rotation.w },
-							},
-						});
-						updateLayout((layout) => {
-							const furniture = layout.furniture[id];
-							if (!furniture) {
-								throw new Error(`Cannot move furniture ${id}; not found`);
-							}
-							if (position) {
-								furniture.position = position;
-							}
-							if (rotation) {
-								furniture.rotation = rotation;
-							}
-						});
-					},
-					deleteFurniture: async (id) => {
-						await socket.request({
-							type: 'removeFurniture',
-							roomId,
-							roomLayoutId: getLayoutId(),
-							id,
-						});
-						updateLayout((layout) => {
-							delete layout.furniture[id];
-						});
-					},
+							});
+						},
 
-					addLight: async (init) => {
-						const placementId = id('lp');
-						const layoutId = getLayoutId();
-						const placement = {
-							id: placementId,
-							...init,
-						};
-						await socket.request({
-							type: 'addLight',
-							roomId,
-							roomLayoutId: layoutId,
-							data: placement,
-						});
-						set((state) => {
-							state.lights[placement.id] = placement;
-						});
-						return placementId;
-					},
-					moveLight: async (id, { position }) => {
-						await socket.request({
-							type: 'updateLight',
-							roomId,
-							roomLayoutId: getLayoutId(),
-							data: {
+						addLight: async (init) => {
+							const placementId = id('lp');
+							const placement = {
+								id: placementId,
+								...init,
+							};
+							await applyChange({
+								type: 'addLight',
+								roomId,
+								data: placement,
+							});
+							return placementId;
+						},
+						moveLight: async (id, { position }) => {
+							await applyChange({
+								type: 'updateLight',
+								roomId,
+								data: {
+									id,
+									position,
+								},
+							});
+						},
+						deleteLight: async (id) => {
+							await applyChange({
+								type: 'removeLight',
+								roomId,
 								id,
-								position,
-							},
-						});
-						set((state) => {
-							const light = state.lights[id];
-							if (!light) {
-								throw new Error(`Cannot move light ${id}; not found`);
-							}
-							if (position) {
-								light.position = position;
-							}
-						});
-					},
-					deleteLight: async (id) => {
-						await socket.request({
-							type: 'removeLight',
-							roomId,
-							roomLayoutId: getLayoutId(),
-							id,
-						});
-						set((state) => {
-							delete state.lights[id];
-						});
-					},
-					updateGlobalLighting: async (update) => {
-						console.log('updateGlobalLighting', update);
-						await socket.request({
-							type: 'updateGlobalLighting',
-							roomId,
-							data: update,
-						});
-						set((state) => {
-							state.globalLighting = { ...state.globalLighting, ...update };
-						});
-					},
-				} satisfies RoomStoreState;
-			})
+							});
+						},
+						updateGlobalLighting: async (update) => {
+							await applyChange({
+								type: 'updateGlobalLighting',
+								roomId,
+								data: update,
+							});
+						},
+					} satisfies RoomStoreState;
+				})
+			),
+			{
+				name: `room-${roomId}`,
+				partialize(state) {
+					const { id, layouts, lights, globalLighting, operationBacklog: messageBacklog, walls, viewingLayoutId } = state;
+					return {
+						id,
+						layouts,
+						lights,
+						globalLighting,
+						messageBacklog,
+						walls,
+						viewingLayoutId,
+					};
+				},
+				onRehydrateStorage() {
+					// if no layouts exist, create a default one
+					return (state) => {
+						if (state?.layouts && Object.keys(state.layouts).length === 0) {
+							state.createLayout();
+						}
+					};
+				},
+			}
 		)
 	);
 export type RoomStore = ReturnType<typeof makeRoomStore>;

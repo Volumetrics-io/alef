@@ -3,7 +3,6 @@ import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { z } from 'zod';
 import { wrapRpcData } from '../../helpers/wrapRpcData';
-import { loggedInMiddleware } from '../../middleware/session';
 import { Env } from '../config/ctx';
 
 const formattedAttrSchema = z.string().regex(/^[^:]+:[^:]+$/);
@@ -11,7 +10,6 @@ const formattedAttrSchema = z.string().regex(/^[^:]+:[^:]+$/);
 export const furnitureRouter = new Hono<Env>()
 	.get(
 		'/',
-		loggedInMiddleware,
 		zValidator(
 			'query',
 			z.object({
@@ -31,26 +29,25 @@ export const furnitureRouter = new Hono<Env>()
 			return ctx.json(wrapRpcData(furniture));
 		}
 	)
+	.get('/attributes', async (ctx) => {
+		return ctx.json(wrapRpcData(await ctx.env.PUBLIC_STORE.listAttributes()));
+	})
 	.get(
-		'/attributes',
-		loggedInMiddleware,
+		'/attributes/:key',
 		zValidator(
-			'query',
+			'param',
 			z.object({
-				key: z.string().optional(),
+				key: z.string(),
 			})
 		),
 		async (ctx) => {
-			const key = ctx.req.valid('query').key;
-			if (key) {
-				return ctx.json(wrapRpcData(await ctx.env.PUBLIC_STORE.getAttributeValues(key)));
-			}
-			return ctx.json(wrapRpcData(await ctx.env.PUBLIC_STORE.listAttributes()));
+			const key = ctx.req.valid('param').key;
+			return ctx.json(wrapRpcData(await ctx.env.PUBLIC_STORE.getAttributeValues(key)));
 		}
 	)
 	.get(
 		'/:id',
-		loggedInMiddleware,
+
 		zValidator(
 			'param',
 			z.object({

@@ -28,7 +28,7 @@ export function useAllFurnitureAttributes() {
 	return useSuspenseQuery({
 		queryKey: ['attributes', null],
 		queryFn: async () => {
-			const response = await publicApiClient.furniture.attributes.$get({ query: { key: undefined } });
+			const response = await publicApiClient.furniture.attributes.$get();
 			return response.json();
 		},
 	});
@@ -38,7 +38,7 @@ export function useFurnitureAttributes(key: AttributeKey) {
 	return useSuspenseQuery({
 		queryKey: ['attributes', key],
 		queryFn: async () => {
-			const response = await publicApiClient.furniture.attributes.$get({ query: { key } });
+			const response = await publicApiClient.furniture.attributes[':key'].$get({ param: { key } });
 			return response.json();
 		},
 	});

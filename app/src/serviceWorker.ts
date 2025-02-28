@@ -8,6 +8,7 @@
 // You can also remove this file if you'd prefer not to use a
 // service worker, and the Workbox build step will be skipped.
 
+import type { Attribute } from '@alef/common';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
 import { NavigationRoute, registerRoute } from 'workbox-routing';
@@ -30,19 +31,69 @@ precacheAndRoute(self.__WB_MANIFEST);
 registerRoute(new NavigationRoute(createHandlerBoundToURL('/index.html')));
 
 // Cache model files as they are fetched
+const modelPathMatch = /\/furniture\/.+\/model$/;
 registerRoute(
 	// Add in any other file extensions or routing criteria as needed.
-	({ url }) => url.origin === import.meta.env.VITE_PUBLIC_API_ORIGIN && url.pathname.endsWith('.gltf'),
+	({ url }) => url.origin === import.meta.env.VITE_PUBLIC_API_ORIGIN && modelPathMatch.test(url.pathname),
 	// Customize this strategy as needed, e.g., by changing to CacheFirst.
 	new StaleWhileRevalidate({
 		cacheName: 'models',
 		plugins: [
 			// Ensure that once this runtime cache reaches a maximum size the
 			// least-recently used files are removed.
-			new ExpirationPlugin({ maxEntries: 200 }),
+			new ExpirationPlugin({ maxEntries: 800 }),
 		],
 	})
 );
+
+registerRoute(
+	({ url }) => url.origin === import.meta.env.VITE_PUBLIC_API_ORIGIN && (url.pathname.endsWith('.jpg') || url.pathname.endsWith('.jpeg') || url.pathname.endsWith('.png')),
+	new StaleWhileRevalidate({
+		cacheName: 'images',
+		plugins: [new ExpirationPlugin({ maxEntries: 200 })],
+	})
+);
+
+/**
+ * On load, preload all 'starter pack' furniture into a special cache if not already
+ * present.
+ */
+self.addEventListener('install', (event) => {
+	event.waitUntil(
+		caches.open('starter-pack').then(async (cache) => {
+			const coreFurniture = await fetch(
+				`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture?${new URLSearchParams({
+					attribute: `package:core`,
+				})}`
+			);
+
+			if (!coreFurniture.ok) {
+				console.error('Failed to fetch core furniture metadata', coreFurniture);
+				throw new Error('Failed to fetch core furniture metadata');
+			}
+			const coreFurnitureJson = (await coreFurniture.json()) as {
+				id: string;
+				name: string;
+				attributes: Attribute[];
+				modelUpdatedAt: string;
+			}[];
+
+			// avoid re-fetching the same furniture
+			const cachedFurniture = await cache.keys();
+			const cachedFurnitureIds = cachedFurniture.map((r) => r.url.split('/')[4]);
+			const coreFurnitureJsonFiltered = coreFurnitureJson.filter((f) => !cachedFurnitureIds.includes(f.id));
+
+			// Cache all original quality models and preview thumbnails
+			const coreFurnitureModels = coreFurnitureJsonFiltered
+				.map((f) => {
+					return [`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${f.id}/model?quality=original`, `${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${f.id}/image.jpg`];
+				})
+				.flat();
+			await cache.addAll(coreFurnitureModels);
+			console.log('Cached core furniture models', coreFurnitureModels);
+		})
+	);
+});
 
 // This allows the web app to trigger skipWaiting via
 // registration.waiting.postMessage({type: 'SKIP_WAITING'})

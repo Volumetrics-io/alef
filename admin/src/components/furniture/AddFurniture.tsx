@@ -1,4 +1,5 @@
 import { adminApiClient } from '@/services/adminApi';
+import { Attribute } from '@alef/common';
 import { Box, Form, Heading } from '@alef/sys';
 import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
@@ -12,7 +13,10 @@ export function AddFurniture() {
 			<Form
 				initialValues={{
 					name: '',
-					attributes: [] as { key: string; value: string }[],
+					attributes: [
+						// default to core package (for now?)
+						{ key: 'package', value: 'core' },
+					] as Attribute[],
 				}}
 				onSubmit={async (values, tools) => {
 					const response = await adminApiClient.furniture.$post({

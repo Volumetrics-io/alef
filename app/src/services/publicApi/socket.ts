@@ -13,7 +13,8 @@ export type PropertySocket = {
 		message: T,
 		expectedType?: Response
 	) => Promise<ServerMessageByType<Response>>;
-	subscribe: <T extends ServerMessageType>(type: T, handler: (message: ServerMessageByType<T>) => void) => () => void;
+	onMessage: <T extends ServerMessageType>(type: T, handler: (message: ServerMessageByType<T>) => void) => () => void;
+	onConnect: (handler: () => void) => () => void;
 	unsubscribeAll: () => void;
 	close: () => void;
 	reconnect: () => Promise<void>;
@@ -101,13 +102,14 @@ export async function connectToSocket(propertyId: PrefixedId<'p'>): Promise<Prop
 	const socket = {
 		send,
 		request,
-		subscribe,
+		onMessage: subscribe,
 		unsubscribeAll,
 		close,
 		get isClosed() {
 			return websocket.isClosed;
 		},
 		reconnect: () => websocket.reconnect(),
+		onConnect: websocket.onConnect,
 	};
 	socketCache.set(propertyId, socket);
 	return socket;
@@ -128,6 +130,7 @@ class ReconnectingWebsocket {
 	private websocket: WebSocket | null = null;
 	private messageEvents = new EventTarget();
 	private errorEvents = new EventTarget();
+	private connectEvents = new EventTarget();
 	private backlog: string[] = [];
 
 	constructor(
@@ -141,15 +144,15 @@ class ReconnectingWebsocket {
 		return this.websocket?.readyState === WebSocket.CLOSED;
 	}
 
-	send(message: string) {
+	send = (message: string) => {
 		if (this.websocket?.readyState === WebSocket.OPEN) {
 			this.websocket.send(message);
 		} else {
 			this.backlog.push(message);
 		}
-	}
+	};
 
-	onMessage(handler: (event: ServerMessage) => void) {
+	onMessage = (handler: (event: ServerMessage) => void) => {
 		function wrappedHandler(event: Event) {
 			if (event instanceof MessageEvent) {
 				const msg = JSON.parse(event.data) as ServerMessage;
@@ -160,18 +163,25 @@ class ReconnectingWebsocket {
 		return () => {
 			this.messageEvents.removeEventListener('message', wrappedHandler);
 		};
-	}
+	};
 
-	onError(handler: (event: Event) => void) {
+	onError = (handler: (event: Event) => void) => {
 		this.errorEvents.addEventListener('error', handler);
 		return () => {
 			this.errorEvents.removeEventListener('error', handler);
 		};
-	}
+	};
 
-	close() {
+	onConnect = (handler: () => void) => {
+		this.connectEvents.addEventListener('connect', handler);
+		return () => {
+			this.connectEvents.removeEventListener('connect', handler);
+		};
+	};
+
+	close = () => {
 		this.websocket?.close();
-	}
+	};
 
 	async reconnect() {
 		const token = await getSocketToken(this.propertyId);
@@ -180,6 +190,7 @@ class ReconnectingWebsocket {
 		const websocket = (this.websocket = new WebSocket(url));
 		websocket.addEventListener('open', () => {
 			console.log('Socket connected');
+			this.connectEvents.dispatchEvent(new Event('connect'));
 			if (this.backlog.length) {
 				this.backlog.forEach((msg) => websocket.send(msg));
 				this.backlog = [];

@@ -1,4 +1,4 @@
-import { AlefError, assertPrefixedId, ClientMessage, PrefixedId, ServerLayoutCreatedMessage, ServerMessage, ServerRoomUpdateMessage } from '@alef/common';
+import { AlefError, assertPrefixedId, ClientMessage, PrefixedId, ServerMessage, ServerRoomUpdateMessage } from '@alef/common';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { z } from 'zod';
@@ -95,44 +95,13 @@ export class PropertySocketHandler {
 					}
 					ws.send(JSON.stringify({ responseTo: message.messageId, type: 'roomUpdate', data: room } satisfies ServerRoomUpdateMessage));
 					break;
-				case 'createLayout':
-					const layout = await this.#property.createLayout(message.roomId, message.data);
-					ws.send(JSON.stringify({ responseTo: message.messageId, type: 'layoutCreated', data: layout } satisfies ServerLayoutCreatedMessage));
-					break;
-				case 'updateWalls':
-					await this.#property.updateWalls(message.roomId, message.walls);
-					break;
-				case 'addFurniture':
-					await this.#property.addFurniture(message.roomId, message.roomLayoutId, message.data);
-					break;
-				case 'updateFurniture':
-					await this.#property.updateFurniture(message.roomId, message.roomLayoutId, message.data);
-					break;
-				case 'removeFurniture':
-					await this.#property.removeFurniture(message.roomId, message.roomLayoutId, message.id);
-					break;
-				case 'addLight':
-					await this.#property.addLight(message.roomId, message.data);
-					break;
-				case 'updateLight':
-					await this.#property.updateLight(message.roomId, message.data);
-					break;
-				case 'removeLight':
-					await this.#property.removeLight(message.roomId, message.id);
-					break;
-				case 'updateGlobalLighting':
-					await this.#property.updateGlobalLighting(message.roomId, message.data);
-					break;
-				case 'updateLayout':
-					await this.#property.updateLayout(message.roomId, message.data.id, message.data);
-					break;
-				case 'deleteLayout':
-					await this.#property.deleteLayout(message.roomId, message.roomLayoutId);
-					break;
 				case 'ping':
 					break;
+				case 'applyOperations':
+					this.#property.applyOperations(message.operations);
+					break;
 				default:
-					throw new AlefError(AlefError.Code.BadRequest, `Unknown message type: ${(message as unknown as any).type}`);
+					break;
 			}
 
 			// ack the message

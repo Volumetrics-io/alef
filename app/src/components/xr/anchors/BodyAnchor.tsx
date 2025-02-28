@@ -1,11 +1,11 @@
 import { animated, config, useSpring } from '@react-spring/three';
 import { ScreenSpace } from '@react-three/drei';
-import { Billboard } from '../Billboard';
 import { GroupProps, useFrame } from '@react-three/fiber';
 import { useXR } from '@react-three/xr';
 import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { Group, Vector3 } from 'three';
 import { useCameraForward, useCameraOrigin } from '../../../hooks/useCameraOrigin.js';
+import { Billboard } from '../Billboard';
 
 const AnimatedGroup = animated('group');
 

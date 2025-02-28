@@ -1,4 +1,4 @@
-export const attributeKeys = ['type', 'category', 'style'] as const;
+export const attributeKeys = ['type', 'category', 'style', 'package'] as const;
 
 export type AttributeKey = (typeof attributeKeys)[number];
 export type Attribute = { key: AttributeKey; value: string };

@@ -2,7 +2,6 @@ import { useFurnitureModel } from '@/services/publicApi/furnitureHooks';
 import { FurnitureModelQuality, PrefixedId } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
 import { Clone, Detailed, Outlines } from '@react-three/drei';
-import { Object3DProps } from '@react-three/fiber';
 import { forwardRef, ReactNode, Suspense } from 'react';
 import { Group, Mesh } from 'three';
 
@@ -57,22 +56,24 @@ const FurnitureModelRenderer = forwardRef<Group, FurnitureModelRendererProps>(fu
 	);
 });
 
-export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode }>(
-	({ errorFallback, debugLod, ...props }, ref) => {
-		return (
-			<ErrorBoundary fallback={errorFallback ?? (
-				// add an error boundary here as well just in case the whole furniture is missing or the network is
-				// unavailable.
-				<ErrorBoundary fallback={null}>
-					{/* We likely have the original quality model, at minimum, even if others 404. */}
-					<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Original} ref={ref} transparent={true} />
-				</ErrorBoundary>
-			)}>
-				<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Collision} ref={ref} transparent={true} />
-			</ErrorBoundary>
-		);
-	}
-);
+export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode }>(({ errorFallback, debugLod, ...props }, ref) => {
+	return (
+		<ErrorBoundary
+			fallback={
+				errorFallback ?? (
+					// add an error boundary here as well just in case the whole furniture is missing or the network is
+					// unavailable.
+					<ErrorBoundary fallback={null}>
+						{/* We likely have the original quality model, at minimum, even if others 404. */}
+						<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Original} ref={ref} transparent={true} />
+					</ErrorBoundary>
+				)
+			}
+		>
+			<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Collision} ref={ref} transparent={true} />
+		</ErrorBoundary>
+	);
+});
 
 export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode }>(
 	({ errorFallback, maxQuality = FurnitureModelQuality.Original, debugLod, ...props }, ref) => {

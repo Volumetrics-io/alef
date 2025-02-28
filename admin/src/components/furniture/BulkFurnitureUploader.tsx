@@ -13,7 +13,12 @@ const progressState = proxy({
 });
 
 export function BulkFurnitureUploader() {
-	const [attributes, setAttributes] = useState<Attribute[]>([]);
+	const [attributes, setAttributes] = useState<Attribute[]>([
+		{
+			key: 'package',
+			value: 'core',
+		},
+	]);
 	const [directory, setDirectory] = useState<FileList | null>(null);
 	const onDirectory = (ev: ChangeEvent<HTMLInputElement>) => {
 		const files = ev.target.files;

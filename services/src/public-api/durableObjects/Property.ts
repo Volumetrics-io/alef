@@ -1,4 +1,4 @@
-import { AlefError, id, PrefixedId, RoomFurniturePlacement, RoomGlobalLighting, RoomLayout, RoomLightPlacement, RoomState, Updates } from '@alef/common';
+import { AlefError, id, Operation, PrefixedId, RoomState, updateRoom } from '@alef/common';
 import { DurableObject } from 'cloudflare:workers';
 import { Bindings } from '../config/ctx';
 import { PropertySocketHandler } from './sockets/PropertySocketHandler';
@@ -67,7 +67,7 @@ export class Property extends DurableObject<Bindings> {
 
 	// note: layout ID not currently used, updates are not very granular with
 	// the current protocol, we just send the whole room.
-	#broadcastLayoutChange(roomId: PrefixedId<'r'>, _roomLayoutId?: PrefixedId<'rl'>) {
+	#broadcastChange(roomId: PrefixedId<'r'>, _roomLayoutId?: PrefixedId<'rl'>) {
 		const room = this.getRoom(roomId);
 		if (!room) return;
 		// Notify clients of layout change
@@ -75,6 +75,18 @@ export class Property extends DurableObject<Bindings> {
 			type: 'roomUpdate',
 			data: room,
 		});
+	}
+
+	applyOperations(operations: Operation[]) {
+		const affectedRooms = new Set<PrefixedId<'r'>>();
+		for (const op of operations) {
+			updateRoom(this.#rooms[op.roomId], op);
+			affectedRooms.add(op.roomId);
+		}
+		this.#saveState();
+		for (const roomId of affectedRooms) {
+			this.#broadcastChange(roomId);
+		}
 	}
 
 	async getAllRooms() {
@@ -98,131 +110,5 @@ export class Property extends DurableObject<Bindings> {
 		this.#rooms[roomId] = { id: roomId, ...createDefaultRoomState() };
 		this.#saveState();
 		return this.#rooms[roomId];
-	}
-
-	createLayout(roomId: PrefixedId<'r'>, data?: Pick<RoomLayout, 'name' | 'icon'>) {
-		const room = this.getRoom(roomId);
-		if (!room) {
-			throw new AlefError(AlefError.Code.NotFound, 'Room not found');
-		}
-		const layoutId = id('rl');
-		room.layouts[layoutId] = { ...data, id: layoutId, furniture: {} };
-		this.#saveState();
-		return room.layouts[layoutId];
-	}
-
-	updateLayout(roomId: PrefixedId<'r'>, layoutId: PrefixedId<'rl'>, data: Pick<RoomLayout, 'name' | 'icon' | 'type'>) {
-		const layout = this.getRoomLayout(roomId, layoutId);
-		if (!layout) {
-			throw new AlefError(AlefError.Code.NotFound, 'Room layout not found');
-		}
-		if (data.name) {
-			layout.name = data.name;
-		}
-		if (data.icon) {
-			layout.icon = data.icon;
-		}
-		if (data.type) {
-			layout.type = data.type;
-		}
-		this.#saveState();
-	}
-
-	deleteLayout(roomId: PrefixedId<'r'>, layoutId: PrefixedId<'rl'>) {
-		const room = this.getRoom(roomId);
-		if (!room) {
-			throw new AlefError(AlefError.Code.NotFound, 'Room not found');
-		}
-		if (!room.layouts[layoutId]) {
-			throw new AlefError(AlefError.Code.NotFound, 'Room layout not found');
-		}
-		delete room.layouts[layoutId];
-		this.#saveState();
-	}
-
-	async updateWalls(roomId: PrefixedId<'r'>, walls: RoomState['walls']) {
-		const room = this.getRoom(roomId);
-		if (!room) {
-			throw new AlefError(AlefError.Code.NotFound, 'Room not found');
-		}
-		room.walls = walls;
-		await this.#saveState();
-	}
-
-	async addFurniture(roomId: PrefixedId<'r'>, roomLayoutId: PrefixedId<'rl'>, furniture: RoomFurniturePlacement) {
-		const layout = this.getRoomLayout(roomId, roomLayoutId);
-		if (!layout) {
-			throw new AlefError(AlefError.Code.NotFound, 'Room layout not found');
-		}
-		layout.furniture[furniture.id] = furniture;
-		await this.#saveState();
-		this.#broadcastLayoutChange(roomId, roomLayoutId);
-	}
-
-	async updateFurniture(roomId: PrefixedId<'r'>, roomLayoutId: PrefixedId<'rl'>, furniture: Updates<RoomFurniturePlacement>) {
-		const layout = this.getRoomLayout(roomId, roomLayoutId);
-		if (!layout) {
-			throw new AlefError(AlefError.Code.NotFound, 'Room layout not found');
-		}
-		if (!layout.furniture[furniture.id]) {
-			throw new AlefError(AlefError.Code.NotFound, 'Furniture not found');
-		}
-		layout.furniture[furniture.id] = { ...layout.furniture[furniture.id], ...furniture };
-		await this.#saveState();
-		this.#broadcastLayoutChange(roomId, roomLayoutId);
-	}
-
-	async removeFurniture(roomId: PrefixedId<'r'>, roomLayoutId: PrefixedId<'rl'>, id: RoomFurniturePlacement['id']) {
-		const layout = this.getRoomLayout(roomId, roomLayoutId);
-		if (!layout) {
-			throw new AlefError(AlefError.Code.NotFound, 'Room layout not found');
-		}
-		delete layout.furniture[id];
-		await this.#saveState();
-		this.#broadcastLayoutChange(roomId, roomLayoutId);
-	}
-
-	async addLight(roomId: PrefixedId<'r'>, light: RoomLightPlacement) {
-		const room = this.getRoom(roomId);
-		if (!room) {
-			throw new AlefError(AlefError.Code.NotFound, 'Room layout not found');
-		}
-		room.lights ??= {};
-		room.lights[light.id] = light;
-		await this.#saveState();
-		this.#broadcastLayoutChange(roomId);
-	}
-
-	async updateLight(roomId: PrefixedId<'r'>, light: Updates<RoomLightPlacement>) {
-		const room = this.getRoom(roomId);
-		if (!room) {
-			throw new AlefError(AlefError.Code.NotFound, 'Room layout not found');
-		}
-		if (!room.lights[light.id]) {
-			throw new AlefError(AlefError.Code.NotFound, 'Light not found');
-		}
-		room.lights[light.id] = { ...room.lights[light.id], ...light };
-		await this.#saveState();
-		this.#broadcastLayoutChange(roomId);
-	}
-
-	async removeLight(roomId: PrefixedId<'r'>, id: RoomLightPlacement['id']) {
-		const room = this.getRoom(roomId);
-		if (!room) {
-			throw new AlefError(AlefError.Code.NotFound, 'Room layout not found');
-		}
-		delete room.lights[id];
-		await this.#saveState();
-		this.#broadcastLayoutChange(roomId);
-	}
-
-	async updateGlobalLighting(roomId: PrefixedId<'r'>, data: Partial<RoomGlobalLighting>) {
-		const room = this.getRoom(roomId);
-		if (!room) {
-			throw new AlefError(AlefError.Code.NotFound, 'Room not found');
-		}
-		room.globalLighting = { ...room.globalLighting, ...data };
-		await this.#saveState();
-		this.#broadcastLayoutChange(roomId, id('rl'));
 	}
 }

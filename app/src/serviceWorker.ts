@@ -9,6 +9,7 @@
 // service worker, and the Workbox build step will be skipped.
 
 import type { Attribute } from '@alef/common';
+import type { WorkboxPlugin } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
 import { NavigationRoute, registerRoute } from 'workbox-routing';
@@ -30,18 +31,27 @@ precacheAndRoute(self.__WB_MANIFEST);
 
 registerRoute(new NavigationRoute(createHandlerBoundToURL('/index.html')));
 
+const fallbackToOfflineCachePlugin: WorkboxPlugin = {
+	handlerDidError: async ({ request }: { request: Request }) => {
+		const fallbackResponse = await caches.match(request, { cacheName: 'offline-requirements' });
+		if (fallbackResponse) {
+			return fallbackResponse;
+		}
+	},
+};
+
 // Cache model files as they are fetched
 const modelPathMatch = /\/furniture\/.+\/model$/;
 registerRoute(
 	// Add in any other file extensions or routing criteria as needed.
 	({ url }) => url.origin === import.meta.env.VITE_PUBLIC_API_ORIGIN && modelPathMatch.test(url.pathname),
-	// Customize this strategy as needed, e.g., by changing to CacheFirst.
 	new StaleWhileRevalidate({
 		cacheName: 'models',
 		plugins: [
 			// Ensure that once this runtime cache reaches a maximum size the
 			// least-recently used files are removed.
 			new ExpirationPlugin({ maxEntries: 800 }),
+			fallbackToOfflineCachePlugin,
 		],
 	})
 );
@@ -50,7 +60,7 @@ registerRoute(
 	({ url }) => url.origin === import.meta.env.VITE_PUBLIC_API_ORIGIN && (url.pathname.endsWith('.jpg') || url.pathname.endsWith('.jpeg') || url.pathname.endsWith('.png')),
 	new StaleWhileRevalidate({
 		cacheName: 'images',
-		plugins: [new ExpirationPlugin({ maxEntries: 200 })],
+		plugins: [new ExpirationPlugin({ maxEntries: 200 }), fallbackToOfflineCachePlugin],
 	})
 );
 

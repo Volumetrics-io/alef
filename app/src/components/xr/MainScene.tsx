@@ -1,6 +1,7 @@
 import { DepthShader } from '@/components/xr/shaders/DepthShader';
 // import SunLight from '@/components/xr/lighting/SunLight.tsx';
 
+import { useIsOnline } from '@/hooks/useIsOnline';
 import { useCurrentDevice } from '@/services/publicApi/deviceHooks';
 import { useAllProperties, useProperty } from '@/services/publicApi/propertyHooks';
 import { PropertySocketProvider } from '@/services/publicApi/PropertySocketProvider';
@@ -19,11 +20,13 @@ export function MainScene() {
 	const { data: session } = useMe();
 	const isLoggedIn = !!session;
 	const { data: selfDevice } = useCurrentDevice();
+	const isOnline = useIsOnline();
 
 	const debug = location.search.includes('debug');
 
 	let sceneContent: ReactNode = null;
-	if (!isLoggedIn) {
+	// you can be logged in but not offline (cached /me response)
+	if (!isLoggedIn || !isOnline) {
 		// unauthenticated devices do not have access to Properties or the API, they run a single
 		// room locally. Internally, we provide a Stager experience with an extra option to pair
 		// a device with a user account.

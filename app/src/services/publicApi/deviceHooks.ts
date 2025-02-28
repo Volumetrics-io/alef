@@ -4,7 +4,7 @@ import { InferResponseType } from 'hono';
 import toast from 'react-hot-toast';
 import { queryClient } from '../queryClient';
 import { publicApiClient } from './client';
-import { fallbackNullWhenOfflineOrError, handleErrors } from './utils';
+import { fallbackWhenOfflineOrError, handleErrors } from './utils';
 
 export function useDeviceDiscovery(description?: string) {
 	return useSuspenseQuery({
@@ -132,12 +132,13 @@ export function useCurrentDevice(name?: string) {
 	return useSuspenseQuery({
 		queryKey: ['currentDevice'],
 		queryFn: async () => {
-			return fallbackNullWhenOfflineOrError(
+			return fallbackWhenOfflineOrError(
 				publicApiClient.devices.self.$get({
 					query: {
 						description: name,
 					},
-				})
+				}),
+				null
 			);
 		},
 	});

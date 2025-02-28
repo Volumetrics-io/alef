@@ -14,7 +14,6 @@ import {
 	FurniturePanelFilterSidebarSectionHeader,
 	FurniturePanelHeader,
 	FurniturePanelNavigation,
-	FurniturePanelRoot,
 } from './common';
 
 export function OfflineFurniturePanel() {
@@ -59,13 +58,13 @@ export function OfflineFurniturePanel() {
 	}, [filters, furnitureUnfiltered]);
 
 	return (
-		<FurniturePanelRoot>
+		<>
 			<FurnitureFilters furnitureUnfiltered={furnitureUnfiltered} />
 			<OfflineModeWarning />
 			<FurniturePanelHeader />
 			<FurnitureCollection furniture={furniture} />
 			<FurniturePanelNavigation />
-		</FurniturePanelRoot>
+		</>
 	);
 }
 

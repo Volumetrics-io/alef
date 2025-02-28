@@ -9,17 +9,16 @@ import {
 	FurniturePanelFilterSidebarSectionHeader,
 	FurniturePanelHeader,
 	FurniturePanelNavigation,
-	FurniturePanelRoot,
 } from './common';
 
 export function OnlineFurniturePanel() {
 	return (
-		<FurniturePanelRoot>
+		<>
 			<FurnitureFilters />
 			<FurniturePanelHeader />
 			<FilteredFurniture />
 			<FurniturePanelNavigation />
-		</FurniturePanelRoot>
+		</>
 	);
 }
 

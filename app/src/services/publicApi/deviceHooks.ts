@@ -1,10 +1,10 @@
-import { AlefError, PrefixedId } from '@alef/common';
+import { PrefixedId } from '@alef/common';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { InferResponseType } from 'hono';
 import toast from 'react-hot-toast';
 import { queryClient } from '../queryClient';
 import { publicApiClient } from './client';
-import { handleErrors } from './utils';
+import { fallbackNullWhenOfflineOrError, handleErrors } from './utils';
 
 export function useDeviceDiscovery(description?: string) {
 	return useSuspenseQuery({
@@ -132,17 +132,13 @@ export function useCurrentDevice(name?: string) {
 	return useSuspenseQuery({
 		queryKey: ['currentDevice'],
 		queryFn: async () => {
-			const response = await publicApiClient.devices.self.$get({
-				query: {
-					description: name,
-				},
-			});
-			if (!response.ok) {
-				const asAlefError = AlefError.fromResponse(response);
-				console.error(asAlefError);
-				return null;
-			}
-			return response.json();
+			return fallbackNullWhenOfflineOrError(
+				publicApiClient.devices.self.$get({
+					query: {
+						description: name,
+					},
+				})
+			);
 		},
 	});
 }

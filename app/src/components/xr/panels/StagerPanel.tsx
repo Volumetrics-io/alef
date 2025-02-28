@@ -14,6 +14,7 @@ import { FurniturePanel } from './staging/furniture/FurniturePanel';
 import { Layouts } from './staging/Layouts';
 import { Lighting } from './staging/Lighting';
 import { SettingsPanel } from './staging/SettingsPanel';
+import { UpdatePrompt } from './UpdatePrompt';
 
 export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 	const [mode, setMode] = useEditorStageMode();
@@ -38,6 +39,7 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 	return (
 		<DraggableBodyAnchor follow={!isOpen} position={position} lockY={true} distance={0.15}>
 			<Root pixelSize={0.001} flexDirection="column" gap={10}>
+				<UpdatePrompt />
 				<Surface flexGrow={0} flexShrink={0} marginX="auto">
 					<Toggle
 						onClick={() => {

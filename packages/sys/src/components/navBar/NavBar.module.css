@@ -1,7 +1,6 @@
 @layer components {
 	.root {
 		font-family: var(--font-head);
-		font-weight: var(--weight-bold);
 		justify-content: space-between;
 		position: sticky;
 		top: 0;

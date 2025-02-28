@@ -18,10 +18,12 @@ export const NavBarRoot = forwardRef<HTMLDivElement, NavBarProps>(function NavBa
 
 export const NavBarStart = withProps(Box, {
 	gapped: true,
+	align: 'center',
 });
 
 export const NavBarEnd = withProps(Box, {
 	gapped: true,
+	align: 'center',
 });
 
 export const NavBar = Object.assign(NavBarRoot, {

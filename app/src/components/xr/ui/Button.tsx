@@ -1,10 +1,12 @@
 import { colors } from "./theme";
 import { borderRadius } from "@react-three/uikit-default";
-import { RefAttributes } from "react";
+import { RefAttributes, useCallback, useRef, useEffect } from "react";
 import { ReactNode } from "react";
 import { forwardRef } from "react";
 import { Container, ContainerRef, DefaultProperties, ContainerProperties, AllOptionalProperties } from "@react-three/uikit";
-
+import { PositionalAudio } from "@react-three/drei";
+import { PositionalAudio as PositionalAudioType } from "three";
+import { ThreeEvent } from "@react-three/fiber";
 const buttonVariants = {
     default: {
       containerHoverProps: {
@@ -95,6 +97,13 @@ const buttonVariants = {
     lg: { height: 42, paddingX: 32 },
     icon: { height: 42, width: 42 },
   } satisfies { [Key in string]: ContainerProperties }
+
+  const audioDistance = {
+    default: 0.01,
+    sm: 0.005,
+    lg: 0.015,
+    icon: 0.01,
+  }
   
   export type ButtonProperties = ContainerProperties & {
     variant?: keyof typeof buttonVariants
@@ -114,6 +123,29 @@ const buttonVariants = {
         defaultProps?: AllOptionalProperties
       } = buttonVariants[variant]
       const sizeProps = buttonSizes[size]
+
+      const audioRef = useRef<PositionalAudioType>(null)
+
+      // Clean up audio when component unmounts
+      useEffect(() => {
+        return () => {
+          // Stop audio when component unmounts
+          if (audioRef.current) {
+            audioRef.current.stop();
+          }
+        };
+      }, []);
+
+      const onClick = useCallback((e: ThreeEvent<MouseEvent>) => {
+        // Stop any currently playing audio before playing again
+        if (audioRef.current) {
+          if (audioRef.current.isPlaying) {
+            audioRef.current.stop();
+          }
+          audioRef.current.play();
+        }
+        props.onClick?.(e);
+      }, [props]);
   
       return (
         <Container
@@ -132,7 +164,15 @@ const buttonVariants = {
           }}
           ref={ref}
           {...props}
+          onClick={onClick}
         >
+          <PositionalAudio
+            url={`./audio/click.webm`}
+            distance={audioDistance[size]}
+            autoplay={false}
+            loop={false}
+            ref={audioRef}
+          />
           <DefaultProperties
             fontSize={14}
             lineHeight={20}

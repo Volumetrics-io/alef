@@ -19,14 +19,15 @@ export function NonHeadsetDeviceDiscovery() {
 		<Frame padded stacked gapped>
 			<Heading level={3}>Pair a headset</Heading>
 			<Form
-				initialValues={{ name: selfDevice.name }}
+				initialValues={{ name: selfDevice?.name || '' }}
 				enableReinitialize
 				onSubmit={async ({ name }) => {
+					if (!selfDevice) return;
 					await updateDevice.mutateAsync({ deviceId: selfDevice.id, updates: { name } });
 				}}
 			>
 				<Form.TextField name="name" label="This device" />
-				<Form.Submit>Change name</Form.Submit>
+				<Form.Submit disabled={!selfDevice}>Change name</Form.Submit>
 			</Form>
 			{firstSuggested && <SuggestedDevice device={firstSuggested} />}
 			{!suggested.length && (

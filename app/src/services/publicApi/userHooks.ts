@@ -1,5 +1,6 @@
 import { AlefError } from '@alef/common';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 import { publicApiClient } from './client';
 import { handleErrors } from './utils';
 
@@ -14,7 +15,9 @@ export function useMe() {
 				if (AlefError.isInstance(err) && err.statusCode === 401) {
 					return null;
 				}
-				throw err;
+				// otherwise show error toast but still proceed
+				toast.error(`Server error! Running in offline mode. Please try again in a moment.`);
+				return null;
 			}
 		},
 	});

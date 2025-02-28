@@ -63,7 +63,7 @@ registerRoute(
 			return false;
 		}
 		// offline furniture core query
-		if (url.pathname === '/furniture' && url.searchParams.has('package') && url.searchParams.get('attribute') === 'package:core') {
+		if (url.pathname === '/furniture' && url.searchParams.has('attribute') && url.searchParams.get('attribute') === 'package:core') {
 			return true;
 		}
 

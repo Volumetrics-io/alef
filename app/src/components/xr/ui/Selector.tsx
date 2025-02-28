@@ -94,7 +94,7 @@ export function SelectorItem({ wrap = false, selected, size = 'medium', children
         >
             <PositionalAudio
             url={`./audio/click.webm`}
-            distance={0.01}
+            distance={0.5}
             autoplay={false}
             loop={false}
             ref={audioRef}

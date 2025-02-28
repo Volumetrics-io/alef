@@ -99,10 +99,10 @@ const buttonVariants = {
   } satisfies { [Key in string]: ContainerProperties }
 
   const audioDistance = {
-    default: 0.01,
-    sm: 0.005,
-    lg: 0.015,
-    icon: 0.01,
+    default: 1,
+    sm: 0.5,
+    lg: 1,
+    icon: 0.25,
   }
   
   export type ButtonProperties = ContainerProperties & {

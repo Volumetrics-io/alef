@@ -3,7 +3,7 @@ import { Box, Link, Text, type ToolbarProps } from '@alef/sys';
 export function Footer(props: ToolbarProps) {
 	const currentYear = new Date().getFullYear();
 	return (
-		<Box padded="squeeze">
+		<Box padded="squeeze" background="paper">
 			<Box padded align="start" justify="between" gapped full stacked="mobile" {...props}>
 				<Text>ⓒ {currentYear} Volumetrics, Inc</Text>
 				<Box gapped stacked="mobile" wrap>

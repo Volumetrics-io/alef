@@ -1,8 +1,9 @@
 import { ROOM_TYPES, RoomType } from '@alef/common';
-import { Container, Text } from '@react-three/uikit';
-import { Button, colors } from '@react-three/uikit-default';
+import { Text } from '@react-three/uikit';
 import { sentenceCase } from 'change-case';
 import { LayoutIcon } from '../room/LayoutIcon';
+import { Selector, SelectorItem } from './Selector';
+import { colors } from './theme';
 
 export interface RoomTypePickerProps {
 	value?: RoomType[];
@@ -15,10 +16,12 @@ export interface RoomTypePickerProps {
 
 export function RoomTypePicker({ value = [], onValueChange, multiple, direction = 'column', wrap, size = 'medium' }: RoomTypePickerProps) {
 	return (
-		<Container flexDirection={direction} flexWrap={wrap ? 'wrap' : 'no-wrap'} gap={4} flexShrink={0}>
+		<Selector flexDirection={direction} flexWrap={wrap ? 'wrap' : 'no-wrap'} size={size}>
 			{ROOM_TYPES.map((roomType) => (
-				<Button
+				<SelectorItem
+					wrap={wrap}
 					key={roomType}
+					size={size}
 					onClick={() => {
 						if (multiple) {
 							if (value?.includes(roomType)) {
@@ -30,22 +33,14 @@ export function RoomTypePicker({ value = [], onValueChange, multiple, direction 
 							onValueChange?.([roomType]);
 						}
 					}}
-					backgroundColor={value.includes(roomType) ? colors.accent : undefined}
-					alignItems="center"
-					flexDirection="row"
-					width={wrap ? 'auto' : '100%'}
-					paddingY={size === 'small' ? 4 : 8}
-					paddingX={size === 'small' ? 8 : 12}
-					height="auto"
-					gap={4}
-					justifyContent="flex-start"
+					selected={value.includes(roomType)}
 				>
-					<LayoutIcon icon={roomType} color={colors.foreground} width={size === 'small' ? 12 : 20} height={size === 'small' ? 12 : 20} />
-					<Text fontSize={size === 'small' ? 10 : 16} color={colors.foreground}>
+					<LayoutIcon icon={roomType} width={size === 'small' ? 12 : 20} height={size === 'small' ? 12 : 20} />
+					<Text>
 						{sentenceCase(roomType)}
 					</Text>
-				</Button>
+				</SelectorItem>
 			))}
-		</Container>
+		</Selector>
 	);
 }

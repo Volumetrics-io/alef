@@ -1,7 +1,7 @@
 import { Billboard } from '@react-three/drei';
 import { ThreeElements } from '@react-three/fiber';
 import { Container, Root } from '@react-three/uikit';
-import { colors } from '@react-three/uikit-default';
+import { colors } from './ui/theme';
 import { X } from '@react-three/uikit-lucide';
 import { useState } from 'react';
 import { DragController, Draggable } from './controls/Draggable.tsx';
@@ -30,11 +30,11 @@ export function Panel({ open = true, onToggle, children, ...props }: { open?: bo
 						{open && children}
 						<DragController>
 							<Container flexDirection="row" width="50%" gap={10} alignItems="center">
-								<Container backgroundColor={colors.background} borderRadius={15} borderColor={colors.border} borderWidth={0.5} padding={5} onClick={handleToggle}>
-									<X color={colors.primary} width={12} height={12} />
+								<Container backgroundColor={colors.surface} borderRadius={15} borderColor={colors.border} borderWidth={0.5} padding={5} onClick={handleToggle}>
+									<X color={colors.ink} width={12} height={12} />
 								</Container>
 								<Container
-									backgroundColor={colors.background}
+									backgroundColor={colors.surface}
 									height={15}
 									borderRadius={10}
 									borderColor={colors.border}

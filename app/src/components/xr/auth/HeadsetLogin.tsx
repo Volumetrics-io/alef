@@ -2,10 +2,11 @@ import { isQuest } from '@/services/os';
 import { useDeviceDiscovery, useDiscoverySuggest } from '@/services/publicApi/deviceHooks';
 import { PrefixedId } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
-import { Button, colors } from '@react-three/uikit-default';
+import { colors } from '../ui/theme';
 import { HourglassIcon } from '@react-three/uikit-lucide';
 import { useState } from 'react';
 import { Surface } from '../ui/Surface';
+import { Button } from '../ui/Button';
 
 export function HeadsetLogin() {
 	// TODO: modify name from here
@@ -30,7 +31,7 @@ export function HeadsetLogin() {
 
 	return (
 		<Surface flexDirection="column" flexWrap="no-wrap" maxWidth={400} padding={8}>
-			<Text fontSize={8} color={colors.foreground}>
+			<Text fontSize={8}>
 				Pair this device
 			</Text>
 			{selectedDevice ? <WaitingToPair selectedDevice={selectedDevice} onCancel={() => setSelectedDevice(null)} /> : <DeviceList onSelect={pairWithDevice} devices={devices} />}
@@ -41,10 +42,10 @@ export function HeadsetLogin() {
 function DeviceList({ devices, onSelect }: { devices: { id: PrefixedId<'d'>; name?: string }[]; onSelect: (id: PrefixedId<'d'>) => void }) {
 	return (
 		<Container flexDirection="column" gap={4}>
-			<Text color={colors.foreground}>Log into Alef on a phone or computer using the same Wifi network as this device, then select it here.</Text>
+			<Text>Log into Alef on a phone or computer using the same Wifi network as this device, then select it here.</Text>
 			<Container flexDirection="column" gap={4} width="100%">
 				{!devices?.length ? (
-					<Text color={colors.mutedForeground}>No devices yet</Text>
+					<Text color={colors.faded}>No devices yet</Text>
 				) : (
 					devices.map((device) => (
 						<Button key={device.id} onClick={() => onSelect(device.id)}>
@@ -60,11 +61,11 @@ function DeviceList({ devices, onSelect }: { devices: { id: PrefixedId<'d'>; nam
 function WaitingToPair({ selectedDevice, onCancel }: { selectedDevice: { id: PrefixedId<'d'>; name?: string }; onCancel?: () => void }) {
 	return (
 		<Container flexDirection={'column'} gap={4}>
-			<HourglassIcon color={colors.foreground} />
-			<Text fontSize={8} color={colors.foreground}>
+			<HourglassIcon />
+			<Text fontSize={8}>
 				Waiting to pair with {selectedDevice.name ?? 'Unknown device'}
 			</Text>
-			<Text color={colors.foreground}>Press "Pair" on your device when prompted.</Text>
+			<Text>Press "Pair" on your device when prompted.</Text>
 			<Button onClick={onCancel}>
 				<Text>Cancel</Text>
 			</Button>

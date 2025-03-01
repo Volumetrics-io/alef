@@ -1,29 +1,30 @@
 import { useRescanRoom } from '@/hooks/useRescanRoom';
 import { useMe } from '@/services/publicApi/userHooks';
 import { useEditorStageMode } from '@/stores/editorStore';
-import { Container, Root } from '@react-three/uikit';
-import { colors, Toggle } from '@react-three/uikit-default';
+import { Container, FontFamilyProvider, Root } from '@react-three/uikit';
+import { colors, Defaults } from '@react-three/uikit-default';
 import { BoxIcon, HouseIcon, Menu, SettingsIcon, Sofa, SunIcon, X } from '@react-three/uikit-lucide';
 import { useXR } from '@react-three/xr';
 import { Suspense, useMemo, useState } from 'react';
 import { Vector3 } from 'three';
 import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
 import { DragController } from '../controls/Draggable';
-import { Surface } from '../ui/Surface';
 import { FurniturePanel } from './staging/furniture/FurniturePanel';
 import { Layouts } from './staging/Layouts';
 import { Lighting } from './staging/Lighting';
 import { SettingsPanel } from './staging/SettingsPanel';
 import { UpdatePrompt } from './UpdatePrompt';
+import { Selector, SelectorItem } from '../ui/Selector';
+import { Button } from '../ui/Button';
 
-export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
+export function StagerPanel() {
 	const [mode, setMode] = useEditorStageMode();
 	const [isOpen, setIsOpen] = useState(false);
 	const isInXR = useXR((s) => !!s.session);
 
 	const position = useMemo(() => {
 		if (!isInXR) {
-			return new Vector3(0, -0.1, 0.75);
+			return new Vector3(-0.1, 0, 0.75);
 		}
 		if (isOpen) {
 			return new Vector3(0, -0.15, 0.75);
@@ -39,39 +40,65 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 	return (
 		<DraggableBodyAnchor follow={!isOpen} position={position} lockY={true} distance={0.15}>
 			<Root pixelSize={0.001} flexDirection="column" gap={10}>
-				<UpdatePrompt />
-				<Surface flexGrow={0} flexShrink={0} marginX="auto">
-					<Toggle
+				<Defaults>
+					<FontFamilyProvider
+						bricolage-grotesque={{
+							thin: './fonts/msdf/bricolage/BricolageGrotesque-Thin.json',
+							'extra-light': './fonts/msdf/bricolage/BricolageGrotesque-ExtraLight.json',
+							light: './fonts/msdf/bricolage/BricolageGrotesque-Light.json',
+							medium: './fonts/msdf/bricolage/BricolageGrotesque-Medium.json',
+							normal: './fonts/msdf/bricolage/BricolageGrotesque-Regular.json',
+							'semi-bold': './fonts/msdf/bricolage/BricolageGrotesque-SemiBold.json',
+							bold: './fonts/msdf/bricolage/BricolageGrotesque-Bold.json',
+							'extra-bold': './fonts/msdf/bricolage/BricolageGrotesque-ExtraBold.json',
+						}}
+						ibm-plex-sans={{
+							thin: './fonts/msdf/ibm-plex/IBMPlexSans-Thin.json',
+							'extra-light': './fonts/msdf/ibm-plex/IBMPlexSans-ExtraLight.json',
+							light: './fonts/msdf/ibm-plex/IBMPlexSans-Light.json',
+							medium: './fonts/msdf/ibm-plex/IBMPlexSans-Medium.json',
+							normal: './fonts/msdf/ibm-plex/IBMPlexSans-Regular.json',
+							'semi-bold': './fonts/msdf/ibm-plex/IBMPlexSans-SemiBold.json',
+							bold: './fonts/msdf/ibm-plex/IBMPlexSans-Bold.json',
+							'extra-bold': './fonts/msdf/ibm-plex/IBMPlexSans-ExtraBold.json',
+						}}
+					>
+				<Container alignItems="center" flexGrow={0} flexShrink={0} gap={4} marginX="auto">
+					<UpdatePrompt />
+					<Button size="icon" variant={isOpen ? 'destructive' : 'default'}
 						onClick={() => {
 							setMode(null);
 							setIsOpen(!isOpen);
-							onToggle?.();
 						}}
 					>
-						{isOpen ? <X color={colors.primary} /> : <Menu color={colors.primary} />}
-					</Toggle>
-					<Container display={isOpen ? 'flex' : 'none'} flexDirection="row" alignItems={'center'} gap={10}>
-						<Toggle checked={mode === 'layout'} onClick={() => setMode('layout')}>
-							<HouseIcon color={colors.primary} />
-						</Toggle>
-						<Toggle checked={mode === 'furniture'} onClick={() => setMode('furniture')}>
-							<Sofa color={colors.primary} />
-						</Toggle>
-						<Toggle checked={mode === 'lighting'} onClick={() => setMode('lighting')}>
-							<SunIcon color={colors.primary} />
-						</Toggle>
-						{canRescan && (
-							<Toggle onClick={() => rescanRoom()}>
-								<BoxIcon color={colors.primary} />
-							</Toggle>
-						)}
-						{!isLoggedIn && (
-							<Toggle onClick={() => setMode('settings')}>
+						{isOpen ? <X /> : <Menu />}
+					</Button>
+					{isOpen && (
+						<>
+						<Selector flexDirection="row" size="small">
+							<SelectorItem selected={mode === 'layout'} onClick={() => setMode('layout')}>
+								<HouseIcon />
+							</SelectorItem>
+							<SelectorItem selected={mode === 'furniture'} onClick={() => setMode('furniture')}>
+								<Sofa />
+							</SelectorItem>
+							<SelectorItem selected={mode === 'lighting'} onClick={() => setMode('lighting')}>
+								<SunIcon />
+							</SelectorItem>
+							{!isLoggedIn && (
+							<SelectorItem selected={mode === 'settings'} onClick={() => setMode('settings')}>
 								<SettingsIcon color={colors.secondaryForeground} />
-							</Toggle>
+							</SelectorItem>
 						)}
-					</Container>
-				</Surface>
+						</Selector>
+						{canRescan && (
+							<Button size="icon" onClick={() => rescanRoom()}>
+								<BoxIcon />
+							</Button>
+						)}
+						</>
+					)}
+				</Container>
 				{isOpen && (
 					<>
 						{mode === 'lighting' && <Lighting />}
@@ -91,6 +118,8 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 						)}
 					</>
 				)}
+				</FontFamilyProvider>
+				</Defaults>
 			</Root>
 		</DraggableBodyAnchor>
 	);

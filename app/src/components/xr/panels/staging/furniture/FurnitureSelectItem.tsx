@@ -2,12 +2,12 @@ import { Surface } from '@/components/xr/ui/Surface';
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
 import { useAddFurniture } from '@/stores/roomStore';
 import { Container, Image } from '@react-three/uikit';
-import { colors } from '@react-three/uikit-default';
 import { PlusIcon } from '@react-three/uikit-lucide';
 import { useState } from 'react';
+import { Button } from '@/components/xr/ui/Button';
+import { colors } from '@/components/xr/ui/theme';
 
 export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }) {
-	const addFurniture = useAddFurniture();
 	const [hovered, setHovered] = useState(false);
 	return (
 		<Surface
@@ -18,36 +18,44 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 			flexShrink={0}
 			alignItems="center"
 			onHoverChange={(hovered) => setHovered(hovered)}
-			onClick={() => {
-				addFurniture({
-					furnitureId: furnitureItem.id,
-					position: { x: 0, y: 0, z: 0 },
-					rotation: { x: 0, y: 0, z: 0, w: 1 },
-				});
-			}}
 		>
-			<Container flexDirection="column" alignItems="center" justifyContent="center" backgroundColor={colors.accent} borderRadius={5} width="100%">
-				{hovered && <AddIndicator />}
+			<Container
+				flexDirection="column"
+				alignItems="center"
+				justifyContent="center"
+				backgroundColor={colors.paper}
+				borderRadius={5}
+				width="100%"
+			>
+				{hovered && <FurnitureAddButton furnitureItem={furnitureItem} />}
 				<Image src={`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureItem.id}/image.jpg`} width="100%" height="100%" objectFit="cover" />
 			</Container>
 		</Surface>
 	);
 }
 
-function AddIndicator() {
+function FurnitureAddButton({ furnitureItem }: { furnitureItem: FurnitureItem }) {
+	const addFurniture = useAddFurniture();
+	const [hovered, setHovered] = useState(false);
 	return (
-		<Container
-			zIndexOffset={10}
-			height={30}
+		<Button
+			variant="link"
 			width={30}
+			height={30}
 			padding={4}
-			borderRadius={25}
+			onHoverChange={(hovered) => setHovered(hovered)}
+			zIndexOffset={hovered ? 10 : 0}
 			positionType="absolute"
-			positionBottom={10}
-			positionRight={10}
-			backgroundColor={colors.primary}
+			positionBottom={6}
+			positionRight={6}
+			onClick={() =>
+				addFurniture({
+					furnitureId: furnitureItem.id,
+					position: { x: 0, y: 0, z: 0 },
+					rotation: { x: 0, y: 0, z: 0, w: 1 },
+				})}
 		>
-			<PlusIcon color={colors.primaryForeground} />
-		</Container>
+			<PlusIcon />
+		</Button>
 	);
 }

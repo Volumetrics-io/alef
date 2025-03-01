@@ -109,7 +109,7 @@ const XRBodyAnchor = forwardRef<Group, BodyAnchorProps>(({ position = [0, -0.2, 
 
 	return (
 		<AnimatedGroup ref={groupRef} position={pos} {...groupProps}>
-			<Billboard>{children}</Billboard>
+			<Billboard lockZ lockX>{children}</Billboard>
 		</AnimatedGroup>
 	);
 });

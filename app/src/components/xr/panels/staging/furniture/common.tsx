@@ -5,11 +5,18 @@ import { useEditorStageMode } from '@/stores/editorStore';
 import { useAllFilters, useCategoryFilter, useSetFilters } from '@/stores/FilterStore';
 import { Attribute, AttributeKey } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
-import { Button, colors } from '@react-three/uikit-default';
+import { Button } from '@/components/xr/ui/Button';
+import { colors } from '@/components/xr/ui/theme';
 import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, PanelLeftCloseIcon, PanelLeftIcon, SofaIcon } from '@react-three/uikit-lucide';
-import { ReactNode, Suspense, useState } from 'react';
+import { ReactNode, Suspense, useRef, useState } from 'react';
 import { proxy, useSnapshot } from 'valtio';
 import { FurnitureSelectItem } from './FurnitureSelectItem';
+import { config, useSpring, animated } from '@react-spring/three';
+import { useFrame } from '@react-three/fiber';
+import { Selector } from '@/components/xr/ui/Selector';
+import { SelectorItem } from '@/components/xr/ui/Selector';
+
+const AnimatedSurface = animated(Surface);
 
 const panelState = proxy({
 	showFilters: false,
@@ -21,10 +28,9 @@ export const FurniturePanelRoot = ({ children }: { children?: ReactNode }) => (
 	</Surface>
 );
 
-export function SmallButton({ children, onClick }: { children: React.ReactNode; onClick: () => void }) {
-	const [hovered, setHovered] = useState(false);
+function SmallButton({ children, onClick }: { children: React.ReactNode; onClick: () => void }) {
 	return (
-		<Button onClick={onClick} backgroundColor={hovered ? colors.accent : undefined} padding={4} width={30} height={30} onHoverChange={(hovered) => setHovered(hovered)}>
+		<Button onClick={onClick} variant="ghost" padding={4} width={30} height={30}>
 			{children}
 		</Button>
 	);
@@ -38,11 +44,11 @@ export const FurniturePanelHeader = () => {
 					panelState.showFilters = true;
 				}}
 			>
-				<PanelLeftIcon color={colors.primary} width={20} height={20} />
+				<PanelLeftIcon width={20} height={20} />
 			</SmallButton>
 			<Container marginX="auto" flexDirection="row" gap={4} alignItems="center" justifyContent="center">
-				<SofaIcon color={colors.primary} width={20} height={20} />
-				<Text fontSize={20} color={colors.primary}>
+				<SofaIcon width={20} height={20} />
+				<Text fontSize={20}>
 					Furniture
 				</Text>
 			</Container>
@@ -52,47 +58,70 @@ export const FurniturePanelHeader = () => {
 
 export const FurniturePanelFilterSidebar = ({ children }: { children?: ReactNode }) => {
 	const visible = useSnapshot(panelState).showFilters;
-	const [scrollbarVisible, setScrollbarVisible] = useState(0);
+	const scrollbarVisible = useRef(0);
+	const [isVisible, setIsVisible] = useState(false);
+
+	const [{ transformTranslateX }, api] = useSpring(() => ({ transformTranslateX: -180, config: config.default }));
+
+	useFrame(() => {
+		if (visible) {
+			api.start({ transformTranslateX: 0 });
+		} else {
+			api.start({ transformTranslateX: -180 });
+		}
+
+		const newVisibility = visible || transformTranslateX.isAnimating;
+		if (newVisibility !== isVisible) {
+			setIsVisible(newVisibility);
+		}
+	});
+
 	const handleEnter = () => {
-		setScrollbarVisible(1);
+		scrollbarVisible.current = 1;
 	};
 
 	const handleLeave = () => {
-		setScrollbarVisible(0);
+		scrollbarVisible.current = 0;
 	};
+
 	return (
 		<Container
-			display={visible ? 'flex' : 'none'}
-			flexDirection="column"
-			zIndexOffset={2}
-			flexGrow={1}
-			flexShrink={0}
-			height="100%"
-			width="30%"
-			positionType="absolute"
-			positionTop={0}
-			positionLeft={0}
-			gap={8}
+		width="30%"
+		overflow="hidden"
+		display={isVisible ? 'flex' : 'none'}
+		flexDirection="column"
+		zIndexOffset={2}
+		flexGrow={1}
+		flexShrink={0} 
+		height="100%"
+		positionType="absolute"
+		positionTop={0}
+		positionLeft={0}
+		gap={8} 
+		padding={6}>
+
+		<AnimatedSurface 
+			transformTranslateX={transformTranslateX}
+			flexDirection="column" 
+			height="100%" 
+			width="100%" 
+			onPointerEnter={handleEnter} onPointerLeave={handleLeave} 
+			scrollbarOpacity={scrollbarVisible.current} 
+			scrollbarWidth={8} 
+			scrollbarBorderRadius={4} 
 			overflow="scroll"
-			padding={10}
-			onPointerEnter={handleEnter}
-			onPointerLeave={handleLeave}
-			scrollbarOpacity={scrollbarVisible}
-			scrollbarWidth={8}
-			scrollbarBorderRadius={4}
-			scrollbarColor={colors.primary}
-		>
-			<Surface flexDirection="column" height="100%" width="100%" gap={8}>
+			scrollbarColor={colors.ink}
+			gap={8}>
 				{children}
-			</Surface>
+		</AnimatedSurface>
 		</Container>
 	);
 };
 
 export const FurniturePanelFilterSidebarSectionHeader = ({ children, label }: { children?: ReactNode; label: string }) => {
 	return (
-		<Container paddingY={10} borderBottomWidth={2} borderColor={colors.primary} justifyContent="space-between">
-			<Text color={colors.primary}>{label}</Text>
+		<Container paddingY={10} justifyContent="space-between">
+			<Text>{label}</Text>
 			{children}
 		</Container>
 	);
@@ -105,7 +134,7 @@ export const FurniturePanelFilterSidebarCloseButton = () => {
 				panelState.showFilters = false;
 			}}
 		>
-			<PanelLeftCloseIcon color={colors.primary} width={20} height={20} />
+			<PanelLeftCloseIcon width={20} height={20} />
 		</SmallButton>
 	);
 };
@@ -134,7 +163,7 @@ export const FurnitureCollection = ({ furniture }: { furniture: FurnitureItem[] 
 			scrollbarWidth={8}
 			scrollbarBorderRadius={4}
 			paddingBottom={8}
-			scrollbarColor={colors.primary}
+			scrollbarColor={colors.ink}
 		>
 			{furniture.map((furnitureItem) => (
 				<FurnitureSelectItem key={furnitureItem.id} furnitureItem={furnitureItem} />
@@ -170,7 +199,7 @@ export function FurnitureAttributePicker({ options }: { options: Attribute[] }) 
 	if (!key) {
 		return (
 			<Container padding={5}>
-				<Text color={colors.mutedForeground} fontSize={12}>
+				<Text color={colors.faded} fontSize={12}>
 					No filters available
 				</Text>
 			</Container>
@@ -178,12 +207,12 @@ export function FurnitureAttributePicker({ options }: { options: Attribute[] }) 
 	}
 
 	return (
-		<Container flexDirection="column" gap={4} flexShrink={0}>
-			<FurnitureAttributePickerAllItem attributeKey={key} />
+		<Selector flexWrap="wrap" flexDirection="column" size="small">
+            <FurnitureAttributePickerAllItem key="all" attributeKey={key} />
 			{options.map((option) => (
 				<FurnitureAttributePickerItem key={option.value} attribute={option} />
 			))}
-		</Container>
+		</Selector>
 	);
 }
 
@@ -193,7 +222,7 @@ function FurnitureAttributePickerItem({ attribute }: { attribute: Attribute }) {
 	const setValue = useSetFilters();
 
 	return (
-		<FurnitureAttributePickerItemButton
+		<SelectorItem
 			onClick={() =>
 				setValue((prev) => {
 					if (selected) {
@@ -205,8 +234,10 @@ function FurnitureAttributePickerItem({ attribute }: { attribute: Attribute }) {
 			}
 			selected={selected}
 		>
-			{attribute.value[0].toUpperCase() + attribute.value.slice(1)}
-		</FurnitureAttributePickerItemButton>
+			<Text>
+				{attribute.value[0].toUpperCase() + attribute.value.slice(1)}
+			</Text>
+		</SelectorItem>
 	);
 }
 
@@ -216,7 +247,7 @@ function FurnitureAttributePickerAllItem({ attributeKey }: { attributeKey: Attri
 	const setValue = useSetFilters();
 
 	return (
-		<FurnitureAttributePickerItemButton
+		<SelectorItem
 			// does nothing when already active
 			onClick={
 				selected
@@ -229,31 +260,9 @@ function FurnitureAttributePickerAllItem({ attributeKey }: { attributeKey: Attri
 			}
 			selected={selected}
 		>
-			All
-		</FurnitureAttributePickerItemButton>
+			<Text>
+				All
+			</Text>
+		</SelectorItem>
 	);
 }
-
-const FurnitureAttributePickerItemButton = ({ children, onClick, selected }: { children: string; onClick?: () => void; selected?: boolean }) => {
-	const [hovered, setHovered] = useState(false);
-	return (
-		<Button
-			onClick={onClick}
-			backgroundColor={selected || hovered ? colors.accent : undefined}
-			alignItems="center"
-			flexDirection="row"
-			width="100%"
-			paddingY={8}
-			paddingX={12}
-			height="auto"
-			gap={4}
-			justifyContent="space-between"
-			onHoverChange={(hovered) => setHovered(hovered)}
-		>
-			<Text fontSize={16} color={colors.foreground}>
-				{children}
-			</Text>
-			{selected && <CheckIcon color={colors.foreground} width={16} height={16} />}
-		</Button>
-	);
-};

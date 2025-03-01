@@ -13,12 +13,13 @@ import { Bvh } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { Handle } from '@react-three/handle';
 import { Container, Root } from '@react-three/uikit';
-import { Button, colors } from '@react-three/uikit-default';
+import { theme } from '../ui/theme';
 import { ArrowLeft, ArrowRight, Trash } from '@react-three/uikit-lucide';
-import { ComponentPropsWithoutRef, useCallback, useRef } from 'react';
-import { Group } from 'three';
-import { Billboard } from '../Billboard';
+import { ComponentPropsWithoutRef, useCallback, useRef, useState } from 'react';
+import { Group, BackSide } from 'three';
 import { CollisionModel, FurnitureModel } from './FurnitureModel';
+import { Billboard } from '../Billboard';
+import { Button } from '../ui/Button';
 
 export interface PlacedFurnitureProps {
 	furniturePlacementId: PrefixedId<'fp'>;
@@ -89,17 +90,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 			)}
 			{isEditable && selected && (
 				<Handle targetRef={groupRef as any} rotate={{ x: false, y: true, z: false }} translate="as-rotate">
-					<mesh
-						onPointerUp={handlePointerUpRotate}
-						onPointerOut={handlePointerUpRotate}
-						onPointerLeave={handlePointerUpRotate}
-						position={[0, 0.2, 0]}
-						rotation={[Math.PI / 2, 0, 0]}
-						renderOrder={-2}
-					>
-						<torusGeometry args={[hypotenuse + 0.1, 0.025, 64]} />
-						<meshPhongMaterial color="#1d7e7f" emissive="#1d7e7f" emissiveIntensity={0.5} />
-					</mesh>
+					<RotationRing hypotenuse={hypotenuse} handlePointerUpRotate={handlePointerUpRotate} />
 				</Handle>
 			)}
 		</group>
@@ -111,6 +102,28 @@ function ConditionalHandle({ enabled, ...props }: ComponentPropsWithoutRef<typeo
 	return <Handle {...props} />;
 }
 
+function RotationRing({ hypotenuse, handlePointerUpRotate }: { hypotenuse: number; handlePointerUpRotate: () => void }) {
+	const [hovered, setHovered] = useState(false);
+	return (
+		<group 
+			onPointerEnter={() => setHovered(true)}
+			onPointerLeave={() => setHovered(false)}
+			onPointerUp={handlePointerUpRotate}
+			position={[0, 0.2, 0]}
+			rotation={[Math.PI / 2, 0, 0]}
+			renderOrder={-2}
+		>
+			<mesh castShadow >
+				<torusGeometry args={[hypotenuse + 0.1, 0.025, 64]} />
+				<meshPhongMaterial color={hovered ? theme.light.attentionHover : theme.light.attentionSurface} emissive={hovered ? theme.light.attentionHover : theme.light.attentionSurface} emissiveIntensity={0.5} />
+			</mesh>
+			<mesh castShadow >
+				<torusGeometry args={[hypotenuse + 0.1, 0.03, 64]} />
+				<meshPhongMaterial color={hovered ? theme.light.attentionFaded : theme.light.attentionBorder} side={BackSide} emissive={hovered ? theme.light.attentionFaded : theme.light.attentionBorder} emissiveIntensity={0.5} />
+			</mesh>
+		</group>
+	)
+}
 function PlaceFurnitureUI({
 	furniturePlacementId,
 	furnitureId,
@@ -121,7 +134,7 @@ function PlaceFurnitureUI({
 	furnitureId: PrefixedId<'f'>;
 	setFurnitureId: (id: PrefixedId<'fp'>, furnitureId: PrefixedId<'f'>) => Promise<void>;
 	height: number;
-}) {
+}) {	
 	const handleDelete = useDeleteFurniturePlacement(furniturePlacementId);
 
 	const { data: currentFurniture } = useFurnitureDetails(furnitureId);
@@ -147,15 +160,15 @@ function PlaceFurnitureUI({
 
 	return (
 		<Billboard lockX lockZ position={[0, height, 0]}>
-			<Root pixelSize={0.005}>
+			<Root pixelSize={0.002}>
 				<Container width="100%" height="100%" gap={20}>
-					<Button borderRadius={5} onClick={handlePrevious}>
+					<Button variant="link" onClick={handlePrevious}>
 						<ArrowLeft />
 					</Button>
-					<Button backgroundColor={colors.destructive} borderRadius={5} onClick={handleDelete}>
+					<Button variant="destructive" onClick={handleDelete}>
 						<Trash />
 					</Button>
-					<Button borderRadius={5} onClick={handleNext}>
+					<Button variant="link" onClick={handleNext}>
 						<ArrowRight />
 					</Button>
 				</Container>

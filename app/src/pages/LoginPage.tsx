@@ -12,7 +12,7 @@ const LoginPage = () => {
 				<Box full align="center" gapped>
 					<Logo width={80} height={80} style={{ alignSelf: 'flex-start' }} />
 					<Heading level={1} style={{ fontSize: '2rem' }}>
-						Alef
+						alef
 					</Heading>
 				</Box>
 

@@ -15,7 +15,7 @@ import { config, useSpring, animated } from '@react-spring/three';
 import { useFrame } from '@react-three/fiber';
 import { Selector } from '@/components/xr/ui/Selector';
 import { SelectorItem } from '@/components/xr/ui/Selector';
-
+import { Heading } from '@/components/xr/ui/Heading';
 const AnimatedSurface = animated(Surface);
 
 const panelState = proxy({
@@ -48,9 +48,9 @@ export const FurniturePanelHeader = () => {
 			</SmallButton>
 			<Container marginX="auto" flexDirection="row" gap={4} alignItems="center" justifyContent="center">
 				<SofaIcon width={20} height={20} />
-				<Text fontSize={20}>
+				<Heading level={3}>
 					Furniture
-				</Text>
+				</Heading>
 			</Container>
 		</Container>
 	);

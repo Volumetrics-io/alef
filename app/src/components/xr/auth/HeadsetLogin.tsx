@@ -7,7 +7,8 @@ import { HourglassIcon, X } from '@react-three/uikit-lucide';
 import { useState } from 'react';
 import { Surface } from '../ui/Surface';
 import { Button } from '../ui/Button';
-
+import { Dimmer } from '../ui/Dimmer';
+import { Heading } from '../ui/Heading';
 export function HeadsetLogin({ onCancel }: { onCancel?: () => void }) {
 	// TODO: modify name from here
 	const [name, _setName] = useState(() => {
@@ -30,32 +31,17 @@ export function HeadsetLogin({ onCancel }: { onCancel?: () => void }) {
 	};
 
 	return (
-		<Container flexDirection="column" 
-					backgroundColor={colors.dimmed}
-					backgroundOpacity={0.5}
-					borderRadius={10}
-					width="100%" 
-					height="100%" 
-					positionType="absolute" 
-					positionTop={0} 
-					positionLeft={0} 
-					positionRight={0} 
-					positionBottom={0}
-					justifyContent="center"
-					alignItems="center"
-					zIndexOffset={10}
-					padding={10}
-					>
+		<Dimmer>
 			<Surface flexDirection="column" flexWrap="no-wrap" maxWidth={400} height="100%" gap={10} padding={10}>
-					<Text alignSelf="center" fontSize={20}>
+					<Heading level={3} alignSelf="center">
 						Device Pairing
-					</Text>
+					</Heading>
 				{selectedDevice ? <WaitingToPair selectedDevice={selectedDevice} onCancel={() => setSelectedDevice(null)} /> : <DeviceList onSelect={pairWithDevice} devices={devices} />}
 				<Button onClick={onCancel}>
 					<Text>Cancel</Text>
 				</Button>
 			</Surface>
-		</Container>
+		</Dimmer>
 	);
 }
 

@@ -192,6 +192,9 @@ importers:
       '@pmndrs/uikit':
         specifier: ^0.8.7
         version: 0.8.7(three@0.172.0)
+      '@preact/signals-core':
+        specifier: ^1.8.0
+        version: 1.8.0
       '@preact/signals-react':
         specifier: ^3.0.1
         version: 3.0.1(react@18.3.1)

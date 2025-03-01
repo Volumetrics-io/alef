@@ -174,8 +174,8 @@ const buttonVariants = {
             ref={audioRef}
           />
           <DefaultProperties
-            fontSize={14}
-            lineHeight={20}
+            fontSize={16}
+            lineHeight={24}
             fontWeight="medium"
             wordBreak="keep-all"
             {...defaultProps}

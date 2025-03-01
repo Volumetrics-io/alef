@@ -1,12 +1,12 @@
 import { useEditorStageMode, useSelectedLightPlacementId } from '@/stores/editorStore';
 import { useDeleteLightPlacement, useGlobalLighting } from '@/stores/roomStore/roomStore';
 import { PrefixedId } from '@alef/common';
-import { Container, Text } from '@react-three/uikit';
-import { Slider } from '@react-three/uikit-default';
+import { Container } from '@react-three/uikit';
 import { ArrowLeftIcon, SunIcon, Trash } from '@react-three/uikit-lucide';
 import { Surface } from '../../ui/Surface';
 import { Button } from '../../ui/Button';
-import { colors } from '../../ui/theme';
+import { Heading } from '../../ui/Heading';
+import { Slider } from '../../ui/Slider';
 
 export const Lighting = () => {
 	const selectedLightId = useSelectedLightPlacementId();
@@ -26,21 +26,21 @@ const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
 		<Container flexDirection="column" width="100%" height="100%" padding={10} gap={10}>
 			<Container marginX="auto" flexDirection="row" gap={4} alignItems="center" justifyContent="center">
 				<SunIcon width={20} height={20} />
-				<Text fontSize={20}>
+				<Heading level={3}>
 					Lighting
-				</Text>
+				</Heading>
 			</Container>
 			<Container flexDirection="column" gap={50} flexGrow={1}>
 				<Container flexDirection="column" gap={10}>
-					<Text fontSize={18}>
+					<Heading level={4}>
 						Intensity
-					</Text>
+					</Heading>
 					<Slider value={globalIntensity} min={0} max={2} step={0.01} onValueChange={(v) => updateGlobal({ intensity: v })} />
 				</Container>
 				<Container flexDirection="column" gap={10} width="100%">
-					<Text fontSize={18}>
+					<Heading level={4}>
 						Warmth
-					</Text>
+					</Heading>
 					<Slider value={globalColor} min={0} max={10} step={0.1} onValueChange={(v) => updateGlobal({ color: v })} />
 				</Container>
 			</Container>

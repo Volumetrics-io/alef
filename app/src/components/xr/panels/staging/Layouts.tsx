@@ -8,7 +8,7 @@ import { LayoutIcon } from '../../room/LayoutIcon';
 import { RoomTypePicker } from '../../ui/RoomTypePicker';
 import { Surface } from '../../ui/Surface';
 import { Button } from '../../ui/Button';
-
+import { Heading } from '../../ui/Heading';
 export function Layouts({ readonly }: { readonly?: boolean }) {
 	const layoutIds = useRoomLayoutIds();
 	const [_mode, setMode] = useEditorStageMode();
@@ -20,9 +20,9 @@ export function Layouts({ readonly }: { readonly?: boolean }) {
 			<Surface flexDirection="column" flexWrap="no-wrap" flexGrow={1} height={420} width={500} gap={10} padding={10}>
 				<Container marginX="auto" flexDirection="row" gap={4} alignItems="center" justifyContent="center">
 					<HouseIcon width={20} height={20} />
-					<Text fontSize={20}>
+					<Heading level={3}>
 						Layouts
-					</Text>
+					</Heading>
 				</Container>
 				<Container flexDirection="column" flexGrow={1} flexShrink={0} justifyContent="space-between">
 					<Container flexDirection="column" gap={4} overflow="scroll" paddingRight={6} scrollbarWidth={5} scrollbarBorderRadius={2}>

@@ -40,16 +40,6 @@ export function StagerPanel() {
 			<Root pixelSize={0.001} flexDirection="column" gap={10}>
 				<Defaults>
 					<FontFamilyProvider
-						bricolage-grotesque={{
-							thin: './fonts/msdf/bricolage/BricolageGrotesque-Thin.json',
-							'extra-light': './fonts/msdf/bricolage/BricolageGrotesque-ExtraLight.json',
-							light: './fonts/msdf/bricolage/BricolageGrotesque-Light.json',
-							medium: './fonts/msdf/bricolage/BricolageGrotesque-Medium.json',
-							normal: './fonts/msdf/bricolage/BricolageGrotesque-Regular.json',
-							'semi-bold': './fonts/msdf/bricolage/BricolageGrotesque-SemiBold.json',
-							bold: './fonts/msdf/bricolage/BricolageGrotesque-Bold.json',
-							'extra-bold': './fonts/msdf/bricolage/BricolageGrotesque-ExtraBold.json',
-						}}
 						ibm-plex-sans={{
 							thin: './fonts/msdf/ibm-plex/IBMPlexSans-Thin.json',
 							'extra-light': './fonts/msdf/ibm-plex/IBMPlexSans-ExtraLight.json',
@@ -59,6 +49,16 @@ export function StagerPanel() {
 							'semi-bold': './fonts/msdf/ibm-plex/IBMPlexSans-SemiBold.json',
 							bold: './fonts/msdf/ibm-plex/IBMPlexSans-Bold.json',
 							'extra-bold': './fonts/msdf/ibm-plex/IBMPlexSans-ExtraBold.json',
+						}}
+						bricolage-grotesque={{
+							thin: './fonts/msdf/bricolage/BricolageGrotesque-Thin.json',
+							'extra-light': './fonts/msdf/bricolage/BricolageGrotesque-ExtraLight.json',
+							light: './fonts/msdf/bricolage/BricolageGrotesque-Light.json',
+							medium: './fonts/msdf/bricolage/BricolageGrotesque-Medium.json',
+							normal: './fonts/msdf/bricolage/BricolageGrotesque-Regular.json',
+							'semi-bold': './fonts/msdf/bricolage/BricolageGrotesque-SemiBold.json',
+							bold: './fonts/msdf/bricolage/BricolageGrotesque-Bold.json',
+							'extra-bold': './fonts/msdf/bricolage/BricolageGrotesque-ExtraBold.json',
 						}}
 					>
 							<Container alignItems="center" flexGrow={0} flexShrink={0} gap={4} marginX="auto">

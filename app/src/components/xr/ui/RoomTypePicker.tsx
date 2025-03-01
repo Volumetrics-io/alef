@@ -3,7 +3,6 @@ import { Text } from '@react-three/uikit';
 import { sentenceCase } from 'change-case';
 import { LayoutIcon } from '../room/LayoutIcon';
 import { Selector, SelectorItem } from './Selector';
-import { colors } from './theme';
 
 export interface RoomTypePickerProps {
 	value?: RoomType[];

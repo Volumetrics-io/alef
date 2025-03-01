@@ -1,5 +1,4 @@
 import { useRescanRoom } from '@/hooks/useRescanRoom';
-import { useMe } from '@/services/publicApi/userHooks';
 import { useEditorStageMode } from '@/stores/editorStore';
 import { Container, FontFamilyProvider, Root } from '@react-three/uikit';
 import { Defaults } from '@react-three/uikit-default';

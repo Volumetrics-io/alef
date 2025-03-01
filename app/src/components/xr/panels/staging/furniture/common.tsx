@@ -7,7 +7,7 @@ import { Attribute, AttributeKey } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { Button } from '@/components/xr/ui/Button';
 import { colors } from '@/components/xr/ui/theme';
-import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, PanelLeftCloseIcon, PanelLeftIcon, SofaIcon } from '@react-three/uikit-lucide';
+import { ArrowLeftIcon, ArrowRightIcon, PanelLeftCloseIcon, PanelLeftIcon, SofaIcon } from '@react-three/uikit-lucide';
 import { ReactNode, Suspense, useRef, useState } from 'react';
 import { proxy, useSnapshot } from 'valtio';
 import { FurnitureSelectItem } from './FurnitureSelectItem';

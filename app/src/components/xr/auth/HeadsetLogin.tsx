@@ -3,12 +3,13 @@ import { useDeviceDiscovery, useDiscoverySuggest } from '@/services/publicApi/de
 import { PrefixedId } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { colors } from '../ui/theme';
-import { HourglassIcon, X } from '@react-three/uikit-lucide';
+import { HourglassIcon } from '@react-three/uikit-lucide';
 import { useState } from 'react';
 import { Surface } from '../ui/Surface';
 import { Button } from '../ui/Button';
 import { Dimmer } from '../ui/Dimmer';
 import { Heading } from '../ui/Heading';
+
 export function HeadsetLogin({ onCancel }: { onCancel?: () => void }) {
 	// TODO: modify name from here
 	const [name, _setName] = useState(() => {

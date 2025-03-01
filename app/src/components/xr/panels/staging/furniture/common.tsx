@@ -105,6 +105,7 @@ export const FurniturePanelFilterSidebar = ({ children }: { children?: ReactNode
 			flexDirection="column" 
 			height="100%" 
 			width="100%" 
+			flexWrap="no-wrap"
 			onPointerEnter={handleEnter} onPointerLeave={handleLeave} 
 			scrollbarOpacity={scrollbarVisible.current} 
 			scrollbarWidth={8} 

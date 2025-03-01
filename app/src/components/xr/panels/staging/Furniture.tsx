@@ -2,15 +2,20 @@ import { FurnitureItem, useAllFurniture, useFurnitureAttributes } from '@/servic
 import { useEditorStageMode } from '@/stores/editorStore';
 import {  useAddFurniture } from '@/stores/roomStore/roomStore';
 import { Attribute, RoomType } from '@alef/common';
-import { Container, Image, Text } from '@react-three/uikit';
+import { Container, ContainerRef, Image, Text } from '@react-three/uikit';
 import { colors } from '../../ui/theme';
 import { ArrowLeftIcon, ArrowRightIcon, PanelLeftCloseIcon, PanelLeftIcon, PlusIcon, SofaIcon } from '@react-three/uikit-lucide';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { RoomTypePicker } from '../../ui/RoomTypePicker';
 import { Surface } from '../../ui/Surface';
 import { useFilterStore } from '@/stores/FilterStore';
 import { FurnitureTypePicker } from '../../ui/FurnitureTypePicker';
 import { Button } from '../../ui/Button';
+import { animated, config, useSpring } from '@react-spring/three';
+import { useFrame } from '@react-three/fiber';
+
+const AnimatedSurface = animated(Surface);
+
 
 
 export function Furniture() {
@@ -45,41 +50,61 @@ export function Furniture() {
 }
 
 function FurnitureTypeFilters({ visible, setVisible }: { visible: boolean; setVisible: (visible: boolean) => void }) {
-	const [scrollbarVisible, setScrollbarVisible] = useState(0);
+	const scrollbarVisible = useRef(0);
 	const { filters, setFilters } = useFilterStore();
-
 	const { data: attributes } = useFurnitureAttributes('type');
+	const [{ transformTranslateX }, api] = useSpring(() => ({ transformTranslateX: -180, config: config.default }));
 
+	const [isVisible, setIsVisible] = useState(false);
+
+	useFrame(() => {
+		if (visible) {
+			api.start({ transformTranslateX: 0 });
+		} else {
+			api.start({ transformTranslateX: -180 });
+		}
+
+		const newVisibility = visible || transformTranslateX.isAnimating;
+		if (newVisibility !== isVisible) {
+			setIsVisible(newVisibility);
+		}
+	});
 
 	const handleEnter = () => {
-		setScrollbarVisible(1);
+		scrollbarVisible.current = 1;
 	};
 
 	const handleLeave = () => {
-		setScrollbarVisible(0);
+		scrollbarVisible.current = 0;
 	};
 	return (
 		<Container
-		display={visible ? 'flex' : 'none'}
+		width="30%"
+		overflow="hidden"
+		display={isVisible ? 'flex' : 'none'}
 		flexDirection="column"
 		zIndexOffset={2}
 		flexGrow={1}
 		flexShrink={0} 
 		height="100%"
-		width="30%"
 		positionType="absolute"
 		positionTop={0}
 		positionLeft={0}
 		gap={8} 
-		overflow="scroll"
-		padding={10}
-		onPointerEnter={handleEnter} onPointerLeave={handleLeave} 
-		scrollbarOpacity={scrollbarVisible} 
-		scrollbarWidth={8} 
-		scrollbarBorderRadius={4} 
-		scrollbarColor={colors.ink}>
+		padding={6}>
 
-		<Surface flexDirection="column" height="100%" width="100%" gap={8}>
+		<AnimatedSurface 
+			transformTranslateX={transformTranslateX}
+			flexDirection="column" 
+			height="100%" 
+			width="100%" 
+			onPointerEnter={handleEnter} onPointerLeave={handleLeave} 
+			scrollbarOpacity={scrollbarVisible.current} 
+			scrollbarWidth={8} 
+			scrollbarBorderRadius={4} 
+			overflow="scroll"
+			scrollbarColor={colors.ink}
+			gap={8}>
 			<Container flexDirection="column" gap={2}>
 				<Container paddingY={10} paddingX={4} flexDirection="row" justifyContent="space-between" alignItems="center">
 					<Text>Categories</Text>
@@ -93,7 +118,7 @@ function FurnitureTypeFilters({ visible, setVisible }: { visible: boolean; setVi
 				<Text paddingY={10} paddingX={4}>Types</Text>
 			<FurnitureTypePicker attributes={attributes} size="small" />
 			</Container>
-		</Surface>
+		</AnimatedSurface>
 		</Container>
 	);
 }

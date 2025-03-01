@@ -6,7 +6,6 @@ import { BoxIcon, HouseIcon, Menu, Sofa, SunIcon, X } from '@react-three/uikit-l
 import { Suspense, useMemo, useState } from 'react';
 import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
 import { DragController } from '../controls/Draggable';
-import { Surface } from '../ui/Surface';
 import { Furniture } from './staging/Furniture';
 import { Layouts } from './staging/Layouts';
 import { Lighting } from './staging/Lighting';
@@ -15,7 +14,7 @@ import { Vector3 } from 'three';
 import { Selector, SelectorItem } from '../ui/Selector';
 import { Button } from '../ui/Button';
 
-export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
+export function StagerPanel() {
 	const [mode, setMode] = useEditorStageMode();
 	const [isOpen, setIsOpen] = useState(false);
 	const isInXR = useXR((s) => !!s.session);
@@ -82,9 +81,11 @@ export function StagerPanel({ onToggle }: { onToggle?: () => void }) {
 								<SunIcon />
 							</SelectorItem>
 						</Selector>
-						<Button size="icon" onClick={() => rescanRoom()}>
-							<BoxIcon />
-						</Button>
+						{canRescan && (
+							<Button size="icon" onClick={() => rescanRoom()}>
+								<BoxIcon />
+							</Button>
+						)}
 						</>
 					)}
 				</Container>

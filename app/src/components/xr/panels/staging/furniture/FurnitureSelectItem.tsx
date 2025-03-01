@@ -44,7 +44,7 @@ function FurnitureAddButton({ furnitureItem }: { furnitureItem: FurnitureItem })
 			height={30}
 			padding={4}
 			onHoverChange={(hovered) => setHovered(hovered)}
-			zIndexOffset={hovered ? 10 : 0}
+			zIndexOffset={hovered ? 100 : 10}
 			positionType="absolute"
 			positionBottom={6}
 			positionRight={6}

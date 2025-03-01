@@ -31,6 +31,9 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	const setFurnitureId = useSetFurniturePlacementFurnitureId();
 	const select = useEditorStore((s) => s.select);
 	const selected = useEditorStore((s) => s.selectedId === furniturePlacementId);
+	const mode = useEditorStore((s) => s.mode);
+
+
 	const { gl } = useThree();
 
 	const groupRef = useRef<Group>(null);
@@ -59,7 +62,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 
 	const hypotenuse = Math.sqrt(halfExtents[0] * halfExtents[0] + halfExtents[2] * halfExtents[2]);
 
-	const isEditable = ready;
+	const isEditable = ready && mode === "furniture";
 
 	if (!furnitureId || !placement) return null;
 

@@ -13,7 +13,7 @@ import { Bvh } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { Handle } from '@react-three/handle';
 import { Container, Root } from '@react-three/uikit';
-import { theme } from '../ui/theme';
+import { colors } from '../ui/theme';
 import { ArrowLeft, ArrowRight, Trash } from '@react-three/uikit-lucide';
 import { ComponentPropsWithoutRef, useCallback, useRef, useState } from 'react';
 import { Group, BackSide } from 'three';
@@ -115,11 +115,14 @@ function RotationRing({ hypotenuse, handlePointerUpRotate }: { hypotenuse: numbe
 		>
 			<mesh castShadow >
 				<torusGeometry args={[hypotenuse + 0.1, 0.025, 64]} />
-				<meshPhongMaterial color={hovered ? theme.light.attentionHover : theme.light.attentionSurface} emissive={hovered ? theme.light.attentionHover : theme.light.attentionSurface} emissiveIntensity={0.5} />
+				<meshPhongMaterial color={colors.focus.value} emissive={colors.focus.value} emissiveIntensity={0.5} />
 			</mesh>
-			<mesh castShadow >
+			<mesh 
+				// @ts-ignore - not sure why this keeps coming up when it's wrong
+				pointerEvents="none" 
+				>
 				<torusGeometry args={[hypotenuse + 0.1, 0.03, 64]} />
-				<meshPhongMaterial color={hovered ? theme.light.attentionFaded : theme.light.attentionBorder} side={BackSide} emissive={hovered ? theme.light.attentionFaded : theme.light.attentionBorder} emissiveIntensity={0.5} />
+				<meshPhongMaterial color={hovered ? colors.faded.value : colors.border.value} side={BackSide} emissive={hovered ? colors.faded.value : colors.border.value} emissiveIntensity={0.5} />
 			</mesh>
 		</group>
 	)

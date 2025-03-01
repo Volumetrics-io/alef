@@ -2,7 +2,7 @@ import { useRescanRoom } from '@/hooks/useRescanRoom';
 import { useMe } from '@/services/publicApi/userHooks';
 import { useEditorStageMode } from '@/stores/editorStore';
 import { Container, FontFamilyProvider, Root } from '@react-three/uikit';
-import { colors, Defaults } from '@react-three/uikit-default';
+import { Defaults } from '@react-three/uikit-default';
 import { BoxIcon, HouseIcon, Menu, SettingsIcon, Sofa, SunIcon, X } from '@react-three/uikit-lucide';
 import { useXR } from '@react-three/xr';
 import { Suspense, useMemo, useState } from 'react';
@@ -16,6 +16,7 @@ import { SettingsPanel } from './staging/SettingsPanel';
 import { UpdatePrompt } from './UpdatePrompt';
 import { Selector, SelectorItem } from '../ui/Selector';
 import { Button } from '../ui/Button';
+import { colors } from '../ui/theme';
 
 export function StagerPanel() {
 	const [mode, setMode] = useEditorStageMode();
@@ -33,9 +34,6 @@ export function StagerPanel() {
 	}, [isOpen, isInXR]);
 
 	const { canRescan, rescanRoom } = useRescanRoom();
-
-	const { data: session } = useMe();
-	const isLoggedIn = !!session;
 
 	return (
 		<DraggableBodyAnchor follow={!isOpen} position={position} lockY={true} distance={0.15}>
@@ -63,9 +61,8 @@ export function StagerPanel() {
 							'extra-bold': './fonts/msdf/ibm-plex/IBMPlexSans-ExtraBold.json',
 						}}
 					>
-				<Container alignItems="center" flexGrow={0} flexShrink={0} gap={4} marginX="auto">
-					<UpdatePrompt />
-					<Button size="icon" variant={isOpen ? 'destructive' : 'default'}
+							<Container alignItems="center" flexGrow={0} flexShrink={0} gap={4} marginX="auto">
+								<Button size="icon" variant={isOpen ? 'destructive' : 'default'}
 						onClick={() => {
 							setMode(null);
 							setIsOpen(!isOpen);
@@ -85,11 +82,9 @@ export function StagerPanel() {
 							<SelectorItem selected={mode === 'lighting'} onClick={() => setMode('lighting')}>
 								<SunIcon />
 							</SelectorItem>
-							{!isLoggedIn && (
 							<SelectorItem selected={mode === 'settings'} onClick={() => setMode('settings')}>
-								<SettingsIcon color={colors.secondaryForeground} />
+								<SettingsIcon />
 							</SelectorItem>
-						)}
 						</Selector>
 						{canRescan && (
 							<Button size="icon" onClick={() => rescanRoom()}>
@@ -99,6 +94,7 @@ export function StagerPanel() {
 						</>
 					)}
 				</Container>
+				<UpdatePrompt />
 				{isOpen && (
 					<>
 						{mode === 'lighting' && <Lighting />}
@@ -112,7 +108,7 @@ export function StagerPanel() {
 						{mode !== null && (
 							<DragController>
 								<Container flexDirection="row" width="70%" gap={10} alignItems="center">
-									<Container backgroundColor={colors.background} height={15} borderRadius={10} borderColor={colors.border} borderWidth={0.5} flexGrow={1} />
+									<Container backgroundColor={colors.surface} height={15} borderRadius={10} borderColor={colors.border} borderWidth={0.5} flexGrow={1} />
 								</Container>
 							</DragController>
 						)}

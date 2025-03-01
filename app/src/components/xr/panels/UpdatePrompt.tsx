@@ -1,8 +1,10 @@
 import { useUpdateApp } from '@/services/updateState';
 import { Container, Text } from '@react-three/uikit';
-import { Button, colors } from '@react-three/uikit-default';
 import { UploadIcon } from '@react-three/uikit-lucide';
 import { Surface } from '../ui/Surface';
+import { Button } from '../ui/Button';
+import { colors } from '../ui/theme';
+
 
 const TEST = false;
 
@@ -14,10 +16,10 @@ export function UpdatePrompt() {
 	}
 
 	return (
-		<Surface backgroundColor={colors.accent} flexDirection="row" alignItems="center" justifyContent="space-between" gap={10} padding={5}>
+		<Surface backgroundColor={colors.paper} flexDirection="row" alignItems="center" justifyContent="space-between" gap={10} padding={5}>
 			<Container flexDirection="row" alignItems="center" gap={10}>
-				<UploadIcon color={colors.accentForeground} width={12} height={12} marginLeft={10} />
-				<Text color={colors.accentForeground} fontSize={12}>
+				<UploadIcon width={12} height={12} marginLeft={10} />
+				<Text fontSize={12}>
 					App update available!
 				</Text>
 			</Container>

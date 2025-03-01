@@ -54,6 +54,7 @@ const DARK_HUE = {
 
 export const theme = {
     light: {
+        dimmed: hsl(0, 0, 0),
         focus: oklch(66, 50, 284),
         required: hsl(0, 100, 70),
         surface: oklch(100, 0, LIGHT_HUE.mono),
@@ -93,6 +94,7 @@ export const theme = {
         selectionInk: oklch(40, 5, LIGHT_HUE.selection),
     },
     dark: {
+        dimmed: hsl(0, 0, 0),
         focus: hsl(56, 100, 70),
         required: hsl(0, 100, 70),
         surface: oklch(25, 0, DARK_HUE.mono),

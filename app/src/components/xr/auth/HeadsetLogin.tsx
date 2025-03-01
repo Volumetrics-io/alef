@@ -3,12 +3,12 @@ import { useDeviceDiscovery, useDiscoverySuggest } from '@/services/publicApi/de
 import { PrefixedId } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { colors } from '../ui/theme';
-import { HourglassIcon } from '@react-three/uikit-lucide';
+import { HourglassIcon, X } from '@react-three/uikit-lucide';
 import { useState } from 'react';
 import { Surface } from '../ui/Surface';
 import { Button } from '../ui/Button';
 
-export function HeadsetLogin() {
+export function HeadsetLogin({ onCancel }: { onCancel?: () => void }) {
 	// TODO: modify name from here
 	const [name, _setName] = useState(() => {
 		if (isQuest) {
@@ -30,20 +30,50 @@ export function HeadsetLogin() {
 	};
 
 	return (
-		<Surface flexDirection="column" flexWrap="no-wrap" maxWidth={400} padding={8}>
-			<Text fontSize={8}>
-				Pair this device
-			</Text>
-			{selectedDevice ? <WaitingToPair selectedDevice={selectedDevice} onCancel={() => setSelectedDevice(null)} /> : <DeviceList onSelect={pairWithDevice} devices={devices} />}
-		</Surface>
+		<Container flexDirection="column" 
+					backgroundColor={colors.dimmed}
+					backgroundOpacity={0.5}
+					borderRadius={10}
+					width="100%" 
+					height="100%" 
+					positionType="absolute" 
+					positionTop={0} 
+					positionLeft={0} 
+					positionRight={0} 
+					positionBottom={0}
+					justifyContent="center"
+					alignItems="center"
+					zIndexOffset={10}
+					padding={10}
+					>
+			<Surface flexDirection="column" flexWrap="no-wrap" maxWidth={400} height="100%" gap={10} padding={10}>
+					<Text alignSelf="center" fontSize={20}>
+						Device Pairing
+					</Text>
+				{selectedDevice ? <WaitingToPair selectedDevice={selectedDevice} onCancel={() => setSelectedDevice(null)} /> : <DeviceList onSelect={pairWithDevice} devices={devices} />}
+				<Button onClick={onCancel}>
+					<Text>Cancel</Text>
+				</Button>
+			</Surface>
+		</Container>
 	);
 }
 
 function DeviceList({ devices, onSelect }: { devices: { id: PrefixedId<'d'>; name?: string }[]; onSelect: (id: PrefixedId<'d'>) => void }) {
 	return (
-		<Container flexDirection="column" gap={4}>
+		<Container flexDirection="column" flexGrow={1} flexShrink={0} gap={4}>
 			<Text>Log into Alef on a phone or computer using the same Wifi network as this device, then select it here.</Text>
-			<Container flexDirection="column" gap={4} width="100%">
+			<Container flexDirection="column" 
+				gap={4} 
+				flexGrow={1} 
+				flexShrink={0} 
+				overflow="scroll" 
+				width="100%"
+				scrollbarWidth={10}
+				scrollbarColor={colors.ink}
+				scrollbarBorderRadius={5}
+				paddingRight={10}
+				>
 				{!devices?.length ? (
 					<Text color={colors.faded}>No devices yet</Text>
 				) : (

@@ -36,14 +36,12 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 
 function FurnitureAddButton({ furnitureItem }: { furnitureItem: FurnitureItem }) {
 	const addFurniture = useAddFurniture();
-	const [hovered, setHovered] = useState(false);
 	return (
 		<Button
 			variant="link"
 			width={30}
 			height={30}
 			padding={4}
-			onHoverChange={(hovered) => setHovered(hovered)}
 			zIndexOffset={10}
 			positionType="absolute"
 			positionBottom={6}

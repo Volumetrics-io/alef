@@ -19,7 +19,7 @@
   "iconUrl": "https://app.alef.io/icons/512.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
-    "path": "/home/a-type/alef/quest/android.keystore",
+    "path": "C:\\Users\\a-typ\\git\\volu\\alef\\quest\\android.keystore",
     "alias": "android"
   },
   "appVersionName": "1",

@@ -7,19 +7,19 @@ import {
 	useFurniturePlacementFurnitureId,
 	useSetFurniturePlacementFurnitureId,
 	useUpdateFurniturePlacementTransform,
-} from '@/stores/roomStore/roomStore';
+} from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
 import { Bvh } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
-import { Handle } from '@react-three/handle';
+import { defaultApply, Handle, HandleState } from '@react-three/handle';
 import { Container, Root } from '@react-three/uikit';
-import { colors } from '../ui/theme';
 import { ArrowLeft, ArrowRight, Trash } from '@react-three/uikit-lucide';
 import { ComponentPropsWithoutRef, useCallback, useRef, useState } from 'react';
-import { Group, BackSide } from 'three';
-import { CollisionModel, FurnitureModel } from './FurnitureModel';
+import { BackSide, Group, Object3D } from 'three';
 import { Billboard } from '../Billboard';
 import { Button } from '../ui/Button';
+import { colors } from '../ui/theme';
+import { CollisionModel, FurnitureModel } from './FurnitureModel';
 
 export interface PlacedFurnitureProps {
 	furniturePlacementId: PrefixedId<'fp'>;
@@ -33,36 +33,35 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	const selected = useEditorStore((s) => s.selectedId === furniturePlacementId);
 	const mode = useEditorStore((s) => s.mode);
 
-
 	const { gl } = useThree();
 
 	const groupRef = useRef<Group>(null);
 	const move = useUpdateFurniturePlacementTransform(furniturePlacementId);
 	const handleClick = useCallback(() => {
-		console.log('CLICKKK');
 		if (selected) return;
 		select(furniturePlacementId);
 	}, [select, furniturePlacementId, selected]);
 
-	const handlePointerUpDrag = useCallback(() => {
-		if (!groupRef.current) return;
-		gl.shadowMap.needsUpdate = true;
+	const applyWithSave = useCallback(
+		(state: HandleState<any>, target: Object3D) => {
+			defaultApply(state, target);
 
-		move({ position: groupRef.current.position, rotation: groupRef.current.quaternion });
-	}, [move, groupRef, gl]);
-
-	const handlePointerUpRotate = useCallback(() => {
-		if (!groupRef.current) return;
-		gl.shadowMap.needsUpdate = true;
-
-		move({ position: groupRef.current.position, rotation: groupRef.current.quaternion });
-	}, [move, groupRef, gl]);
+			if (state.last) {
+				gl.shadowMap.needsUpdate = true;
+				move({
+					position: target.position,
+					rotation: target.quaternion,
+				});
+			}
+		},
+		[move, gl]
+	);
 
 	const { halfExtents, size, center, ref: modelRef, ready } = useAABB();
 
 	const hypotenuse = Math.sqrt(halfExtents[0] * halfExtents[0] + halfExtents[2] * halfExtents[2]);
 
-	const isEditable = ready && mode === "furniture";
+	const isEditable = ready && mode === 'furniture';
 
 	if (!furnitureId || !placement) return null;
 
@@ -73,15 +72,8 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 			quaternion={[placement.rotation.x, placement.rotation.y, placement.rotation.z, placement.rotation.w]}
 		>
 			{isEditable && (
-				<ConditionalHandle enabled={selected} targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false}>
-					<Bvh
-						firstHitOnly
-						onPointerUp={handlePointerUpDrag}
-						onPointerOut={handlePointerUpDrag}
-						onPointerLeave={handlePointerUpDrag}
-						onClick={handleClick}
-						onPointerDown={handleClick}
-					>
+				<ConditionalHandle enabled={selected} targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false} apply={applyWithSave}>
+					<Bvh firstHitOnly onClick={handleClick} onPointerDown={handleClick}>
 						<CollisionModel furnitureId={furnitureId} />
 					</Bvh>
 				</ConditionalHandle>
@@ -92,8 +84,8 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 				<PlaceFurnitureUI furniturePlacementId={furniturePlacementId} furnitureId={furnitureId} setFurnitureId={setFurnitureId} height={halfExtents[1] + center.y + 0.2} />
 			)}
 			{isEditable && selected && (
-				<Handle targetRef={groupRef as any} rotate={{ x: false, y: true, z: false }} translate="as-rotate">
-					<RotationRing hypotenuse={hypotenuse} handlePointerUpRotate={handlePointerUpRotate} />
+				<Handle targetRef={groupRef as any} rotate={{ x: false, y: true, z: false }} translate="as-rotate" apply={applyWithSave}>
+					<RotationRing hypotenuse={hypotenuse} />
 				</Handle>
 			)}
 		</group>
@@ -105,30 +97,28 @@ function ConditionalHandle({ enabled, ...props }: ComponentPropsWithoutRef<typeo
 	return <Handle {...props} />;
 }
 
-function RotationRing({ hypotenuse, handlePointerUpRotate }: { hypotenuse: number; handlePointerUpRotate: () => void }) {
+function RotationRing({ hypotenuse }: { hypotenuse: number }) {
 	const [hovered, setHovered] = useState(false);
 	return (
-		<group 
-			onPointerEnter={() => setHovered(true)}
-			onPointerLeave={() => setHovered(false)}
-			onPointerUp={handlePointerUpRotate}
-			position={[0, 0.2, 0]}
-			rotation={[Math.PI / 2, 0, 0]}
-			renderOrder={-2}
-		>
-			<mesh castShadow >
+		<group onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} position={[0, 0.2, 0]} rotation={[Math.PI / 2, 0, 0]} renderOrder={-2}>
+			<mesh castShadow>
 				<torusGeometry args={[hypotenuse + 0.1, 0.025, 64]} />
 				<meshPhongMaterial color={colors.focus.value} emissive={colors.focus.value} emissiveIntensity={0.5} />
 			</mesh>
-			<mesh 
+			<mesh
 				// @ts-ignore - not sure why this keeps coming up when it's wrong
-				pointerEvents="none" 
-				>
+				pointerEvents="none"
+			>
 				<torusGeometry args={[hypotenuse + 0.1, 0.03, 64]} />
-				<meshPhongMaterial color={hovered ? colors.faded.value : colors.border.value} side={BackSide} emissive={hovered ? colors.faded.value : colors.border.value} emissiveIntensity={0.5} />
+				<meshPhongMaterial
+					color={hovered ? colors.faded.value : colors.border.value}
+					side={BackSide}
+					emissive={hovered ? colors.faded.value : colors.border.value}
+					emissiveIntensity={0.5}
+				/>
 			</mesh>
 		</group>
-	)
+	);
 }
 function PlaceFurnitureUI({
 	furniturePlacementId,
@@ -140,7 +130,7 @@ function PlaceFurnitureUI({
 	furnitureId: PrefixedId<'f'>;
 	setFurnitureId: (id: PrefixedId<'fp'>, furnitureId: PrefixedId<'f'>) => Promise<void>;
 	height: number;
-}) {	
+}) {
 	const handleDelete = useDeleteFurniturePlacement(furniturePlacementId);
 
 	const { data: currentFurniture } = useFurnitureDetails(furnitureId);

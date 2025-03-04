@@ -1,5 +1,5 @@
 import { useIsEditorStageMode } from '@/stores/editorStore';
-import { useAddLight, useGlobalLighting, useLightPlacementIds } from '@/stores/roomStore/roomStore';
+import { useAddLight, useGlobalLighting, useLightPlacementIds } from '@/stores/roomStore';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useXR, useXRPlanes } from '@react-three/xr';
 import { useCallback, useRef } from 'react';

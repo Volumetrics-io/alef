@@ -1,5 +1,5 @@
 import { useIsEditorStageMode, useSelect, useSelectedLightPlacementId } from '@/stores/editorStore';
-import { useGlobalLighting, useLightPlacement, useMoveLight, useSubscribeToPlacementPosition } from '@/stores/roomStore/roomStore';
+import { useGlobalLighting, useLightPlacement, useMoveLight, useSubscribeToPlacementPosition } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
 import { Handle, HandleTarget } from '@react-three/handle';
 import { useHover } from '@react-three/xr';

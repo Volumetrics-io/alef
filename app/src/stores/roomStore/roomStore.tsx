@@ -1,32 +1,9 @@
-import { useVibrateOnHover } from '@/hooks/useVibrateOnHover';
-import { DragController } from '@/physics/DragController';
-import { isPlaneUserData } from '@/physics/planeUserData';
 import { PropertySocket } from '@/services/publicApi/socket';
-import {
-	getUndo,
-	id,
-	isPrefixedId,
-	Operation,
-	PrefixedId,
-	RoomFurniturePlacement,
-	RoomGlobalLighting,
-	RoomLayout,
-	RoomLightPlacement,
-	RoomState,
-	RoomWallData,
-	updateRoom,
-} from '@alef/common';
-import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
-import { ActiveCollisionTypes } from '@dimforge/rapier3d-compat';
-import { HandleOptions, TransformHandlesProperties } from '@react-three/handle';
-import { IntersectionEnterPayload, IntersectionExitPayload, RigidBodyProps, RoundCuboidColliderProps, useRapier } from '@react-three/rapier';
-import { RefObject, useCallback, useEffect, useRef } from 'react';
-import { Group } from 'three';
+import { getUndo, id, Operation, PrefixedId, RoomFurniturePlacement, RoomGlobalLighting, RoomLayout, RoomLightPlacement, RoomState, RoomWallData, updateRoom } from '@alef/common';
+import { useEffect, useRef } from 'react';
 import { createStore, useStore } from 'zustand';
 import { persist, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { useShallow } from 'zustand/react/shallow';
-import { useEditorStore, useIntersectingPlaneLabels } from '../editorStore';
 import { useRoomStoreContext } from './Provider';
 
 export type RoomStoreState = RoomState & {
@@ -123,7 +100,10 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 						return id;
 					}
 
-					async function applyChange(op: Operation, { historyStack = 'undoStack' }: { historyStack?: 'undoStack' | 'redoStack' } = {}): Promise<void> {
+					async function applyChange(
+						op: Operation,
+						{ historyStack = 'undoStack', disableClearRedo }: { historyStack?: 'undoStack' | 'redoStack'; disableClearRedo?: boolean } = {}
+					): Promise<void> {
 						// apply change and add to undo stack
 						set((state) => {
 							const undo = getUndo(state, op);
@@ -140,7 +120,9 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 						if (socket?.isClosed) {
 							set((state) => {
 								state.operationBacklog.push(op);
-								state.redoStack = [];
+								if (!disableClearRedo) {
+									state.redoStack = [];
+								}
 							});
 						} else {
 							try {
@@ -148,14 +130,18 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 									type: 'applyOperations',
 									operations: [op],
 								});
-								set((state) => {
-									state.redoStack = [];
-								});
+								if (!disableClearRedo) {
+									set((state) => {
+										state.redoStack = [];
+									});
+								}
 							} catch (e) {
 								if (e instanceof Error && e.message === 'Request timed out') {
 									set((state) => {
 										state.operationBacklog.push(op);
-										state.redoStack = [];
+										if (!disableClearRedo) {
+											state.redoStack = [];
+										}
 									});
 								}
 							}
@@ -177,15 +163,21 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 						},
 
 						undo: () => {
-							const undo = get().undoStack.pop();
+							const undo = get().undoStack[get().undoStack.length - 1];
 							if (undo) {
-								applyChange(undo, { historyStack: 'redoStack' });
+								applyChange(undo, { historyStack: 'redoStack', disableClearRedo: true });
+								set((state) => {
+									state.undoStack.pop();
+								});
 							}
 						},
 						redo: () => {
-							const redo = get().redoStack.pop();
+							const redo = get().redoStack[get().redoStack.length - 1];
 							if (redo) {
-								applyChange(redo, { historyStack: 'undoStack' });
+								applyChange(redo, { historyStack: 'undoStack', disableClearRedo: true });
+								set((state) => {
+									state.redoStack.pop();
+								});
 							}
 						},
 
@@ -353,12 +345,16 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 	);
 export type RoomStore = ReturnType<typeof makeRoomStore>;
 
-function useRoomStore<T>(selector: (s: RoomStoreState) => T) {
+export function useRoomStore<T>(selector: (s: RoomStoreState) => T) {
 	const store = useRoomStoreContext();
 	return useStore(store, selector);
 }
 
-function useRoomStoreSubscribe<T>(selector: (s: RoomStoreState) => T, listener: (state: T) => void, options?: { fireImmediately?: boolean; equalityFn?: (a: T, b: T) => boolean }) {
+export function useRoomStoreSubscribe<T>(
+	selector: (s: RoomStoreState) => T,
+	listener: (state: T) => void,
+	options?: { fireImmediately?: boolean; equalityFn?: (a: T, b: T) => boolean }
+) {
 	const store = useRoomStoreContext();
 	const stable = useRef({ listener, options });
 	stable.current.listener = listener;
@@ -374,213 +370,4 @@ function useRoomStoreSubscribe<T>(selector: (s: RoomStoreState) => T, listener: 
 			),
 		[store, selector]
 	);
-}
-
-export function useFurniturePlacementIds() {
-	return useRoomStore(useShallow((s) => Object.keys(s.viewingLayoutId ? s.layouts[s.viewingLayoutId]?.furniture : {}) as PrefixedId<'fp'>[]));
-}
-
-export function useFurniturePlacement(id: PrefixedId<'fp'>) {
-	return useRoomStore((s) => (s.viewingLayoutId ? (s.layouts[s.viewingLayoutId]?.furniture[id] ?? null) : null));
-}
-
-export function useDeleteFurniturePlacement(id: PrefixedId<'fp'>) {
-	const deleteFn = useRoomStore((s) => s.deleteFurniture);
-	return useCallback(() => {
-		deleteFn(id);
-	}, [deleteFn, id]);
-}
-
-export function useFurniturePlacementFurnitureId(id: PrefixedId<'fp'>) {
-	return useRoomStore((s) => (s.viewingLayoutId ? (s.layouts[s.viewingLayoutId].furniture[id]?.furnitureId ?? null) : null));
-}
-
-export function useSetFurniturePlacementFurnitureId() {
-	return useRoomStore((s) => s.updateFurnitureId);
-}
-
-export function useAddFurniture() {
-	return useRoomStore((s) => s.addFurniture);
-}
-
-export function useSubscribeToPlacementPosition(id: PrefixedId<'fp'> | PrefixedId<'lp'>, callback: (position: { x: number; y: number; z: number }) => void) {
-	useRoomStoreSubscribe(
-		(s) => (s.viewingLayoutId ? (isPrefixedId(id, 'fp') ? (s.layouts[s.viewingLayoutId]?.furniture[id] ?? null) : (s.lights[id] ?? null)) : null),
-		(placement) => {
-			if (placement) {
-				callback(placement.position);
-			}
-		},
-		{
-			fireImmediately: true,
-		}
-	);
-}
-
-export function useUpdateFurniturePlacementTransform(id: PrefixedId<'fp'>) {
-	const set = useRoomStore((s) => s.moveFurniture);
-	return useCallback((transform: { position?: { x: number; y: number; z: number }; rotation?: { x: number; y: number; z: number; w: number } }) => set(id, transform), [id, set]);
-}
-
-type HandleState = Parameters<NonNullable<TransformHandlesProperties['apply']>>[0];
-
-export function useFurniturePlacementDrag(id: PrefixedId<'fp'>) {
-	const groupRef = useRef<Group>(null);
-	const rigidBodyRef = useRef<RRigidBody>(null);
-	const updatePosition = useUpdateFurniturePlacementTransform(id);
-
-	const updateIntersectionEnter = useEditorStore((s) => s.onIntersectionEnter);
-	const updateIntersectionExit = useEditorStore((s) => s.onIntersectionExit);
-	// which plane types are we contacting?
-	const snappedTo = useIntersectingPlaneLabels(id);
-	// const snappedTo = [] as string[];
-	const isOnFloor = snappedTo.some((plane) => plane === 'floor');
-
-	const controllerRef = useRef<DragController | null>(null);
-	const { world } = useRapier();
-
-	const store = useRoomStoreContext();
-
-	useEffect(() => {
-		console.debug('new drag controller', id);
-		controllerRef.current = new DragController(id, world, rigidBodyRef, store, {
-			onDragEnd: updatePosition,
-		});
-		return () => {
-			console.debug('destroy drag controller', id);
-			controllerRef.current?.dispose();
-		};
-	}, [world, updatePosition, id, store]);
-
-	const apply = useCallback((state: HandleState) => {
-		controllerRef.current?.update(state);
-	}, []);
-
-	const onIntersectionEnter = useCallback(
-		(intersection: IntersectionEnterPayload) => {
-			const userData = intersection.rigidBody?.userData;
-			if (isPlaneUserData(userData)) {
-				updateIntersectionEnter(id, userData.planeId);
-			}
-		},
-		[id, updateIntersectionEnter]
-	);
-
-	const onIntersectionExit = useCallback(
-		(intersection: IntersectionExitPayload) => {
-			const userData = intersection.rigidBody?.userData;
-			if (isPlaneUserData(userData)) {
-				updateIntersectionExit(id, userData.planeId);
-			}
-		},
-		[id, updateIntersectionExit]
-	);
-
-	const rotateHandleProps: HandleOptions<unknown> | null = isOnFloor
-		? {
-				apply,
-				scale: false,
-				rotate: { x: false, y: true, z: false },
-				translate: 'as-rotate',
-			}
-		: null;
-
-	// @ts-expect-error - idk why Group is not inheriting Object3D?
-	useVibrateOnHover(groupRef);
-
-	return {
-		groupProps: {
-			ref: groupRef,
-		},
-		dragHandleProps: {
-			apply,
-			scale: false,
-			rotate: false,
-			alwaysUpdate: true,
-			translate: { x: true, y: false, z: true },
-		} satisfies HandleOptions<unknown>,
-		rotateHandleProps,
-		rigidBodyProps: {
-			ref: rigidBodyRef,
-			type: 'kinematicPosition' as const,
-			linearDamping: 0,
-			angularDamping: 0,
-			onIntersectionEnter,
-			onIntersectionExit,
-		} satisfies RigidBodyProps & { ref: RefObject<RRigidBody> },
-		colliderProps: {
-			activeCollisionTypes: ActiveCollisionTypes.KINEMATIC_FIXED,
-		} satisfies Partial<RoundCuboidColliderProps>,
-	};
-}
-
-export function useLightPlacementIds() {
-	return useRoomStore(useShallow((s) => Object.keys(s.lights ?? {}) as PrefixedId<'lp'>[]));
-}
-
-export function useLightPlacement(id: PrefixedId<'lp'>) {
-	return useRoomStore((s) => s.lights[id] ?? null);
-}
-
-export function useDeleteLightPlacement(id: PrefixedId<'lp'>) {
-	const deleteFn = useRoomStore((s) => s.deleteLight);
-	return useCallback(() => {
-		deleteFn(id);
-	}, [deleteFn, id]);
-}
-
-export function useAddLight() {
-	return useRoomStore((s) => s.addLight);
-}
-
-export function useMoveLight(id: PrefixedId<'lp'>) {
-	const moveFn = useRoomStore((s) => s.moveLight);
-	return useCallback(
-		(transform: { position?: { x: number; y: number; z: number } }) => {
-			moveFn(id, transform);
-		},
-		[id, moveFn]
-	);
-}
-
-export function useGlobalLighting() {
-	const value = useRoomStore((s) => s.globalLighting);
-	const update = useRoomStore((s) => s.updateGlobalLighting);
-	return [value, update] as const;
-}
-
-export function useRoomLayoutIds() {
-	return useRoomStore(useShallow((s) => Object.keys(s.layouts) as PrefixedId<'rl'>[]));
-}
-
-export function useRoomLayout(id: PrefixedId<'rl'>) {
-	return useRoomStore((s) => s.layouts[id] ?? null);
-}
-
-export function useCreateRoomLayout() {
-	return useRoomStore((s) => s.createLayout);
-}
-
-export function useActiveRoomLayoutId() {
-	return useRoomStore(useShallow((s) => [s.viewingLayoutId, s.setViewingLayoutId] as const));
-}
-
-export function useActiveRoomLayout() {
-	return useRoomStore((s) => (s.viewingLayoutId ? (s.layouts[s.viewingLayoutId] ?? null) : null));
-}
-
-export function useUpdateRoomLayout() {
-	return useRoomStore((s) => s.updateLayout);
-}
-
-export function useDeleteRoomLayout() {
-	return useRoomStore((s) => s.deleteLayout);
-}
-
-export function useHasWalls() {
-	return useRoomStore((s) => s.walls.length > 0);
-}
-
-export function useUpdateWalls() {
-	return useRoomStore((s) => s.updateWalls);
 }

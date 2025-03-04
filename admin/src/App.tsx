@@ -7,7 +7,7 @@ function App() {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<Pages />
-			<Toaster />
+			<Toaster containerStyle={{ zIndex: 100000 }} />
 		</QueryClientProvider>
 	);
 }

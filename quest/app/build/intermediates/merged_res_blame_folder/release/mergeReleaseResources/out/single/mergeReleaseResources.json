@@ -1,0 +1,78 @@
+[
+    {
+        "merged": "io.alef.app.twa.app-release-11:/drawable-mdpi_ic_notification_icon.png.flat",
+        "source": "io.alef.app.twa.app-main-12:/drawable-mdpi/ic_notification_icon.png"
+    },
+    {
+        "merged": "io.alef.app.twa.app-release-11:/drawable-hdpi_splash.png.flat",
+        "source": "io.alef.app.twa.app-main-12:/drawable-hdpi/splash.png"
+    },
+    {
+        "merged": "io.alef.app.twa.app-release-11:/drawable-xxhdpi_ic_notification_icon.png.flat",
+        "source": "io.alef.app.twa.app-main-12:/drawable-xxhdpi/ic_notification_icon.png"
+    },
+    {
+        "merged": "io.alef.app.twa.app-release-11:/raw_web_app_manifest.json.flat",
+        "source": "io.alef.app.twa.app-main-12:/raw/web_app_manifest.json"
+    },
+    {
+        "merged": "io.alef.app.twa.app-release-11:/drawable-hdpi_ic_notification_icon.png.flat",
+        "source": "io.alef.app.twa.app-main-12:/drawable-hdpi/ic_notification_icon.png"
+    },
+    {
+        "merged": "io.alef.app.twa.app-release-11:/xml_filepaths.xml.flat",
+        "source": "io.alef.app.twa.app-main-12:/xml/filepaths.xml"
+    },
+    {
+        "merged": "io.alef.app.twa.app-release-11:/drawable-mdpi_splash.png.flat",
+        "source": "io.alef.app.twa.app-main-12:/drawable-mdpi/splash.png"
+    },
+    {
+        "merged": "io.alef.app.twa.app-release-11:/xml_shortcuts.xml.flat",
+        "source": "io.alef.app.twa.app-main-12:/xml/shortcuts.xml"
+    },
+    {
+        "merged": "io.alef.app.twa.app-release-11:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "io.alef.app.twa.app-main-12:/mipmap-xhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "io.alef.app.twa.app-release-11:/drawable-xhdpi_ic_notification_icon.png.flat",
+        "source": "io.alef.app.twa.app-main-12:/drawable-xhdpi/ic_notification_icon.png"
+    },
+    {
+        "merged": "io.alef.app.twa.app-release-11:/drawable-xxhdpi_splash.png.flat",
+        "source": "io.alef.app.twa.app-main-12:/drawable-xxhdpi/splash.png"
+    },
+    {
+        "merged": "io.alef.app.twa.app-release-11:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "io.alef.app.twa.app-main-12:/mipmap-xxxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "io.alef.app.twa.app-release-11:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "io.alef.app.twa.app-main-12:/mipmap-xxhdpi/ic_launcher.png"
+    },
+    {
+        "merged": "io.alef.app.twa.app-release-11:/drawable-xhdpi_splash.png.flat",
+        "source": "io.alef.app.twa.app-main-12:/drawable-xhdpi/splash.png"
+    },
+    {
+        "merged": "io.alef.app.twa.app-release-11:/drawable-anydpi_shortcut_legacy_background.xml.flat",
+        "source": "io.alef.app.twa.app-main-12:/drawable-anydpi/shortcut_legacy_background.xml"
+    },
+    {
+        "merged": "io.alef.app.twa.app-release-11:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "io.alef.app.twa.app-main-12:/mipmap-mdpi/ic_launcher.png"
+    },
+    {
+        "merged": "io.alef.app.twa.app-release-11:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "io.alef.app.twa.app-main-12:/mipmap-hdpi/ic_launcher.png"
+    },
+    {
+        "merged": "io.alef.app.twa.app-release-11:/drawable-xxxhdpi_ic_notification_icon.png.flat",
+        "source": "io.alef.app.twa.app-main-12:/drawable-xxxhdpi/ic_notification_icon.png"
+    },
+    {
+        "merged": "io.alef.app.twa.app-release-11:/drawable-xxxhdpi_splash.png.flat",
+        "source": "io.alef.app.twa.app-main-12:/drawable-xxxhdpi/splash.png"
+    }
+]

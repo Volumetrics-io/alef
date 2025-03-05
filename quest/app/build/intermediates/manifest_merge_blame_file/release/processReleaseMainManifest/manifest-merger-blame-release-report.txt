@@ -1,0 +1,426 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<!-- Copyright (c) Meta Platforms, Inc. and affiliates. -->
+3<!--
+4    Copyright 2019 Google Inc. All Rights Reserved.
+5
+6     Licensed under the Apache License, Version 2.0 (the "License");
+7     you may not use this file except in compliance with the License.
+8     You may obtain a copy of the License at
+9
+10         http://www.apache.org/licenses/LICENSE-2.0
+11
+12     Unless required by applicable law or agreed to in writing, software
+13     distributed under the License is distributed on an "AS IS" BASIS,
+14     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+15     See the License for the specific language governing permissions and
+16     limitations under the License.
+17-->
+18<!--
+19 The "package" attribute is rewritten by the Gradle build with the value of applicationId.
+20     It is still required here, as it is used to derive paths, for instance when referring
+21     to an Activity by ".MyActivity" instead of the full name. If more Activities are added to the
+22     application, the package attribute will need to reflect the correct path in order to use
+23     the abbreviated format.
+24-->
+25<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+26    package="io.alef.app.twa"
+27    android:versionCode="1"
+28    android:versionName="1" >
+29
+30    <uses-sdk
+31        android:minSdkVersion="23"
+32        android:targetSdkVersion="32" />
+33
+34    <uses-permission android:name="android.permission.INTERNET" />
+34-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:27:9-70
+34-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:27:26-68
+35    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+35-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:29:9-82
+35-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:29:26-80
+36    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+36-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:31:9-79
+36-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:31:26-77
+37    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+37-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:33:9-80
+37-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:33:26-78
+38    <uses-permission android:name="com.oculus.permission.USE_SCENE" />
+38-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:39:5-70
+38-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:39:22-68
+39    <uses-permission android:name="com.oculus.permission.HAND_TRACKING" />
+39-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:43:5-75
+39-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:43:22-72
+40
+41    <uses-feature
+41-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:49:5-52:31
+42        android:name="android.hardware.vr.headtracking"
+42-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:50:9-56
+43        android:required="false"
+43-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:51:9-33
+44        android:version="1" />
+44-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:52:9-28
+45    <uses-feature
+45-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:54:5-56:36
+46        android:name="oculus.software.handtracking"
+46-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:55:9-52
+47        android:required="false" />
+47-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:56:9-33
+48
+49    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+49-->[com.meta.androidbrowserhelper:locationdelegation:1.1.1] /Users/michael/.gradle/caches/8.8/transforms/56e451d24fe5fff1372e0eaf7a8504f9/transformed/locationdelegation-1.1.1/AndroidManifest.xml:11:5-79
+49-->[com.meta.androidbrowserhelper:locationdelegation:1.1.1] /Users/michael/.gradle/caches/8.8/transforms/56e451d24fe5fff1372e0eaf7a8504f9/transformed/locationdelegation-1.1.1/AndroidManifest.xml:11:22-76
+50    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+50-->[com.meta.androidbrowserhelper:locationdelegation:1.1.1] /Users/michael/.gradle/caches/8.8/transforms/56e451d24fe5fff1372e0eaf7a8504f9/transformed/locationdelegation-1.1.1/AndroidManifest.xml:12:5-81
+50-->[com.meta.androidbrowserhelper:locationdelegation:1.1.1] /Users/michael/.gradle/caches/8.8/transforms/56e451d24fe5fff1372e0eaf7a8504f9/transformed/locationdelegation-1.1.1/AndroidManifest.xml:12:22-78
+51
+52    <queries>
+52-->[com.meta.androidbrowserhelper:androidbrowserhelper:2.5.0] /Users/michael/.gradle/caches/8.8/transforms/6c5e59d927a808ada2a8a315ba991c71/transformed/androidbrowserhelper-2.5.0/AndroidManifest.xml:26:5-34:15
+53        <intent>
+53-->[com.meta.androidbrowserhelper:androidbrowserhelper:2.5.0] /Users/michael/.gradle/caches/8.8/transforms/6c5e59d927a808ada2a8a315ba991c71/transformed/androidbrowserhelper-2.5.0/AndroidManifest.xml:27:9-33:18
+54            <action android:name="android.intent.action.VIEW" />
+54-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:174:17-68
+54-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:174:25-66
+55
+56            <category android:name="android.intent.category.BROWSABLE" />
+56-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:176:17-77
+56-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:176:27-75
+57
+58            <data android:scheme="https" />
+58-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:177:17-180:19
+58-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:177:23-45
+59        </intent>
+60    </queries>
+61
+62    <application
+62-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:59:5-268:19
+63        android:name="io.alef.app.twa.Application"
+63-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:60:9-35
+64        android:allowBackup="true"
+64-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:61:9-35
+65        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+65-->[androidx.core:core:1.2.0] /Users/michael/.gradle/caches/8.8/transforms/feb8e2b099a13ef41f9cf940d6fd2758/transformed/core-1.2.0/AndroidManifest.xml:24:18-86
+66        android:extractNativeLibs="false"
+67        android:icon="@mipmap/ic_launcher"
+67-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:62:9-43
+68        android:label="@string/appName"
+68-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:63:9-40
+69        android:manageSpaceActivity="com.meta.androidbrowserhelper.trusted.ManageDataLauncherActivity"
+69-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:65:9-103
+70        android:supportsRtl="true"
+70-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:67:9-35
+71        android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+71-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:68:9-68
+72        <meta-data
+72-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:70:9-72:58
+73            android:name="asset_statements"
+73-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:71:13-44
+74            android:resource="@string/assetStatements" />
+74-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:72:13-55
+75
+76        <!-- Temporarily remove this for Quest as it would launch the old style PWA -->
+77
+78        <meta-data
+78-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:77:9-79:52
+79            android:name="twa_generator"
+79-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:78:13-41
+80            android:value="@string/generatorApp" />
+80-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:79:13-49
+81        <meta-data
+81-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:84:13-86:50
+82            android:name="com.meta.horizon.platform.ovr.OCULUS_APP_ID"
+82-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:85:17-75
+83            android:value="\ 9358165304204524" />
+83-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:86:13-47
+84
+85        <activity android:name="com.meta.androidbrowserhelper.trusted.ManageDataLauncherActivity" >
+85-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:90:13-94:24
+85-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:90:23-102
+86            <meta-data
+86-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:91:13-93:53
+87                android:name="android.support.customtabs.trusted.MANAGE_SPACE_URL"
+87-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:92:17-83
+88                android:value="@string/launchUrl" />
+88-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:93:17-50
+89        </activity>
+90        <activity
+90-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:97:9-184:20
+91            android:name="io.alef.app.twa.LauncherActivity"
+91-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:97:19-50
+92            android:alwaysRetainTaskState="true"
+92-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:98:13-49
+93            android:exported="true"
+93-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:101:13-36
+94            android:label="@string/launcherName" >
+94-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:99:13-49
+95            <meta-data
+95-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:102:13-103:53
+96                android:name="android.support.customtabs.trusted.DEFAULT_URL"
+96-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:102:24-85
+97                android:value="@string/launchUrl" />
+97-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:103:17-50
+98            <meta-data
+98-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:105:13-107:58
+99                android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR"
+99-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:106:17-83
+100                android:resource="@color/colorPrimary" />
+100-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:107:17-55
+101            <meta-data
+101-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:109:13-111:62
+102                android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR_DARK"
+102-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:110:17-88
+103                android:resource="@color/colorPrimaryDark" />
+103-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:111:17-59
+104            <meta-data
+104-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:113:13-115:61
+105                android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR"
+105-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:114:17-87
+106                android:resource="@color/navigationColor" />
+106-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:115:17-58
+107            <meta-data
+107-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:117:13-119:65
+108                android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR_DARK"
+108-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:118:17-92
+109                android:resource="@color/navigationColorDark" />
+109-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:119:17-62
+110            <meta-data
+110-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:121:13-123:68
+111                android:name="androix.browser.trusted.NAVIGATION_BAR_DIVIDER_COLOR"
+111-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:122:17-84
+112                android:resource="@color/navigationDividerColor" />
+112-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:123:17-65
+113            <meta-data
+113-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:125:13-127:72
+114                android:name="androix.browser.trusted.NAVIGATION_BAR_DIVIDER_COLOR_DARK"
+114-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:126:17-89
+115                android:resource="@color/navigationDividerColorDark" />
+115-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:127:17-69
+116            <meta-data
+116-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:129:13-130:54
+117                android:name="android.support.customtabs.trusted.SPLASH_IMAGE_DRAWABLE"
+117-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:129:24-95
+118                android:resource="@drawable/splash" />
+118-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:130:17-52
+119            <meta-data
+119-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:132:13-133:60
+120                android:name="android.support.customtabs.trusted.SPLASH_SCREEN_BACKGROUND_COLOR"
+120-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:132:24-104
+121                android:resource="@color/backgroundColor" />
+121-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:133:17-58
+122            <meta-data
+122-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:135:13-136:71
+123                android:name="android.support.customtabs.trusted.SPLASH_SCREEN_FADE_OUT_DURATION"
+123-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:135:24-105
+124                android:value="@integer/splashScreenFadeOutDuration" />
+124-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:136:17-69
+125            <meta-data
+125-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:138:13-139:60
+126                android:name="android.support.customtabs.trusted.FILE_PROVIDER_AUTHORITY"
+126-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:138:24-97
+127                android:value="@string/providerAuthority" />
+127-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:139:17-58
+128            <meta-data
+128-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:141:13-97
+129                android:name="android.app.shortcuts"
+129-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:141:24-60
+130                android:resource="@xml/shortcuts" />
+130-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:141:61-94
+131            <meta-data
+131-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:143:13-144:56
+132                android:name="android.support.customtabs.trusted.FALLBACK_STRATEGY"
+132-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:143:24-91
+133                android:value="@string/fallbackType" />
+133-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:144:17-53
+134            <meta-data
+134-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:147:17-149:64
+135                android:name="horizonos.pwa.APP_MODE"
+135-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:148:21-58
+136                android:value="@string/horizonOSAppMode" />
+136-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:149:21-61
+137            <meta-data
+137-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:157:13-158:54
+138                android:name="android.support.customtabs.trusted.SCREEN_ORIENTATION"
+138-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:157:24-92
+139                android:value="@string/orientation" />
+139-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:158:17-52
+140
+141            <intent-filter>
+141-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:164:13-171:29
+142                <action android:name="android.intent.action.MAIN" />
+142-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:165:17-69
+142-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:165:25-66
+143
+144                <category android:name="android.intent.category.LAUNCHER" />
+144-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:166:17-77
+144-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:166:27-74
+145                <category android:name="com.oculus.intent.category.VR" />
+145-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:168:21-78
+145-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:168:31-75
+146            </intent-filter>
+147            <intent-filter android:autoVerify="true" >
+147-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:173:13-181:29
+147-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:173:28-53
+148                <action android:name="android.intent.action.VIEW" />
+148-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:174:17-68
+148-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:174:25-66
+149
+150                <category android:name="android.intent.category.DEFAULT" />
+150-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:175:17-76
+150-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:175:27-73
+151                <category android:name="android.intent.category.BROWSABLE" />
+151-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:176:17-77
+151-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:176:27-75
+152
+153                <data
+153-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:177:17-180:19
+154                    android:host="@string/hostName"
+154-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:178:21-52
+155                    android:scheme="https" />
+155-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:177:23-45
+156            </intent-filter>
+157        </activity>
+158        <activity android:name="com.meta.androidbrowserhelper.trusted.FocusActivity" />
+158-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:186:9-88
+158-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:186:19-85
+159        <activity
+159-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:188:9-189:62
+160            android:name="com.meta.androidbrowserhelper.trusted.WebViewFallbackActivity"
+160-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:188:19-95
+161            android:configChanges="orientation|screenSize" />
+161-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:189:13-59
+162
+163        <provider
+163-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:191:9-199:20
+164            android:name="androidx.core.content.FileProvider"
+164-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:192:13-62
+165            android:authorities="@string/providerAuthority"
+165-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:193:13-60
+166            android:exported="false"
+166-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:195:13-37
+167            android:grantUriPermissions="true" >
+167-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:194:13-47
+168            <meta-data
+168-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:196:13-198:53
+169                android:name="android.support.FILE_PROVIDER_PATHS"
+169-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:197:17-67
+170                android:resource="@xml/filepaths" />
+170-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:198:17-50
+171        </provider>
+172
+173        <service
+173-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:201:9-216:19
+174            android:name="io.alef.app.twa.DelegationService"
+174-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:202:13-46
+175            android:enabled="@bool/enableNotification"
+175-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:203:13-55
+176            android:exported="@bool/enableNotification" >
+176-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:204:13-56
+177            <meta-data
+177-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:207:17-209:73
+178                android:name="android.support.customtabs.trusted.SMALL_ICON"
+178-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:208:21-81
+179                android:resource="@drawable/ic_notification_icon" />
+179-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:209:21-70
+180
+181            <intent-filter>
+181-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:212:13-215:29
+182                <action android:name="android.support.customtabs.trusted.TRUSTED_WEB_ACTIVITY_SERVICE" />
+182-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:213:17-105
+182-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:213:25-103
+183
+184                <category android:name="android.intent.category.DEFAULT" />
+184-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:175:17-76
+184-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:175:27-73
+185            </intent-filter>
+186        </service>
+187
+188        <activity android:name="com.meta.androidbrowserhelper.trusted.NotificationPermissionRequestActivity" />
+188-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:219:13-116
+188-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:219:23-113
+189        <activity
+189-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:224:17-234:28
+190            android:name="com.meta.androidbrowserhelper.horizonpermissions.PermissionRequestActivity"
+190-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:225:21-110
+191            android:exported="false"
+191-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:226:21-45
+192            android:screenOrientation="landscape"
+192-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:228:21-58
+193            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
+193-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:227:21-85
+194            <intent-filter>
+194-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:229:21-233:37
+195                <action android:name="com.meta.androidbrowserhelper.horizonpermissions.permissions.REQUEST" />
+195-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:230:25-118
+195-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:230:33-116
+196
+197                <category android:name="android.intent.category.DEFAULT" />
+197-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:175:17-76
+197-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:175:27-73
+198                <category android:name="com.oculus.intent.category.VR" />
+198-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:168:21-78
+198-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:168:31-75
+199            </intent-filter>
+200        </activity>
+201        <activity android:name="com.meta.androidbrowserhelper.locationdelegation.PermissionRequestActivity" />
+201-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:239:13-240:87
+201-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:239:23-121
+202        <activity
+202-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:243:9-257:20
+203            android:name="com.meta.androidbrowserhelper.horizonbilling.provider.PaymentActivity"
+203-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:244:13-97
+204            android:configChanges="keyboardHidden|keyboard|orientation|screenLayout|screenSize"
+204-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:246:13-96
+205            android:exported="true"
+205-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:247:13-36
+206            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+206-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:245:13-72
+207            <intent-filter>
+207-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:249:13-252:29
+208                <action android:name="org.chromium.intent.action.PAY" />
+208-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:250:17-73
+208-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:250:25-70
+209
+210                <category android:name="com.oculus.intent.category.VR" />
+210-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:168:21-78
+210-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:168:31-75
+211            </intent-filter>
+212
+213            <meta-data
+213-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:254:13-256:66
+214                android:name="org.chromium.default_payment_method_name"
+214-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:255:17-72
+215                android:value="https://quest.meta.com/billing" />
+215-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:256:17-63
+216        </activity>
+217
+218        <!-- This service checks who calls it at runtime. -->
+219        <service
+219-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:260:9-266:19
+220            android:name="com.meta.androidbrowserhelper.horizonbilling.provider.PaymentService"
+220-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:261:13-96
+221            android:exported="true" >
+221-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:262:13-36
+222            <intent-filter>
+222-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:263:13-265:29
+223                <action android:name="org.chromium.intent.action.IS_READY_TO_PAY" />
+223-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:264:17-85
+223-->/Users/michael/alef/quest/app/src/main/AndroidManifest.xml:264:25-82
+224            </intent-filter>
+225        </service>
+226
+227        <activity
+227-->[com.google.android.gms:play-services-base:18.1.0] /Users/michael/.gradle/caches/8.8/transforms/9d7b38f1d96938519477dd5bb030ea7d/transformed/play-services-base-18.1.0/AndroidManifest.xml:20:9-22:45
+228            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+228-->[com.google.android.gms:play-services-base:18.1.0] /Users/michael/.gradle/caches/8.8/transforms/9d7b38f1d96938519477dd5bb030ea7d/transformed/play-services-base-18.1.0/AndroidManifest.xml:20:19-85
+229            android:exported="false"
+229-->[com.google.android.gms:play-services-base:18.1.0] /Users/michael/.gradle/caches/8.8/transforms/9d7b38f1d96938519477dd5bb030ea7d/transformed/play-services-base-18.1.0/AndroidManifest.xml:22:19-43
+230            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+230-->[com.google.android.gms:play-services-base:18.1.0] /Users/michael/.gradle/caches/8.8/transforms/9d7b38f1d96938519477dd5bb030ea7d/transformed/play-services-base-18.1.0/AndroidManifest.xml:21:19-78
+231
+232        <meta-data
+232-->[com.google.android.gms:play-services-basement:18.1.0] /Users/michael/.gradle/caches/8.8/transforms/070e01525a9f4da3b88a8516a42b5c99/transformed/play-services-basement-18.1.0/AndroidManifest.xml:21:9-23:69
+233            android:name="com.google.android.gms.version"
+233-->[com.google.android.gms:play-services-basement:18.1.0] /Users/michael/.gradle/caches/8.8/transforms/070e01525a9f4da3b88a8516a42b5c99/transformed/play-services-basement-18.1.0/AndroidManifest.xml:22:13-58
+234            android:value="@integer/google_play_services_version" />
+234-->[com.google.android.gms:play-services-basement:18.1.0] /Users/michael/.gradle/caches/8.8/transforms/070e01525a9f4da3b88a8516a42b5c99/transformed/play-services-basement-18.1.0/AndroidManifest.xml:23:13-66
+235    </application>
+236
+237</manifest>

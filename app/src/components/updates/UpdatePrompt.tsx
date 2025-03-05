@@ -3,7 +3,7 @@ import { Box, BoxProps, Button, Icon, Text } from '@alef/sys';
 
 export interface UpdatePromptProps extends BoxProps {}
 
-const TEST = true;
+const TEST = false;
 
 export function UpdatePrompt(props: UpdatePromptProps) {
 	const { update, updateAvailable, updating } = useUpdateApp();

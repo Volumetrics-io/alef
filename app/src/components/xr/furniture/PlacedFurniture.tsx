@@ -9,7 +9,6 @@ import {
 	useUpdateFurniturePlacementTransform,
 } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
-import { Bvh } from '@react-three/drei';
 import { useThree } from '@react-three/fiber';
 import { defaultApply, Handle, HandleState } from '@react-three/handle';
 import { Container, Root } from '@react-three/uikit';
@@ -37,10 +36,17 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 
 	const groupRef = useRef<Group>(null);
 	const move = useUpdateFurniturePlacementTransform(furniturePlacementId);
+
+	const { halfExtents, size, center, ref: modelRef, ready } = useAABB();
+	const isEditable = ready && mode === 'furniture';
+	console.log('isEditable', isEditable, ready, mode);
+
 	const handleClick = useCallback(() => {
+		console.log('handleClick', furniturePlacementId, selected, isEditable);
 		if (selected) return;
+		if (!isEditable) return;
 		select(furniturePlacementId);
-	}, [select, furniturePlacementId, selected]);
+	}, [select, furniturePlacementId, selected, isEditable]);
 
 	const applyWithSave = useCallback(
 		(state: HandleState<any>, target: Object3D) => {
@@ -57,11 +63,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 		[move, gl]
 	);
 
-	const { halfExtents, size, center, ref: modelRef, ready } = useAABB();
-
 	const hypotenuse = Math.sqrt(halfExtents[0] * halfExtents[0] + halfExtents[2] * halfExtents[2]);
-
-	const isEditable = ready && mode === 'furniture';
 
 	if (!furnitureId || !placement) return null;
 
@@ -73,9 +75,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 		>
 			{isEditable && (
 				<ConditionalHandle enabled={selected} targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false} apply={applyWithSave}>
-					<Bvh firstHitOnly onClick={handleClick} onPointerDown={handleClick}>
-						<CollisionModel furnitureId={furnitureId} />
-					</Bvh>
+					<CollisionModel furnitureId={furnitureId} onClick={handleClick} />
 				</ConditionalHandle>
 			)}
 			<FurnitureModel furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} receiveShadow={size.y < 0.2} pointerEvents="none" />

@@ -5,7 +5,6 @@ import {
 	FurnitureAttributePicker,
 	FurnitureCollection,
 	FurniturePanelFilterSidebar,
-	FurniturePanelFilterSidebarCloseButton,
 	FurniturePanelFilterSidebarSectionHeader,
 	FurniturePanelHeader,
 	FurniturePanelNavigation,
@@ -28,7 +27,6 @@ function FurnitureFilters() {
 	return (
 		<FurniturePanelFilterSidebar>
 			<FurniturePanelFilterSidebarSectionHeader label="Categories">
-				<FurniturePanelFilterSidebarCloseButton />
 			</FurniturePanelFilterSidebarSectionHeader>
 			<CategoryFilter />
 			<FurniturePanelFilterSidebarSectionHeader label="Types" />

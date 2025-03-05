@@ -105,15 +105,31 @@ export const FurniturePanelFilterSidebar = ({ children }: { children?: ReactNode
 			flexDirection="column" 
 			height="100%" 
 			width="100%" 
+			gap={10}
+			padding={10}
 			flexWrap="no-wrap"
-			onPointerEnter={handleEnter} onPointerLeave={handleLeave} 
-			scrollbarOpacity={scrollbarVisible.current} 
-			scrollbarWidth={8} 
-			scrollbarBorderRadius={4} 
-			overflow="scroll"
-			scrollbarColor={colors.ink}
-			gap={8}>
-				{children}
+			>
+				<Container 
+				marginTop={5}
+				alignItems="center" 
+				flexDirection="row" 
+				width="100%" 
+				justifyContent="space-between">
+					<Text>Filters</Text>
+					<FurniturePanelFilterSidebarCloseButton />
+				</Container>
+				<Container 
+				flexDirection="column" 
+				gap={8}
+				onPointerEnter={handleEnter} onPointerLeave={handleLeave} 
+				scrollbarOpacity={scrollbarVisible.current} 
+				scrollbarWidth={8} 
+				scrollbarBorderRadius={4} 
+				overflow="scroll"
+				scrollbarColor={colors.ink}
+				>
+					{children}
+				</Container>
 		</AnimatedSurface>
 		</Container>
 	);

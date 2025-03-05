@@ -10,7 +10,6 @@ import {
 	FurnitureAttributePicker,
 	FurnitureCollection,
 	FurniturePanelFilterSidebar,
-	FurniturePanelFilterSidebarCloseButton,
 	FurniturePanelFilterSidebarSectionHeader,
 	FurniturePanelHeader,
 	FurniturePanelNavigation,
@@ -80,7 +79,6 @@ function FurnitureFilters({ furnitureUnfiltered }: { furnitureUnfiltered: Furnit
 	return (
 		<FurniturePanelFilterSidebar>
 			<FurniturePanelFilterSidebarSectionHeader label="Categories">
-				<FurniturePanelFilterSidebarCloseButton />
 			</FurniturePanelFilterSidebarSectionHeader>
 			<CategoryFilter />
 			<FurniturePanelFilterSidebarSectionHeader label="Types" />

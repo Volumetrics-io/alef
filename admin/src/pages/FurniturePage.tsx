@@ -1,4 +1,5 @@
 import { AddFurniture } from '@/components/furniture/AddFurniture';
+import { BulkFurnitureDelete } from '@/components/furniture/BulkFurnitureDelete';
 import { BulkFurnitureUploader } from '@/components/furniture/BulkFurnitureUploader';
 import { FurnitureBrowser } from '@/components/furniture/FurnitureBrowser';
 import { Box, Button, Frame, Heading, Icon } from '@alef/sys';
@@ -17,7 +18,10 @@ const FurniturePage = () => {
 			</Box>
 			<Heading level={2}>New Furniture</Heading>
 			<Box gapped>
-				<BulkFurnitureUploader />
+				<Box p stacked gapped>
+					<BulkFurnitureUploader />
+					<BulkFurnitureDelete />
+				</Box>
 				<Frame p>
 					<AddFurniture />
 				</Frame>

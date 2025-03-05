@@ -1,12 +1,12 @@
 import { adminApiClient } from '@/services/adminApi';
+import { queryClient } from '@/services/queryClient';
 import { handleErrors } from '@/services/utils';
 import { Attribute, FurnitureModelQuality } from '@alef/common';
 import { Box, Button, CardGrid, Dialog, Frame, Heading, Icon, ScrollArea } from '@alef/sys';
 import { ChangeEvent, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { proxy, useSnapshot } from 'valtio';
-import { AttributePicker } from './AttributePicker';
-import { AttributePill } from './AttributePill';
+import { MultiAttributePicker } from './MultiAttributePicker';
 
 const progressState = proxy({
 	completed: {} as Record<string, boolean>,
@@ -113,6 +113,7 @@ export function BulkFurnitureUploader() {
 			} else {
 				toast.success('All models uploaded');
 			}
+			queryClient.refetchQueries({ queryKey: ['furniture'] });
 		} catch (err) {
 			console.error(err);
 		} finally {
@@ -130,12 +131,7 @@ export function BulkFurnitureUploader() {
 					Select a folder with subfolders containing furniture LOD models "original.gltf/glb", "medium.gltf/glb", "low.gltf/glb", "collision.gltf/glb"
 				</Dialog.Description>
 				<Frame p stacked gapped>
-					<AttributePicker onSubmit={(attr) => setAttributes((v) => [...v, attr])} actionText="Add" />
-					<Box gapped wrap>
-						{attributes.map((attr, idx) => (
-							<AttributePill attribute={attr} key={`${attr.key}:${attr.value}`} onRemove={() => setAttributes(attributes.filter((_, i) => i !== idx))} />
-						))}
-					</Box>
+					<MultiAttributePicker value={attributes} onChange={setAttributes} />
 				</Frame>
 				<div>
 					<input

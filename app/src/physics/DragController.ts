@@ -1,7 +1,7 @@
 import { useDebugStore } from '@/stores/debugStore';
 import { useEditorStore } from '@/stores/editorStore';
 import { usePlanesStore } from '@/stores/planesStore';
-import { RoomStore } from '@/stores/roomStore/roomStore';
+import { RoomStore } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
 import type RAPIER from '@dimforge/rapier3d-compat';
 import { KinematicCharacterController, QueryFilterFlags } from '@dimforge/rapier3d-compat';

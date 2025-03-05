@@ -2,6 +2,7 @@ import { adminApiClient } from '@/services/adminApi';
 import { FurnitureData } from '@/services/publicApi';
 import { queryClient } from '@/services/queryClient';
 import { handleErrors } from '@/services/utils';
+import { useFurnitureStore } from '@/stores/furnitureStore';
 import { Box, Button, Card, Dialog, Form, Frame, Icon, Input, ScrollArea } from '@alef/sys';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -9,7 +10,6 @@ import { AttributesField } from './AttributesField';
 import { FurnitureModelUpload } from './FurnitureModelUpload';
 import { FurniturePreview } from './FurniturePreview';
 import { FurnitureSnapshot } from './FurnitureSnapshot';
-import { useFurnitureStore } from '@/stores/furnitureStore';
 export interface FurnitureCardProps {
 	furniture: FurnitureData;
 }
@@ -47,7 +47,7 @@ export function FurnitureCard({ furniture }: FurnitureCardProps) {
 						<FurnitureSnapshot furnitureId={furniture.id} />
 						<Box float="top-left" gapped align="center">
 							{furniture.attributes.map((attr) => (
-								<Frame key={attr.key} p="squeeze">
+								<Frame key={`${attr.key}:${attr.value}`} p="squeeze">
 									{attr.key}: {attr.value}
 								</Frame>
 							))}

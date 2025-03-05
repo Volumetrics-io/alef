@@ -24,6 +24,12 @@
     package="io.alef.app.twa">
 
     
+        <uses-permission android:name="android.permission.INTERNET"/>
+    
+        <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    
+        <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    
         <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     
 
@@ -77,7 +83,7 @@
         
             <meta-data
                 android:name="com.meta.horizon.platform.ovr.OCULUS_APP_ID"
-            android:value="\ 0" />
+            android:value="\ 9358165304204524" />
         
 
         
@@ -229,6 +235,35 @@
             
         
 
+        
+            <activity android:name=
+        "com.meta.androidbrowserhelper.locationdelegation.PermissionRequestActivity"/>
+        
+            
+        <activity
+            android:name="com.meta.androidbrowserhelper.horizonbilling.provider.PaymentActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:configChanges="keyboardHidden|keyboard|orientation|screenLayout|screenSize"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="org.chromium.intent.action.PAY" />
+                <category android:name="com.oculus.intent.category.VR" />
+            </intent-filter>
+
+            <meta-data
+                android:name="org.chromium.default_payment_method_name"
+                android:value="https://quest.meta.com/billing" />
+        </activity>
+
+        <!-- This service checks who calls it at runtime. -->
+        <service
+            android:name="com.meta.androidbrowserhelper.horizonbilling.provider.PaymentService"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="org.chromium.intent.action.IS_READY_TO_PAY" />
+            </intent-filter>
+        </service> 
         
     </application>
 </manifest>

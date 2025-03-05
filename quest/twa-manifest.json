@@ -1,50 +1,60 @@
 {
-	"packageId": "io.alef.app.twa",
-	"applicationId": "0",
-	"host": "app.alef.io",
-	"name": "Alef",
-	"launcherName": "Alef",
-	"display": "standalone",
-	"themeColor": "#000000",
-	"themeColorDark": "#000000",
-	"navigationColor": "#000000",
-	"navigationColorDark": "#000000",
-	"navigationDividerColor": "#000000",
-	"navigationDividerColorDark": "#000000",
-	"backgroundColor": "#FFFFFF",
-	"enableNotifications": true,
-	"enableMicrophone": false,
-	"enableXRScene": true,
-	"startUrl": "/?directLaunch=true",
-	"iconUrl": "https://app.alef.io/icons/512.png",
-	"splashScreenFadeOutDuration": 300,
-	"signingKey": {
-		"path": "./android.keystore",
-		"alias": "android"
-	},
-	"appVersionName": "1",
-	"appVersionCode": 1,
-	"shortcuts": [],
-	"generatorApp": "bubblewrap-cli",
-	"webManifestUrl": "https://app.alef.io/manifest.webmanifest",
-	"fallbackType": "customtabs",
-	"features": {
-		"horizonPlatformSDK": {
-			"enabled": true
-		}
-	},
-	"alphaDependencies": {
-		"enabled": false
-	},
-	"enableSiteSettingsShortcut": true,
-	"isChromeOSOnly": false,
-	"isMetaQuest": true,
-	"horizonOSAppMode": "immersive",
-	"fullScopeUrl": "https://app.alef.io/",
-	"minSdkVersion": 23,
-	"orientation": "default",
-	"fingerprints": [],
-	"additionalTrustedOrigins": [],
-	"retainedBundles": [],
-	"appVersion": "1"
+  "packageId": "io.alef.app.twa",
+  "applicationId": "9358165304204524",
+  "host": "app.alef.io",
+  "name": "alef",
+  "launcherName": "alef",
+  "display": "standalone",
+  "themeColor": "#000000",
+  "themeColorDark": "#000000",
+  "navigationColor": "#000000",
+  "navigationColorDark": "#000000",
+  "navigationDividerColor": "#000000",
+  "navigationDividerColorDark": "#000000",
+  "backgroundColor": "#EFFFFF",
+  "enableNotifications": true,
+  "enableMicrophone": false,
+  "enableXRScene": true,
+  "startUrl": "/?directLaunch=true",
+  "iconUrl": "https://app.alef.io/icons/512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "/Users/michael/alef/quest/android.keystore",
+    "alias": "android"
+  },
+  "appVersionName": "1",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://app.alef.io/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {
+    "horizonPlatformSDK": {
+      "enabled": true
+    },
+    "horizonBilling": {
+      "enabled": true
+    },
+    "locationDelegation": {
+      "enabled": true
+    }
+  },
+  "alphaDependencies": {
+    "enabled": true
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": true,
+  "horizonOSAppMode": "immersive",
+  "fullScopeUrl": "https://app.alef.io/",
+  "minSdkVersion": 23,
+  "orientation": "default",
+  "fingerprints": [
+    {
+      "value": "71:60:43:70:6A:06:94:B9:54:9E:9A:C2:8A:83:0E:A5:F1:FB:A7:6C:3E:08:F8:26:2A:4B:F4:1E:6C:30:4A:B9"
+    }
+  ],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "appVersion": "1"
 }

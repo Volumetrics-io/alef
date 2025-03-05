@@ -77,6 +77,11 @@ export default defineConfig({
 				rewrite: (path) => path.replace(/^\/public-api/, ''),
 				ws: true,
 			},
+			'/admin-ui': {
+				target: 'http://localhost:4203',
+				changeOrigin: true,
+				ws: true,
+			},
 		},
 	},
 });

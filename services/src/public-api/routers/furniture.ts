@@ -14,18 +14,33 @@ export const furnitureRouter = new Hono<Env>()
 			'query',
 			z.object({
 				attribute: z.union([formattedAttrSchema, formattedAttrSchema.array()]).optional(),
+				page: z.coerce.number().optional(),
+				pageSize: z.coerce.number().optional(),
 			})
 		),
 		async (ctx) => {
 			// not using validated version here because .queries gives the coerced array version,
 			// easier to work with...
 			const attribute = ctx.req.queries('attribute') || [];
-			if (attribute.length) {
-				const keyValues = attribute.map((attr) => attr.split(':')).map(([key, value]) => ({ key, value }) as Attribute);
-				const filteredFurniture = await ctx.env.PUBLIC_STORE.listFurnitureByAttributes(keyValues);
-				return ctx.json(wrapRpcData(filteredFurniture));
+			const { page, pageSize } = ctx.req.valid('query');
+			const keyValues = attribute.map((attr) => attr.split(':')).map(([key, value]) => ({ key, value }) as Attribute);
+
+			// we only allow fetching a larger page size than 20 if the attribute filter
+			// is the core package --- this is a special query used to preload and cache
+			// core furniture data for offline use.
+			if (pageSize && pageSize > 20 && !keyValues.every((attr) => attr.key === 'package' && attr.value === 'core')) {
+				throw new AlefError(AlefError.Code.BadRequest, 'Page size too large');
 			}
-			const furniture = await ctx.env.PUBLIC_STORE.listFurniture();
+
+			if (page !== undefined && page < 0) {
+				throw new AlefError(AlefError.Code.BadRequest, 'Invalid page number. Pages start at 0.');
+			}
+
+			const furniture = await ctx.env.PUBLIC_STORE.listFurniture({
+				attributeFilters: keyValues,
+				page,
+				pageSize: pageSize || 10,
+			});
 			return ctx.json(wrapRpcData(furniture));
 		}
 	)

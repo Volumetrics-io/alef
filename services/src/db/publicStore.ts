@@ -61,11 +61,66 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 		).as('attributes');
 	}
 
-	async listFurniture() {
-		return this.#db
-			.selectFrom('Furniture')
-			.select((eb) => ['id', 'name', 'modelUpdatedAt', this.selectFurnitureAttributes(eb)])
-			.execute();
+	async listFurniture({ attributeFilters, page, pageSize }: { attributeFilters?: Attribute[]; page?: number; pageSize?: number }) {
+		let builder = this.#db.selectFrom('Furniture').select((eb) => ['Furniture.id', 'Furniture.name', 'Furniture.modelUpdatedAt', this.selectFurnitureAttributes(eb)]);
+
+		if (attributeFilters) {
+			// Separate attributes by key
+			const categorizedAttributes = attributeFilters.reduce<Record<string, Attribute[]>>((acc, attr) => {
+				assertAttributeKey(attr.key);
+				if (!acc[attr.key]) {
+					acc[attr.key] = [];
+				}
+				acc[attr.key].push(attr);
+				return acc;
+			}, {});
+
+			// furniture must match attributes with the following rules:
+			// when multiple attribute values with the same key are selected,
+			//  the furniture must match any one of those values
+			// when multiple attributes of DIFFERENT keys are selected,
+			//  the furniture must match at least one value for each key.
+			// e.g. if we have selected 'chair' and 'sofa' for 'type' and 'living room' for 'category',
+			//  the furniture must be either a chair or a sofa and must be in the living room category.
+
+			// this is expressed by filtering by attribute key where value is in the
+			// set of values for that key. we can't select directly on Attribute, though,
+			// we need to include the whole join in the clause, because there will
+			// be multiple distinct attributes matched against when multiple keys
+			// are provided.
+			for (const [key, attrs] of Object.entries(categorizedAttributes)) {
+				assertAttributeKey(key);
+				builder = builder.where((eb) =>
+					eb.exists(
+						eb
+							.selectFrom('FurnitureAttribute')
+							.select('FurnitureAttribute.furnitureId')
+							.innerJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id')
+							.whereRef('FurnitureAttribute.furnitureId', '=', 'Furniture.id')
+							.where('Attribute.key', '=', key)
+							.where(
+								'Attribute.value',
+								'in',
+								attrs.map((attr) => attr.value)
+							)
+					)
+				);
+			}
+		}
+
+		if (page !== undefined && pageSize !== undefined) {
+			builder = builder.limit(pageSize + 1).offset(pageSize * page);
+		}
+
+		console.log(builder.compile().sql, builder.compile().parameters);
+		const result = await builder.execute();
+
+		const hasNextPage = !!pageSize && result.length > pageSize;
+		if (hasNextPage) {
+			result.pop();
+		}
+
+		return { items: result, pageInfo: { hasNextPage, pageSize, page, nextPage: page === undefined ? undefined : page + 1 } };
 	}
 
 	async getAttributeValues(key: string) {
@@ -75,57 +130,6 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 
 	async listAttributes() {
 		return this.#db.selectFrom('Attribute').select(['key', 'value']).execute();
-	}
-
-	async listFurnitureByAttributes(attributes: Attribute[]) {
-		// Start with the base query
-		let builder = this.#db.selectFrom('Furniture').select(['Furniture.id', 'Furniture.name', 'Furniture.modelUpdatedAt', this.selectFurnitureAttributes]).distinct();
-
-		// Separate attributes by key
-		const categorizedAttributes = attributes.reduce<Record<string, Attribute[]>>((acc, attr) => {
-			assertAttributeKey(attr.key);
-			if (!acc[attr.key]) {
-				acc[attr.key] = [];
-			}
-			acc[attr.key].push(attr);
-			return acc;
-		}, {});
-
-		// furniture must match attributes with the following rules:
-		// when multiple attribute values with the same key are selected,
-		//  the furniture must match any one of those values
-		// when multiple attributes of DIFFERENT keys are selected,
-		//  the furniture must match at least one value for each key.
-		// e.g. if we have selected 'chair' and 'sofa' for 'type' and 'living room' for 'category',
-		//  the furniture must be either a chair or a sofa and must be in the living room category.
-
-		// this is expressed by filtering by attribute key where value is in the
-		// set of values for that key. we can't select directly on Attribute, though,
-		// we need to include the whole join in the clause, because there will
-		// be multiple distinct attributes matched against when multiple keys
-		// are provided.
-		for (const [key, attrs] of Object.entries(categorizedAttributes)) {
-			assertAttributeKey(key);
-			builder = builder.where((eb) =>
-				eb.exists(
-					eb
-						.selectFrom('FurnitureAttribute')
-						.select('FurnitureAttribute.furnitureId')
-						.innerJoin('Attribute', 'FurnitureAttribute.attributeId', 'Attribute.id')
-						.whereRef('FurnitureAttribute.furnitureId', '=', 'Furniture.id')
-						.where('Attribute.key', '=', key)
-						.where(
-							'Attribute.value',
-							'in',
-							attrs.map((attr) => attr.value)
-						)
-				)
-			);
-		}
-
-		console.log(builder.compile().sql, builder.compile().parameters);
-
-		return builder.execute();
 	}
 
 	/**

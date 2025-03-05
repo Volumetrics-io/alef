@@ -26,8 +26,7 @@ function FurnitureFilters() {
 
 	return (
 		<FurniturePanelFilterSidebar>
-			<FurniturePanelFilterSidebarSectionHeader label="Categories">
-			</FurniturePanelFilterSidebarSectionHeader>
+			<FurniturePanelFilterSidebarSectionHeader label="Categories"></FurniturePanelFilterSidebarSectionHeader>
 			<CategoryFilter />
 			<FurniturePanelFilterSidebarSectionHeader label="Types" />
 			<FurnitureAttributePicker options={typeOptions} />
@@ -37,9 +36,12 @@ function FurnitureFilters() {
 
 function FilteredFurniture() {
 	const attributes = useAllFilters();
-	const { data: furniture } = useAllFurniture({
+	const { data: furniture, fetchNextPage } = useAllFurniture({
 		attributeFilter: attributes,
 	});
 
-	return <FurnitureCollection furniture={furniture} />;
+	const allFurniture = furniture.pages.flatMap((page) => page.items);
+	const hasMore = furniture.pages[furniture.pages.length - 1].pageInfo.hasNextPage;
+
+	return <FurnitureCollection furniture={allFurniture} hasMore={hasMore} onLoadMore={() => fetchNextPage()} />;
 }

@@ -111,6 +111,7 @@ self.addEventListener('install', (event) => {
 			const coreFurniture = await fetch(
 				`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture?${new URLSearchParams({
 					attribute: `package:core`,
+					pageSize: '1000',
 				})}`
 			);
 

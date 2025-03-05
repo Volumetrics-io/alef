@@ -17,12 +17,15 @@ import {
 
 export function OfflineFurniturePanel() {
 	// we can only use one precached query when offline.
-	const { data: furnitureUnfiltered } = useAllFurniture({
+	// CAREFUL. THIS MUST MATCH THE SAME EXACT FILTERS IN THE SERVICE WORKER.
+	const { data } = useAllFurniture({
 		attributeFilter: [
 			// our precached query is for furniture in the core package
 			{ key: 'package', value: 'core' },
 		],
+		pageSize: 1000,
 	});
+	const furnitureUnfiltered = data.pages[0].items;
 
 	// since the precached furniture is unfiltered by the API, we have
 	// to apply any selected attribute filters on it manually on the client.
@@ -78,8 +81,7 @@ function FurnitureFilters({ furnitureUnfiltered }: { furnitureUnfiltered: Furnit
 
 	return (
 		<FurniturePanelFilterSidebar>
-			<FurniturePanelFilterSidebarSectionHeader label="Categories">
-			</FurniturePanelFilterSidebarSectionHeader>
+			<FurniturePanelFilterSidebarSectionHeader label="Categories"></FurniturePanelFilterSidebarSectionHeader>
 			<CategoryFilter />
 			<FurniturePanelFilterSidebarSectionHeader label="Types" />
 			<FurnitureAttributePicker options={types.map((type): Attribute => ({ key: 'type', value: type }))} />

@@ -1,21 +1,20 @@
+import { Button } from '@/components/xr/ui/Button';
+import { Heading } from '@/components/xr/ui/Heading';
 import { RoomTypePicker } from '@/components/xr/ui/RoomTypePicker';
+import { Selector, SelectorItem } from '@/components/xr/ui/Selector';
 import { Surface } from '@/components/xr/ui/Surface';
+import { colors } from '@/components/xr/ui/theme';
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
 import { useEditorStageMode } from '@/stores/editorStore';
 import { useAllFilters, useCategoryFilter, useSetFilters } from '@/stores/FilterStore';
 import { Attribute, AttributeKey } from '@alef/common';
+import { animated, config, useSpring } from '@react-spring/three';
+import { useFrame } from '@react-three/fiber';
 import { Container, Text } from '@react-three/uikit';
-import { Button } from '@/components/xr/ui/Button';
-import { colors } from '@/components/xr/ui/theme';
 import { ArrowLeftIcon, ArrowRightIcon, PanelLeftCloseIcon, PanelLeftIcon, SofaIcon } from '@react-three/uikit-lucide';
 import { ReactNode, Suspense, useRef, useState } from 'react';
 import { proxy, useSnapshot } from 'valtio';
 import { FurnitureSelectItem } from './FurnitureSelectItem';
-import { config, useSpring, animated } from '@react-spring/three';
-import { useFrame } from '@react-three/fiber';
-import { Selector } from '@/components/xr/ui/Selector';
-import { SelectorItem } from '@/components/xr/ui/Selector';
-import { Heading } from '@/components/xr/ui/Heading';
 const AnimatedSurface = animated(Surface);
 
 const panelState = proxy({
@@ -48,9 +47,7 @@ export const FurniturePanelHeader = () => {
 			</SmallButton>
 			<Container marginX="auto" flexDirection="row" gap={4} alignItems="center" justifyContent="center">
 				<SofaIcon width={20} height={20} />
-				<Heading level={3}>
-					Furniture
-				</Heading>
+				<Heading level={3}>Furniture</Heading>
 			</Container>
 		</Container>
 	);
@@ -86,51 +83,39 @@ export const FurniturePanelFilterSidebar = ({ children }: { children?: ReactNode
 
 	return (
 		<Container
-		width="30%"
-		overflow="hidden"
-		display={isVisible ? 'flex' : 'none'}
-		flexDirection="column"
-		zIndexOffset={2}
-		flexGrow={1}
-		flexShrink={0} 
-		height="100%"
-		positionType="absolute"
-		positionTop={0}
-		positionLeft={0}
-		gap={8} 
-		padding={6}>
-
-		<AnimatedSurface 
-			transformTranslateX={transformTranslateX}
-			flexDirection="column" 
-			height="100%" 
-			width="100%" 
-			gap={10}
-			padding={10}
-			flexWrap="no-wrap"
-			>
-				<Container 
-				marginTop={5}
-				alignItems="center" 
-				flexDirection="row" 
-				width="100%" 
-				justifyContent="space-between">
+			width="30%"
+			overflow="hidden"
+			display={isVisible ? 'flex' : 'none'}
+			flexDirection="column"
+			zIndexOffset={2}
+			flexGrow={1}
+			flexShrink={0}
+			height="100%"
+			positionType="absolute"
+			positionTop={0}
+			positionLeft={0}
+			gap={8}
+			padding={6}
+		>
+			<AnimatedSurface transformTranslateX={transformTranslateX} flexDirection="column" height="100%" width="100%" gap={10} padding={10} flexWrap="no-wrap">
+				<Container marginTop={5} alignItems="center" flexDirection="row" width="100%" justifyContent="space-between">
 					<Text>Filters</Text>
 					<FurniturePanelFilterSidebarCloseButton />
 				</Container>
-				<Container 
-				flexDirection="column" 
-				gap={8}
-				onPointerEnter={handleEnter} onPointerLeave={handleLeave} 
-				scrollbarOpacity={scrollbarVisible.current} 
-				scrollbarWidth={8} 
-				scrollbarBorderRadius={4} 
-				overflow="scroll"
-				scrollbarColor={colors.ink}
+				<Container
+					flexDirection="column"
+					gap={8}
+					onPointerEnter={handleEnter}
+					onPointerLeave={handleLeave}
+					scrollbarOpacity={scrollbarVisible.current}
+					scrollbarWidth={8}
+					scrollbarBorderRadius={4}
+					overflow="scroll"
+					scrollbarColor={colors.ink}
 				>
 					{children}
 				</Container>
-		</AnimatedSurface>
+			</AnimatedSurface>
 		</Container>
 	);
 };
@@ -156,7 +141,7 @@ export const FurniturePanelFilterSidebarCloseButton = () => {
 	);
 };
 
-export const FurnitureCollection = ({ furniture }: { furniture: FurnitureItem[] }) => {
+export const FurnitureCollection = ({ furniture, hasMore, onLoadMore }: { furniture: FurnitureItem[]; hasMore?: boolean; onLoadMore?: () => void }) => {
 	const [scrollbarVisible, setScrollbarVisible] = useState(0);
 
 	const handleEnter = () => {
@@ -185,6 +170,11 @@ export const FurnitureCollection = ({ furniture }: { furniture: FurnitureItem[] 
 			{furniture.map((furnitureItem) => (
 				<FurnitureSelectItem key={furnitureItem.id} furnitureItem={furnitureItem} />
 			))}
+			{hasMore && (
+				<Button onClick={onLoadMore}>
+					<Text>Load more</Text>
+				</Button>
+			)}
 		</Container>
 	);
 };
@@ -225,7 +215,7 @@ export function FurnitureAttributePicker({ options }: { options: Attribute[] }) 
 
 	return (
 		<Selector flexWrap="wrap" flexDirection="column" size="small">
-            <FurnitureAttributePickerAllItem key="all" attributeKey={key} />
+			<FurnitureAttributePickerAllItem key="all" attributeKey={key} />
 			{options.map((option) => (
 				<FurnitureAttributePickerItem key={option.value} attribute={option} />
 			))}
@@ -251,9 +241,7 @@ function FurnitureAttributePickerItem({ attribute }: { attribute: Attribute }) {
 			}
 			selected={selected}
 		>
-			<Text>
-				{attribute.value[0].toUpperCase() + attribute.value.slice(1)}
-			</Text>
+			<Text>{attribute.value[0].toUpperCase() + attribute.value.slice(1)}</Text>
 		</SelectorItem>
 	);
 }
@@ -277,9 +265,7 @@ function FurnitureAttributePickerAllItem({ attributeKey }: { attributeKey: Attri
 			}
 			selected={selected}
 		>
-			<Text>
-				All
-			</Text>
+			<Text>All</Text>
 		</SelectorItem>
 	);
 }

@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.alef.app.twa",
+        "sha256_cert_fingerprints": ["71:60:43:70:6A:06:94:B9:54:9E:9A:C2:8A:83:0E:A5:F1:FB:A7:6C:3E:08:F8:26:2A:4B:F4:1E:6C:30:4A:B9"]
+      }
+    }]

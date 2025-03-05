@@ -1,0 +1,179 @@
+androidx.lifecycle.CompositeGeneratedAdaptersObserver
+com.meta.androidbrowserhelper.horizonpermissions.PermissionRequestActivity
+com.meta.androidbrowserhelper.trusted.WebViewFallbackActivity
+com.google.android.gms.common.GooglePlayServicesManifestException
+androidx.annotation.Keep
+androidx.lifecycle.SingleGeneratedAdapterObserver
+androidx.lifecycle.FullLifecycleObserverAdapter
+com.google.android.gms.common.GooglePlayServicesIncorrectManifestValueException
+com.google.android.gms.common.util.DynamiteApi
+com.meta.horizon.platform.ovr.requests.IAP
+com.google.android.gms.location.LocationAvailability
+com.google.android.gms.location.LocationRequest
+com.google.android.gms.location.LocationResult
+androidx.core.app.RemoteActionCompat
+io.alef.app.twa.Application
+com.meta.horizon.platform.ovr.Message
+io.alef.app.twa.LauncherActivity
+com.google.android.gms.common.annotation.KeepName
+androidx.core.app.CoreComponentFactory
+com.meta.horizon.platform.ovr.models.Product
+io.alef.app.twa.DelegationService
+com.meta.horizon.platform.ovr.requests.UserAgeCategory
+androidx.lifecycle.ReflectiveGenericLifecycleObserver
+com.meta.horizon.platform.ovr.Error
+androidx.core.graphics.drawable.IconCompat
+com.meta.androidbrowserhelper.horizonbilling.provider.PaymentActivity
+com.meta.horizon.platform.ovr.Core
+android.support.v4.app.RemoteActionCompatParcelizer
+com.google.android.gms.common.api.Scope
+androidx.lifecycle.LiveData$LifecycleBoundObserver
+com.google.android.gms.common.GooglePlayServicesMissingManifestValueException
+com.meta.androidbrowserhelper.trusted.FocusActivity
+android.support.v4.graphics.drawable.IconCompatParcelizer
+com.meta.androidbrowserhelper.trusted.ManageDataLauncherActivity
+com.meta.horizon.platform.ovr.models.Purchase
+com.google.android.gms.common.api.GoogleApiActivity
+com.meta.horizon.platform.ovr.models.Price
+androidx.core.app.RemoteActionCompatParcelizer
+com.meta.androidbrowserhelper.horizonbilling.provider.PaymentService
+com.meta.androidbrowserhelper.locationdelegation.PermissionRequestActivity
+com.google.android.gms.dynamite.DynamiteModule$DynamiteLoaderClassLoader
+com.meta.horizon.platform.ovr.models.PurchaseArray
+com.google.android.gms.common.internal.ReflectedParcelable
+com.google.android.gms.auth.api.signin.GoogleSignInAccount
+com.google.android.gms.common.api.internal.LifecycleCallback
+com.meta.horizon.platform.ovr.models.UserAccountAgeCategory
+androidx.core.graphics.drawable.IconCompatParcelizer
+androidx.browser.browseractions.BrowserActionsFallbackMenuView
+com.meta.horizon.platform.ovr.models.PlatformInitialize
+com.google.android.gms.common.api.Status
+com.meta.horizon.platform.ovr.models.ProductArray
+androidx.core.content.FileProvider
+androidx.versionedparcelable.ParcelImpl
+com.google.android.gms.common.api.internal.BasePendingResult
+androidx.versionedparcelable.CustomVersionedParcelable
+com.meta.androidbrowserhelper.trusted.NotificationPermissionRequestActivity
+com.google.android.gms.common.internal.zat: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.signin.internal.zai: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.internal.location.zzg: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.common.internal.ClientIdentity: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.signin.internal.zag: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.location.zzac: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.common.Feature: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.location.LocationRequest: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.common.internal.zzj: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.internal.location.zzd: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.common.internal.ConnectionTelemetryConfiguration: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.common.api.Scope: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.dynamite.DynamiteModule$DynamiteLoaderClassLoader: java.lang.ClassLoader sClassLoader
+com.google.android.gms.common.internal.MethodInvocation: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.internal.location.zzdb: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.signin.internal.zak: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.common.internal.zav: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.common.internal.GetServiceRequest: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.common.ConnectionResult: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.signin.internal.zaa: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.location.LastLocationRequest: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.common.internal.RootTelemetryConfiguration: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.internal.location.zzdf: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.internal.location.zzdd: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.common.api.Status: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.auth.api.signin.GoogleSignInAccount: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.common.internal.TelemetryData: android.os.Parcelable$Creator CREATOR
+androidx.versionedparcelable.ParcelImpl: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.location.LocationResult: android.os.Parcelable$Creator CREATOR
+com.google.android.gms.location.LocationAvailability: android.os.Parcelable$Creator CREATOR
+com.meta.horizon.platform.ovr.enums.ProductType: com.meta.horizon.platform.ovr.enums.ProductType valueOf(java.lang.String)
+com.meta.horizon.platform.ovr.models.ProductArray: long nativeGetSize(long)
+com.meta.horizon.platform.ovr.Message: long nativeGetError(long)
+android.support.v4.graphics.drawable.IconCompatParcelizer: void write(androidx.core.graphics.drawable.IconCompat,androidx.versionedparcelable.VersionedParcel)
+io.alef.app.twa.LauncherActivity: LauncherActivity()
+com.meta.horizon.platform.ovr.models.Product: java.lang.String nativeGetDescription(long)
+com.meta.androidbrowserhelper.locationdelegation.PermissionRequestActivity: PermissionRequestActivity()
+com.meta.horizon.platform.ovr.Message: int nativeGetType(long)
+com.meta.horizon.platform.ovr.models.Product: java.lang.String nativeGetFormattedPrice(long)
+android.support.v4.app.RemoteActionCompatParcelizer: void write(androidx.core.app.RemoteActionCompat,androidx.versionedparcelable.VersionedParcel)
+com.meta.horizon.platform.ovr.models.Price: java.lang.String nativeGetFormatted(long)
+com.meta.horizon.platform.ovr.models.PurchaseArray: long nativeGetSize(long)
+androidx.core.app.RemoteActionCompat: RemoteActionCompat()
+com.meta.horizon.platform.ovr.enums.AccountAgeCategory: com.meta.horizon.platform.ovr.enums.AccountAgeCategory[] values()
+com.meta.horizon.platform.ovr.models.UserAccountAgeCategory: int nativeGetAgeCategory(long)
+com.meta.horizon.platform.ovr.requests.IAP: long nativeGetViewerPurchases()
+com.meta.horizon.platform.ovr.Error: java.lang.String nativeGetMessage(long)
+com.meta.horizon.platform.ovr.models.Product: int nativeGetType(long)
+androidx.core.app.RemoteActionCompatParcelizer: androidx.core.app.RemoteActionCompat read(androidx.versionedparcelable.VersionedParcel)
+com.meta.horizon.platform.ovr.models.Price: java.lang.String nativeGetCurrency(long)
+com.meta.androidbrowserhelper.trusted.ManageDataLauncherActivity: ManageDataLauncherActivity()
+androidx.lifecycle.Lifecycle$State: androidx.lifecycle.Lifecycle$State valueOf(java.lang.String)
+com.meta.horizon.platform.ovr.enums.ProductType: com.meta.horizon.platform.ovr.enums.ProductType[] values()
+com.meta.horizon.platform.ovr.enums.AccountAgeCategory: com.meta.horizon.platform.ovr.enums.AccountAgeCategory valueOf(java.lang.String)
+com.meta.horizon.platform.ovr.Message: long nativeGetUserAccountAgeCategory(long)
+androidx.core.app.RemoteActionCompatParcelizer: RemoteActionCompatParcelizer()
+com.google.android.gms.common.ErrorDialogFragment: ErrorDialogFragment()
+com.meta.horizon.platform.ovr.models.Purchase: java.lang.String nativeGetSKU(long)
+com.meta.horizon.platform.ovr.models.Purchase: java.lang.String nativeGetReportingId(long)
+com.meta.horizon.platform.ovr.Error: int nativeGetCode(long)
+com.google.android.gms.common.api.internal.LifecycleCallback: com.google.android.gms.common.api.internal.LifecycleFragment getChimeraLifecycleFragmentImpl(com.google.android.gms.common.api.internal.LifecycleActivity)
+com.meta.horizon.platform.ovr.models.PurchaseArray: long nativeGetElement(long,int)
+com.meta.horizon.platform.ovr.models.PurchaseArray: boolean nativeHasNextPage(long)
+androidx.versionedparcelable.CustomVersionedParcelable: CustomVersionedParcelable()
+com.meta.horizon.platform.ovr.Message: long nativeGetPurchase(long)
+com.meta.horizon.platform.ovr.models.ProductArray: long nativeGetElement(long,int)
+androidx.lifecycle.Lifecycle$State: androidx.lifecycle.Lifecycle$State[] values()
+com.meta.horizon.platform.ovr.Message: boolean nativeIsError(long)
+androidx.core.content.FileProvider: FileProvider()
+com.meta.horizon.platform.ovr.models.Purchase: java.lang.String nativeGetDeveloperPayload(long)
+com.meta.horizon.platform.ovr.models.Purchase: java.lang.String nativeGetPurchaseStrID(long)
+com.meta.horizon.platform.ovr.requests.IAP: long nativeLaunchCheckoutFlow(java.lang.String)
+com.meta.horizon.platform.ovr.Error: java.lang.String nativeGetDisplayableMessage(long)
+io.alef.app.twa.Application: Application()
+com.meta.horizon.platform.ovr.Message: long nativeGetProductArray(long)
+com.meta.horizon.platform.ovr.requests.IAP: long nativeGetViewerPurchasesDurableCache()
+com.meta.horizon.platform.ovr.Message: long nativeGetPurchaseArray(long)
+androidx.core.app.RemoteActionCompatParcelizer: void write(androidx.core.app.RemoteActionCompat,androidx.versionedparcelable.VersionedParcel)
+com.meta.horizon.platform.ovr.models.ProductArray: java.lang.String nativeGetNextUrl(long)
+androidx.core.app.CoreComponentFactory: CoreComponentFactory()
+com.meta.androidbrowserhelper.trusted.NotificationPermissionRequestActivity: NotificationPermissionRequestActivity()
+androidx.core.graphics.drawable.IconCompatParcelizer: IconCompatParcelizer()
+com.meta.androidbrowserhelper.trusted.WebViewFallbackActivity: WebViewFallbackActivity()
+com.google.android.gms.common.GooglePlayServicesMissingManifestValueException: GooglePlayServicesMissingManifestValueException()
+android.support.v4.app.RemoteActionCompatParcelizer: RemoteActionCompatParcelizer()
+com.meta.horizon.platform.ovr.Message$MessageType: com.meta.horizon.platform.ovr.Message$MessageType[] values()
+androidx.core.graphics.drawable.IconCompat: IconCompat()
+com.meta.horizon.platform.ovr.models.ProductArray: boolean nativeHasNextPage(long)
+android.support.v4.graphics.drawable.IconCompatParcelizer: androidx.core.graphics.drawable.IconCompat read(androidx.versionedparcelable.VersionedParcel)
+com.meta.androidbrowserhelper.horizonbilling.provider.PaymentActivity: PaymentActivity()
+com.meta.horizon.platform.ovr.models.Purchase: long nativeGetGrantTime(long)
+androidx.core.graphics.drawable.IconCompatParcelizer: void write(androidx.core.graphics.drawable.IconCompat,androidx.versionedparcelable.VersionedParcel)
+com.meta.androidbrowserhelper.trusted.FocusActivity: FocusActivity()
+io.alef.app.twa.DelegationService: DelegationService()
+androidx.browser.browseractions.BrowserActionsFallbackMenuView: BrowserActionsFallbackMenuView(android.content.Context,android.util.AttributeSet)
+com.meta.horizon.platform.ovr.models.Product: java.lang.String nativeGetName(long)
+com.meta.horizon.platform.ovr.models.PurchaseArray: java.lang.String nativeGetNextUrl(long)
+com.meta.horizon.platform.ovr.Core: long nativeHTTPGetWithMessageType(java.lang.String,int)
+com.meta.horizon.platform.ovr.enums.PlatformInitializeResult: com.meta.horizon.platform.ovr.enums.PlatformInitializeResult valueOf(java.lang.String)
+com.meta.horizon.platform.ovr.requests.UserAgeCategory: long nativeGet()
+com.meta.horizon.platform.ovr.enums.PlatformInitializeResult: com.meta.horizon.platform.ovr.enums.PlatformInitializeResult[] values()
+com.meta.androidbrowserhelper.horizonpermissions.PermissionRequestActivity: PermissionRequestActivity()
+com.meta.horizon.platform.ovr.Message: long nativeGetRequestId(long)
+com.meta.horizon.platform.ovr.models.Product: java.lang.String nativeGetSKU(long)
+com.google.android.gms.common.api.internal.zzb: zzb()
+com.meta.horizon.platform.ovr.Message: void nativeFreeMessage(long)
+com.meta.horizon.platform.ovr.Core: long nativePopMessage()
+com.meta.horizon.platform.ovr.Core: long nativeAsyncInitialize(java.lang.String,android.content.Context)
+com.meta.horizon.platform.ovr.Core: long nativeGetLoggedInUserID()
+com.meta.androidbrowserhelper.horizonbilling.provider.PaymentService: PaymentService()
+com.meta.horizon.platform.ovr.models.Product: long nativeGetPrice(long)
+com.google.android.gms.common.api.GoogleApiActivity: GoogleApiActivity()
+com.meta.horizon.platform.ovr.Message: long nativeGetPlatformInitialize(long)
+com.meta.horizon.platform.ovr.requests.IAP: long nativeConsumePurchase(java.lang.String)
+android.support.v4.graphics.drawable.IconCompatParcelizer: IconCompatParcelizer()
+com.meta.horizon.platform.ovr.requests.IAP: long nativeGetProductsBySKU(java.lang.String[])
+com.meta.horizon.platform.ovr.models.Purchase: long nativeGetExpirationTime(long)
+com.google.android.gms.dynamite.DynamiteModule$DynamiteLoaderClassLoader: DynamiteModule$DynamiteLoaderClassLoader()
+com.meta.horizon.platform.ovr.models.PlatformInitialize: int nativeGetResult(long)
+com.meta.horizon.platform.ovr.models.Price: long nativeGetAmountInHundredths(long)
+androidx.core.graphics.drawable.IconCompatParcelizer: androidx.core.graphics.drawable.IconCompat read(androidx.versionedparcelable.VersionedParcel)
+android.support.v4.app.RemoteActionCompatParcelizer: androidx.core.app.RemoteActionCompat read(androidx.versionedparcelable.VersionedParcel)
+com.meta.horizon.platform.ovr.Message$MessageType: com.meta.horizon.platform.ovr.Message$MessageType valueOf(java.lang.String)

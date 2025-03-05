@@ -1,5 +1,5 @@
-import { xrPlaneToRoomWallData } from '@/physics/xrPlaneTools';
-import { useHasWalls, useUpdateWalls } from '@/stores/roomStore';
+import { xrPlaneToRoomPlaneData } from '@/physics/xrPlaneTools';
+import { usePlanesUpdatedAt, useUpdatePlanes } from '@/stores/roomStore';
 import { GroupProps, useFrame } from '@react-three/fiber';
 import { useXR, useXRPlanes } from '@react-three/xr';
 import { DemoPlane } from './DemoPlane';
@@ -37,14 +37,15 @@ export function Wall({ plane }: WallProps) {
 
 /** Update the backend's room walls if they are not already set */
 function useUpdateWallsIfNeeded(planes: readonly XRPlane[], isInSession: boolean) {
-	const hasWalls = useHasWalls();
-	const updateWalls = useUpdateWalls();
+	const planesUpdatedAt = usePlanesUpdatedAt();
+	const updatePlanes = useUpdatePlanes();
 	const referenceSpace = useXR((s) => s.originReferenceSpace);
 	useFrame((_, __, xrFrame: XRFrame) => {
 		if (!isInSession) return;
-		if (hasWalls) return;
+		const planesAreOld = planesUpdatedAt === null || Date.now() - planesUpdatedAt > 1000 * 60 * 60; /* One hour */
+		if (!planesAreOld) return;
 		if (!referenceSpace) return;
-		const asRoomWalls = planes.map((plane) => xrPlaneToRoomWallData(xrFrame, referenceSpace, plane));
-		updateWalls(asRoomWalls);
+		const asRoomPlanes = planes.map((plane) => xrPlaneToRoomPlaneData(xrFrame, referenceSpace, plane));
+		updatePlanes(asRoomPlanes);
 	});
 }

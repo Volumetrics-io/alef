@@ -1,73 +1,99 @@
-import { RoomType } from './attributes';
+import { z } from 'zod';
 import { AlefError } from './error';
-import { PrefixedId } from './ids';
+import { id, isPrefixedId, PrefixedId } from './ids';
 import { Operation } from './operations';
+import { mergePlane } from './planes';
 
-export interface SimpleVector3 {
-	x: number;
-	y: number;
-	z: number;
-}
-export interface SimpleQuaternion {
-	x: number;
-	y: number;
-	z: number;
-	w: number;
-}
+export const ROOM_STATE_VERSION = 1;
 
-export interface RoomState {
-	id: PrefixedId<'r'>;
-	walls: RoomWallData[];
-	layouts: Record<PrefixedId<'rl'>, RoomLayout>;
-	lights: Record<PrefixedId<'lp'>, RoomLightPlacement>;
-	globalLighting: RoomGlobalLighting;
-}
+export const simpleVector3Shape = z.object({
+	x: z.number(),
+	y: z.number(),
+	z: z.number(),
+});
+export type SimpleVector3 = z.infer<typeof simpleVector3Shape>;
 
-export interface RoomLayout {
-	id: PrefixedId<'rl'>;
-	furniture: Record<PrefixedId<'fp'>, RoomFurniturePlacement>;
-	/** An icon override. Kind of legacy. */
-	icon?: string;
-	name?: string;
-	/** A specified type for this room layout, if specified */
-	type?: RoomType;
-}
+export const simpleQuaternionShape = z.object({
+	x: z.number(),
+	y: z.number(),
+	z: z.number(),
+	w: z.number(),
+});
+export type SimpleQuaternion = z.infer<typeof simpleQuaternionShape>;
 
-export interface RoomWallData {
-	origin: SimpleVector3;
-	normal: SimpleVector3;
-	extents: [number, number];
-}
+export const roomPlaneDataShape = z.object({
+	id: z.custom<PrefixedId<'rp'>>((v) => isPrefixedId(v, 'rp')),
+	label: z.string(),
+	origin: simpleVector3Shape,
+	normal: simpleVector3Shape,
+	extents: z.tuple([z.number(), z.number()]),
+});
+export type RoomPlaneData = z.infer<typeof roomPlaneDataShape>;
 
-export interface RoomFurniturePlacement {
-	id: PrefixedId<'fp'>;
-	position: SimpleVector3;
-	rotation: SimpleQuaternion;
-	furnitureId: PrefixedId<'f'>;
-}
+export const roomFurniturePlacementShape = z.object({
+	id: z.custom<PrefixedId<'fp'>>((v) => isPrefixedId(v, 'fp')),
+	position: simpleVector3Shape,
+	rotation: simpleQuaternionShape,
+	furnitureId: z.custom<PrefixedId<'f'>>((v) => isPrefixedId(v, 'f')),
+});
+export type RoomFurniturePlacement = z.infer<typeof roomFurniturePlacementShape>;
 
-export interface RoomLightPlacement {
-	id: PrefixedId<'lp'>;
-	position: SimpleVector3;
-}
+export const roomLightPlacementShape = z.object({
+	id: z.custom<PrefixedId<'lp'>>((v) => isPrefixedId(v, 'lp')),
+	position: simpleVector3Shape,
+});
+export type RoomLightPlacement = z.infer<typeof roomLightPlacementShape>;
 
-export interface RoomGlobalLighting {
-	color: number;
-	intensity: number;
-}
+export const roomGlobalLightingShape = z.object({
+	color: z.number(),
+	intensity: z.number(),
+});
+export type RoomGlobalLighting = z.infer<typeof roomGlobalLightingShape>;
+
+export const roomLayoutShape = z.object({
+	id: z.custom<PrefixedId<'rl'>>((v) => isPrefixedId(v, 'rl')),
+	furniture: z.record(
+		z.custom<PrefixedId<'fp'>>((v) => isPrefixedId(v, 'fp')),
+		roomFurniturePlacementShape
+	),
+	icon: z.string().optional(),
+	name: z.string().optional(),
+	type: z.string().optional(),
+});
+export type RoomLayout = z.infer<typeof roomLayoutShape>;
+
+export const roomStateShape = z.object({
+	id: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')),
+	version: z.number(),
+	planes: roomPlaneDataShape.array(),
+	planesUpdatedAt: z.number().nullable(),
+	layouts: z.record(
+		z.custom<PrefixedId<'rl'>>((v) => isPrefixedId(v, 'rl')),
+		roomLayoutShape
+	),
+	lights: z.record(
+		z.custom<PrefixedId<'lp'>>((v) => isPrefixedId(v, 'lp')),
+		roomLightPlacementShape
+	),
+	globalLighting: roomGlobalLightingShape,
+});
+export type RoomState = z.infer<typeof roomStateShape>;
+
+export type UnknownRoomPlaneData = Omit<RoomPlaneData, 'id'>;
 
 export type Updates<T extends { id: any }> = T extends { id: infer U } ? { id: U } & Partial<Omit<T, 'id'>> : T;
 
 export function updateRoom(state: RoomState, change: Operation) {
 	switch (change.type) {
-		case 'updateWalls':
-			state.walls = change.walls;
+		case 'updatePlanes':
+			state.planes = change.planes.reduce(mergePlane, state.planes);
+			state.planesUpdatedAt = change.time;
 			return state;
 		case 'addFurniture':
 			if (!state.layouts[change.roomLayoutId]) {
 				throw new AlefError(AlefError.Code.NotFound, `Room layout ${change.roomLayoutId} not found`);
 			}
-			state.layouts[change.roomLayoutId].furniture[change.data.id] = change.data;
+			state.layouts[change.roomLayoutId]!.furniture[change.data.id] = change.data;
 			return state;
 		case 'addLight':
 			state.lights[change.data.id] = change.data;
@@ -76,22 +102,22 @@ export function updateRoom(state: RoomState, change: Operation) {
 			if (!state.layouts[change.roomLayoutId]) {
 				throw new AlefError(AlefError.Code.NotFound, `Room layout ${change.roomLayoutId} not found`);
 			}
-			if (!state.layouts[change.roomLayoutId].furniture[change.data.id]) {
+			if (!state.layouts[change.roomLayoutId]!.furniture[change.data.id]) {
 				throw new AlefError(AlefError.Code.NotFound, `Furniture ${change.data.id} not found in room layout ${change.roomLayoutId}`);
 			}
-			state.layouts[change.roomLayoutId].furniture[change.data.id] = { ...state.layouts[change.roomLayoutId].furniture[change.data.id], ...change.data };
+			state.layouts[change.roomLayoutId]!.furniture[change.data.id] = { ...state.layouts[change.roomLayoutId]!.furniture[change.data.id]!, ...change.data };
 			return state;
 		case 'updateLight':
 			if (!state.lights[change.data.id]) {
 				throw new AlefError(AlefError.Code.NotFound, `Light ${change.data.id} not found`);
 			}
-			state.lights[change.data.id] = { ...state.lights[change.data.id], ...change.data };
+			state.lights[change.data.id] = { ...state.lights[change.data.id]!, ...change.data };
 			return state;
 		case 'removeFurniture':
 			if (!state.layouts[change.roomLayoutId]) {
 				throw new AlefError(AlefError.Code.NotFound, `Room layout ${change.roomLayoutId} not found`);
 			}
-			delete state.layouts[change.roomLayoutId].furniture[change.id];
+			delete state.layouts[change.roomLayoutId]!.furniture[change.id];
 			return state;
 		case 'removeLight':
 			delete state.lights[change.id];
@@ -116,7 +142,7 @@ export function updateRoom(state: RoomState, change: Operation) {
 			if (!state.layouts[change.data.id]) {
 				throw new AlefError(AlefError.Code.NotFound, `Room layout ${change.data.id} not found`);
 			}
-			state.layouts[change.data.id] = { ...state.layouts[change.data.id], ...change.data };
+			state.layouts[change.data.id] = { ...state.layouts[change.data.id]!, ...change.data };
 			return state;
 		default:
 			return state;
@@ -133,21 +159,109 @@ export function getUndo(baseState: RoomState, change: Operation): Operation | nu
 			if (!baseState.layouts[change.roomLayoutId]) {
 				return null;
 			}
-			return { type: 'updateFurniture', roomId: baseState.id, roomLayoutId: change.roomLayoutId, data: baseState.layouts[change.roomLayoutId]?.furniture[change.data.id] };
+			if (!baseState.layouts[change.roomLayoutId]!.furniture[change.data.id]) {
+				return null;
+			}
+			return { type: 'updateFurniture', roomId: baseState.id, roomLayoutId: change.roomLayoutId, data: baseState.layouts[change.roomLayoutId]!.furniture[change.data.id]! };
 		case 'updateLight':
-			return { type: 'updateLight', roomId: baseState.id, data: baseState.lights[change.data.id] };
+			if (!baseState.lights[change.data.id]) {
+				return null;
+			}
+			return { type: 'updateLight', roomId: baseState.id, data: baseState.lights[change.data.id]! };
 		case 'removeFurniture':
 			if (!baseState.layouts[change.roomLayoutId]) {
 				return null;
 			}
-			return { type: 'addFurniture', roomId: baseState.id, roomLayoutId: change.roomLayoutId, data: baseState.layouts[change.roomLayoutId]?.furniture[change.id] };
+			if (!baseState.layouts[change.roomLayoutId]!.furniture[change.id]) {
+				return null;
+			}
+			return { type: 'addFurniture', roomId: baseState.id, roomLayoutId: change.roomLayoutId, data: baseState.layouts[change.roomLayoutId]!.furniture[change.id]! };
 		case 'removeLight':
-			return { type: 'addLight', roomId: baseState.id, data: baseState.lights[change.id] };
+			if (!baseState.lights[change.id]) {
+				return null;
+			}
+			return { type: 'addLight', roomId: baseState.id, data: baseState.lights[change.id]! };
 		case 'updateGlobalLighting':
 			return { type: 'updateGlobalLighting', roomId: baseState.id, data: { ...baseState.globalLighting } };
 		case 'deleteLayout':
-			return { type: 'createLayout', roomId: baseState.id, data: baseState.layouts[change.roomLayoutId] };
+			if (!baseState.layouts[change.roomLayoutId]) {
+				return null;
+			}
+			return { type: 'createLayout', roomId: baseState.id, data: baseState.layouts[change.roomLayoutId]! };
 		default:
 			return null;
 	}
+}
+
+/**
+ * Ensures proper state shape for a room.
+ */
+export function migrateRoomState(oldState: any): RoomState {
+	if (!oldState.version) {
+		// can't assume much at this point. merge in default properties, delete unknowns,
+		// and set version to 1.
+		const defaults = getDefaultRoomState();
+
+		// attempt to parse each property to ensure it's valid.
+		// if not valid, we discard it.
+		// This kind of safety is only needed because we're migrating from an unknown state.
+		// Future versioned migrations can be a little less fastidious.
+		const planes: RoomPlaneData[] =
+			oldState.planes
+				?.map((p: any) => {
+					return roomPlaneDataShape.safeParse(p).success ? p : null;
+				})
+				.filter((p: any) => p !== null) ?? defaults.planes;
+		const layouts: Record<PrefixedId<'rl'>, RoomLayout> = Object.fromEntries(
+			Object.entries(oldState.layouts ?? {})
+				.map(([id, layout]: [string, any]): [string, any] => {
+					return [id, roomLayoutShape.safeParse(layout).success ? layout : null];
+				})
+				.filter(([_, layout]: [string, any]) => layout !== null)
+		) ?? defaults.layouts;
+		const lights: Record<PrefixedId<'lp'>, RoomLightPlacement> = Object.fromEntries(
+			Object.entries(oldState.lights ?? {})
+				.map(([id, light]: [string, any]): [string, any] => {
+					return [id, roomLightPlacementShape.safeParse(light).success ? light : null];
+				})
+				.filter(([_, light]: [string, any]) => light !== null)
+		) ?? defaults.lights;
+		const globalLighting: RoomGlobalLighting = roomGlobalLightingShape.safeParse(oldState.globalLighting).success ? oldState.globalLighting : defaults.globalLighting;
+
+		return {
+			version: ROOM_STATE_VERSION,
+			id: oldState.id ?? defaults.id,
+			planes,
+			planesUpdatedAt: oldState.planesUpdatedAt ?? defaults.planesUpdatedAt,
+			layouts,
+			lights,
+			globalLighting,
+		};
+	} else if (oldState.version === ROOM_STATE_VERSION) {
+		// check validity of state just in case.
+		return roomStateShape.parse(oldState);
+	} else {
+		throw new Error(`Unsupported room state version ${oldState.version}`);
+	}
+}
+
+export function getDefaultRoomState(idOverride?: PrefixedId<'r'>): RoomState {
+	const defaultLayoutId = id('rl');
+	return {
+		id: idOverride || id('r'),
+		version: ROOM_STATE_VERSION,
+		planes: [],
+		planesUpdatedAt: null,
+		layouts: {
+			[defaultLayoutId]: {
+				id: defaultLayoutId,
+				furniture: {},
+			},
+		},
+		lights: {},
+		globalLighting: {
+			color: 2.7,
+			intensity: 0.8,
+		},
+	};
 }

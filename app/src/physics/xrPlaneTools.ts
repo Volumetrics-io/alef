@@ -1,4 +1,4 @@
-import { RoomWallData } from '@alef/common';
+import { UnknownRoomPlaneData } from '@alef/common';
 import { Vector3 } from 'three';
 
 export function xrPlaneToRawPlaneData(frame: XRFrame, rootSpace: XRReferenceSpace, plane: XRPlane) {
@@ -70,12 +70,12 @@ export function getMostIntentionalPlaneSnappedMovement(movement: Vector3, planeN
 	return matchedIndex;
 }
 
-export function xrPlaneToRoomWallData(frame: XRFrame, rootSpace: XRReferenceSpace, plane: XRPlane) {
+export function xrPlaneToRoomPlaneData(frame: XRFrame, rootSpace: XRReferenceSpace, plane: XRPlane): UnknownRoomPlaneData {
 	const { center, normal, extents } = xrPlaneToRawPlaneData(frame, rootSpace, plane);
-	const wallData: RoomWallData = {
+	return {
 		normal: { x: normal.x, y: normal.y, z: normal.z },
 		origin: { x: center.x, y: center.y, z: center.z },
 		extents,
+		label: plane.semanticLabel || 'unknown',
 	};
-	return wallData;
 }

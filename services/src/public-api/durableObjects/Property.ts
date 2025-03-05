@@ -1,25 +1,7 @@
-import { AlefError, id, Operation, PrefixedId, RoomState, updateRoom } from '@alef/common';
+import { AlefError, getDefaultRoomState, id, migrateRoomState, Operation, PrefixedId, RoomState, updateRoom } from '@alef/common';
 import { DurableObject } from 'cloudflare:workers';
 import { Bindings } from '../config/ctx';
 import { PropertySocketHandler } from './sockets/PropertySocketHandler';
-
-function createDefaultRoomState(): Omit<RoomState, 'id'> {
-	const defaultLayoutId = id('rl');
-	return {
-		walls: [],
-		layouts: {
-			[defaultLayoutId]: {
-				id: defaultLayoutId,
-				furniture: {},
-			},
-		},
-		lights: {},
-		globalLighting: {
-			color: 2.7,
-			intensity: 0.8,
-		},
-	};
-}
 
 export class Property extends DurableObject<Bindings> {
 	#rooms: Record<PrefixedId<'r'>, RoomState> = {};
@@ -48,11 +30,13 @@ export class Property extends DurableObject<Bindings> {
 	async #loadState() {
 		// Load state from storage
 		await this.ctx.blockConcurrencyWhile(async () => {
-			this.#rooms = (await this.ctx.storage.get('state')) || {};
+			// Apply migrations to state before assigning
+			const loadedRooms = (await this.ctx.storage.get('state')) || {};
+			this.#rooms = Object.fromEntries(Object.entries(loadedRooms).map(([id, roomState]) => [id, migrateRoomState(roomState)]));
 			if (!Object.keys(this.#rooms).length) {
 				// if no rooms exist, insert a default room.
 				const roomId = id('r');
-				this.#rooms[roomId] = { id: roomId, ...createDefaultRoomState() };
+				this.#rooms[roomId] = getDefaultRoomState(roomId);
 				await this.#saveState();
 			}
 		});
@@ -107,7 +91,7 @@ export class Property extends DurableObject<Bindings> {
 
 	createRoom() {
 		const roomId = id('r');
-		this.#rooms[roomId] = { id: roomId, ...createDefaultRoomState() };
+		this.#rooms[roomId] = getDefaultRoomState(roomId);
 		this.#saveState();
 		return this.#rooms[roomId];
 	}

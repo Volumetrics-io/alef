@@ -30,10 +30,14 @@ export function useDeleteRoomLayout() {
 	return useRoomStore((s) => s.deleteLayout);
 }
 
-export function useHasWalls() {
-	return useRoomStore((s) => s.walls.length > 0);
+export function useHasPlanes() {
+	return useRoomStore((s) => s.planes.length > 0);
 }
 
-export function useUpdateWalls() {
-	return useRoomStore((s) => s.updateWalls);
+export function usePlanesUpdatedAt() {
+	return useRoomStore((s) => s.planesUpdatedAt);
+}
+
+export function useUpdatePlanes() {
+	return useRoomStore((s) => s.updatePlanes);
 }

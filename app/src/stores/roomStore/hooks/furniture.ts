@@ -14,7 +14,7 @@ import { useRoomStoreContext } from '../Provider';
 import { useRoomStore, useRoomStoreSubscribe } from '../roomStore';
 
 export function useFurniturePlacementIds() {
-	return useRoomStore(useShallow((s) => Object.keys(s.viewingLayoutId ? s.layouts[s.viewingLayoutId]?.furniture : {}) as PrefixedId<'fp'>[]));
+	return useRoomStore(useShallow((s) => Object.keys(s.viewingLayoutId ? (s.layouts[s.viewingLayoutId]?.furniture ?? {}) : {}) as PrefixedId<'fp'>[]));
 }
 
 export function useFurniturePlacement(id: PrefixedId<'fp'>) {

@@ -54,6 +54,8 @@ const DARK_HUE = {
 
 export const theme = {
     light: {
+        cursor: oklch(60, 0, LIGHT_HUE.mono),
+        cursorSelect: oklch(40, 0, LIGHT_HUE.mono),
         dimmed: hsl(0, 0, 0),
         focus: oklch(66, 50, 284),
         required: hsl(0, 100, 70),
@@ -94,6 +96,8 @@ export const theme = {
         selectionInk: oklch(40, 5, LIGHT_HUE.selection),
     },
     dark: {
+        cursor: oklch(80, 0, DARK_HUE.mono),
+        cursorSelect: oklch(100, 0, DARK_HUE.mono),
         dimmed: hsl(0, 0, 0),
         focus: hsl(56, 100, 70),
         required: hsl(0, 100, 70),
@@ -136,3 +140,11 @@ export const theme = {
 }
 
 export const colors = basedOnPreferredColorScheme(theme);
+
+export const getCursorColor = ( selected: boolean ) => {
+    return selected ? colors.cursorSelect.value : colors.cursor.value;
+}
+
+export const getRayColor = ( selected: boolean ) => {
+    return selected ? colors.focus.value : colors.cursor.value;
+}

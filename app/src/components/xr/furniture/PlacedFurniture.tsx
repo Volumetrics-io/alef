@@ -82,7 +82,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 				furnitureId={furnitureId} 
 				ref={modelRef} 
 				castShadow={size.y > 0.2} 
-				receiveShadow
+				receiveShadow={mode !== 'furniture'}
 				pointerEvents="none" 
 			/>
 

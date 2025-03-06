@@ -8,6 +8,7 @@ import { Signal, computed } from '@preact/signals-core'
 const vectorHelper = new Vector3()
 
 export type SliderProperties = {
+  color?: string
   disabled?: boolean
   value?: Signal<number> | number
   defaultValue?: number
@@ -110,8 +111,9 @@ export const Slider: (props: SliderProperties & RefAttributes<ContainerRef>) => 
                 padding={2} 
                 width={percentage} 
                 borderRadius={1000} 
-                borderColor={colors.border} 
-                backgroundColor={colors.focus}>
+                borderColor={props.color ? colors.focus : undefined} 
+                borderWidth={props.color ? 1 : 0}
+                backgroundColor={props.color ?? colors.focus}>
             <Container
                 cursor="pointer"
                 borderOpacity={disabled ? 0.5 : undefined}

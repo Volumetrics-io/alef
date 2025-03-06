@@ -40,10 +40,8 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 
 	const { halfExtents, size, center, ref: modelRef, ready } = useAABB();
 	const isEditable = ready && mode === 'furniture';
-	console.log('isEditable', isEditable, ready, mode);
 
 	const handleClick = useCallback(() => {
-		console.log('handleClick', furniturePlacementId, selected, isEditable);
 		if (selected) return;
 		if (!isEditable) return;
 		select(furniturePlacementId);

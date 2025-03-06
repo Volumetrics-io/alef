@@ -1,5 +1,5 @@
-import { Container, isDarkMode, Text, setPreferredColorScheme } from '@react-three/uikit';
-import { useState } from 'react';
+import { Container, isDarkMode, Text, setPreferredColorScheme, getPreferredColorScheme, PreferredColorScheme } from '@react-three/uikit';
+import { useEffect, useState } from 'react';
 import { HeadsetLogin } from '../../auth/HeadsetLogin';
 import { Surface } from '../../ui/Surface';
 import { Button } from '@/components/xr/ui/Button';
@@ -7,6 +7,8 @@ import { SettingsIcon } from '@react-three/uikit-lucide';
 import { useMe } from '@/services/publicApi/userHooks';
 import { Switch } from '../../ui/Switch';
 import { Heading } from '../../ui/Heading';
+import { useLocalStorage } from '@/hooks/useStorage';
+
 export function SettingsPanel() {
 	const [isPairing, setIsPairing] = useState(false);
 	const { data: session } = useMe();
@@ -63,13 +65,18 @@ function Login({ onPair }: { onPair: () => void }) {
 }
 
 function ToggleTheme() {
+	const [theme, setTheme] = useLocalStorage('theme', isDarkMode.value, false);
+
+	useEffect(() => {
+		setPreferredColorScheme(theme ? 'dark' : 'light');
+	}, [theme]);
 	
 	return (
 		<SettingsItem label="Theme">
 			<Text>
 				Toggle the app theme.
 			</Text>
-			<Switch defaultChecked={isDarkMode.value} onCheckedChange={() => setPreferredColorScheme(isDarkMode.value ? 'light' : 'dark')} />
+			<Switch defaultChecked={theme} onCheckedChange={() => setTheme(!theme)} />
 		</SettingsItem>
 	);
 }

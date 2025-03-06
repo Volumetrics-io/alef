@@ -13,6 +13,16 @@ export interface SceneWrapperProps {
 	children: ReactNode;
 }
 
+
+// This is a hack to get around the fact that the session crashes after asking for a boundary.
+document.addEventListener("visibilitychange", () => {
+    console.log("Page visibility changed:", document.visibilityState);
+	if (document.visibilityState === 'visible' && new URLSearchParams(window.location.search).get('directLaunch')) {
+		console.log('try to recover from PWA loop');
+		xrStore.enterAR();
+	}
+});
+
 export function SceneWrapper({ children }: SceneWrapperProps) {
 	const geoStore = useGeoStore();
 	return (

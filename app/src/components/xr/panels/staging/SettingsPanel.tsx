@@ -1,4 +1,4 @@
-import { Container, isDarkMode, Text, setPreferredColorScheme, getPreferredColorScheme, PreferredColorScheme } from '@react-three/uikit';
+import { Container, isDarkMode, Text, setPreferredColorScheme } from '@react-three/uikit';
 import { useEffect, useState } from 'react';
 import { HeadsetLogin } from '../../auth/HeadsetLogin';
 import { Surface } from '../../ui/Surface';

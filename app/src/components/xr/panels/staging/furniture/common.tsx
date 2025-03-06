@@ -11,7 +11,7 @@ import { Attribute, AttributeKey } from '@alef/common';
 import { animated, config, useSpring } from '@react-spring/three';
 import { useFrame } from '@react-three/fiber';
 import { Container, Text } from '@react-three/uikit';
-import { ArrowLeftIcon, ArrowRightIcon, ChevronRight, ChevronRightIcon, PanelLeftCloseIcon, PanelLeftIcon, SofaIcon } from '@react-three/uikit-lucide';
+import { ArrowLeftIcon, ArrowRightIcon, ChevronRightIcon, PanelLeftCloseIcon, PanelLeftIcon, SofaIcon } from '@react-three/uikit-lucide';
 import { ReactNode, Suspense, useRef, useState } from 'react';
 import { proxy, useSnapshot } from 'valtio';
 import { FurnitureSelectItem } from './FurnitureSelectItem';

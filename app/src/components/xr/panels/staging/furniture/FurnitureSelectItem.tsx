@@ -12,6 +12,7 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 	return (
 		<Surface
 			height="48%"
+			minWidth="32%"
 			flexDirection="column"
 			flexWrap="no-wrap"
 			gap={3}
@@ -28,7 +29,10 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 				width="100%"
 			>
 				{hovered && <FurnitureAddButton furnitureItem={furnitureItem} />}
-				<Image src={`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureItem.id}/image.jpg`} width="100%" height="100%" objectFit="cover" />
+				<Image src={`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureItem.id}/image.jpg`} 
+				width="100%" 
+				height="100%"
+				objectFit="cover" />
 			</Container>
 		</Surface>
 	);

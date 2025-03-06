@@ -28,7 +28,7 @@ export function FurnitureCard({ furniture }: FurnitureCardProps) {
 
 	useEffect(() => {
 		setOpen(focusedFurniture === furniture.id);
-	}, [focusedFurniture]);
+	}, [focusedFurniture, furniture.id]);
 
 	const { mutate: updateSelf, isPending: isUpdating } = useMutation({
 		mutationFn: (data: { name: string }) => handleErrors(adminApiClient.furniture[':id'].$put({ param: { id: furniture.id }, json: data })),
@@ -46,7 +46,7 @@ export function FurnitureCard({ furniture }: FurnitureCardProps) {
 					<Card.Main align="center">
 						<FurnitureSnapshot furnitureId={furniture.id} />
 						<Box float="top-left" gapped align="center">
-							{furniture.attributes.map((attr) => (
+							{furniture.attributes.map((attr: { key: string; value: string }) => (
 								<Frame key={`${attr.key}:${attr.value}`} p="squeeze">
 									{attr.key}: {attr.value}
 								</Frame>

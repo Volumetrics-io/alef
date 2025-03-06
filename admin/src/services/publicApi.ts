@@ -6,4 +6,4 @@ export const publicApiClient = hcWithType(import.meta.env.VITE_PUBLIC_API_ORIGIN
 	fetch,
 });
 
-export type FurnitureData = InferResponseType<(typeof publicApiClient)['furniture']['$get']>[number];
+export type FurnitureData = InferResponseType<(typeof publicApiClient)['furniture']['$get']>['items'][number];

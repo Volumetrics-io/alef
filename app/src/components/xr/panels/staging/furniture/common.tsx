@@ -11,7 +11,7 @@ import { Attribute, AttributeKey } from '@alef/common';
 import { animated, config, useSpring } from '@react-spring/three';
 import { useFrame } from '@react-three/fiber';
 import { Container, Text } from '@react-three/uikit';
-import { ArrowLeftIcon, ArrowRightIcon, PanelLeftCloseIcon, PanelLeftIcon, SofaIcon } from '@react-three/uikit-lucide';
+import { ArrowLeftIcon, ArrowRightIcon, ChevronRight, ChevronRightIcon, PanelLeftCloseIcon, PanelLeftIcon, SofaIcon } from '@react-three/uikit-lucide';
 import { ReactNode, Suspense, useRef, useState } from 'react';
 import { proxy, useSnapshot } from 'valtio';
 import { FurnitureSelectItem } from './FurnitureSelectItem';
@@ -171,8 +171,8 @@ export const FurnitureCollection = ({ furniture, hasMore, onLoadMore }: { furnit
 				<FurnitureSelectItem key={furnitureItem.id} furnitureItem={furnitureItem} />
 			))}
 			{hasMore && (
-				<Button onClick={onLoadMore}>
-					<Text>Load more</Text>
+				<Button size="icon" variant="ghost" marginY="auto" onClick={onLoadMore}>
+					<ChevronRightIcon />
 				</Button>
 			)}
 		</Container>

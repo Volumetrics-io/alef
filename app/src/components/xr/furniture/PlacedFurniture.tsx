@@ -33,6 +33,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	const mode = useEditorStore((s) => s.mode);
 
 	const { gl } = useThree();
+	gl.shadowMap.needsUpdate = true;
 
 	const groupRef = useRef<Group>(null);
 	const move = useUpdateFurniturePlacementTransform(furniturePlacementId);
@@ -64,7 +65,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	);
 
 	const hypotenuse = Math.sqrt(halfExtents[0] * halfExtents[0] + halfExtents[2] * halfExtents[2]);
-
+	
 	if (!furnitureId || !placement) return null;
 
 	return (
@@ -78,14 +79,21 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 					<CollisionModel furnitureId={furnitureId} onClick={handleClick} />
 				</ConditionalHandle>
 			)}
-			<FurnitureModel furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} receiveShadow={size.y < 0.2} pointerEvents="none" />
+			<FurnitureModel 
+				key={furnitureId} 
+				furnitureId={furnitureId} 
+				ref={modelRef} 
+				castShadow={size.y > 0.2} 
+				receiveShadow
+				pointerEvents="none" 
+			/>
 
 			{isEditable && selected && (
 				<PlaceFurnitureUI furniturePlacementId={furniturePlacementId} furnitureId={furnitureId} setFurnitureId={setFurnitureId} height={halfExtents[1] + center.y + 0.2} />
 			)}
 			{isEditable && selected && (
 				<Handle targetRef={groupRef as any} rotate={{ x: false, y: true, z: false }} translate="as-rotate" apply={applyWithSave}>
-					<RotationRing hypotenuse={hypotenuse} />
+					<RotationRing radius={hypotenuse + 0.075} position={[0, 0.5, 0]} />
 				</Handle>
 			)}
 		</group>
@@ -97,19 +105,19 @@ function ConditionalHandle({ enabled, ...props }: ComponentPropsWithoutRef<typeo
 	return <Handle {...props} />;
 }
 
-function RotationRing({ hypotenuse }: { hypotenuse: number }) {
+function RotationRing({ radius, position }: { radius: number; position: [number, number, number] }) {
 	const [hovered, setHovered] = useState(false);
 	return (
-		<group onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} position={[0, 0.2, 0]} rotation={[Math.PI / 2, 0, 0]} renderOrder={-2}>
+		<group onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} position={position} rotation={[Math.PI / 2, 0, 0]} renderOrder={-2}>
 			<mesh castShadow>
-				<torusGeometry args={[hypotenuse + 0.1, 0.025, 64]} />
+				<torusGeometry args={[radius, 0.025, 64]} />
 				<meshPhongMaterial color={colors.focus.value} emissive={colors.focus.value} emissiveIntensity={0.5} />
 			</mesh>
 			<mesh
 				// @ts-ignore - not sure why this keeps coming up when it's wrong
 				pointerEvents="none"
 			>
-				<torusGeometry args={[hypotenuse + 0.1, 0.03, 64]} />
+				<torusGeometry args={[radius, 0.03, 64]} />
 				<meshPhongMaterial
 					color={hovered ? colors.faded.value : colors.border.value}
 					side={BackSide}

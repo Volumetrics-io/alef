@@ -14,6 +14,8 @@ import { StagerPanel } from './panels/StagerPanel';
 import { ViewerPanel } from './panels/ViewerPanel';
 import { RoomRenderer } from './room/RoomRenderer';
 import { SceneWrapper } from './SceneWrapper';
+import { useLocalStorage } from '@/hooks/useStorage';
+import { isDarkMode, setPreferredColorScheme } from '@react-three/uikit';
 
 export function MainScene() {
 	const { data: session } = useMe();
@@ -21,6 +23,10 @@ export function MainScene() {
 	const { data: selfDevice } = useCurrentDevice();
 
 	const debug = location.search.includes('debug');
+
+	const [theme, _] = useLocalStorage('theme', isDarkMode.value, false);
+
+	setPreferredColorScheme(theme ? 'dark' : 'light');
 
 	let sceneContent: ReactNode = null;
 	// you can be logged in but not offline (cached /me response)

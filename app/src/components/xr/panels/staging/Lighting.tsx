@@ -7,6 +7,7 @@ import { Button } from '../../ui/Button';
 import { Heading } from '../../ui/Heading';
 import { Slider } from '../../ui/Slider';
 import { Surface } from '../../ui/Surface';
+import { getLightColor } from '../../lighting/getLightColor';
 
 export const Lighting = () => {
 	const selectedLightId = useSelectedLightPlacementId();
@@ -30,12 +31,12 @@ const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
 			</Container>
 			<Container flexDirection="column" gap={50} flexGrow={1}>
 				<Container flexDirection="column" gap={10}>
-					<Heading level={4}>Intensity</Heading>
+					<Heading level={4}>Brightness</Heading>
 					<Slider value={globalIntensity} min={0} max={2} step={0.01} onValueChange={(v) => updateGlobal({ intensity: v })} />
 				</Container>
 				<Container flexDirection="column" gap={10} width="100%">
 					<Heading level={4}>Warmth</Heading>
-					<Slider value={globalColor} min={0} max={10} step={0.1} onValueChange={(v) => updateGlobal({ color: v })} />
+					<Slider value={globalColor} color={getLightColor(globalColor)} min={0} max={10} step={0.1} onValueChange={(v) => updateGlobal({ color: v })} />
 				</Container>
 			</Container>
 			<Container flexDirection="row" gap={4} width="100%" paddingRight={6} justifyContent="space-between">

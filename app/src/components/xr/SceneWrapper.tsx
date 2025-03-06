@@ -36,6 +36,13 @@ export function SceneWrapper({ children }: SceneWrapperProps) {
 						state.gl.setTransparentSort(reversePainterSortStable);
 						state.gl.shadowMap.autoUpdate = false;
 						state.gl.shadowMap.type = PCFSoftShadowMap;
+						// @ts-ignore it does
+						if (window.getDigitalGoodsService !== undefined) {
+							if (navigator.xr) {
+								xrStore.enterAR();
+							}
+						}
+
 					}}
 					shadows={true}
 					camera={{ position: [-0.5, 0.5, 0.5] }}

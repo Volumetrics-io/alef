@@ -138,7 +138,7 @@ function PlaceFurnitureUI({
 		attributeFilter: currentFurniture?.attributes,
 	});
 
-	const furnitureIds = furniture.map((f) => f.id).sort();
+	const furnitureIds = furniture.pages.flatMap((page) => page.items).map((f) => f.id).sort();
 
 	const handlePrevious = () => {
 		const index = furnitureIds.findIndex((f) => f === furnitureId);

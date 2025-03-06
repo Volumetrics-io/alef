@@ -25,7 +25,7 @@ export function useAllFurniture(
 			return response.json();
 		},
 		initialPageParam: 0,
-		getNextPageParam: (lastPage, pages) => {
+		getNextPageParam: (lastPage, _) => {
 			return lastPage.pageInfo.nextPage ?? 0;
 		},
 	});

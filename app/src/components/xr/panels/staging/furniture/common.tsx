@@ -58,13 +58,13 @@ export const FurniturePanelFilterSidebar = ({ children }: { children?: ReactNode
 	const scrollbarVisible = useRef(0);
 	const [isVisible, setIsVisible] = useState(false);
 
-	const [{ transformTranslateX }, api] = useSpring(() => ({ transformTranslateX: -180, config: config.default }));
+	const [{ transformTranslateX, transformTranslateZ }, api] = useSpring(() => ({ transformTranslateX: -180, transformTranslateZ: 0, config: config.default }));
 
 	useFrame(() => {
 		if (visible) {
-			api.start({ transformTranslateX: 0 });
+			api.start({ transformTranslateX: 0, transformTranslateZ: 10 });
 		} else {
-			api.start({ transformTranslateX: -180 });
+			api.start({ transformTranslateX: -180, transformTranslateZ: 0 });
 		}
 
 		const newVisibility = visible || transformTranslateX.isAnimating;
@@ -97,7 +97,7 @@ export const FurniturePanelFilterSidebar = ({ children }: { children?: ReactNode
 			gap={8}
 			padding={6}
 		>
-			<AnimatedSurface transformTranslateX={transformTranslateX} flexDirection="column" height="100%" width="100%" gap={10} padding={10} flexWrap="no-wrap">
+			<AnimatedSurface transformTranslateX={transformTranslateX} transformTranslateZ={transformTranslateZ} flexDirection="column" height="100%" width="100%" gap={10} padding={10} flexWrap="no-wrap">
 				<Container marginTop={5} alignItems="center" flexDirection="row" width="100%" justifyContent="space-between">
 					<Text>Filters</Text>
 					<FurniturePanelFilterSidebarCloseButton />

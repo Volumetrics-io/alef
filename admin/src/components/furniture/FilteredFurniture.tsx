@@ -1,6 +1,6 @@
 import { FurnitureData, publicApiClient } from '@/services/publicApi';
 import { Attribute } from '@alef/common';
-import { Box, Button, Card } from '@alef/sys';
+import { Box, Button, Card, ScrollArea } from '@alef/sys';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { FurnitureCard } from './FurnitureCard';
 
@@ -21,7 +21,16 @@ export function FilteredFurniture({ filters }: FilteredFurnitureProps) {
 }
 
 export function FilteredFurnitureGrid({ furniture }: { furniture: FurnitureData[] }) {
-	return <Card.Grid full>{furniture?.map((furniture) => <FurnitureCard key={furniture.id} furniture={furniture} />)}</Card.Grid>;
+	return (
+		<ScrollArea>
+
+		<Card.Grid full>
+				{furniture?.map((furniture) => (
+					<FurnitureCard key={furniture.id} furniture={furniture} />
+				))}
+			</Card.Grid>
+		</ScrollArea>
+	);
 }
 
 export function useFilteredFurniture(filters: Attribute[], options?: { enabled?: boolean }) {

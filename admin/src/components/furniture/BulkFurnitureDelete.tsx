@@ -21,10 +21,11 @@ export function BulkFurnitureDelete() {
 
 		try {
 			setDeleting(true);
-			const ids = furniture.map((f) => f.id);
-			const results = await Promise.allSettled(ids.map((id) => adminApiClient.furniture[':id'].$delete({ param: { id } })));
-			if (results.some((res) => res.status === 'rejected')) {
-				console.error(results.filter((res) => res.status === 'rejected'));
+			const furnitureItems = furniture.pages.flatMap(page => page.items);
+			const ids = furnitureItems.map((f) => f.id);
+			const results = await Promise.allSettled(ids.map((id: string) => adminApiClient.furniture[':id'].$delete({ param: { id } })));
+			if (results.some((res: PromiseSettledResult<any>) => res.status === 'rejected')) {
+				console.error(results.filter((res: PromiseSettledResult<any>) => res.status === 'rejected'));
 				toast.error('Some furniture failed to delete. See console logs.');
 			}
 			toast.success('All furniture deleted');
@@ -41,10 +42,10 @@ export function BulkFurnitureDelete() {
 			</Dialog.Trigger>
 			<Dialog.Content width="large" title="Bulk furniture delete">
 				<Dialog.Description>Delete all furniture that matches the provided filters.</Dialog.Description>
-				<Frame p>
+				<Frame p grow>
 					<MultiAttributePicker value={filters} onChange={setFilters} />
 				</Frame>
-				<Suspense>{filters.length > 0 ? <FilteredFurnitureGrid furniture={furniture || []} /> : <Box p>No filters selected</Box>}</Suspense>
+				<Suspense>{filters.length > 0 ? <FilteredFurnitureGrid furniture={furniture ? furniture.pages.flatMap(page => page.items) : []} /> : <Box p>No filters selected</Box>}</Suspense>
 				<Dialog.Actions>
 					<Dialog.Close asChild>
 						<Button>Done</Button>

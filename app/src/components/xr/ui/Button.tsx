@@ -156,8 +156,8 @@ const buttonVariants = {
 
       const onHoverChange = useCallback((hover: boolean) => {
         console.log('hover', hover);
-        setIsHovered(hover);
         props.onHoverChange?.(hover);
+        setIsHovered(hover);
       }, [props]);
 
       const onClick = useCallback((e: ThreeEvent<MouseEvent>) => {
@@ -169,6 +169,8 @@ const buttonVariants = {
           audioRef.current.play();
         }
         props.onClick?.(e);
+        setIsHovered(false);
+
       }, [props]);
   
       return (

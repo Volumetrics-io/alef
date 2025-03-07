@@ -134,7 +134,7 @@ const buttonVariants = {
   }
   
   export const Button: (props: ButtonProperties & RefAttributes<ContainerRef>) => ReactNode = forwardRef(
-    ({ children, variant = 'default', size = 'default', disabled = false, hover, animated = true, ...props }, ref) => {
+    ({ children, variant = 'default', size = 'default', disabled = false, hover, animated = true, ...props }) => {
       const {
         containerProps,
         defaultProps,

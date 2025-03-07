@@ -58,16 +58,13 @@ export const FurniturePanelFilterSidebar = ({ children }: { children?: ReactNode
 	const scrollbarVisible = useRef(0);
 	const [isVisible, setIsVisible] = useState(false);
 
-	const [{ transformTranslateX, transformTranslateZ }, api] = useSpring(() => ({ transformTranslateX: -180, transformTranslateZ: 0, config: config.default }));
+	const { spring } = useSpring({ spring: visible ? 1 : 0 });
+
+	const transformTranslateX = spring.to([0,1], [-180, 0])
+	const transformTranslateZ = spring.to([0,1], [0, 8])
 
 	useFrame(() => {
-		if (visible) {
-			api.start({ transformTranslateX: 0, transformTranslateZ: 10 });
-		} else {
-			api.start({ transformTranslateX: -180, transformTranslateZ: 0 });
-		}
-
-		const newVisibility = visible || transformTranslateX.isAnimating;
+		const newVisibility = visible || spring.isAnimating;
 		if (newVisibility !== isVisible) {
 			setIsVisible(newVisibility);
 		}
@@ -99,7 +96,7 @@ export const FurniturePanelFilterSidebar = ({ children }: { children?: ReactNode
 		>
 			<AnimatedSurface transformTranslateX={transformTranslateX} transformTranslateZ={transformTranslateZ} flexDirection="column" height="100%" width="100%" gap={10} padding={10} flexWrap="no-wrap">
 				<Container marginTop={5} alignItems="center" flexDirection="row" width="100%" justifyContent="space-between">
-					<Text>Filters</Text>
+					<Heading level={4}>Filters</Heading>
 					<FurniturePanelFilterSidebarCloseButton />
 				</Container>
 				<Container
@@ -123,7 +120,7 @@ export const FurniturePanelFilterSidebar = ({ children }: { children?: ReactNode
 export const FurniturePanelFilterSidebarSectionHeader = ({ children, label }: { children?: ReactNode; label: string }) => {
 	return (
 		<Container paddingY={10} justifyContent="space-between">
-			<Text>{label}</Text>
+			<Heading level={6}>{label}</Heading>
 			{children}
 		</Container>
 	);

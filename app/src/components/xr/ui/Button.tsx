@@ -1,12 +1,17 @@
 import { colors } from "./theme";
 import { borderRadius } from "@react-three/uikit-default";
-import { RefAttributes, useCallback, useRef, useEffect } from "react";
+import { RefAttributes, useCallback, useRef, useEffect, useState } from "react";
 import { ReactNode } from "react";
 import { forwardRef } from "react";
 import { Container, ContainerRef, DefaultProperties, ContainerProperties, AllOptionalProperties } from "@react-three/uikit";
 import { PositionalAudio } from "@react-three/drei";
 import { PositionalAudio as PositionalAudioType } from "three";
-import { ThreeEvent } from "@react-three/fiber";
+import { ThreeEvent, useFrame } from "@react-three/fiber";
+import { useSpring, config, animated } from "@react-spring/three";
+
+const AnimatedContainer = animated(Container);
+
+
 const buttonVariants = {
     default: {
       containerHoverProps: {
@@ -106,13 +111,14 @@ const buttonVariants = {
   }
   
   export type ButtonProperties = ContainerProperties & {
+    animated?: boolean
     variant?: keyof typeof buttonVariants
     size?: keyof typeof buttonSizes
     disabled?: boolean
   }
   
   export const Button: (props: ButtonProperties & RefAttributes<ContainerRef>) => ReactNode = forwardRef(
-    ({ children, variant = 'default', size = 'default', disabled = false, hover, ...props }, ref) => {
+    ({ children, variant = 'default', size = 'default', disabled = false, hover, animated = true, ...props }, ref) => {
       const {
         containerProps,
         defaultProps,
@@ -124,7 +130,19 @@ const buttonVariants = {
       } = buttonVariants[variant]
       const sizeProps = buttonSizes[size]
 
+      const [isHovered, setIsHovered] = useState(false);
+
       const audioRef = useRef<PositionalAudioType>(null)
+
+      const [{ transformTranslateZ }, api] = useSpring(() => ({ transformTranslateZ: 0, config: config.default }));
+
+      useFrame(() => {
+        if (isHovered) {
+          api.start({ transformTranslateZ: 0 });
+        } else {
+          api.start({ transformTranslateZ: 3 });
+        }
+      });
 
       // Clean up audio when component unmounts
       useEffect(() => {
@@ -135,6 +153,12 @@ const buttonVariants = {
           }
         };
       }, []);
+
+      const onHoverChange = useCallback((hover: boolean) => {
+        console.log('hover', hover);
+        setIsHovered(hover);
+        props.onHoverChange?.(hover);
+      }, [props]);
 
       const onClick = useCallback((e: ThreeEvent<MouseEvent>) => {
         // Stop any currently playing audio before playing again
@@ -148,7 +172,8 @@ const buttonVariants = {
       }, [props]);
   
       return (
-        <Container
+        <AnimatedContainer
+          transformTranslateZ={transformTranslateZ}
           borderRadius={borderRadius.md}
           alignItems="center"
           justifyContent="center"
@@ -165,6 +190,7 @@ const buttonVariants = {
           ref={ref}
           {...props}
           onClick={onClick}
+          onHoverChange={onHoverChange}
         >
           <PositionalAudio
             url={`./audio/click.webm`}
@@ -183,7 +209,7 @@ const buttonVariants = {
           >
             {children}
           </DefaultProperties>
-        </Container>
+        </AnimatedContainer>
       )
     },
   )

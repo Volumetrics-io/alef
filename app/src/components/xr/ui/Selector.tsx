@@ -6,7 +6,7 @@ import { PositionalAudio } from '@react-three/drei';
 import { Color, PositionalAudio as PositionalAudioType } from 'three';
 import { useRef } from 'react';
 import { ThreeEvent } from '@react-three/fiber';
-import { AnimatedContainer } from './Animations';
+import { AnimatedContainer, usePullAnimation } from './Animations';
 import { useSpring, config } from '@react-spring/three';
 export interface SelectorProps {
 	wrap?: boolean;
@@ -70,7 +70,7 @@ export function SelectorItem({ wrap = false, selected, size = 'medium', children
       config: config.default
      })
 
-    const transformTranslateZ = spring.to([0,1], [0, 3])
+    const transformTranslateZ = usePullAnimation(spring)
 
     const backgroundColor = spring.to([0,1], [`#${startColor.getHexString()}`, `#${endColor.getHexString()}`])
 

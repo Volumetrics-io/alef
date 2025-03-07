@@ -1,4 +1,3 @@
-import { Surface } from '@/components/xr/ui/Surface';
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
 import { useAddFurniture } from '@/stores/roomStore';
 import { Container, Image } from '@react-three/uikit';
@@ -6,11 +5,18 @@ import { PlusIcon } from '@react-three/uikit-lucide';
 import { useState } from 'react';
 import { Button } from '@/components/xr/ui/Button';
 import { colors } from '@/components/xr/ui/theme';
-
+import { AnimatedSurface, usePullAnimation } from '@/components/xr/ui/Animations';
+import { useSpring, config } from '@react-spring/three';
 export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }) {
-	const [hovered, setHovered] = useState(false);
+	const [hovered, setHovered] = useState(0);
+
+	const { spring } = useSpring({ spring: hovered, config: config.default });
+
+	const transformTranslateZ = usePullAnimation(spring)
+
 	return (
-		<Surface
+		<AnimatedSurface
+			transformTranslateZ={transformTranslateZ}
 			height="48%"
 			minWidth="32%"
 			flexDirection="column"
@@ -18,7 +24,7 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 			gap={3}
 			flexShrink={0}
 			alignItems="center"
-			onHoverChange={(hovered) => setHovered(hovered)}
+			onHoverChange={(hovered) => setHovered(Number(hovered))}
 		>
 			<Container
 				flexDirection="column"
@@ -34,7 +40,7 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 				height="100%"
 				objectFit="cover" />
 			</Container>
-		</Surface>
+		</AnimatedSurface>
 	);
 }
 

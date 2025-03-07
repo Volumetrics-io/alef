@@ -8,7 +8,7 @@ import { PositionalAudio } from "@react-three/drei";
 import { Color, PositionalAudio as PositionalAudioType } from "three";
 import { ThreeEvent } from "@react-three/fiber";
 import { useSpring, config } from "@react-spring/three";
-import { AnimatedContainer, AnimationProps } from "./Animations";
+import { AnimatedContainer, AnimationProps, usePullAnimation } from "./Animations";
 
 
 const buttonVariants = {
@@ -154,7 +154,7 @@ const buttonVariants = {
 
       const { spring } = useSpring({ spring: active, config: config.default });
 
-      const transformTranslateZ = spring.to([0,1], [0, 3])
+      const transformTranslateZ = usePullAnimation(spring)
       
       const startColor = getColorForAnimation(animationProps?.from?.backgroundColor) as Color
       const endColor = getColorForAnimation(animationProps?.to?.backgroundColor) as Color

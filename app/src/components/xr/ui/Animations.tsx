@@ -1,6 +1,6 @@
 import { Container, ContainerProperties } from "@react-three/uikit";
-import { animated } from "@react-spring/three";
-
+import { animated, SpringValue } from "@react-spring/three";
+import { Surface } from "./Surface";
 export type AnimationProps = {
     from: ContainerProperties
     to: ContainerProperties
@@ -14,3 +14,13 @@ function StaticContainer({ children, ...props }: ContainerProperties & { childre
 	);
 }
 export const AnimatedContainer = animated(StaticContainer);
+
+export const AnimatedSurface = animated(Surface);
+
+export const usePullAnimation = (spring: SpringValue<number>) => {
+    return spring.to([0,1], [0, 3])
+}
+
+export const usePushAnimation = (spring: SpringValue<number>) => {
+    return spring.to([0,1], [0, -3])
+}

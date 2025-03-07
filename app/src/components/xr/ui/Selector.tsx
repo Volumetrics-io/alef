@@ -1,5 +1,5 @@
 import { Container, ContainerProperties, DefaultProperties } from '@react-three/uikit';
-import { colors } from './theme';
+import { colors, getColorForAnimation } from './theme';
 import { borderRadius } from '@react-three/uikit-default';
 import { useCallback, useEffect, useState } from 'react';
 import { PositionalAudio } from '@react-three/drei';
@@ -62,15 +62,19 @@ export function SelectorItem({ wrap = false, selected, size = 'medium', children
     const [animation, setAnimation] = useState(0);
     const audioRef = useRef<PositionalAudioType>(null)
 
-    const startColor = colors.selectionSurface.value as Color
-    const endColor = colors.selectionHover.value as Color
+    const startColor = getColorForAnimation(colors.selectionSurface)
+    const endColor = getColorForAnimation(colors.selectionHover)
     
     const { spring } = useSpring({ 
       spring: animation, 
-      config: config.default
+      config: config.stiff
      })
 
     const transformTranslateZ = usePullAnimation(spring)
+
+    if (!startColor || !endColor) {
+        return null;
+    }
 
     const backgroundColor = spring.to([0,1], [`#${startColor.getHexString()}`, `#${endColor.getHexString()}`])
 

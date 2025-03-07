@@ -24,3 +24,7 @@ export const usePullAnimation = (spring: SpringValue<number>) => {
 export const usePushAnimation = (spring: SpringValue<number>) => {
     return spring.to([0,1], [0, -3])
 }
+
+export const useWiggleAnimation = (spring: SpringValue<number>) => {
+    return spring.to([0,0.25,0.5,0.75,1], [0, 1, 0, -1, 0])
+}

@@ -4,7 +4,7 @@ import { Container, Image } from '@react-three/uikit';
 import { PlusIcon } from '@react-three/uikit-lucide';
 import { useState } from 'react';
 import { Button } from '@/components/xr/ui/Button';
-import { colors } from '@/components/xr/ui/theme';
+import { colors, getColorForAnimation } from '@/components/xr/ui/theme';
 import { AnimatedSurface, usePullAnimation } from '@/components/xr/ui/Animations';
 import { useSpring, config } from '@react-spring/three';
 export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }) {
@@ -14,9 +14,28 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 
 	const transformTranslateZ = usePullAnimation(spring)
 
+	const startBorderColor = getColorForAnimation(colors.border)
+	const endBorderColor = getColorForAnimation(colors.faded)
+
+	if (!startBorderColor || !endBorderColor) {
+		return null;
+	}
+
+	const borderColor = spring.to([0,1], [`#${startBorderColor.getHexString()}`, `#${endBorderColor.getHexString()}`])
+
+	const startBackgroundColor = getColorForAnimation(colors.surface)
+	const endBackgroundColor = getColorForAnimation(colors.hover)
+
+	if (!startBackgroundColor || !endBackgroundColor) {
+		return null;
+	}
+
+	const backgroundColor = spring.to([0,1], [`#${startBackgroundColor.getHexString()}`, `#${endBackgroundColor.getHexString()}`])
 	return (
 		<AnimatedSurface
 			transformTranslateZ={transformTranslateZ}
+			borderColor={borderColor}
+			backgroundColor={backgroundColor}
 			height="48%"
 			minWidth="32%"
 			flexDirection="column"

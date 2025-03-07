@@ -151,13 +151,13 @@ export const getRayColor = ( selected: boolean ) => {
 }
 
 
-export const getColorForAnimation = (color: ColorRepresentation | ReadonlySignal<ColorRepresentation | undefined> | undefined) => {
+export const getColorForAnimation = (color: ColorRepresentation | ReadonlySignal<ColorRepresentation | undefined> | undefined) : Color | undefined => {
     if (!color) {
         return undefined;
     }
     const rs = color as ReadonlySignal<ColorRepresentation | undefined>
     if (rs != null) {
-        return rs.value;
+        return rs.value as Color;
     }
-    return color;
+    return undefined;
 }

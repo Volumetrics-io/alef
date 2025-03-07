@@ -58,10 +58,10 @@ export const FurniturePanelFilterSidebar = ({ children }: { children?: ReactNode
 	const scrollbarVisible = useRef(0);
 	const [isVisible, setIsVisible] = useState(false);
 
-	const { spring } = useSpring({ spring: visible ? 1 : 0 });
+	const { spring } = useSpring({ spring: visible ? 1 : 0, config: config.default });
 
 	const transformTranslateX = spring.to([0,1], [-180, 0])
-	const transformTranslateZ = spring.to([0,1], [0, 8])
+	const transformTranslateZ = spring.to([0, 0.8, 1], [0, 0, 8])
 
 	useFrame(() => {
 		const newVisibility = visible || spring.isAnimating;

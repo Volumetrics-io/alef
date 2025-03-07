@@ -134,7 +134,7 @@ const buttonVariants = {
   }
   
   export const Button: (props: ButtonProperties & RefAttributes<ContainerRef>) => ReactNode = forwardRef(
-    ({ children, variant = 'default', size = 'default', disabled = false, hover, animated = true, ...props }) => {
+    ({ children, variant = 'default', size = 'default', disabled = false, hover, animated = true, ...props }, ref) => {
       const {
         containerProps,
         defaultProps,
@@ -156,8 +156,12 @@ const buttonVariants = {
 
       const transformTranslateZ = usePullAnimation(spring)
       
-      const startColor = getColorForAnimation(animationProps?.from?.backgroundColor) as Color
-      const endColor = getColorForAnimation(animationProps?.to?.backgroundColor) as Color
+      const startColor = getColorForAnimation(animationProps?.from?.backgroundColor)
+      const endColor = getColorForAnimation(animationProps?.to?.backgroundColor)
+
+      if (!startColor || !endColor) {
+        return null;
+      }
 
       const backgroundColor = spring.to([0,1], [`#${startColor.getHexString()}`, `#${endColor.getHexString()}`])
 

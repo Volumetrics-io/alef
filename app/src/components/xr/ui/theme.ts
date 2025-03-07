@@ -1,4 +1,5 @@
-import { basedOnPreferredColorScheme } from "@pmndrs/uikit";
+import { basedOnPreferredColorScheme, ColorRepresentation } from "@pmndrs/uikit";
+import { ReadonlySignal } from "@preact/signals-core";
 import { Color } from "three";
 
 function hsl(h: number, s: number, l: number) {
@@ -147,4 +148,16 @@ export const getCursorColor = ( selected: boolean ) => {
 
 export const getRayColor = ( selected: boolean ) => {
     return selected ? colors.focus.value : colors.cursor.value;
+}
+
+
+export const getColorForAnimation = (color: ColorRepresentation | ReadonlySignal<ColorRepresentation | undefined> | undefined) => {
+    if (!color) {
+        return undefined;
+    }
+    const rs = color as ReadonlySignal<ColorRepresentation | undefined>
+    if (rs != null) {
+        return rs.value;
+    }
+    return color;
 }

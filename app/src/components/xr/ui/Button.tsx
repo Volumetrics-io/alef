@@ -1,98 +1,114 @@
-import { colors } from "./theme";
+import { colors, getColorForAnimation } from "./theme";
 import { borderRadius } from "@react-three/uikit-default";
 import { RefAttributes, useCallback, useRef, useEffect, useState } from "react";
 import { ReactNode } from "react";
 import { forwardRef } from "react";
-import { Container, ContainerRef, DefaultProperties, ContainerProperties, AllOptionalProperties } from "@react-three/uikit";
+import {  ContainerRef, DefaultProperties, ContainerProperties, AllOptionalProperties } from "@react-three/uikit";
 import { PositionalAudio } from "@react-three/drei";
-import { PositionalAudio as PositionalAudioType } from "three";
-import { ThreeEvent, useFrame } from "@react-three/fiber";
-import { useSpring, config, animated } from "@react-spring/three";
-
-const AnimatedContainer = animated(Container);
+import { Color, PositionalAudio as PositionalAudioType } from "three";
+import { ThreeEvent } from "@react-three/fiber";
+import { useSpring, config } from "@react-spring/three";
+import { AnimatedContainer, AnimationProps } from "./Animations";
 
 
 const buttonVariants = {
     default: {
       containerHoverProps: {
-        backgroundColor: colors.hover,
         borderColor: colors.faded,
       },
       containerProps: {
-        backgroundColor: colors.surface,
         borderColor: colors.border,
         borderWidth: 1,
       },
       defaultProps: {
         color: colors.ink,
       },
+      animationProps: {
+        from: {
+          backgroundColor: colors.surface,
+        },
+        to: {
+          backgroundColor: colors.hover,
+        }
+      }
     },
     link: { 
       containerHoverProps: {
-        backgroundColor: colors.attentionHover,
         borderColor: colors.attentionFaded,
       },
       containerProps: {
-          backgroundColor: colors.attentionSurface,
           borderColor: colors.attentionBorder,
           borderWidth: 1,
       },
       defaultProps: {
           color: colors.attentionInk,
       },
+      animationProps: {
+        from: {
+          backgroundColor: colors.attentionSurface,
+        },
+        to: {
+          backgroundColor: colors.attentionHover,
+        }
+      }
     },
     secondary: { 
       containerHoverProps: {
-        backgroundColor: colors.secondaryHover,
         borderColor: colors.secondaryFaded
       },
       containerProps: {
-          backgroundColor: colors.secondarySurface,
           borderColor: colors.secondaryBorder,
           borderWidth: 1,
       },
       defaultProps: {
           color: colors.secondaryInk,
       },
+      animationProps: {
+        from: {
+          backgroundColor: colors.secondarySurface,
+        },
+        to: {
+          backgroundColor: colors.secondaryHover,
+        }
+      }
     },
     destructive: {
       containerHoverProps: {
-        backgroundColor: colors.destructiveHover,
         borderColor: colors.destructiveFaded,
       },
       containerProps: {
-        backgroundColor: colors.destructiveSurface,
         borderColor: colors.destructiveBorder,
         borderWidth: 1,
       },
       defaultProps: {
         color: colors.destructiveInk,
       },
-    },
-    outline: {
-      containerHoverProps: {
-        borderColor: colors.faded,
-      },
-      containerProps: {
-        backgroundColor: colors.surface,
-        borderColor: colors.border,
-        borderWidth: 1,
-      },
-      defaultProps: {
-        color: colors.ink,
-      },
+      animationProps: {
+        from: {
+          backgroundColor: colors.destructiveSurface,
+        },
+        to: {
+          backgroundColor: colors.destructiveHover,
+        }
+      }
     },
     ghost: {
       containerHoverProps: {
-        backgroundColor: colors.hover,
         borderColor: colors.faded,
       },
       containerProps: {
-        backgroundColor: colors.surface,
       },
       defaultProps: {
         color: colors.ink,
       },
+      animationProps: {
+        from: {
+          backgroundColor: colors.surface,
+        },
+        to: {
+          backgroundColor: colors.hover,
+        }
+      }
     },
   }
 
@@ -123,26 +139,27 @@ const buttonVariants = {
         containerProps,
         defaultProps,
         containerHoverProps,
+        animationProps,
       }: {
         containerHoverProps?: ContainerProperties['hover']
         containerProps?: Omit<ContainerProperties, 'hover'>
         defaultProps?: AllOptionalProperties
+        animationProps?: AnimationProps
       } = buttonVariants[variant]
       const sizeProps = buttonSizes[size]
 
-      const [isHovered, setIsHovered] = useState(false);
+      const [active, setActive] = useState(0);
 
       const audioRef = useRef<PositionalAudioType>(null)
 
-      const [{ transformTranslateZ }, api] = useSpring(() => ({ transformTranslateZ: 0, config: config.default }));
+      const { spring } = useSpring({ spring: active, config: config.default });
 
-      useFrame(() => {
-        if (isHovered) {
-          api.start({ transformTranslateZ: 0 });
-        } else {
-          api.start({ transformTranslateZ: 3 });
-        }
-      });
+      const transformTranslateZ = spring.to([0,1], [0, 3])
+      
+      const startColor = getColorForAnimation(animationProps?.from?.backgroundColor) as Color
+      const endColor = getColorForAnimation(animationProps?.to?.backgroundColor) as Color
+
+      const backgroundColor = spring.to([0,1], [`#${startColor.getHexString()}`, `#${endColor.getHexString()}`])
 
       // Clean up audio when component unmounts
       useEffect(() => {
@@ -155,9 +172,8 @@ const buttonVariants = {
       }, []);
 
       const onHoverChange = useCallback((hover: boolean) => {
-        console.log('hover', hover);
         props.onHoverChange?.(hover);
-        setIsHovered(hover);
+        setActive(Number(hover));
       }, [props]);
 
       const onClick = useCallback((e: ThreeEvent<MouseEvent>) => {
@@ -169,7 +185,7 @@ const buttonVariants = {
           audioRef.current.play();
         }
         props.onClick?.(e);
-        setIsHovered(false);
+        setActive(0);
 
       }, [props]);
   
@@ -185,11 +201,11 @@ const buttonVariants = {
           backgroundOpacity={disabled ? 0.5 : undefined}
           cursor={disabled ? undefined : 'pointer'}
           flexDirection="row"
+          backgroundColor={backgroundColor}
           hover={{
             ...containerHoverProps,
             ...hover,
           }}
-          ref={ref}
           {...props}
           onClick={onClick}
           onHoverChange={onHoverChange}

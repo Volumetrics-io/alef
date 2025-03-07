@@ -62,6 +62,8 @@ export class PropertySocketHandler {
 					status: 'pending',
 				});
 
+				console.debug('Socket connected', userId, server.deserializeAttachment());
+
 				return new Response(null, {
 					status: 101,
 					webSocket: client,
@@ -133,6 +135,7 @@ export class PropertySocketHandler {
 	#onWebSocketCloseOrError = (ws: WebSocket) => {
 		// TODO: collaboration: signal to peers that this client has disconnected
 		this.#socketInfo.delete(ws);
+		console.log('Socket closed', ws.deserializeAttachment());
 	};
 
 	send = async (
@@ -162,6 +165,7 @@ export class PropertySocketHandler {
 				console.error(`Cannot send message to closed socket: { userId: ${userId}, socketId: ${socketId} }`);
 			} else {
 				ws.send(JSON.stringify(msg));
+				console.debug('Sent message to socket', socketId, userId, msg.type);
 			}
 		}
 	};

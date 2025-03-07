@@ -85,10 +85,11 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 								viewingLayoutId: Object.keys(response.data.layouts)[0] as PrefixedId<'rl'> | undefined,
 							});
 						})();
-						socket.onMessage('roomUpdate', (data) => {
+						socket.onMessage('roomUpdate', (msg) => {
 							// apply incoming room updates
+							console.log('Applying room update', msg);
 							set((state) => {
-								Object.assign(state, data);
+								Object.assign(state, msg.data);
 							});
 						});
 						// apply backlog on connect

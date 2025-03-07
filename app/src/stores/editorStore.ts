@@ -5,7 +5,6 @@ import { useEffect } from 'react';
 import { Object3D, Object3DEventMap } from 'three';
 import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
-import { usePlanesStore } from './planesStore';
 
 export type StageMode = 'lighting' | 'furniture' | 'layout' | 'settings' | null;
 
@@ -75,12 +74,6 @@ export function useEditorSelectionReset() {
 		voidObject.addEventListener('click', fn);
 		return () => voidObject.removeEventListener('click', fn);
 	}, [scene]);
-}
-
-export function useIntersectingPlaneLabels(id: PrefixedId<'fp'>) {
-	const intersections = useEditorStore((s) => s.stickyIntersections[id]) ?? [];
-	// map to plane info
-	return usePlanesStore(useShallow((s) => intersections.map((i) => s.getPlaneLabel(i))));
 }
 
 export function useSelectedFurniturePlacementId() {

@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { AlefError } from './error';
 import { id, isPrefixedId, PrefixedId } from './ids';
 import { Operation } from './operations';
-import { mergePlane } from './planes';
+import { mergePlanes } from './planes';
 
 export const ROOM_STATE_VERSION = 1;
 
@@ -25,7 +25,7 @@ export const roomPlaneDataShape = z.object({
 	id: z.custom<PrefixedId<'rp'>>((v) => isPrefixedId(v, 'rp')),
 	label: z.string(),
 	origin: simpleVector3Shape,
-	normal: simpleVector3Shape,
+	orientation: simpleQuaternionShape,
 	extents: z.tuple([z.number(), z.number()]),
 });
 export type RoomPlaneData = z.infer<typeof roomPlaneDataShape>;
@@ -86,7 +86,7 @@ export type Updates<T extends { id: any }> = T extends { id: infer U } ? { id: U
 export function updateRoom(state: RoomState, change: Operation) {
 	switch (change.type) {
 		case 'updatePlanes':
-			state.planes = change.planes.reduce(mergePlane, state.planes);
+			state.planes = mergePlanes(state.planes, change.planes);
 			state.planesUpdatedAt = change.time;
 			return state;
 		case 'addFurniture':
@@ -239,7 +239,12 @@ export function migrateRoomState(oldState: any): RoomState {
 		};
 	} else if (oldState.version === ROOM_STATE_VERSION) {
 		// check validity of state just in case.
-		return roomStateShape.parse(oldState);
+		try {
+			return roomStateShape.parse(oldState);
+		} catch (err) {
+			// fallback to unknown.
+			return migrateRoomState({ ...oldState, version: undefined });
+		}
 	} else {
 		throw new Error(`Unsupported room state version ${oldState.version}`);
 	}

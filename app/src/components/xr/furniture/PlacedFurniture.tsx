@@ -9,16 +9,17 @@ import {
 	useUpdateFurniturePlacementTransform,
 } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
+import { ErrorBoundary } from '@alef/sys';
 import { useThree } from '@react-three/fiber';
 import { defaultApply, Handle, HandleState } from '@react-three/handle';
 import { Container, Root } from '@react-three/uikit';
 import { ArrowLeft, ArrowRight, Trash } from '@react-three/uikit-lucide';
-import { ComponentPropsWithoutRef, useCallback, useRef, useState } from 'react';
+import { ComponentPropsWithoutRef, startTransition, useCallback, useRef, useState } from 'react';
 import { BackSide, Group, Object3D } from 'three';
 import { Billboard } from '../Billboard';
 import { Button } from '../ui/Button';
 import { colors } from '../ui/theme';
-import { CollisionModel, FurnitureModel } from './FurnitureModel';
+import { CollisionModel, FurnitureModel, MissingModel } from './FurnitureModel';
 
 export interface PlacedFurnitureProps {
 	furniturePlacementId: PrefixedId<'fp'>;
@@ -44,11 +45,17 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	const handleClick = useCallback(() => {
 		if (selected) return;
 		if (!isEditable) return;
-		select(furniturePlacementId);
+		startTransition(() => {
+			select(furniturePlacementId);
+		});
 	}, [select, furniturePlacementId, selected, isEditable]);
 
 	const applyWithSave = useCallback(
 		(state: HandleState<any>, target: Object3D) => {
+			if (!(state && target)) {
+				// not sure how or why, but this has occurred.
+				return;
+			}
 			defaultApply(state, target);
 
 			if (state.last) {
@@ -63,38 +70,33 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	);
 
 	const hypotenuse = Math.sqrt(halfExtents[0] * halfExtents[0] + halfExtents[2] * halfExtents[2]);
-	
+
 	if (!furnitureId || !placement) return null;
 
 	return (
-		<group
-			ref={groupRef}
-			position={[placement.position.x, placement.position.y, placement.position.z]}
-			quaternion={[placement.rotation.x, placement.rotation.y, placement.rotation.z, placement.rotation.w]}
-		>
-			{isEditable && (
-				<ConditionalHandle enabled={selected} targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false} apply={applyWithSave}>
-					<CollisionModel furnitureId={furnitureId} onClick={handleClick} />
-				</ConditionalHandle>
-			)}
-			<FurnitureModel 
-				key={furnitureId} 
-				furnitureId={furnitureId} 
-				ref={modelRef} 
-				castShadow={size.y > 0.2} 
-				receiveShadow={mode !== 'furniture'}
-				pointerEvents="none" 
-			/>
+		<ErrorBoundary fallback={<MissingModel />}>
+			<group
+				ref={groupRef}
+				position={[placement.position.x, placement.position.y, placement.position.z]}
+				quaternion={[placement.rotation.x, placement.rotation.y, placement.rotation.z, placement.rotation.w]}
+			>
+				{isEditable && (
+					<ConditionalHandle enabled={selected} targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false} apply={applyWithSave}>
+						<CollisionModel furnitureId={furnitureId} onClick={handleClick} />
+					</ConditionalHandle>
+				)}
+				<FurnitureModel key={furnitureId} furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} receiveShadow={mode !== 'furniture'} pointerEvents="none" />
 
-			{isEditable && selected && (
-				<PlaceFurnitureUI furniturePlacementId={furniturePlacementId} furnitureId={furnitureId} setFurnitureId={setFurnitureId} height={halfExtents[1] + center.y + 0.2} />
-			)}
-			{isEditable && selected && (
-				<Handle targetRef={groupRef as any} rotate={{ x: false, y: true, z: false }} translate="as-rotate" apply={applyWithSave}>
-					<RotationRing radius={hypotenuse + 0.075} position={[0, 0.5, 0]} />
-				</Handle>
-			)}
-		</group>
+				{isEditable && selected && (
+					<PlaceFurnitureUI furniturePlacementId={furniturePlacementId} furnitureId={furnitureId} setFurnitureId={setFurnitureId} height={halfExtents[1] + center.y + 0.2} />
+				)}
+				{isEditable && selected && (
+					<Handle targetRef={groupRef as any} rotate={{ x: false, y: true, z: false }} translate="as-rotate" apply={applyWithSave}>
+						<RotationRing radius={hypotenuse + 0.075} position={[0, 0.5, 0]} />
+					</Handle>
+				)}
+			</group>
+		</ErrorBoundary>
 	);
 }
 
@@ -144,7 +146,10 @@ function PlaceFurnitureUI({
 		attributeFilter: currentFurniture?.attributes,
 	});
 
-	const furnitureIds = furniture.pages.flatMap((page) => page.items).map((f) => f.id).sort();
+	const furnitureIds = furniture.pages
+		.flatMap((page) => page.items)
+		.map((f) => f.id)
+		.sort();
 
 	const handlePrevious = () => {
 		const index = furnitureIds.findIndex((f) => f === furnitureId);

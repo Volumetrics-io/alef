@@ -1,29 +1,40 @@
-import { id } from './ids';
+import { id, PrefixedId } from './ids';
 import { RoomPlaneData, UnknownRoomPlaneData } from './state';
 
 /**
- * Compares a new or updated plane with a list of preexisting detected planes. If the plane appears
+ * Compares a new or updated planes with a list of preexisting detected planes. If the plane appears
  * to have the same identity as another plane, it replaces that plane in the list. Otherwise, it
- * adds it to the end.
+ * adds it to the end. Any preexisting planes not matched by a new plane are removed.
  */
-export function mergePlane(planes: RoomPlaneData[], unknownPlane: UnknownRoomPlaneData): RoomPlaneData[] {
-	const candidates = planes.filter(
-		(other) => isTypeMatch(other, unknownPlane) && isNormalClose(other, unknownPlane) && isPositionClose(other, unknownPlane) && isSizeClose(other, unknownPlane)
-	);
-	if (candidates.length === 0) {
-		return [...planes, { ...unknownPlane, id: id('rp') }];
-	} else {
-		// narrow down to 1 candidate and replace it in the list
-		let finalCandidate = candidates.sort(createDivergenceSorter(unknownPlane))[0];
-		return planes.map((plane) =>
-			plane === finalCandidate
-				? {
-						...unknownPlane,
-						id: plane.id,
-					}
-				: plane
+export function mergePlanes(existingPlanes: RoomPlaneData[], newPlanes: UnknownRoomPlaneData[]): RoomPlaneData[] {
+	const mergedIds = new Set<PrefixedId<'rp'>>();
+	let mergedPlanes = [...existingPlanes];
+	for (const newPlane of newPlanes) {
+		const candidates = existingPlanes.filter(
+			(other) => isTypeMatch(other, newPlane) && isNormalClose(other, newPlane) && isPositionClose(other, newPlane) && isSizeClose(other, newPlane)
 		);
+		if (candidates.length === 0) {
+			const newId = id('rp');
+			mergedPlanes = [...mergedPlanes, { ...newPlane, id: newId }];
+			mergedIds.add(newId);
+		} else {
+			// narrow down to 1 candidate and replace it in the list
+			let finalCandidate = candidates.sort(createDivergenceSorter(newPlane))[0];
+			mergedPlanes = mergedPlanes.map((plane) =>
+				plane === finalCandidate
+					? {
+							...newPlane,
+							id: plane.id,
+						}
+					: plane
+			);
+			mergedIds.add(finalCandidate.id);
+		}
 	}
+
+	// remove planes which weren't matched or added
+	mergedPlanes = mergedPlanes.filter((plane) => mergedIds.has(plane.id));
+	return mergedPlanes;
 }
 
 const divergenceThresholds = {
@@ -36,12 +47,18 @@ export function isTypeMatch(planeA: UnknownRoomPlaneData, planeB: UnknownRoomPla
 	return planeA.label === planeB.label;
 }
 
-export function normalDivergence(planeA: UnknownRoomPlaneData, planeB: UnknownRoomPlaneData) {
-	return planeA.normal.x * planeB.normal.x + planeA.normal.y * planeB.normal.y + planeA.normal.z * planeB.normal.z;
+export function orientationDivergence(planeA: UnknownRoomPlaneData, planeB: UnknownRoomPlaneData) {
+	// compare quaternions
+	const dot =
+		planeA.orientation.x * planeB.orientation.x +
+		planeA.orientation.y * planeB.orientation.y +
+		planeA.orientation.z * planeB.orientation.z +
+		planeA.orientation.w * planeB.orientation.w;
+	return Math.abs(dot);
 }
 
 export function isNormalClose(planeA: UnknownRoomPlaneData, planeB: UnknownRoomPlaneData) {
-	const dot = normalDivergence(planeA, planeB);
+	const dot = orientationDivergence(planeA, planeB);
 	return dot > 1 - divergenceThresholds.normal;
 }
 
@@ -70,7 +87,7 @@ export function createDivergenceSorter(unknownPlane: UnknownRoomPlaneData) {
 	return function (a: UnknownRoomPlaneData, b: UnknownRoomPlaneData) {
 		const size = (sizeDivergence(a, unknownPlane) - sizeDivergence(b, unknownPlane)) / divergenceThresholds.size;
 		const position = (positionDivergence(a, unknownPlane) - positionDivergence(b, unknownPlane)) / divergenceThresholds.position;
-		const normal = (normalDivergence(a, unknownPlane) - normalDivergence(b, unknownPlane)) / divergenceThresholds.normal;
+		const normal = (orientationDivergence(a, unknownPlane) - orientationDivergence(b, unknownPlane)) / divergenceThresholds.normal;
 		return size + position + normal;
 	};
 }

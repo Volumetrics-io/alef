@@ -1,4 +1,4 @@
-import { PrefixedId } from '@alef/common';
+import { PrefixedId, RoomPlaneData } from '@alef/common';
 import { useShallow } from 'zustand/react/shallow';
 import { useRoomStore } from '../roomStore';
 
@@ -40,4 +40,8 @@ export function usePlanesUpdatedAt() {
 
 export function useUpdatePlanes() {
 	return useRoomStore((s) => s.updatePlanes);
+}
+
+export function usePlanes(filter?: (p: RoomPlaneData) => boolean) {
+	return useRoomStore(useShallow((s) => (filter ? s.planes.filter(filter) : s.planes)));
 }

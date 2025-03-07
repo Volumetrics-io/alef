@@ -42,10 +42,9 @@ export function SceneWrapper({ children }: SceneWrapperProps) {
 								xrStore.enterAR();
 							}
 						}
-
 					}}
 					shadows={true}
-					camera={{ position: [-0.5, 0.5, 0.5] }}
+					camera={{ position: [-5, 5, 5] }}
 				>
 					<XR store={xrStore}>
 						<PointerEvents />

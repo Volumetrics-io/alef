@@ -121,6 +121,7 @@ const SunLight: React.FC = () => {
 	}, [scene]);
 
 	const { originReferenceSpace } = useXR();
+	// FIXME: lots of allocation in this frame loop
 	useFrame((_, delta, frame: XRFrame) => {
 		// Accumulate elapsed time
 		elapsedTimeRef.current += delta;

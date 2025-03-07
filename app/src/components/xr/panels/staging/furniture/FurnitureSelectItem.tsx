@@ -70,12 +70,15 @@ function FurnitureAddButton({ furnitureItem }: { furnitureItem: FurnitureItem })
 	const closestFloorPositionRef = useRef<Vector3>(new Vector3());
 
 	// temp vars
-	const viewerPosition = new Vector3();
-	const viewerMatrix = new Matrix4();
-	const floorPosition = new Vector3();
+	const tempVars = useRef({
+		viewerPosition: new Vector3(),
+		viewerMatrix: new Matrix4(),
+		floorPosition: new Vector3(),
+	});
 	useFrame((state, __, xrFrame: XRFrame) => {
 		// if in XR, we use the head position to determine viewer position
 		// otherwise, we use the camera position
+		const { viewerPosition, viewerMatrix, floorPosition } = tempVars.current;
 		let gotViewer = false;
 		if (isInSession && getViewerMatrix) {
 			if (getViewerMatrix(viewerMatrix, xrFrame)) {

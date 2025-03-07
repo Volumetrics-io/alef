@@ -5,7 +5,7 @@ import { ReactNode } from "react";
 import { forwardRef } from "react";
 import {  ContainerRef, DefaultProperties, ContainerProperties, AllOptionalProperties } from "@react-three/uikit";
 import { PositionalAudio } from "@react-three/drei";
-import { Color, PositionalAudio as PositionalAudioType } from "three";
+import { PositionalAudio as PositionalAudioType } from "three";
 import { ThreeEvent } from "@react-three/fiber";
 import { useSpring, config } from "@react-spring/three";
 import { AnimatedContainer, AnimationProps, usePullAnimation } from "./Animations";

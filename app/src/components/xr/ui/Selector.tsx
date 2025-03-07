@@ -3,7 +3,7 @@ import { colors, getColorForAnimation } from './theme';
 import { borderRadius } from '@react-three/uikit-default';
 import { useCallback, useEffect, useState } from 'react';
 import { PositionalAudio } from '@react-three/drei';
-import { Color, PositionalAudio as PositionalAudioType } from 'three';
+import { PositionalAudio as PositionalAudioType } from 'three';
 import { useRef } from 'react';
 import { ThreeEvent } from '@react-three/fiber';
 import { AnimatedContainer, usePullAnimation } from './Animations';

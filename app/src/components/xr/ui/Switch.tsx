@@ -21,6 +21,7 @@ export const Switch: (props: SwitchProperties & RefAttributes<ContainerRef>) => 
     const { spring: checkedSpring } = useSpring({ spring: Number(checked), config: config.default })
 
     const position = checkedSpring.to([0,1], [0, 15])
+    console.log(position.get())
     const width = checkedSpring.to([0, 0.5, 1], [20, 25, 20])
 
     const startBackgroundColor = getColorForAnimation(colors.surface)
@@ -34,9 +35,6 @@ export const Switch: (props: SwitchProperties & RefAttributes<ContainerRef>) => 
 
 
     return (
-      <Container
-        ref={ref}
-      >
       <AnimatedContainer
         height={28}
         width={44}
@@ -63,6 +61,11 @@ export const Switch: (props: SwitchProperties & RefAttributes<ContainerRef>) => 
         }
         {...props}
       >
+        <Container
+          width="auto"
+          height="auto"
+          ref={ref}
+        >
         <AnimatedCursor
           // @ts-ignore this works fine
           marginLeft={position}
@@ -71,8 +74,8 @@ export const Switch: (props: SwitchProperties & RefAttributes<ContainerRef>) => 
 
           externalAnimate={hoverAnimate}
         />
+        </Container>
       </AnimatedContainer>
-      </Container>
     )
   },
 )

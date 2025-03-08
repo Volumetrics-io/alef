@@ -67,13 +67,13 @@ export function AnimatedCursor({ disabled, externalAnimate, ...props }: Containe
         borderRadius={1000}
         borderColor={disabled ? colors.border : animateBorderColor}
         backgroundColor={disabled ? colors.surface : animateBackgroundColor}
-        {...props}
         onHoverChange={(hover) => {
           if (externalAnimate == null) {
             setAnimate(Number(hover))
           }
         }}
         transformTranslateZ={disabled ? 0 : translateZ}
+        {...props}
       />
     )
   }

@@ -1,4 +1,4 @@
-import { colors } from '@react-three/uikit-default';
+import { getCursorColor, getRayColor } from '@/components/xr/ui/theme';
 import { createXRStore, XRStore } from '@react-three/xr';
 
 export const xrStore: XRStore = createXRStore({
@@ -11,12 +11,13 @@ export const xrStore: XRStore = createXRStore({
 		touchPointer: false,
 		rayPointer: {
 			rayModel: {
-				color: (pointer) => (pointer.getButtonsDown().size > 0 ? 'hsl(240, 100%, 70%)' : 'white'),
-				opacity: (pointer) => (pointer.getButtonsDown().size > 0 ? 1.0 : 0.4),
+				color: (pointer) => getRayColor(pointer.getButtonsDown().size > 0),
+				opacity: 0.4,
+
 			},
 			cursorModel: {
-				color: colors.primary.value,
-				opacity: (pointer) => (pointer.getButtonsDown().size > 0 ? 0.6 : 0.4),
+				color: (pointer) => getCursorColor(pointer.getButtonsDown().size > 0),
+				opacity: 0.8,
 			},
 		},
 		grabPointer: false,
@@ -25,12 +26,12 @@ export const xrStore: XRStore = createXRStore({
 	controller: {
 		rayPointer: {
 			rayModel: {
-				color: (pointer) => (pointer.getButtonsDown().size > 0 ? 'hsl(240, 100%, 70%)' : 'white'),
-				opacity: (pointer) => (pointer.getButtonsDown().size > 0 ? 1.0 : 0.4),
+				color: (pointer) => getRayColor(pointer.getButtonsDown().size > 0),
+				opacity: 0.4,
 			},
 			cursorModel: {
-				color: colors.primary.value,
-				opacity: (pointer) => (pointer.getButtonsDown().size > 0 ? 0.6 : 0.4),
+				color: (pointer) => getCursorColor(pointer.getButtonsDown().size > 0),
+				opacity: 0.8,
 			},
 		},
 		teleportPointer: false,

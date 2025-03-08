@@ -82,7 +82,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 				furnitureId={furnitureId} 
 				ref={modelRef} 
 				castShadow={size.y > 0.2} 
-				receiveShadow
+				receiveShadow={mode !== 'furniture'}
 				pointerEvents="none" 
 			/>
 
@@ -107,7 +107,7 @@ function RotationRing({ radius, position }: { radius: number; position: [number,
 	const [hovered, setHovered] = useState(false);
 	return (
 		<group onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} position={position} rotation={[Math.PI / 2, 0, 0]} renderOrder={-2}>
-			<mesh castShadow>
+			<mesh>
 				<torusGeometry args={[radius, 0.025, 64]} />
 				<meshPhongMaterial color={colors.focus.value} emissive={colors.focus.value} emissiveIntensity={0.5} />
 			</mesh>

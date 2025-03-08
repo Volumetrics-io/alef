@@ -1,12 +1,13 @@
 import { Container, ContainerProperties, DefaultProperties } from '@react-three/uikit';
-import { colors } from './theme';
+import { colors, getColorForAnimation } from './theme';
 import { borderRadius } from '@react-three/uikit-default';
 import { useCallback, useEffect, useState } from 'react';
 import { PositionalAudio } from '@react-three/drei';
 import { PositionalAudio as PositionalAudioType } from 'three';
 import { useRef } from 'react';
 import { ThreeEvent } from '@react-three/fiber';
-
+import { AnimatedContainer, usePullAnimation } from './Animations';
+import { useSpring, config } from '@react-spring/three';
 export interface SelectorProps {
 	wrap?: boolean;
 	size?: 'small' | 'medium';
@@ -58,8 +59,24 @@ const selectorItemSizeVariants = {
 }
 
 export function SelectorItem({ wrap = false, selected, size = 'medium', children, ...props }: ContainerProperties & { wrap?: boolean, selected: boolean, size?: 'small' | 'medium', children: React.ReactNode }) {
-    const [hover, setHover] = useState(false);
+    const [animation, setAnimation] = useState(0);
     const audioRef = useRef<PositionalAudioType>(null)
+
+    const startColor = getColorForAnimation(colors.selectionSurface)
+    const endColor = getColorForAnimation(colors.selectionHover)
+    
+    const { spring } = useSpring({ 
+      spring: animation, 
+      config: config.stiff
+     })
+
+    const transformTranslateZ = usePullAnimation(spring)
+
+    if (!startColor || !endColor) {
+        return null;
+    }
+
+    const backgroundColor = spring.to([0,1], [`#${startColor.getHexString()}`, `#${endColor.getHexString()}`])
 
     useEffect(() => {
         return () => {
@@ -79,16 +96,19 @@ export function SelectorItem({ wrap = false, selected, size = 'medium', children
           audioRef.current.play();
         }
         props.onClick?.(e);
+        setAnimation(1);
       }, [props]);
 
 	return (
-		<Container
-            backgroundColor={selected || hover ? colors.selectionHover : undefined}
+		<AnimatedContainer
+            transformTranslateZ={transformTranslateZ}
+            borderRadius={borderRadius.md}
+            backgroundColor={selected ? colors.selectionPress : backgroundColor}
             alignItems="center"
             flexDirection="row"
             width={wrap ? 'auto' : '100%'}
             justifyContent="flex-start"
-            onHoverChange={(hover) => setHover(hover)}
+            onHoverChange={(hover) => setAnimation(Number(hover))}
             {...props}
             onClick={onClick}
         >
@@ -106,6 +126,6 @@ export function SelectorItem({ wrap = false, selected, size = 'medium', children
             >
             {children}
             </DefaultProperties>
-        </Container>
+        </AnimatedContainer>
 	);
 }

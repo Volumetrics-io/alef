@@ -1,4 +1,5 @@
-import { basedOnPreferredColorScheme } from "@pmndrs/uikit";
+import { basedOnPreferredColorScheme, ColorRepresentation } from "@pmndrs/uikit";
+import { ReadonlySignal } from "@preact/signals-core";
 import { Color } from "three";
 
 function hsl(h: number, s: number, l: number) {
@@ -54,7 +55,10 @@ const DARK_HUE = {
 
 export const theme = {
     light: {
+        cursor: oklch(60, 0, LIGHT_HUE.mono),
+        cursorSelect: oklch(40, 0, LIGHT_HUE.mono),
         dimmed: hsl(0, 0, 0),
+        drawFocus: oklch(56, 50, 284),
         focus: oklch(66, 50, 284),
         required: hsl(0, 100, 70),
         surface: oklch(100, 0, LIGHT_HUE.mono),
@@ -94,8 +98,11 @@ export const theme = {
         selectionInk: oklch(40, 5, LIGHT_HUE.selection),
     },
     dark: {
+        cursor: oklch(80, 0, DARK_HUE.mono),
+        cursorSelect: oklch(100, 0, DARK_HUE.mono),
         dimmed: hsl(0, 0, 0),
-        focus: hsl(56, 100, 70),
+        drawFocus: oklch(90.65, 13.67, 93.23),
+        focus: oklch(95.15, 16.14, 105.21),
         required: hsl(0, 100, 70),
         surface: oklch(25, 0, DARK_HUE.mono),
         paper: oklch(32, 0, DARK_HUE.mono),
@@ -136,3 +143,23 @@ export const theme = {
 }
 
 export const colors = basedOnPreferredColorScheme(theme);
+
+export const getCursorColor = ( selected: boolean ) => {
+    return selected ? colors.cursorSelect.value : colors.cursor.value;
+}
+
+export const getRayColor = ( selected: boolean ) => {
+    return selected ? colors.focus.value : colors.cursor.value;
+}
+
+
+export const getColorForAnimation = (color: ColorRepresentation | ReadonlySignal<ColorRepresentation | undefined> | undefined) : Color | undefined => {
+    if (!color) {
+        return undefined;
+    }
+    const rs = color as ReadonlySignal<ColorRepresentation | undefined>
+    if (rs != null) {
+        return rs.value as Color;
+    }
+    return undefined;
+}

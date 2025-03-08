@@ -9,6 +9,7 @@ import { useXR, XRPlaneModel, XRSpace } from '@react-three/xr';
 import { forwardRef, useRef } from 'react';
 import { DoubleSide, Object3D, ShadowMaterial, Vector3 } from 'three';
 import { DebugPlaneNormal } from './DebugPlaneNormal';
+import { useGlobalLighting } from '@/stores/roomStore';
 
 export interface PhysicalXRPlaneProps {
 	/** Whether to add a sensor for snapping moved objects to this plane when they're close */
@@ -23,13 +24,14 @@ const PLANE_EXTENSION_BUFFER = 0.1;
 
 export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(function PhysicalXRPlane({ plane, snapSensor = true, debug }, ref) {
 	const { originReferenceSpace } = useXR();
+	const [ globalLighting ] = useGlobalLighting();
 
 	// sync sunlight to shadow material
 	const shadowMaterialRef = useRef<ShadowMaterial>(null);
 	useFrame(() => {
 		const sunlightIntensity = useEnvironmentStore.getState().sunlightIntensity;
 		if (shadowMaterialRef.current) {
-			shadowMaterialRef.current.opacity = 0.2 * sunlightIntensity;
+			shadowMaterialRef.current.opacity = 0.3 * (globalLighting.intensity + sunlightIntensity) * 0.5;
 		}
 	});
 

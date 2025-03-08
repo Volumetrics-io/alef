@@ -1,10 +1,12 @@
 import { Container, ContainerRef, ContainerProperties } from '@react-three/uikit'
-import { colors } from './theme.js'
+import { colors, getColorForAnimation } from './theme.js'
 import { ReactNode, RefAttributes, forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { EventHandlers, ThreeEvent } from '@react-three/fiber/dist/declarations/src/core/events.js'
 import { Vector3 } from 'three'
 import { Signal, computed } from '@preact/signals-core'
-
+import { config } from '@react-spring/three'
+import { useSpring } from '@react-spring/three'
+import { AnimatedContainer, AnimatedCursor } from './Animations'
 const vectorHelper = new Vector3()
 
 export type SliderProperties = {
@@ -29,7 +31,7 @@ export const Slider: (props: SliderProperties & RefAttributes<ContainerRef>) => 
       () =>
         computed(() => {
           const range = readReactive(max) - readReactive(min)
-          return `${(100 * readReactive(value)) / range}%` as const
+          return `${Math.min(((100 * readReactive(value)) / range) + 3, 100)}%` as const
         }),
       [min, max, value],
     )
@@ -82,6 +84,20 @@ export const Slider: (props: SliderProperties & RefAttributes<ContainerRef>) => 
       } satisfies EventHandlers
     }, [max, min, hasProvidedValue, step])
     useImperativeHandle(ref, () => internalRef.current!)
+
+    const [animate, setAnimate] = useState(0)
+
+    const { spring: colorSpring } = useSpring({ spring: animate, config: config.default })
+
+    const startBorderColor = getColorForAnimation(colors.border)
+    const endBorderColor = getColorForAnimation(colors.faded)
+
+    if (startBorderColor == null || endBorderColor == null) {
+      throw new Error('startBorderColor or endBorderColor is null')
+    }
+
+    const animateBorderColor = colorSpring.to([0,1], [`#${startBorderColor.getHexString()}`, `#${endBorderColor.getHexString()}`])
+ 
     return (
       <Container
         {...(disabled ? {} : handler)}
@@ -91,9 +107,10 @@ export const Slider: (props: SliderProperties & RefAttributes<ContainerRef>) => 
         width="100%"
         alignItems="center"
         ref={internalRef}
+        onHoverChange={(hover) => setAnimate(Number(hover))}
         {...props}
       >
-        <Container
+        <AnimatedContainer
             height={28}
             positionType="absolute"
             positionLeft={0}
@@ -101,10 +118,10 @@ export const Slider: (props: SliderProperties & RefAttributes<ContainerRef>) => 
             flexGrow={1}
             borderRadius={1000}
             borderWidth={2}
-            borderColor={colors.border}
+            borderColor={disabled ? colors.faded : animateBorderColor}
             backgroundColor={colors.paper}
         >
-            <Container height="100%" 
+            <AnimatedContainer height="100%" 
                 flexDirection="row" 
                 alignItems="center" 
                 justifyContent="flex-end" 
@@ -112,21 +129,12 @@ export const Slider: (props: SliderProperties & RefAttributes<ContainerRef>) => 
                 width={percentage} 
                 borderRadius={1000} 
                 borderColor={props.color ? colors.focus : undefined} 
-                borderWidth={props.color ? 1 : 0}
-                backgroundColor={props.color ?? colors.focus}>
-            <Container
-                cursor="pointer"
-                borderOpacity={disabled ? 0.5 : undefined}
-                backgroundOpacity={disabled ? 0.5 : undefined}
-                height={20}
-                width={20}
-                borderWidth={2}
-                borderRadius={1000}
-                borderColor={colors.border}
-                backgroundColor={colors.surface}
-                />
-            </Container>
-        </Container>
+                borderWidth={props.color ? 2 : 0}
+                backgroundColor={props.color ?? colors.focus}
+                >
+            <AnimatedCursor disabled={disabled} />
+            </AnimatedContainer>
+        </AnimatedContainer>
       </Container>
     )
   },

@@ -3,7 +3,6 @@ import { animated, SpringValue, useSpring, config } from "@react-spring/three";
 import { Surface } from "./Surface";
 import { colors, getColorForAnimation } from "./theme";
 import { useState } from "react";
-import { Signal } from "@preact/signals-core";
 
 export type AnimationProps = {
     from: ContainerProperties

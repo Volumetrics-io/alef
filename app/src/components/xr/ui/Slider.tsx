@@ -7,7 +7,6 @@ import { Signal, computed } from '@preact/signals-core'
 import { config } from '@react-spring/three'
 import { useSpring } from '@react-spring/three'
 import { AnimatedContainer, AnimatedCursor } from './Animations'
-import { readReactive } from '@pmndrs/uikit/internals'
 const vectorHelper = new Vector3()
 
 export type SliderProperties = {
@@ -32,7 +31,7 @@ export const Slider: (props: SliderProperties & RefAttributes<ContainerRef>) => 
       () =>
         computed(() => {
           const range = readReactive(max) - readReactive(min)
-          return `${(100 * readReactive(value)) / range}%` as const
+          return `${Math.min(((100 * readReactive(value)) / range) + 3, 100)}%` as const
         }),
       [min, max, value],
     )
@@ -140,3 +139,10 @@ export const Slider: (props: SliderProperties & RefAttributes<ContainerRef>) => 
     )
   },
 )
+
+function readReactive<T>(s: Signal<T> | T): T {
+  if (s instanceof Signal) {
+    return s.value
+  }
+  return s
+}

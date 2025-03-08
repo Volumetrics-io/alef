@@ -78,10 +78,3 @@ export function AnimatedCursor({ disabled, externalAnimate, ...props }: Containe
       />
     )
   }
-  
-  function readReactive<T>(s: Signal<T> | T): T {
-    if (s instanceof Signal) {
-      return s.value
-    }
-    return s
-  }

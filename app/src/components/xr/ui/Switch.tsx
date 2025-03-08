@@ -21,7 +21,6 @@ export const Switch: (props: SwitchProperties & RefAttributes<ContainerRef>) => 
     const { spring: checkedSpring } = useSpring({ spring: Number(checked), config: config.default })
 
     const position = checkedSpring.to([0,1], [0, 15])
-    console.log(position.get())
     const width = checkedSpring.to([0, 0.5, 1], [20, 25, 20])
 
     const startBackgroundColor = getColorForAnimation(colors.surface)

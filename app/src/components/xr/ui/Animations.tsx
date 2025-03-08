@@ -1,4 +1,4 @@
-import { Container, ContainerProperties } from "@react-three/uikit";
+import { Container, ContainerProperties, ContainerRef } from "@react-three/uikit";
 import { animated, SpringValue, useSpring, config } from "@react-spring/three";
 import { Surface } from "./Surface";
 import { colors, getColorForAnimation } from "./theme";
@@ -9,9 +9,9 @@ export type AnimationProps = {
     to: ContainerProperties
 }
 
-function StaticContainer({ children, ...props }: ContainerProperties & { children?: React.ReactNode }) {
+function StaticContainer({ children, ref, ...props }: ContainerProperties & { children?: React.ReactNode, ref?: React.Ref<ContainerRef> }) {
 	return (
-		<Container {...props}>
+		<Container {...props} ref={ref}>
 			{children}
 		</Container>
 	);

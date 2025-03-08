@@ -213,6 +213,7 @@ const buttonVariants = {
           {...props}
           onClick={onClick}
           onHoverChange={onHoverChange}
+          ref={ref}
         >
           <PositionalAudio
             url={`./audio/click.webm`}

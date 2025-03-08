@@ -58,13 +58,9 @@ export const Switch: (props: SwitchProperties & RefAttributes<ContainerRef>) => 
                 onCheckedChange?.(!checked)
               }
         }
+        ref={ref}
         {...props}
       >
-        <Container
-          width="auto"
-          height="auto"
-          ref={ref}
-        >
         <AnimatedCursor
           // @ts-ignore this works fine
           marginLeft={position}
@@ -73,7 +69,6 @@ export const Switch: (props: SwitchProperties & RefAttributes<ContainerRef>) => 
 
           externalAnimate={hoverAnimate}
         />
-        </Container>
       </AnimatedContainer>
     )
   },

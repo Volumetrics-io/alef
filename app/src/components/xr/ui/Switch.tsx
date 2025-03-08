@@ -1,4 +1,4 @@
-import { ContainerRef, ContainerProperties, Container } from '@react-three/uikit'
+import { ContainerRef, ContainerProperties } from '@react-three/uikit'
 import { ReactNode, RefAttributes, forwardRef, useState } from 'react'
 import { colors, getColorForAnimation } from './theme.js'
 import { useSpring, config } from '@react-spring/three'

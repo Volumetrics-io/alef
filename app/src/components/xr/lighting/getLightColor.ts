@@ -1,5 +1,7 @@
 export function getLightColor(kelvin: number): string {
-	const clampedKelvin = Math.max(1.5, Math.min(10, kelvin));
+	// Invert the scale: 10 is warmest (lowest kelvin), 0 is coldest (highest kelvin)
+	const invertedKelvin = 11.5 - kelvin;
+	const clampedKelvin = Math.max(1.5, Math.min(10, invertedKelvin));
 	const temperature = clampedKelvin * 10;
 
 	// Calculate red

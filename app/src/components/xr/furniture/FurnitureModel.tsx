@@ -88,7 +88,8 @@ const PlaceholderModel = forwardRef<any, { onClick?: () => void }>(function Plac
 	return (
 		<mesh onClick={onClick} ref={ref}>
 			<sphereGeometry args={[0.5, 8, 8]} />
-			<meshBasicMaterial color="white" transparent opacity={0.5} />
+			{/* FIXME: Weird bug, this material is being applied to the collision model once it's loaded for some reason? had to set opacity to 0 to avoid it */}
+			<meshBasicMaterial color="white" transparent opacity={0} />
 		</mesh>
 	);
 });
@@ -185,9 +186,9 @@ export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFal
 );
 
 const lods = [
-	{ quality: FurnitureModelQuality.Original, distance: 1 },
+	{ quality: FurnitureModelQuality.Original, distance: 1.5 },
 	{ quality: FurnitureModelQuality.Medium, distance: 2 },
-	{ quality: FurnitureModelQuality.Low, distance: 3 },
+	{ quality: FurnitureModelQuality.Low, distance: 4 },
 ];
 
 const qualityColor = {

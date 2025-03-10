@@ -13,8 +13,8 @@ export default defineConfig({
 			filename: 'serviceWorker.ts',
 			manifest: {
 				id: 'io.alef.app',
-				name: 'Alef',
-				short_name: 'Alef',
+				name: 'alef',
+				short_name: 'alef',
 				description: 'One room, endless possibilities.',
 				theme_color: '#000000',
 				background_color: '#ffffff',

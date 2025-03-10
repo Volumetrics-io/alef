@@ -3,6 +3,7 @@ import { useXRPlanes } from '@react-three/xr';
 import { PhysicalXRPlane } from './PhysicalXRPlane';
 export function Floors(props: GroupProps) {
 	const planes = useXRPlanes('floor');
+
 	return (
 		<group {...props}>
 			{planes.map((plane, index) => {

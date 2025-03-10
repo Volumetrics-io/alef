@@ -5,10 +5,10 @@ import { Container, Text } from '@react-three/uikit';
 import { ArrowRightIcon, CheckIcon, HouseIcon, PencilIcon } from '@react-three/uikit-lucide';
 import { useEffect, useState } from 'react';
 import { LayoutIcon } from '../../room/LayoutIcon';
-import { RoomTypePicker } from '../../ui/RoomTypePicker';
-import { Surface } from '../../ui/Surface';
 import { Button } from '../../ui/Button';
 import { Heading } from '../../ui/Heading';
+import { RoomTypePicker } from '../../ui/RoomTypePicker';
+import { Surface } from '../../ui/Surface';
 export function Layouts({ readonly }: { readonly?: boolean }) {
 	const layoutIds = useRoomLayoutIds();
 	const [_mode, setMode] = useEditorStageMode();
@@ -20,9 +20,7 @@ export function Layouts({ readonly }: { readonly?: boolean }) {
 			<Surface flexDirection="column" flexWrap="no-wrap" flexGrow={1} height={420} width={500} gap={10} padding={10}>
 				<Container marginX="auto" flexDirection="row" gap={4} alignItems="center" justifyContent="center">
 					<HouseIcon width={20} height={20} />
-					<Heading level={3}>
-						Layouts
-					</Heading>
+					<Heading level={3}>Layouts</Heading>
 				</Container>
 				<Container flexDirection="column" flexGrow={1} flexShrink={0} justifyContent="space-between">
 					<Container flexDirection="column" gap={4} overflow="scroll" paddingRight={6} scrollbarWidth={5} scrollbarBorderRadius={2}>
@@ -53,9 +51,7 @@ function LayoutItem({ layoutId, onEdit }: { layoutId: PrefixedId<'rl'>; onEdit?:
 			<Button onClick={() => set(layoutId)} justifyContent="space-between" flexGrow={1} gap={4}>
 				<Container margin="auto" flexDirection="row" gap={4} alignItems="center">
 					<LayoutIcon icon={layoutData?.icon ?? layoutData?.type ?? 'living-room'} />
-					<Text fontFamily="ibm-plex-sans">
-						{layoutData?.name ?? 'Unnamed layout'}
-					</Text>
+					<Text fontFamily="ibm-plex-sans">{layoutData?.name ?? 'Unnamed layout'}</Text>
 				</Container>
 				{active === layoutId ? <CheckIcon /> : <Container width={24} height={24} />}
 			</Button>
@@ -85,10 +81,10 @@ function NewLayoutButton({ onNew }: { onNew: (id: PrefixedId<'rl'>) => void }) {
 function EditLayout({ layoutId, onClose }: { layoutId: PrefixedId<'rl'>; onClose: () => void }) {
 	const layoutData = useRoomLayout(layoutId);
 
-	const [editingType, setEditingType] = useState<RoomType>(layoutData?.type ?? 'living-room');
+	const [editingType, setEditingType] = useState<RoomType>((layoutData?.type as RoomType) ?? 'living-room');
 
 	useEffect(() => {
-		setEditingType(layoutData?.type ?? 'living-room');
+		setEditingType((layoutData?.type as RoomType) ?? 'living-room');
 	}, [layoutData]);
 
 	const updateLayout = useUpdateRoomLayout();

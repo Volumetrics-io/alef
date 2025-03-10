@@ -346,7 +346,7 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 						viewingLayoutId,
 					};
 				},
-				migrate(persistedState, version) {
+				migrate(persistedState) {
 					return {
 						messageBacklog: [],
 						viewingLayoutId: undefined,

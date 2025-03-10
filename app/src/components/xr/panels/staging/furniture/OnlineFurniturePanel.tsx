@@ -29,7 +29,7 @@ function FurnitureFilters() {
 			<FurniturePanelFilterSidebarSectionHeader label="Categories"></FurniturePanelFilterSidebarSectionHeader>
 			<CategoryFilter />
 			<FurniturePanelFilterSidebarSectionHeader label="Types" />
-			<FurnitureAttributePicker options={typeOptions} />
+			<FurnitureAttributePicker options={typeOptions.map((value) => ({ key: 'type', value }))} />
 		</FurniturePanelFilterSidebar>
 	);
 }

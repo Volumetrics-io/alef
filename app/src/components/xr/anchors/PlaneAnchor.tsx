@@ -1,5 +1,6 @@
 import { useXRPlanes, XRSpace } from '@react-three/xr';
-import React, { createContext, forwardRef, useImperativeHandle } from 'react';
+import React, { createContext, forwardRef, RefObject, useImperativeHandle } from 'react';
+import { Group } from 'three';
 
 // Define the ref type
 export interface XRPlaneRef {
@@ -10,26 +11,30 @@ export type PlaneLabel = 'desk' | 'couch' | 'floor' | 'ceiling' | 'wall' | 'door
 
 export const PlaneAnchorContext = createContext<XRPlane | null>(null);
 
-export const PlaneAnchor = forwardRef<XRPlaneRef, { label: PlaneLabel; near?: PlaneLabel[]; children: React.ReactNode }>(({ label, children }, ref) => {
-	const planes = useXRPlanes(label as string);
-	const plane = planes.length > 0 ? planes[0] : null;
-	// Expose the plane through the ref
-	useImperativeHandle(ref, () => ({
-		plane: plane || null,
-	}));
+export const PlaneAnchor = forwardRef<XRPlaneRef, { label: PlaneLabel; near?: PlaneLabel[]; children?: React.ReactNode; anchorRef?: RefObject<Group> }>(
+	({ label, children, anchorRef }, ref) => {
+		const planes = useXRPlanes(label as string);
+		const plane = planes.length > 0 ? planes[0] : null;
+		// Expose the plane through the ref
+		useImperativeHandle(ref, () => ({
+			plane: plane || null,
+		}));
 
-	if (plane) {
-		return (
-			<PlaneAnchorContext.Provider value={plane}>
-				<XRSpace space={plane.planeSpace}>
-					<group rotation={[Math.PI, 0, 0]}>{children}</group>
-				</XRSpace>
-			</PlaneAnchorContext.Provider>
-		);
-	} else {
-		return <group>{children}</group>;
+		if (plane) {
+			return (
+				<PlaneAnchorContext.Provider value={plane}>
+					<XRSpace space={plane.planeSpace}>
+						<group rotation={[Math.PI, 0, 0]} ref={anchorRef}>
+							{children}
+						</group>
+					</XRSpace>
+				</PlaneAnchorContext.Provider>
+			);
+		} else {
+			return <group ref={anchorRef}>{children}</group>;
+		}
 	}
-});
+);
 
 // Add display name for dev tools
 PlaneAnchor.displayName = 'PlaneAnchor';

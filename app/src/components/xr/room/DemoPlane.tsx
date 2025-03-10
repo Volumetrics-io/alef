@@ -1,50 +1,43 @@
-import { createPlaneUserData } from '@/physics/planeUserData';
-import { usePlanesStore } from '@/stores/planesStore';
+import { SimpleQuaternion, SimpleVector3 } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
-import { CuboidCollider, RigidBody } from '@react-three/rapier';
-import { useEffect, useId, useRef } from 'react';
+import { useId } from 'react';
 import { Quaternion, Vector3 } from 'three';
-import { DebugPlaneNormal } from './DebugPlaneNormal';
 
 export interface DemoPlaneProps {
-	normal: number[];
-	center: number[];
+	orientation: SimpleQuaternion;
+	center: SimpleVector3;
 	dimensions: [number, number];
 	label: string;
-	debug?: boolean;
-	snapSensor?: boolean;
+	id?: string;
 }
 
-export function DemoPlane({ normal: rawNormal, center: rawCenter, dimensions, label, debug, snapSensor = true }: DemoPlaneProps) {
-	const id = useId();
-	const normal = new Vector3(...rawNormal);
-	normal.normalize();
-	const center = new Vector3(...rawCenter);
-
-	const updatePlane = usePlanesStore((s) => s.updatePlane);
-
-	const onceRef = useRef({ center, normal });
-	useEffect(() => {
-		updatePlane(id, { label, ...onceRef.current });
-	}, [label, id, updatePlane]);
-
-	// orient from normal
-	const quat = new Quaternion();
-	quat.setFromUnitVectors(new Vector3(0, 1, 0), normal);
+export function DemoPlane({ id: userId, orientation: rawOrientation, center: rawCenter, dimensions, label }: DemoPlaneProps) {
+	const defaultId = useId();
+	const id = userId ?? defaultId;
+	const orientation = new Quaternion().copy(rawOrientation);
+	const center = new Vector3().copy(rawCenter);
 
 	return (
 		<ErrorBoundary fallback={null}>
-			<RigidBody type="fixed" colliders={false} userData={createPlaneUserData(id)} position={center} quaternion={quat}>
-				<CuboidCollider args={[dimensions[0] / 2, 0.1, dimensions[1] / 2]} />
-				{snapSensor && <CuboidCollider args={[dimensions[0] / 2, 0.4, dimensions[1] / 2]} position={[0, 0.2, 0]} sensor />}
-				<group rotation={[Math.PI / 2, 0, 0]}>
-					<mesh rotation={[0, Math.PI, 0]}>
+			<group rotation={[Math.PI, 0, 0]}>
+				<group position={center} quaternion={orientation}>
+					<mesh rotation={[Math.PI / 2, 0, 0]}>
 						<planeGeometry args={dimensions} />
-						<meshPhysicalMaterial color={0xaaaaaa} />
+						<meshPhysicalMaterial color={labelColors[label] ?? 'pink'} />
 					</mesh>
 				</group>
-			</RigidBody>
-			{debug && <DebugPlaneNormal planeId={id} />}
+			</group>
 		</ErrorBoundary>
 	);
 }
+
+const labelColors: Record<string, string> = {
+	wall: 'white',
+	floor: 'blue',
+	ceiling: 'green',
+	door: 'yellow',
+	table: 'brown',
+	'wall art': 'purple',
+	storage: 'orange',
+	window: 'lightblue',
+};

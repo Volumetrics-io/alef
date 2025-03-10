@@ -1,81 +1,50 @@
-import { RoomWallData } from '@alef/common';
-import { Vector3 } from 'three';
+import { UnknownRoomPlaneData } from '@alef/common';
+import { Matrix4, Quaternion, Vector3 } from 'three';
 
-export function xrPlaneToRawPlaneData(frame: XRFrame, rootSpace: XRReferenceSpace, plane: XRPlane) {
-	const pose = frame.getPose(plane.planeSpace, rootSpace);
-	if (!pose) {
-		return { center: new Vector3(0, 0, 0), normal: new Vector3(0, 1, 0), extents: [0, 0] as [number, number] };
-	}
-	const orientationQuaternion = pose.transform.orientation;
-	const orientation = new Vector3(orientationQuaternion.x, orientationQuaternion.y, orientationQuaternion.z);
-	const center = new Vector3(pose.transform.position.x, pose.transform.position.y, pose.transform.position.z);
-	const minX = Math.min(...plane.polygon.map((p) => p.x));
-	const maxX = Math.max(...plane.polygon.map((p) => p.x));
-	const minY = Math.min(...plane.polygon.map((p) => p.y));
-	const maxY = Math.max(...plane.polygon.map((p) => p.y));
-	const extents = [maxX - minX, maxY - minY] as [number, number];
-	return {
-		normal: orientation,
-		center,
-		extents,
-	};
+export function getExtentsFromXRPlane(plane: XRPlane) {
+	const minW = Math.min(...plane.polygon.map((p) => p.x));
+	const maxW = Math.max(...plane.polygon.map((p) => p.x));
+	const minH = Math.min(...plane.polygon.map((p) => p.z));
+	const maxH = Math.max(...plane.polygon.map((p) => p.z));
+	return [maxW - minW, maxH - minH] as [number, number];
 }
 
-export function getClosestPointOnXRPlane(frame: XRFrame, rootSpace: XRReferenceSpace, plane: XRPlane, targetPoint: Vector3) {
-	const { center, normal } = xrPlaneToRawPlaneData(frame, rootSpace, plane);
-	return getClosestPointOnPlane(normal, center, targetPoint);
-}
-
-const tmpVec1 = new Vector3();
-const tmpVec2 = new Vector3();
-export function getClosestPointOnPlane(planeNormal: Vector3, planePoint: Vector3, targetPoint: Vector3) {
-	const direction = tmpVec1.copy(targetPoint).sub(planePoint);
-	const distance = direction.dot(planeNormal);
-	const scaledNormal = tmpVec2.copy(planeNormal).multiplyScalar(distance);
-	tmpVec1.copy(targetPoint).sub(scaledNormal);
-	return tmpVec1;
-}
-
-/**
- * Determines which plane a particular movement delta most aligns with. Returns the
- * index of that plane in the provided array.
- */
-export function getMostIntentionalPlaneSnappedMovement(movement: Vector3, planeNormals: Vector3[]) {
-	let matchedIndex = -1;
-	if (!planeNormals.length) {
-		return matchedIndex;
+export function xrPlanesToRoomPlaneData(frame: XRFrame, rootSpace: XRReferenceSpace, planes: readonly XRPlane[]): UnknownRoomPlaneData[] {
+	// find a floor. if there is no floor, we can't do anything
+	const floor = planes.find((p) => p.semanticLabel === 'floor');
+	if (!floor) {
+		return [];
 	}
 
-	// not enough movement to determine affinity
-	if (movement.lengthSq() < 0.0001) {
-		return matchedIndex;
+	// for each plane, get the matrix relative to the floor's matrix. the center of the floor
+	// is the origin of the scene.
+	const floorPose = frame.getPose(floor.planeSpace, rootSpace);
+	if (!floorPose) {
+		return [];
 	}
 
-	const movementNormalized = movement.clone().normalize();
-	// alignment is measured with dot products. however, since we're looking for the most /along/ the
-	// plane, a larger dot (more aligned with normal) is actually bad. negative dots are also treated
-	// the same as positive (math.abs) -- we're really looking for closest to 0 here.
+	const floorMatrix = new Matrix4().fromArray(floorPose.transform.matrix);
+	let tmpMatrix = new Matrix4();
+	return planes
+		.map((plane) => {
+			const pose = frame.getPose(plane.planeSpace, rootSpace);
+			if (!pose) {
+				return null;
+			}
 
-	// we start with a "best" of the absolute worst, which is 1 (total alignment with normal)
-	// anything should beat this.
-	let bestDot = 1;
-	for (let i = 0; i < planeNormals.length; i++) {
-		const dot = Math.abs(movementNormalized.dot(planeNormals[i]));
-		if (dot < bestDot) {
-			bestDot = dot;
-			matchedIndex = i;
-		}
-	}
+			tmpMatrix.fromArray(pose.transform.matrix);
+			tmpMatrix.premultiply(floorMatrix);
+			const center = new Vector3().setFromMatrixPosition(tmpMatrix);
+			const orientation = new Quaternion().setFromRotationMatrix(tmpMatrix);
 
-	return matchedIndex;
-}
-
-export function xrPlaneToRoomWallData(frame: XRFrame, rootSpace: XRReferenceSpace, plane: XRPlane) {
-	const { center, normal, extents } = xrPlaneToRawPlaneData(frame, rootSpace, plane);
-	const wallData: RoomWallData = {
-		normal: { x: normal.x, y: normal.y, z: normal.z },
-		origin: { x: center.x, y: center.y, z: center.z },
-		extents,
-	};
-	return wallData;
+			const extents = getExtentsFromXRPlane(plane);
+			return {
+				// convert to POJOs to be safe.
+				origin: { x: center.x, y: center.y, z: center.z },
+				orientation: { x: orientation.x, y: orientation.y, z: orientation.z, w: orientation.w },
+				extents,
+				label: plane.semanticLabel ?? 'unknown',
+			};
+		})
+		.filter((p) => p !== null);
 }

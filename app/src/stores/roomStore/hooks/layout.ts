@@ -1,4 +1,4 @@
-import { PrefixedId } from '@alef/common';
+import { PrefixedId, RoomPlaneData } from '@alef/common';
 import { useShallow } from 'zustand/react/shallow';
 import { useRoomStore } from '../roomStore';
 
@@ -30,10 +30,18 @@ export function useDeleteRoomLayout() {
 	return useRoomStore((s) => s.deleteLayout);
 }
 
-export function useHasWalls() {
-	return useRoomStore((s) => s.walls.length > 0);
+export function useHasPlanes() {
+	return useRoomStore((s) => s.planes.length > 0);
 }
 
-export function useUpdateWalls() {
-	return useRoomStore((s) => s.updateWalls);
+export function usePlanesUpdatedAt() {
+	return useRoomStore((s) => s.planesUpdatedAt);
+}
+
+export function useUpdatePlanes() {
+	return useRoomStore((s) => s.updatePlanes);
+}
+
+export function usePlanes(filter?: (p: RoomPlaneData) => boolean) {
+	return useRoomStore(useShallow((s) => (filter ? s.planes.filter(filter) : s.planes)));
 }

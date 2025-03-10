@@ -1,4 +1,4 @@
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import { ShaderMaterial } from 'three';
 
@@ -51,10 +51,9 @@ void main() {
 `;
 
 export const DepthShader = () => {
-	const renderer = useThree((state) => state.gl);
 	const shaderSet = useRef(false);
 
-	useFrame(() => {
+	useFrame(({ gl: renderer }) => {
 		if (shaderSet.current) return;
 		if (!renderer.xr.hasDepthSensing() || !renderer.xr.getDepthTexture) return;
 		const depthTexture = renderer.xr.getDepthTexture();
@@ -73,6 +72,8 @@ export const DepthShader = () => {
 				softness: { value: 0.07 },
 			},
 		});
+		// this should make it obvious if this is being done every frame
+		console.debug('Updating depth shader');
 
 		depthMesh.material = shader;
 		shaderSet.current = true;

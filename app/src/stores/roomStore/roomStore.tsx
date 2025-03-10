@@ -1,5 +1,20 @@
 import { PropertySocket } from '@/services/publicApi/socket';
-import { getUndo, id, Operation, PrefixedId, RoomFurniturePlacement, RoomGlobalLighting, RoomLayout, RoomLightPlacement, RoomState, RoomWallData, updateRoom } from '@alef/common';
+import {
+	getDefaultRoomState,
+	getUndo,
+	id,
+	migrateRoomState,
+	Operation,
+	PrefixedId,
+	ROOM_STATE_VERSION,
+	RoomFurniturePlacement,
+	RoomGlobalLighting,
+	RoomLayout,
+	RoomLightPlacement,
+	RoomState,
+	UnknownRoomPlaneData,
+	updateRoom,
+} from '@alef/common';
 import { useEffect, useRef } from 'react';
 import { createStore, useStore } from 'zustand';
 import { persist, subscribeWithSelector } from 'zustand/middleware';
@@ -22,7 +37,7 @@ export type RoomStoreState = RoomState & {
 	createLayout: (data?: { name?: string }) => Promise<PrefixedId<'rl'>>;
 	setViewingLayoutId: (id: PrefixedId<'rl'>) => void;
 	updateLayout: (data: Pick<RoomLayout, 'id' | 'name' | 'icon' | 'type'>) => void;
-	updateWalls: (walls: RoomWallData[]) => void;
+	updatePlanes: (planes: UnknownRoomPlaneData[]) => void;
 	deleteLayout: (id: PrefixedId<'rl'>) => void;
 
 	// furniture APIs
@@ -70,10 +85,11 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 								viewingLayoutId: Object.keys(response.data.layouts)[0] as PrefixedId<'rl'> | undefined,
 							});
 						})();
-						socket.onMessage('roomUpdate', (data) => {
+						socket.onMessage('roomUpdate', (msg) => {
 							// apply incoming room updates
+							console.log('Applying room update', msg);
 							set((state) => {
-								Object.assign(state, data);
+								Object.assign(state, msg.data);
 							});
 						});
 						// apply backlog on connect
@@ -149,18 +165,12 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 					}
 
 					return {
+						...getDefaultRoomState(roomId),
 						id: roomId,
 						operationBacklog: [],
 						undoStack: [],
 						redoStack: [],
 						viewingLayoutId: undefined,
-						walls: [],
-						layouts: {},
-						lights: {},
-						globalLighting: {
-							intensity: 1.5,
-							color: 6.3,
-						},
 
 						undo: () => {
 							const undo = get().undoStack[get().undoStack.length - 1];
@@ -181,11 +191,13 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 							}
 						},
 
-						updateWalls: async (walls) => {
+						updatePlanes: async (planes) => {
+							console.debug('Updating XR planes. There are:', planes.length, 'planes detected');
 							await applyChange({
-								type: 'updateWalls',
+								type: 'updatePlanes',
 								roomId,
-								walls,
+								planes,
+								time: Date.now(),
 							});
 						},
 
@@ -320,16 +332,25 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 			),
 			{
 				name: `room-${roomId}`,
+				version: ROOM_STATE_VERSION,
 				partialize(state) {
-					const { id, layouts, lights, globalLighting, operationBacklog: messageBacklog, walls, viewingLayoutId } = state;
+					const { id, version, layouts, lights, globalLighting, operationBacklog: messageBacklog, planes, viewingLayoutId } = state;
 					return {
 						id,
+						version,
 						layouts,
 						lights,
 						globalLighting,
 						messageBacklog,
-						walls,
+						planes,
 						viewingLayoutId,
+					};
+				},
+				migrate(persistedState, version) {
+					return {
+						messageBacklog: [],
+						viewingLayoutId: undefined,
+						...migrateRoomState(persistedState),
 					};
 				},
 				onRehydrateStorage() {

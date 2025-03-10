@@ -1,5 +1,5 @@
 import { PrefixedId } from './ids';
-import { RoomFurniturePlacement, RoomGlobalLighting, RoomLayout, RoomLightPlacement, RoomWallData, Updates } from './state';
+import { RoomFurniturePlacement, RoomGlobalLighting, RoomLayout, RoomLightPlacement, UnknownRoomPlaneData, Updates } from './state';
 
 export interface CreateLayoutOperation {
 	type: 'createLayout';
@@ -13,10 +13,11 @@ export interface DeleteRoomLayoutOperation {
 	roomLayoutId: PrefixedId<'rl'>;
 }
 
-export interface UpdateWallsOperation {
-	type: 'updateWalls';
+export interface UpdatePlanesOperation {
+	type: 'updatePlanes';
 	roomId: PrefixedId<'r'>;
-	walls: RoomWallData[];
+	planes: UnknownRoomPlaneData[];
+	time: number;
 }
 
 export interface AddFurnitureOperation {
@@ -82,4 +83,4 @@ export type Operation =
 	| UpdateGlobalLightingOperation
 	| UpdateLightOperation
 	| UpdateRoomLayoutOperation
-	| UpdateWallsOperation;
+	| UpdatePlanesOperation;

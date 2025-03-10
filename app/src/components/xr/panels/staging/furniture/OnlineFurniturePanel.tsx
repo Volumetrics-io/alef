@@ -1,5 +1,6 @@
 import { useAllFurniture, useFurnitureAttributes } from '@/services/publicApi/furnitureHooks';
 import { useAllFilters } from '@/stores/FilterStore';
+import { Attribute } from '@alef/common';
 import {
 	CategoryFilter,
 	FurnitureAttributePicker,
@@ -29,7 +30,7 @@ function FurnitureFilters() {
 			<FurniturePanelFilterSidebarSectionHeader label="Categories"></FurniturePanelFilterSidebarSectionHeader>
 			<CategoryFilter />
 			<FurniturePanelFilterSidebarSectionHeader label="Types" />
-			<FurnitureAttributePicker options={typeOptions} />
+			<FurnitureAttributePicker options={typeOptions.map((value) => ({ key: 'type', value })) as Attribute[]} />
 		</FurniturePanelFilterSidebar>
 	);
 }

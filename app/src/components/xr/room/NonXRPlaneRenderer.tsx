@@ -22,7 +22,7 @@ export function NonXRPlaneRenderer({}: NonXRPlaneRendererProps) {
 	return (
 		<>
 			{planes.map((plane, index) => {
-				return <DemoPlane id={plane.id} key={index} orientation={plane.orientation} center={plane.origin} dimensions={plane.extents} label={plane.label} />;
+				return <DemoPlane key={index} orientation={plane.orientation} center={plane.origin} dimensions={plane.extents} label={plane.label} />;
 			})}
 		</>
 	);

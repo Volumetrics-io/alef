@@ -19,7 +19,7 @@ export interface PhysicalXRPlaneProps {
 // planes not quite touching at the edges which seems to happen by default.
 const PLANE_EXTENSION_BUFFER = 0.1;
 
-export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(function PhysicalXRPlane({ plane, snapSensor = true, debug }, ref) {
+export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(function PhysicalXRPlane({ plane, snapSensor = true }, ref) {
 	const { originReferenceSpace } = useXR();
 	const [globalLighting] = useGlobalLighting();
 

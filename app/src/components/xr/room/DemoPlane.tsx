@@ -1,6 +1,5 @@
 import { SimpleQuaternion, SimpleVector3 } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
-import { useId } from 'react';
 import { Quaternion, Vector3 } from 'three';
 
 export interface DemoPlaneProps {
@@ -11,9 +10,7 @@ export interface DemoPlaneProps {
 	id?: string;
 }
 
-export function DemoPlane({ id: userId, orientation: rawOrientation, center: rawCenter, dimensions, label }: DemoPlaneProps) {
-	const defaultId = useId();
-	const id = userId ?? defaultId;
+export function DemoPlane({ orientation: rawOrientation, center: rawCenter, dimensions, label }: DemoPlaneProps) {
 	const orientation = new Quaternion().copy(rawOrientation);
 	const center = new Vector3().copy(rawCenter);
 

@@ -36,7 +36,7 @@ export function AttributesField({ name }: AttributesFieldProps) {
 						multiple
 					/>
 					<AttributePicker omitKeys={['category']} onSubmit={(attr) => helpers.push(attr)} actionText="Add" />
-					<Box gapped>
+					<Box gapped wrap>
 						{field.value.map((attr, idx) => (
 							<AttributePill attribute={attr} key={`${attr.key}:${attr.value}`} onRemove={() => helpers.remove(idx)} />
 						))}

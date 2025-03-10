@@ -21,6 +21,7 @@ export * from './components/link/Link.js';
 export * from './components/logo/Logo.js';
 export * from './components/main/Main.js';
 export * from './components/navBar/NavBar.js';
+export * from './components/popover/Popover.js';
 export * from './components/provider/SysProvider.js';
 export * from './components/scrollArea/ScrollArea.js';
 export * from './components/select/Select.js';

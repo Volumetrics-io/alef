@@ -7,7 +7,7 @@ export interface AttributePillProps {
 
 export function AttributePill({ attribute, onRemove }: AttributePillProps) {
 	return (
-		<Frame align="center" p="squeeze">
+		<Frame align="center" p="squeeze" style={{ textWrap: 'nowrap' }}>
 			{attribute.key}: {attribute.value}
 			<Button color="ghost" onClick={onRemove}>
 				<Icon name="x" />

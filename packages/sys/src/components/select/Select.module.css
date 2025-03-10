@@ -39,6 +39,13 @@
 		&[data-side='right'] {
 			animation-name: slideLeftAndFade;
 		}
+
+		&[data-state='open'] {
+			animation-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+			animation-duration: var(--animation-duration);
+			animation-direction: normal;
+			animation-play-state: running;
+		}
 	}
 
 	.item {

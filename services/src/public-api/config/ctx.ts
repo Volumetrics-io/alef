@@ -19,6 +19,8 @@ export interface Bindings {
 	DEVICE_ID_SIGNING_SECRET: string;
 	SOCKET_TOKEN_SECRET: string;
 	EXTRA_CORS_ORIGINS?: string;
+	TOKEN_ISSUER_OVERRIDE?: string;
+	TOKEN_AUDIENCE_OVERRIDE?: string;
 
 	// services
 	// TODO: use Service<T> wrapper, but this breaks Hono RPC client types

@@ -1,6 +1,7 @@
 import { Attribute, AttributeKey, attributeKeys } from '@alef/common';
-import { Box, Button, Input, Select } from '@alef/sys';
+import { Box, Button, Select } from '@alef/sys';
 import { useState } from 'react';
+import { AttributeValueSuggester } from '../attributes/AttributeValueSuggester';
 
 export interface AttributePickerProps {
 	onSubmit: (attribute: Attribute) => void;
@@ -23,8 +24,15 @@ export function AttributePicker({ onSubmit, omitKeys, actionText = 'Ok' }: Attri
 						</Select.Item>
 					))}
 			</Select>
-			<Input value={selectedValue} onValueChange={setSelectedValue} />
-			<Button onClick={() => onSubmit({ key: selectedKey, value: selectedValue })}>{actionText}</Button>
+			<AttributeValueSuggester attributeKey={selectedKey} value={selectedValue} onValueChange={setSelectedValue} />
+			<Button
+				onClick={() => {
+					onSubmit({ key: selectedKey, value: selectedValue });
+					setSelectedValue('');
+				}}
+			>
+				{actionText}
+			</Button>
 		</Box>
 	);
 }

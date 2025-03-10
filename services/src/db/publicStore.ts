@@ -125,7 +125,8 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 
 	async getAttributeValues(key: string) {
 		assertAttributeKey(key);
-		return this.#db.selectFrom('Attribute').where('key', '=', key).select(['key', 'value']).execute();
+		const rows = await this.#db.selectFrom('Attribute').where('key', '=', key).select(['value']).orderBy('value asc').execute();
+		return rows.map((r) => r.value);
 	}
 
 	async listAttributes() {

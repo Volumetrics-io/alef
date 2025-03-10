@@ -39,8 +39,8 @@ export const sessions = new SessionManager<Context<Env>>({
 				};
 			},
 			secret: ctx.env.SESSION_SECRET,
-			audience: ctx.env.UI_ORIGIN,
-			issuer: ctx.env.API_ORIGIN,
+			audience: ctx.env.TOKEN_AUDIENCE_OVERRIDE ?? ctx.env.UI_ORIGIN,
+			issuer: ctx.env.TOKEN_ISSUER_OVERRIDE ?? ctx.env.API_ORIGIN,
 			mode: 'production',
 			refreshPath,
 			refreshTokenCookieName: 'alef-refresh',

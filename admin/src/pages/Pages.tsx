@@ -24,7 +24,7 @@ const routes = makeRoutes([
 ]);
 
 export const Pages = () => (
-	<Router routes={routes}>
+	<Router routes={routes} basePath={import.meta.env.BASE_URL}>
 		<Box p full>
 			<Outlet />
 		</Box>

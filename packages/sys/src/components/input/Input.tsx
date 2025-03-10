@@ -13,7 +13,7 @@ export type InputProps = (InputFieldProps & InputTextareaFieldProps) & {
 	onValueChange?: (value: string) => void;
 };
 
-function InputBase({ className, multiline, variant, disabled, onChange, onValueChange, ...props }: InputProps) {
+const InputBase = forwardRef<any, InputProps>(function InputBase({ className, multiline, variant, disabled, onChange, onValueChange, ...props }, ref) {
 	const Field = multiline ? InputTextareaField : InputField;
 
 	const handleChange = (event: React.ChangeEvent<any>) => {
@@ -23,10 +23,10 @@ function InputBase({ className, multiline, variant, disabled, onChange, onValueC
 
 	return (
 		<InputRoot className={className} variant={variant} disabled={disabled}>
-			<Field {...props} disabled={disabled} onChange={handleChange} />
+			<Field {...props} disabled={disabled} onChange={handleChange} ref={ref} />
 		</InputRoot>
 	);
-}
+});
 
 export interface InputSlotProps extends BoxProps {}
 

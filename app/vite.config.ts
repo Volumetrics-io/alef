@@ -15,7 +15,7 @@ export default defineConfig({
 				id: 'io.alef.app',
 				name: 'Alef',
 				short_name: 'Alef',
-				description: 'Dynamic virtual staging for modern real estate',
+				description: 'One room, endless possibilities.',
 				theme_color: '#000000',
 				background_color: '#ffffff',
 				scope: 'https://app.alef.io/',

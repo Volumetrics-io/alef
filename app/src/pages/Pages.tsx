@@ -50,6 +50,10 @@ const routes = makeRoutes([
 		],
 	},
 	{
+		path: '/desktop',
+		component: lazy(() => import('./DesktopModePage.js')),
+	},
+	{
 		path: '*',
 		component: lazy(() => import('./NotFoundPage.js')),
 	},

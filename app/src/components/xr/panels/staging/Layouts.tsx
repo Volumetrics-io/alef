@@ -5,10 +5,10 @@ import { Container, Text } from '@react-three/uikit';
 import { ArrowRightIcon, CheckIcon, HouseIcon, PencilIcon } from '@react-three/uikit-lucide';
 import { useEffect, useState } from 'react';
 import { LayoutIcon } from '../../room/LayoutIcon';
-import { RoomTypePicker } from '../../ui/RoomTypePicker';
-import { Surface } from '../../ui/Surface';
 import { Button } from '../../ui/Button';
 import { Heading } from '../../ui/Heading';
+import { RoomTypePicker } from '../../ui/RoomTypePicker';
+import { Surface } from '../../ui/Surface';
 export function Layouts({ readonly }: { readonly?: boolean }) {
 	const layoutIds = useRoomLayoutIds();
 	const [_mode, setMode] = useEditorStageMode();

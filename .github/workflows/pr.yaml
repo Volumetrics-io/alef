@@ -1,4 +1,4 @@
-name: Deploy
+name: PR Checks
 
 on:
   pull_request:
@@ -6,9 +6,9 @@ on:
       - main
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    name: Deploy
+    name: Build
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

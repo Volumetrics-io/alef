@@ -7,6 +7,8 @@ export enum FurnitureModelQuality {
 	Collision = 'collision',
 }
 
+export const RANKED_FURNITURE_MODEL_QUALITIES = [FurnitureModelQuality.Original, FurnitureModelQuality.Medium, FurnitureModelQuality.Low];
+
 export function getFurnitureModelPath(id: PrefixedId<'f'>, quality: FurnitureModelQuality) {
 	return `${id}/${quality}.gltf`;
 }

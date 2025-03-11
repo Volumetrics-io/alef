@@ -1,21 +1,23 @@
 import { DepthShader } from '@/components/xr/shaders/DepthShader';
 // import SunLight from '@/components/xr/lighting/SunLight.tsx';
 
+import { useLocalStorage } from '@/hooks/useStorage';
 import { useCurrentDevice } from '@/services/publicApi/deviceHooks';
 import { useAllProperties, useProperty } from '@/services/publicApi/propertyHooks';
 import { PropertySocketProvider } from '@/services/publicApi/PropertySocketProvider';
 import { useMe } from '@/services/publicApi/userHooks';
+import { usePerformanceStore } from '@/stores/performanceStore';
 import { RoomStoreProvider } from '@/stores/roomStore';
-import { PrefixedId } from '@alef/common';
+import { FurnitureModelQuality, PrefixedId } from '@alef/common';
+import { PerformanceMonitor } from '@react-three/drei';
 import { Physics } from '@react-three/rapier';
+import { isDarkMode, setPreferredColorScheme } from '@react-three/uikit';
 import { ReactNode } from 'react';
 import { ModeProvider } from './modes/ModeContext';
 import { StagerPanel } from './panels/StagerPanel';
 import { ViewerPanel } from './panels/ViewerPanel';
 import { RoomRenderer } from './room/RoomRenderer';
 import { SceneWrapper } from './SceneWrapper';
-import { useLocalStorage } from '@/hooks/useStorage';
-import { isDarkMode, setPreferredColorScheme } from '@react-three/uikit';
 
 export function MainScene() {
 	const { data: session } = useMe();
@@ -27,6 +29,8 @@ export function MainScene() {
 	const [theme, _] = useLocalStorage('theme', isDarkMode.value, false);
 
 	setPreferredColorScheme(theme ? 'dark' : 'light');
+
+	const setMaxModelQuality = usePerformanceStore((state) => state.setMaxModelQuality);
 
 	let sceneContent: ReactNode = null;
 	// you can be logged in but not offline (cached /me response)
@@ -57,6 +61,7 @@ export function MainScene() {
 
 	return (
 		<SceneWrapper>
+			<PerformanceMonitor onIncline={() => setMaxModelQuality(FurnitureModelQuality.Original)} onDecline={() => setMaxModelQuality(FurnitureModelQuality.Low)} />
 			<DepthShader />
 			<Physics debug={debug}>{sceneContent}</Physics>
 		</SceneWrapper>

@@ -3,7 +3,7 @@
     <attr format="reference" name="coordinatorLayoutStyle"/>
     <bool name="enableNotification">true</bool>
     <bool name="enableSiteSettingsShortcut">true</bool>
-    <color name="backgroundColor">#EFFFFF</color>
+    <color name="backgroundColor">#E7FFFF</color>
     <color name="browser_actions_bg_grey">#F5F5F5</color>
     <color name="browser_actions_divider_color">#1E000000</color>
     <color name="browser_actions_text_color">#DE000000</color>

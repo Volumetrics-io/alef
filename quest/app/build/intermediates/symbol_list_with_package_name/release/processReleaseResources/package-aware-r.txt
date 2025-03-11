@@ -225,6 +225,7 @@ layout notification_template_icon_group
 layout notification_template_part_chronometer
 layout notification_template_part_time
 mipmap ic_launcher
+mipmap ic_maskable
 raw web_app_manifest
 string appName
 string app_name

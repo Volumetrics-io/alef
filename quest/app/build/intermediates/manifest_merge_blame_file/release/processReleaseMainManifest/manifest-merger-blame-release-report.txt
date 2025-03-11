@@ -24,8 +24,8 @@
 24-->
 25<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 26    package="io.alef.app.twa"
-27    android:versionCode="1"
-28    android:versionName="1" >
+27    android:versionCode="2"
+28    android:versionName="2" >
 29
 30    <uses-sdk
 31        android:minSdkVersion="23"

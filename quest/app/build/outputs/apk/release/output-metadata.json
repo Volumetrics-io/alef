@@ -1,21 +1,21 @@
 {
-  "version": 3,
-  "artifactType": {
-    "type": "APK",
-    "kind": "Directory"
-  },
-  "applicationId": "io.alef.app.twa",
-  "variantName": "release",
-  "elements": [
-    {
-      "type": "SINGLE",
-      "filters": [],
-      "attributes": [],
-      "versionCode": 1,
-      "versionName": "1",
-      "outputFile": "app-release-unsigned.apk"
-    }
-  ],
-  "elementType": "File",
-  "minSdkVersionForDexing": 23
+	"version": 3,
+	"artifactType": {
+		"type": "APK",
+		"kind": "Directory"
+	},
+	"applicationId": "io.alef.app.twa",
+	"variantName": "release",
+	"elements": [
+		{
+			"type": "SINGLE",
+			"filters": [],
+			"attributes": [],
+			"versionCode": 2,
+			"versionName": "2",
+			"outputFile": "app-release-unsigned.apk"
+		}
+	],
+	"elementType": "File",
+	"minSdkVersionForDexing": 23
 }

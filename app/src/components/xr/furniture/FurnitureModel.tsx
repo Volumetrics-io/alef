@@ -2,7 +2,7 @@ import { useFurnitureModel } from '@/services/publicApi/furnitureHooks';
 import { FurnitureModelQuality, PrefixedId } from '@alef/common';
 import { ErrorBoundary, useMergedRef } from '@alef/sys';
 import { Bvh, Clone, Detailed, Outlines } from '@react-three/drei';
-import { forwardRef, ReactNode, Suspense, useEffect, useRef } from 'react';
+import { forwardRef, ReactNode, Suspense, useRef } from 'react';
 import { Group, Mesh } from 'three';
 
 export interface FurnitureModelProps {
@@ -34,28 +34,17 @@ const FurnitureModelRenderer = forwardRef<Group, FurnitureModelRendererProps>(fu
 
 	if (!model) return null;
 
-	useEffect(() => {
-		if (transparent) {
-			internalRef.current?.traverse((child) => {
-				if (child instanceof Mesh) {
-					child.material.transparent = true;
-					child.material.opacity = 0;
-					child.renderOrder = -1;
-				}
-			});
-		} else {
-			internalRef.current?.traverse((child) => {
-				if (child instanceof Mesh) {
-					child.material.transparent = false;
-					child.material.opacity = 1;
-					child.renderOrder = 0;
-				}
-			});
-		}
-	}, [transparent]);
+	if (transparent) {
+		model.scene.traverse((child) => {
+			if (child instanceof Mesh) {
+				child.material.transparent = true;
+				child.material.opacity = 0;
+				child.renderOrder = -1;
+			}
+		});
+	}
 
 	const finalRef = useMergedRef(internalRef, ref);
-
 	return (
 		<Clone
 			pointerEvents={pointerEvents}
@@ -79,7 +68,7 @@ export const MissingModel = forwardRef<any, { onClick?: () => void; transparent?
 			renderOrder={transparent ? -1 : 0}
 		>
 			<boxGeometry args={[1, 1, 1]} />
-			<meshBasicMaterial color="red" transparent={transparent} opacity={transparent ? 0 : 0.5} />
+			<meshBasicMaterial color="red" transparent={transparent} opacity={transparent ? 0 : 1} />
 		</mesh>
 	);
 });
@@ -88,8 +77,7 @@ const PlaceholderModel = forwardRef<any, { onClick?: () => void }>(function Plac
 	return (
 		<mesh onClick={onClick} ref={ref}>
 			<sphereGeometry args={[0.5, 8, 8]} />
-			{/* FIXME: Weird bug, this material is being applied to the collision model once it's loaded for some reason? had to set opacity to 0 to avoid it */}
-			<meshBasicMaterial color="white" transparent opacity={0} />
+			<meshBasicMaterial color="white" transparent opacity={0.5} />
 		</mesh>
 	);
 });

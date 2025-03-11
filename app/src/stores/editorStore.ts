@@ -1,10 +1,12 @@
-import { isPrefixedId, PrefixedId } from '@alef/common';
+import { isPrefixedId, PrefixedId, SimpleVector3 } from '@alef/common';
 import { getVoidObject, PointerEventsMap } from '@pmndrs/pointer-events';
-import { useThree } from '@react-three/fiber';
-import { useEffect } from 'react';
-import { Object3D, Object3DEventMap } from 'three';
+import { useFrame, useThree } from '@react-three/fiber';
+import { useGetXRSpaceMatrix, useXR, useXRPlanes, useXRSpace } from '@react-three/xr';
+import { useCallback, useEffect, useRef } from 'react';
+import { Matrix4, Object3D, Object3DEventMap, Vector3 } from 'three';
 import { create } from 'zustand';
 import { useShallow } from 'zustand/react/shallow';
+import { usePlanes } from './roomStore';
 
 export type StageMode = 'lighting' | 'furniture' | 'layout' | 'settings' | null;
 
@@ -14,6 +16,9 @@ export type EditorStore = {
 
 	selectedId: PrefixedId<'fp'> | PrefixedId<'lp'> | null;
 	select: (id: PrefixedId<'fp'> | PrefixedId<'lp'> | null) => void;
+
+	closestFloorCenter: SimpleVector3;
+	updateClosestFloorCenter: (center: SimpleVector3) => void;
 
 	/** Actual recorded intersections */
 	liveIntersections: Record<PrefixedId<'fp'>, string[]>;
@@ -27,7 +32,7 @@ export type EditorStore = {
 	onIntersectionExit: (id: PrefixedId<'fp'>, planeId: string) => void;
 };
 
-export const useEditorStore = create<EditorStore>((set) => {
+export const useEditorStore = create<EditorStore>((set, get) => {
 	return {
 		mode: null,
 		setMode: (mode: StageMode) => set({ mode }),
@@ -35,6 +40,15 @@ export const useEditorStore = create<EditorStore>((set) => {
 		select: (id) => set({ selectedId: id }),
 		liveIntersections: {},
 		stickyIntersections: {},
+		closestFloorCenter: { x: 0, y: 0, z: 0 },
+		updateClosestFloorCenter: (center) => {
+			// this may be called in a tight loop, so avoid assignment/allocation
+			const existing = get().closestFloorCenter;
+			if (existing.x === center.x && existing.y === center.y && existing.z === center.z) return;
+			Object.assign(existing, center);
+			// not actually sure this does anything, but we don't really need the reactivity portion for this.
+			set({ closestFloorCenter: existing });
+		},
 		onIntersectionEnter: (id, plane) =>
 			set((state) => {
 				const existing = state.liveIntersections[id];
@@ -90,4 +104,83 @@ export function useEditorStageMode() {
 
 export function useIsEditorStageMode(value: StageMode) {
 	return useEditorStore((s) => s.mode === value);
+}
+
+export function useUpdateClosestFloorCenter() {
+	const isInSession = useXR((s) => !!s.session);
+	const viewerSpace = useXRSpace('head');
+	const originSpace = useXR((s) => s.originReferenceSpace);
+	const getViewerMatrix = useGetXRSpaceMatrix(viewerSpace);
+	const xrFloors = useXRPlanes('floor');
+	const savedFloors = usePlanes((p) => p.label === 'floor');
+	const updateClosestFloorCenter = useEditorStore((s) => s.updateClosestFloorCenter);
+
+	// temp vars
+	const tempVars = useRef({
+		viewerPosition: new Vector3(),
+		viewerMatrix: new Matrix4(),
+		floorPosition: new Vector3(),
+	});
+	useFrame((state, __, xrFrame: XRFrame) => {
+		// if in XR, we use the head position to determine viewer position
+		// otherwise, we use the camera position
+		const { viewerPosition, viewerMatrix, floorPosition } = tempVars.current;
+		let gotViewer = false;
+		if (isInSession && getViewerMatrix) {
+			if (getViewerMatrix(viewerMatrix, xrFrame)) {
+				viewerPosition.setFromMatrixPosition(viewerMatrix);
+				gotViewer = true;
+			}
+		}
+		if (!gotViewer) {
+			// other attempts failed, use camera
+			viewerPosition.copy(state.camera.position);
+		}
+
+		// in XR, we can use the XR detected floor planes to find the closest floor
+		if (isInSession && xrFloors.length && originSpace) {
+			// find the closest floor plane
+			let closestDistance = Infinity;
+			let pose: XRPose | undefined;
+			for (const floor of xrFloors) {
+				pose = xrFrame.getPose(floor.planeSpace, originSpace);
+				if (!pose) {
+					continue;
+				}
+				floorPosition.copy(pose.transform.position);
+				const distance = viewerPosition.distanceTo(floorPosition);
+				if (distance < closestDistance) {
+					closestDistance = distance;
+					updateClosestFloorCenter(floorPosition);
+				}
+			}
+		} else if (savedFloors.length) {
+			// outside XR, or if planes aren't detected, we can fall back to saved planes
+			// from the room data.
+			let closestDistance = Infinity;
+			for (const floor of savedFloors) {
+				floorPosition.set(floor.origin.x, floor.origin.y, floor.origin.z);
+				const distance = viewerPosition.distanceTo(floorPosition);
+				if (distance < closestDistance) {
+					closestDistance = distance;
+					updateClosestFloorCenter(floorPosition);
+				}
+			}
+		} else {
+			// we really have nothing to work with -- just use 0
+			floorPosition.set(0, 0, 0);
+			updateClosestFloorCenter(floorPosition);
+		}
+	});
+}
+
+/**
+ * This returns a getter function since the center position
+ * is not updated reactively. You have to call this getter
+ * when you want to read the position.
+ */
+export function useClosestFloorCenterGetter() {
+	return useCallback(() => {
+		return useEditorStore.getState().closestFloorCenter;
+	}, []);
 }

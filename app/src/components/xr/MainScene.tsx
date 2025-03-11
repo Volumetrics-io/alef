@@ -13,7 +13,7 @@ export function MainScene() {
 	useColorTheme();
 
 	return (
-		<SceneWrapper>
+		<SceneWrapper full style={{ height: '100vh' }}>
 			<DepthShader />
 			<PropertyRoomStoreProvider>
 				<ModePanel />

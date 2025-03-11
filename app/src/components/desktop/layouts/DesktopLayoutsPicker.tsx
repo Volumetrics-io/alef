@@ -2,8 +2,7 @@ import { useActiveRoomLayoutId, useRoomLayout, useRoomLayoutIds } from '@/stores
 import { PrefixedId, RoomType } from '@alef/common';
 import { Box, Heading, ScrollArea, Sidebar } from '@alef/sys';
 import { Suspense } from 'react';
-import { DesktopLayoutEditor } from './DesktopLayoutEditor';
-import { DesktopLayoutIcon } from './DesktopLayoutIcon';
+import { DesktopLayoutIcon } from '../common/DesktopLayoutIcon';
 
 export interface DesktopLayoutsPickerProps {
 	className?: string;
@@ -11,12 +10,13 @@ export interface DesktopLayoutsPickerProps {
 
 export function DesktopLayoutsPicker({ className }: DesktopLayoutsPickerProps) {
 	return (
-		<Box stacked>
-			<Heading level={3}>Layouts</Heading>
+		<Box stacked gapped className={className}>
+			<Box p="small">
+				<Heading level={3}>Layouts</Heading>
+			</Box>
 			<ScrollArea>
 				<LayoutSelector />
 			</ScrollArea>
-			<DesktopLayoutEditor />
 		</Box>
 	);
 }

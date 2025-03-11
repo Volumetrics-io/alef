@@ -24,6 +24,12 @@ export function formatAttribute(attribute: { key: string; value: string }) {
 	return `${attribute.key}:${attribute.value}`;
 }
 
+export function parseAttribute(formatted: string): Attribute {
+	const [key, value] = formatted.split(':');
+	assertAttributeKey(key);
+	return { key, value };
+}
+
 /** Officially supported room types */
 export const ROOM_TYPES = ['bedroom', 'living-room', 'nursery', 'office'] as const;
 export type RoomType = (typeof ROOM_TYPES)[number];

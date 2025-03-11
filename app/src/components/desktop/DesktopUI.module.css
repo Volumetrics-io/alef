@@ -1,0 +1,27 @@
+.root {
+	display: grid;
+	grid-template-areas: 'main content secondary';
+	grid-template-columns: 400px 1fr 400px;
+	grid-template-rows: minmax(0, 1fr);
+	flex: 1;
+	min-height: 0;
+	overflow: hidden;
+	height: auto;
+	width: 100%;
+	background-color: var(--paper);
+}
+
+.main {
+	grid-area: main;
+	max-height: 100%;
+	min-height: 0;
+}
+
+.content {
+	grid-area: content;
+	min-width: 400px;
+}
+
+.secondary {
+	grid-area: secondary;
+}

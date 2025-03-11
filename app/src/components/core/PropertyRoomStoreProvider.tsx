@@ -23,7 +23,7 @@ export function PropertyRoomStoreProvider({ children }: PropertyRoomStoreProvide
 		// a device with a user account.
 		return (
 			<RoomStoreProvider roomId="r-local">
-				<ModeProvider value="staging">\ {children}</ModeProvider>
+				<ModeProvider value="staging">{children}</ModeProvider>
 			</RoomStoreProvider>
 		);
 	}

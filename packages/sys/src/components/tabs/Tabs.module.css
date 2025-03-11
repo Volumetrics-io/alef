@@ -49,5 +49,6 @@
 	.content {
 		flex-grow: 1;
 		outline: none;
+		min-height: 0;
 	}
 }

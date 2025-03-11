@@ -1,14 +1,14 @@
 import { useActiveRoomLayoutId, useRoomLayout, useUpdateRoomLayout } from '@/stores/roomStore';
-import { PrefixedId } from '@alef/common';
 import { Box, Form } from '@alef/sys';
+import { DesktopLayoutTypeField } from './DesktopLayoutTypeField';
 
 export interface DesktopLayoutEditorProps {
-	layoutId?: PrefixedId<'rl'>;
+	className?: string;
 }
 
-export function DesktopLayoutEditor({ layoutId }: DesktopLayoutEditorProps) {
+export function DesktopLayoutEditor({ className }: DesktopLayoutEditorProps) {
 	const [activeLayoutId] = useActiveRoomLayoutId();
-	const layoutData = useRoomLayout(layoutId || activeLayoutId);
+	const layoutData = useRoomLayout(activeLayoutId);
 	const updateLayout = useUpdateRoomLayout();
 
 	if (!layoutData) {
@@ -16,18 +16,26 @@ export function DesktopLayoutEditor({ layoutId }: DesktopLayoutEditorProps) {
 	}
 
 	return (
-		<Form
-			initialValues={{
-				name: layoutData.name ?? '',
-				type: layoutData.type ?? 'living-room',
-			}}
-			enableReinitialize
-			onSubmit={(values) => {
-				updateLayout({
-					id: layoutData.id,
-					...values,
-				});
-			}}
-		></Form>
+		<Box p className={className} stacked gapped>
+			<Form
+				initialValues={{
+					name: layoutData.name ?? '',
+					type: layoutData.type ?? 'living-room',
+				}}
+				enableReinitialize
+				onSubmit={(values) => {
+					updateLayout({
+						id: layoutData.id,
+						...values,
+					});
+				}}
+			>
+				<Form.TextField name="name" label="Name" required />
+				<DesktopLayoutTypeField name="type" />
+				<Form.Actions>
+					<Form.Submit>Save</Form.Submit>
+				</Form.Actions>
+			</Form>
+		</Box>
 	);
 }

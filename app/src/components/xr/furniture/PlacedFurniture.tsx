@@ -1,14 +1,13 @@
 import { useAABB } from '@/hooks/useAABB';
-import { useAllFurniture, useFurnitureDetails } from '@/services/publicApi/furnitureHooks';
 import { useEditorStore } from '@/stores/editorStore';
 import {
 	useDeleteFurniturePlacement,
 	useFurniturePlacement,
 	useFurniturePlacementFurnitureId,
-	useSetFurniturePlacementFurnitureId,
+	useFurnitureQuickSwap,
 	useUpdateFurniturePlacementTransform,
 } from '@/stores/roomStore';
-import { PrefixedId } from '@alef/common';
+import { PrefixedId, RoomFurniturePlacement } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
 import { defaultApply, Handle, HandleState } from '@react-three/handle';
 import { Container, Root } from '@react-three/uikit';
@@ -27,7 +26,6 @@ export interface PlacedFurnitureProps {
 export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) {
 	const furnitureId = useFurniturePlacementFurnitureId(furniturePlacementId);
 	const placement = useFurniturePlacement(furniturePlacementId);
-	const setFurnitureId = useSetFurniturePlacementFurnitureId();
 	const select = useEditorStore((s) => s.select);
 	const selected = useEditorStore((s) => s.selectedId === furniturePlacementId);
 	const mode = useEditorStore((s) => s.mode);
@@ -85,9 +83,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 				)}
 				<FurnitureModel key={furnitureId} furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} receiveShadow={mode !== 'furniture'} pointerEvents="none" />
 
-				{isEditable && selected && (
-					<PlaceFurnitureUI furniturePlacementId={furniturePlacementId} furnitureId={furnitureId} setFurnitureId={setFurnitureId} height={halfExtents[1] + center.y + 0.2} />
-				)}
+				{isEditable && selected && <PlacedFurnitureUI placement={placement} height={halfExtents[1] + center.y + 0.2} />}
 				{isEditable && selected && (
 					<Handle targetRef={groupRef as any} rotate={{ x: false, y: true, z: false }} translate="as-rotate" apply={applyWithSave}>
 						<RotationRing radius={hypotenuse + 0.075} position={[0, 0.5, 0]} />
@@ -126,54 +122,21 @@ function RotationRing({ radius, position }: { radius: number; position: [number,
 		</group>
 	);
 }
-function PlaceFurnitureUI({
-	furniturePlacementId,
-	furnitureId,
-	setFurnitureId,
-	height,
-}: {
-	furniturePlacementId: PrefixedId<'fp'>;
-	furnitureId: PrefixedId<'f'>;
-	setFurnitureId: (id: PrefixedId<'fp'>, furnitureId: PrefixedId<'f'>) => Promise<void>;
-	height: number;
-}) {
-	const handleDelete = useDeleteFurniturePlacement(furniturePlacementId);
-
-	const { data: currentFurniture } = useFurnitureDetails(furnitureId);
-	const { data: furniture } = useAllFurniture({
-		attributeFilter: currentFurniture?.attributes,
-	});
-
-	const furnitureIds = furniture.pages
-		.flatMap((page) => page.items)
-		.map((f) => f.id)
-		.sort();
-
-	const handlePrevious = () => {
-		const index = furnitureIds.findIndex((f) => f === furnitureId);
-		if (index > 0) {
-			setFurnitureId(furniturePlacementId, furnitureIds[index - 1]);
-		}
-	};
-
-	const handleNext = () => {
-		const index = furnitureIds.findIndex((f) => f === furnitureId);
-		if (index < furnitureIds.length - 1) {
-			setFurnitureId(furniturePlacementId, furnitureIds[index + 1]);
-		}
-	};
+function PlacedFurnitureUI({ placement, height }: { placement: RoomFurniturePlacement; height: number }) {
+	const handleDelete = useDeleteFurniturePlacement(placement.id);
+	const { swapPrevious, swapNext } = useFurnitureQuickSwap(placement);
 
 	return (
 		<Billboard lockX lockZ position={[0, height, 0]}>
 			<Root pixelSize={0.002}>
 				<Container width="100%" height="100%" gap={20}>
-					<Button variant="link" onClick={handlePrevious}>
+					<Button variant="link" onClick={swapPrevious}>
 						<ArrowLeft />
 					</Button>
 					<Button variant="destructive" onClick={handleDelete}>
 						<Trash />
 					</Button>
-					<Button variant="link" onClick={handleNext}>
+					<Button variant="link" onClick={swapNext}>
 						<ArrowRight />
 					</Button>
 				</Container>

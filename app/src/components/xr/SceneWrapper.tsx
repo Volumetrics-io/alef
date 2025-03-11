@@ -1,6 +1,6 @@
 import { useGeoStore } from '@/stores/geoStore';
 import { xrStore } from '@/stores/xrStore';
-import { Box, ErrorBoundary, Icon } from '@alef/sys';
+import { Box, BoxProps, ErrorBoundary, Icon } from '@alef/sys';
 import { reversePainterSortStable } from '@pmndrs/uikit';
 import { Canvas } from '@react-three/fiber';
 import { OrbitHandles } from '@react-three/handle';
@@ -11,14 +11,14 @@ import { XRToaster } from './XRToaster';
 import { XRPerformanceManager } from './XRPerformanceManager';
 import { PerformanceMonitor } from '@react-three/drei';
 
-export interface SceneWrapperProps {
+export interface SceneWrapperProps extends BoxProps {
 	children: ReactNode;
 }
 
-export function SceneWrapper({ children }: SceneWrapperProps) {
+export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 	const geoStore = useGeoStore();
 	return (
-		<Box full style={{ height: '100vh' }}>
+		<Box {...rest}>
 			<ErrorBoundary
 				fallback={
 					<ErrorBoundary fallback={<div>Something went wrong</div>}>

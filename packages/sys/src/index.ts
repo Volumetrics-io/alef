@@ -31,6 +31,7 @@ export * from './components/spinner/Spinner.js';
 export * from './components/switch/Switch.js';
 export * from './components/tabs/Tabs.js';
 export * from './components/text/Text.js';
+export * from './components/toggleGroup/ToggleGroup.js';
 export * from './components/toolbar/Toolbar.js';
 export * from './components/tooltip/Tooltip.js';
 

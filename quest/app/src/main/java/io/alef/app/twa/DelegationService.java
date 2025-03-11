@@ -2,8 +2,6 @@
 package io.alef.app.twa;
 
 
-import com.meta.androidbrowserhelper.locationdelegation.LocationDelegationExtraCommandHandler;
-
 import com.meta.androidbrowserhelper.horizonbilling.digitalgoods.DigitalGoodsRequestHandler;
 
 import com.meta.androidbrowserhelper.horizonpermissions.PermissionRequestExtraCommandHandler;
@@ -17,8 +15,6 @@ public class DelegationService extends
     public void onCreate() {
         super.onCreate();
 
-        
-            registerExtraCommandHandler(new LocationDelegationExtraCommandHandler());
         
             registerExtraCommandHandler(new DigitalGoodsRequestHandler(getApplicationContext()));
         

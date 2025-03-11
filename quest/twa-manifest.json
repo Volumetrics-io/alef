@@ -23,8 +23,8 @@
 		"path": "/Users/michael/alef/quest/android.keystore",
 		"alias": "android"
 	},
-	"appVersionName": "2",
-	"appVersionCode": 2,
+	"appVersionName": "4",
+	"appVersionCode": 4,
 	"shortcuts": [],
 	"generatorApp": "bubblewrap-cli",
 	"webManifestUrl": "https://app.alef.io/manifest.webmanifest",
@@ -34,9 +34,6 @@
 			"enabled": true
 		},
 		"horizonBilling": {
-			"enabled": true
-		},
-		"locationDelegation": {
 			"enabled": true
 		}
 	},
@@ -53,5 +50,5 @@
 	"fingerprints": [],
 	"additionalTrustedOrigins": [],
 	"retainedBundles": [],
-	"appVersion": "2"
+	"appVersion": "4"
 }

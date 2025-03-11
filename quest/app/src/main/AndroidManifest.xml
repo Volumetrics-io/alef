@@ -29,9 +29,7 @@
         <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     
         <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    
-        <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    
+        
 
     
 
@@ -58,7 +56,7 @@
 
     <application
         android:name="Application"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/appName"
         
@@ -235,9 +233,6 @@
             
         
 
-        
-            <activity android:name=
-        "com.meta.androidbrowserhelper.locationdelegation.PermissionRequestActivity"/>
         
             
         <activity

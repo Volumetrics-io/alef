@@ -62,8 +62,8 @@ android {
         
             targetSdkVersion 32
         
-        versionCode 2
-        versionName "2"
+        versionCode 4
+        versionName "4"
 
         // The name for the application
         resValue "string", "appName", twaManifest.name
@@ -213,8 +213,6 @@ repositories {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    
-        implementation 'com.meta.androidbrowserhelper:locationdelegation:1.1.1'
     
         implementation 'com.meta.androidbrowserhelper:horizonbilling:1.0.0-alpha11'
     

@@ -15,27 +15,28 @@ export function TermsOfService() {
 					<div className={cls.twoColumnsText}>
 						<h2 id="accept">Acceptance of Terms</h2>
 						<p>
-							This Terms of Service document (the “TOS”) is an agreement you must accept in order to use our Service (as defined below). The terms “you” and “users” encompass all
-							users. This document describes both your rights and your obligations as part of using the Service. It is important that you read it carefully because you will be
-							legally bound to these terms. Volumetrics, Inc. (“Volumetrics,” “we,” “us”) only provides its Volu.dev Service (as defined below) to you subject to this TOS. By
-							accepting this TOS or by accessing or using the Service, you agree to be bound by this TOS (including the Privacy Policy, which is incorporated here by reference).
+							This Terms of Service document (the "TOS") is an agreement you must accept in order to use our Services (as defined below). The terms "you" and "users" encompass all
+							users. This document describes both your rights and your obligations as part of using the Services. It is important that you read it carefully because you will be
+							legally bound to these terms. Volumetrics, Inc. ("Volumetrics," "we," "us") only provides its alef application and related services (as defined below) to you subject
+							to this TOS. By accepting this TOS or by accessing or using the Services, you agree to be bound by this TOS (including the Privacy Policy, which is incorporated here
+							by reference).
 						</p>
 						<p>
 							If you are entering into this TOS on behalf of a company or other legal entity, you represent that you have the authority to bind such entity to this TOS. In that
-							case, the terms “you” or “your” shall also refer to such entity. If you do not have such authority, or if you do not agree with this TOS, you may not use the Service.
-							You acknowledge that this TOS is a contract between you and Volumetrics, even though it is electronic and is not physically signed by you and Volumetrics, and it
-							governs your use of the Service.
+							case, the terms "you" or "your" shall also refer to such entity. If you do not have such authority, or if you do not agree with this TOS, you may not use the
+							Services. You acknowledge that this TOS is a contract between you and Volumetrics, even though it is electronic and is not physically signed by you and Volumetrics,
+							and it governs your use of the Services.
 						</p>
 						<p>
 							As our business evolves, we may change this TOS. If we make a material change to the TOS, we will provide you with reasonable notice prior to the changes either by
-							emailing the email address associated with your account or by posting a notice on the Site. You can review the most current version of the TOS at any time by visiting
-							this page. The revised terms and conditions will become effective on the date set forth in our notice, and if you use the Service after that date, your use will
-							constitute acceptance of the revised terms and conditions. If any change to this TOS is not acceptable to you, your only remedy is to cancel your account and stop
-							using the Services, which you may do by sending an email to{' '}
+							emailing the email address associated with your account or by posting a notice on the Website. You can review the most current version of the TOS at any time by
+							visiting this page. The revised terms and conditions will become effective on the date set forth in our notice, and if you use the Services after that date, your use
+							will constitute acceptance of the revised terms and conditions. If any change to this TOS is not acceptable to you, your only remedy is to cancel your account and
+							stop using the Services, which you may do by sending an email to{' '}
 							<a className={cls.textLink} href="mailto:support@volumetrics.io">
 								support@volumetrics.io
 							</a>{' '}
-							or otherwise through the process provided in the Service.
+							or otherwise through the process provided in the Services.
 						</p>
 						<p>
 							By accessing or using the Services, you affirm that you are at least 16 years of age (or have reached the age of digital consent if that is not 16 years of age where
@@ -47,16 +48,16 @@ export function TermsOfService() {
 					<div className={cls.twoColumnsText}>
 						<h2>Description of Service</h2>
 						<p>
-							The “Service(s)” means (a) the Volumetrics website located at https://volu.dev and any related web application (collectively, the “Site”) and (b) all software
-							(including the Software, as defined below), applications, data, text, images, models, and other content made available by or on behalf of Volumetrics through the
-							foregoing. The “Service” does not include{' '}
+							The "Service(s)" means (a) the Volumetrics website located at https://alef.io (the "Website"), (b) the immersive 3D application "alef" available on Meta platforms and
+							other devices (the "App"), and (c) all software (including the Software, as defined below), applications, data, text, images, 3D models, and other content made
+							available by or on behalf of Volumetrics through the foregoing. The "Services" does not include{' '}
 							<a className={cls.textLink} href="#data-rights">
 								Your Data (as defined below)
 							</a>{' '}
-							or any software application or service that is provided by you or a third party, which you use in connection with the Service (each a “Non-Volumetrics Product”). Any
-							modifications and new features added to the Service are also subject to this TOS. We reserve the right to modify or discontinue the Service or any feature or
-							functionality thereof at any time without notice to you. All rights, title, and interest in and to the Service and its components (including all intellectual property
-							rights) will remain with and belong exclusively to us.
+							or any software application or service that is provided by you or a third party, which you use in connection with the Services (each a "Non-Volumetrics Product"). Any
+							modifications and new features added to the Services are also subject to this TOS. We reserve the right to modify or discontinue the Services or any feature or
+							functionality thereof at any time without notice to you. All rights, title, and interest in and to the Services and its components (including all intellectual
+							property rights) will remain with and belong exclusively to us.
 						</p>
 					</div>
 				</section>
@@ -64,25 +65,26 @@ export function TermsOfService() {
 					<div className={cls.twoColumnsText}>
 						<h2>Access and Use of the Service</h2>
 						<p>
-							You may access and use the Service only for lawful, authorized purposes and you shall not misuse the Service in any manner (as determined by us in our sole
+							You may access and use the Services only for lawful, authorized purposes and you shall not misuse the Services in any manner (as determined by us in our sole
 							discretion). See the section titled{' '}
 							<a className={cls.textLink} href="#reps">
 								Representations and Warranties
 							</a>{' '}
-							for specific provisions outlining prohibited uses of the Service. You shall comply with any codes of conduct, policies, storage limitations, or other notices we
-							provide you or publish in connection with the Service from time to time, but if any of those policies materially change the TOS, we will provide you with reasonable
+							for specific provisions outlining prohibited uses of the Services. You shall comply with any codes of conduct, policies, storage limitations, or other notices we
+							provide you or publish in connection with the Services from time to time, but if any of those policies materially change the TOS, we will provide you with reasonable
 							notice as provided in the{' '}
 							<a className={cls.textLink} href="#accept">
 								Acceptance of Terms
 							</a>{' '}
-							section above. You shall promptly notify us if you learn of a security breach related to the Service.
+							section above. You shall promptly notify us if you learn of a security breach related to the Services.
 						</p>
 						<p>
-							Any software that may be made available by or on behalf of Volumetrics in connection with the Service, including the Volu.dev application (“Software”), contains
+							Any software that may be made available by or on behalf of Volumetrics in connection with the Services, including the alef application ("Software"), contains
 							proprietary and confidential information that is protected by applicable intellectual property and other laws. Subject to the terms and conditions of this TOS, we
-							only grant you a personal, non-sublicensable, and non-exclusive license to use the object code of any Software solely in connection with the Service. Any rights not
+							only grant you a personal, non-sublicensable, and non-exclusive license to use the object code of any Software solely in connection with the Services. Any rights not
 							expressly granted herein are reserved.
 						</p>
+						<p>When using alef on Meta platforms, you agree to also comply with all Meta platform policies and guidelines applicable to applications on those platforms.</p>
 						<p>You hereby agree to be bound by these terms and acknowledge that violation of this TOS is grounds for termination of your account.</p>
 					</div>
 				</section>
@@ -90,12 +92,12 @@ export function TermsOfService() {
 					<div className={cls.twoColumnsText}>
 						<h2 id="data-rights">Your Data and User-Generated Content</h2>
 						<p>
-							"Your Data" means any data and content you upload, post, transmit, or otherwise make available via the Services, including but not limited to code, assets, files,
-							images, models, comments, and profile information (which may include data you elect to import from Non-Volumetrics Products you use). We will make commercially
+							"Your Data" means any data and content you upload, post, transmit, or otherwise make available via the Services, including but not limited to code, assets, files, 3D
+							models, images, comments, and profile information (which may include data you elect to import from Non-Volumetrics Products you use). We will make commercially
 							reasonable efforts to ensure that all facilities used to store and process Your Data meet a high standard for security.
 						</p>
 						<p>
-							By uploading or posting Your Data on the Service, you represent and warrant that you have all the necessary rights, licenses, and permissions to use and share Your
+							By uploading or posting Your Data on the Services, you represent and warrant that you have all the necessary rights, licenses, and permissions to use and share Your
 							Data, and that Your Data does not infringe or violate any third-party rights, including intellectual property rights, privacy rights, or any applicable laws or
 							regulations.
 						</p>
@@ -104,9 +106,9 @@ export function TermsOfService() {
 							reproduce, distribute, prepare derivative works of, display, and perform Your Data solely for the purpose of operating, promoting, and improving the Services.
 						</p>
 						<p>
-							You understand that any code, assets, or content you make public on the Service may be viewed, used, and remixed by other users. You agree that you are solely
+							You understand that any code, assets, or content you make public on the Services may be viewed, used, and remixed by other users. You agree that you are solely
 							responsible for setting the appropriate access permissions and that Volumetrics is not responsible for any use of Your Data by other users or third parties who access
-							Your Data via the Service.
+							Your Data via the Services.
 						</p>
 						<p>
 							If you choose to share or make Your Data publicly available, you do so at your own risk. Volumetrics is not responsible for enforcing any licensing terms you may
@@ -131,8 +133,9 @@ export function TermsOfService() {
 							</li>
 							<li>Violates any applicable laws, regulations, or industry standards.</li>
 							<li>Encourages or provides instructions for a criminal offense or any unlawful activity.</li>
+							<li>Violates any Meta platform policies or guidelines when using the App on Meta platforms.</li>
 						</ul>
-						<p>You agree not to use the Service to engage in any activity that interferes with or disrupts the Service or servers or networks connected to the Service.</p>
+						<p>You agree not to use the Services to engage in any activity that interferes with or disrupts the Services or servers or networks connected to the Services.</p>
 					</div>
 				</section>
 				<section className={clsx(cls.padded)}>
@@ -146,9 +149,10 @@ export function TermsOfService() {
 								herein.
 							</li>
 							<li>
-								Your Data and your use of the Service will not infringe or violate any third-party rights, including intellectual property rights, privacy rights, or any applicable
-								laws or regulations.
+								Your Data and your use of the Services will not infringe or violate any third-party rights, including intellectual property rights, privacy rights, or any
+								applicable laws or regulations.
 							</li>
+							<li>Your use of the App on Meta platforms will comply with all Meta platform policies and guidelines.</li>
 						</ul>
 						<p>You also agree not to engage in any of the prohibited activities outlined in the section titled "Prohibited Content and Activities."</p>
 					</div>
@@ -173,6 +177,10 @@ export function TermsOfService() {
 							Upon any termination of this TOS, we will have no obligation to maintain or provide Your Data.
 						</p>
 						<p>
+							Access to the App on Meta platforms is also subject to Meta's terms and policies, and your access to the App through Meta platforms may be terminated in accordance
+							with their terms.
+						</p>
+						<p>
 							Please see our{' '}
 							<a className={cls.textLink} href="/privacy-policy">
 								Privacy Policy
@@ -185,10 +193,10 @@ export function TermsOfService() {
 					<div className={cls.twoColumnsText}>
 						<h2>Disclaimer of Warranties</h2>
 						<p>
-							THE SERVICE AND ALL RELATED COMPONENTS AND INFORMATION ARE PROVIDED ON AN “AS IS” AND “AS AVAILABLE” BASIS WITHOUT ANY WARRANTIES OF ANY KIND. VOLUMETRICS EXPRESSLY
+							THE SERVICES AND ALL RELATED COMPONENTS AND INFORMATION ARE PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS WITHOUT ANY WARRANTIES OF ANY KIND. VOLUMETRICS EXPRESSLY
 							DISCLAIMS ANY AND ALL WARRANTIES, WHETHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, TITLE, FITNESS FOR A
-							PARTICULAR PURPOSE, AND NON-INFRINGEMENT. VOLUMETRICS DOES NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, TIMELY, SECURE, ERROR-FREE OR VIRUS-FREE, NOR DOES IT
-							MAKE ANY WARRANTY AS TO THE RESULTS THAT MAY BE OBTAINED FROM USE OF THE SERVICES. YOU ACKNOWLEDGE THAT YOU USE THE SERVICE AT YOUR OWN DISCRETION AND RISK.
+							PARTICULAR PURPOSE, AND NON-INFRINGEMENT. VOLUMETRICS DOES NOT WARRANT THAT THE SERVICES WILL BE UNINTERRUPTED, TIMELY, SECURE, ERROR-FREE OR VIRUS-FREE, NOR DOES IT
+							MAKE ANY WARRANTY AS TO THE RESULTS THAT MAY BE OBTAINED FROM USE OF THE SERVICES. YOU ACKNOWLEDGE THAT YOU USE THE SERVICES AT YOUR OWN DISCRETION AND RISK.
 						</p>
 						<p>
 							VOLUMETRICS IS NOT RESPONSIBLE FOR ANY CONTENT PROVIDED BY USERS OR THIRD PARTIES, INCLUDING ANY ERRORS OR OMISSIONS IN SUCH CONTENT, OR FOR ANY LOSS or damage of any
@@ -266,9 +274,23 @@ export function TermsOfService() {
 						<p>
 							You shall defend, indemnify, and hold harmless Volumetrics and its affiliates, officers, agents, employees, and partners from and against any claims, actions, suits,
 							or demands, including without limitation reasonable legal and accounting fees, arising or resulting from your breach of this TOS, any of Your Data, your use or misuse
-							of the Service, or your violation of any third-party rights, including intellectual property rights. Volumetrics shall provide notice to you of any such claim, suit,
+							of the Services, or your violation of any third-party rights, including intellectual property rights. Volumetrics shall provide notice to you of any such claim, suit,
 							or demand. Volumetrics reserves the right to conduct the exclusive defense and control of any matter that is subject to indemnification under this section. In such
 							case, you agree to cooperate with any reasonable requests assisting Volumetrics's defense of such matters.
+						</p>
+					</div>
+				</section>
+				<section className={clsx(cls.padded)}>
+					<div className={cls.twoColumnsText}>
+						<h2>Third-Party Platforms</h2>
+						<p>
+							The App may be available on Meta platforms and other third-party platforms. Your use of the App on such platforms is also subject to the terms, conditions, and
+							policies of those platforms. You acknowledge that these third-party platforms may have their own terms of service and privacy policies, and your use of the App on
+							those platforms constitutes your agreement to comply with such terms.
+						</p>
+						<p>
+							Volumetrics is not responsible for the availability, features, or functionality of third-party platforms, and your ability to access and use the App on those
+							platforms may be affected by their policies and technical requirements.
 						</p>
 					</div>
 				</section>

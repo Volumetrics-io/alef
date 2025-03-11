@@ -1,5 +1,6 @@
 import { useFurnitureModel } from '@/services/publicApi/furnitureHooks';
-import { FurnitureModelQuality, PrefixedId } from '@alef/common';
+import { usePerformanceStore } from '@/stores/performanceStore';
+import { FurnitureModelQuality, PrefixedId, RANKED_FURNITURE_MODEL_QUALITIES } from '@alef/common';
 import { ErrorBoundary, useMergedRef } from '@alef/sys';
 import { Bvh, Clone, Detailed, Outlines } from '@react-three/drei';
 import { forwardRef, ReactNode, Suspense, useRef } from 'react';
@@ -110,7 +111,11 @@ export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFal
 );
 
 export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode }>(
-	({ errorFallback, maxQuality = FurnitureModelQuality.Original, debugLod, ...props }, ref) => {
+	({ errorFallback, maxQuality: preferredMaxQuality = FurnitureModelQuality.Original, debugLod, ...props }, ref) => {
+		const globalMaxQuality = usePerformanceStore((state) => state.maxModelQuality);
+		const maxQualityRank = Math.min(RANKED_FURNITURE_MODEL_QUALITIES.indexOf(preferredMaxQuality), RANKED_FURNITURE_MODEL_QUALITIES.indexOf(globalMaxQuality));
+		const maxQuality = RANKED_FURNITURE_MODEL_QUALITIES[maxQualityRank];
+
 		const isLowQuality = maxQuality === FurnitureModelQuality.Low || maxQuality === FurnitureModelQuality.Collision;
 
 		const baseLodIndex = lods.findIndex((lod) => lod.quality === maxQuality);

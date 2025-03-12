@@ -18,7 +18,7 @@ export function DemoPlane({ orientation: rawOrientation, center: rawCenter, dime
 		<ErrorBoundary fallback={null}>
 			<group rotation={[Math.PI, 0, 0]}>
 				<group position={center} quaternion={orientation}>
-					<mesh rotation={[Math.PI / 2, 0, 0]}>
+					<mesh receiveShadow rotation={[Math.PI / 2, 0, 0]}>
 						<planeGeometry args={dimensions} />
 						<meshPhysicalMaterial color={labelColors[label] ?? 'pink'} />
 					</mesh>

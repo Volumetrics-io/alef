@@ -10,7 +10,6 @@ import {
 } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
-import { useThree } from '@react-three/fiber';
 import { defaultApply, Handle, HandleState } from '@react-three/handle';
 import { Container, Root } from '@react-three/uikit';
 import { ArrowLeft, ArrowRight, Trash } from '@react-three/uikit-lucide';
@@ -20,7 +19,7 @@ import { Billboard } from '../Billboard';
 import { Button } from '../ui/Button';
 import { colors } from '../ui/theme';
 import { CollisionModel, FurnitureModel, MissingModel } from './FurnitureModel';
-
+import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
 export interface PlacedFurnitureProps {
 	furniturePlacementId: PrefixedId<'fp'>;
 }
@@ -33,8 +32,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	const selected = useEditorStore((s) => s.selectedId === furniturePlacementId);
 	const mode = useEditorStore((s) => s.mode);
 
-	const { gl } = useThree();
-	gl.shadowMap.needsUpdate = true;
+	const updateShadowMap = useShadowMapUpdate();
 
 	const groupRef = useRef<Group>(null);
 	const move = useUpdateFurniturePlacementTransform(furniturePlacementId);
@@ -59,14 +57,14 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 			defaultApply(state, target);
 
 			if (state.last) {
-				gl.shadowMap.needsUpdate = true;
+				updateShadowMap();
 				move({
 					position: target.position,
 					rotation: target.quaternion,
 				});
 			}
 		},
-		[move, gl]
+		[move]
 	);
 
 	const hypotenuse = Math.sqrt(halfExtents[0] * halfExtents[0] + halfExtents[2] * halfExtents[2]);

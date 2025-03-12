@@ -11,6 +11,10 @@ export function useLightPlacement(id: PrefixedId<'lp'>) {
 	return useRoomStore((s) => s.lights[id] ?? null);
 }
 
+export function useLights() {
+	return useRoomStore((s) => s.lights);
+}
+
 export function useDeleteLightPlacement(id: PrefixedId<'lp'>) {
 	const deleteFn = useRoomStore((s) => s.deleteLight);
 	return useCallback(() => {

@@ -61,12 +61,14 @@ export const Slider: (props: SliderProperties & RefAttributes<ContainerRef>) => 
 					downPointerId = e.pointerId;
 					setValue(e);
 					(e.target as HTMLElement).setPointerCapture(e.pointerId);
+					props.onPointerDown?.(e);
 				},
 				onPointerMove(e) {
 					if (downPointerId != e.pointerId) {
 						return;
 					}
 					setValue(e);
+					props.onPointerMove?.(e);
 				},
 				onPointerUp(e) {
 					if (downPointerId == null) {
@@ -74,6 +76,7 @@ export const Slider: (props: SliderProperties & RefAttributes<ContainerRef>) => 
 					}
 					downPointerId = undefined;
 					e.stopPropagation();
+					props.onPointerUp?.(e);
 				},
 			} satisfies EventHandlers;
 		}, [max, min, hasProvidedValue, step]);
@@ -94,7 +97,6 @@ export const Slider: (props: SliderProperties & RefAttributes<ContainerRef>) => 
 
 		return (
 			<Container
-				{...(disabled ? {} : handler)}
 				positionType="relative"
 				flexDirection="column"
 				height={28}
@@ -104,6 +106,7 @@ export const Slider: (props: SliderProperties & RefAttributes<ContainerRef>) => 
 				onPointerEnter={() => setAnimate(1)}
 				onPointerLeave={() => setAnimate(0)}
 				{...props}
+				{...(disabled ? {} : handler)}
 			>
 				<AnimatedContainer
 					height={28}

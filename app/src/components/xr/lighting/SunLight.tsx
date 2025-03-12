@@ -5,6 +5,7 @@ import React, { useEffect, useRef } from 'react';
 import SunCalc from 'suncalc';
 import { AmbientLight, DirectionalLight, Object3D, Quaternion, Vector3 } from 'three';
 import { useGeoStore } from '../../../stores/geoStore';
+import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
 
 // Define the LightData type
 interface LightData {
@@ -92,7 +93,7 @@ const calculateSunData = (latitude: number, longitude: number): LightData => {
 };
 
 const SunLight: React.FC = () => {
-	const { scene, gl } = useThree();
+	const { scene } = useThree();
 	const lightTarget = useRef<Object3D>(null);
 	const {
 		position: { latitude, longitude },
@@ -108,6 +109,7 @@ const SunLight: React.FC = () => {
 	const elapsedTimeRef = useRef<number>(0);
 
 	const setSunlightIntensity = useSetSunlightIntensity();
+	const updateShadowMap = useShadowMapUpdate();
 
 	// Initialize the target object in the scene
 	useEffect(() => {
@@ -127,7 +129,7 @@ const SunLight: React.FC = () => {
 		elapsedTimeRef.current += delta;
 
 		// Check if 60 seconds have passed
-		if (elapsedTimeRef.current < 10) {
+		if (elapsedTimeRef.current < 60) {
 			return; // Exit early if not enough time has passed
 		}
 
@@ -193,7 +195,7 @@ const SunLight: React.FC = () => {
 			setSunlightIntensity(sunData.directional.intensity);
 
 			// Ensure shadow map updates
-			gl.shadowMap.needsUpdate = true;
+			updateShadowMap();
 		}
 	});
 

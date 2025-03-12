@@ -1,7 +1,7 @@
 import { useEditorSelectionReset, useUpdateClosestFloorCenter } from '@/stores/editorStore';
 import { useFurniturePlacementIds } from '@/stores/roomStore';
 import { Suspense } from 'react';
-import { PlaneAnchor } from '../anchors';
+import { GlobalSpace } from '../anchors/GlobalSpace';
 import { PlacedFurniture } from '../furniture/PlacedFurniture';
 import { RoomLighting } from '../lighting/RoomLighting';
 import { Floors } from './Floors';
@@ -20,8 +20,8 @@ export function RoomRenderer() {
 			<Floors />
 			<Walls />
 			<PlaneSync />
-			<NonXRPlaneRenderer />
-			<PlaneAnchor label="floor">
+			<GlobalSpace>
+				<NonXRPlaneRenderer debug />
 				<RoomLighting />
 				{furniturePlacementIds.map((furniturePlacementId) => {
 					return (
@@ -30,7 +30,7 @@ export function RoomRenderer() {
 						</Suspense>
 					);
 				})}
-			</PlaneAnchor>
+			</GlobalSpace>
 		</>
 	);
 }

@@ -1,6 +1,7 @@
 import { GroupProps } from '@react-three/fiber';
 import { useXRPlanes } from '@react-three/xr';
 import { PhysicalXRPlane } from './PhysicalXRPlane';
+
 export function Floors(props: GroupProps) {
 	const planes = useXRPlanes('floor');
 
@@ -18,5 +19,5 @@ export interface FloorProps {
 }
 
 export function Floor({ plane }: FloorProps) {
-	return <PhysicalXRPlane plane={plane} />;
+	return <PhysicalXRPlane plane={plane} debug />;
 }

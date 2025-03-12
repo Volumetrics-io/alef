@@ -3,13 +3,15 @@ import { useXR } from '@react-three/xr';
 import { Quaternion } from 'three';
 import { DemoPlane } from './DemoPlane';
 
-export interface NonXRPlaneRendererProps {}
+export interface NonXRPlaneRendererProps {
+	debug?: boolean;
+}
 
-export function NonXRPlaneRenderer({}: NonXRPlaneRendererProps) {
+export function NonXRPlaneRenderer({ debug }: NonXRPlaneRendererProps) {
 	const planes = usePlanes();
 	const isInSession = useXR((s) => !!s.session);
 
-	if (isInSession) {
+	if (isInSession && !debug) {
 		return null;
 	}
 
@@ -20,10 +22,11 @@ export function NonXRPlaneRenderer({}: NonXRPlaneRendererProps) {
 	}
 
 	return (
-		<>
+		// when debugging, bring the planes in a tiny bit so they render over the actual walls.
+		<group>
 			{planes.map((plane, index) => {
 				return <DemoPlane key={index} orientation={plane.orientation} center={plane.origin} dimensions={plane.extents} label={plane.label} />;
 			})}
-		</>
+		</group>
 	);
 }

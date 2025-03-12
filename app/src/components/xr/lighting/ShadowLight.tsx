@@ -19,8 +19,6 @@ export const ShadowLight = ({ target }: { target?: Object3D | null }) => {
 	const validLights = Object.values(lights).filter((light) => !!light);
 	const lightCount = validLights.length;
 
-	console.log('lightCount', lightCount);
-
 	if (lightCount > 0) {
 		for (const light of validLights) {
 			averageLightPosition.x += light.position.x;

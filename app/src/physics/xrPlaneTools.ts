@@ -60,7 +60,7 @@ export function xrPlanesToRoomPlaneData(frame: XRFrame, rootSpace: XRReferenceSp
 			const center = new Vector3().setFromMatrixPosition(tmpMatrix);
 			const orientation = new Quaternion().setFromRotationMatrix(tmpMatrix);
 
-			if (plane === floor && center.length() > Number.EPSILON) {
+			if (plane === floor && center.length() > 1e-16) {
 				// this would suggest the math is wrong here. the floor plane
 				// should be 0,0,0 and the orientation should be identity.
 				console.warn('floor plane is not at origin', 'calculated center was', center);

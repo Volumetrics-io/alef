@@ -1,131 +1,118 @@
 import { Container, ContainerProperties, DefaultProperties } from '@react-three/uikit';
 import { colors, getColorForAnimation } from './theme';
 import { borderRadius } from '@react-three/uikit-default';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { PositionalAudio } from '@react-three/drei';
 import { PositionalAudio as PositionalAudioType } from 'three';
 import { useRef } from 'react';
 import { ThreeEvent } from '@react-three/fiber';
 import { AnimatedContainer, usePullAnimation } from './Animations';
-import { useSpring, config } from '@react-spring/three';
+import { useSpring, config, useSpringRef } from '@react-spring/three';
 export interface SelectorProps {
 	wrap?: boolean;
 	size?: 'small' | 'medium';
 }
 
 const selectorSizeVariants = {
-    small: {
-        paddingY: 8,
-        paddingX: 12,
-        gap: 4,
-    },
-    medium: {
-        paddingY: 12,
-        paddingX: 16,
-        gap: 8,
-        
-    },
-}
+	small: {
+		paddingY: 8,
+		paddingX: 12,
+		gap: 4,
+	},
+	medium: {
+		paddingY: 12,
+		paddingX: 16,
+		gap: 8,
+	},
+};
 
 export function Selector({ size = 'medium', children, ...props }: SelectorProps & ContainerProperties & { children: React.ReactNode }) {
-
 	return (
-		<Container 
-        backgroundColor={colors.selectionSurface}
-        flexShrink={0}
-        borderRadius={borderRadius.md}
-        borderWidth={1}
-        borderColor={colors.border}
-        {...props}
-        
-        >
-            <DefaultProperties
-            {...selectorSizeVariants[size]} >
-                {children}
-            </DefaultProperties>
+		<Container backgroundColor={colors.selectionSurface} flexShrink={0} borderRadius={borderRadius.md} borderWidth={1} borderColor={colors.border} {...props}>
+			<DefaultProperties {...selectorSizeVariants[size]}>{children}</DefaultProperties>
 		</Container>
 	);
 }
 
 const selectorItemSizeVariants = {
-    small: {
-        fontSize: 14,
-        lineHeight: 20,
-    },
-    medium: {
-        fontSize: 16,
-        lineHeight: 24,
-    },
-}
+	small: {
+		fontSize: 14,
+		lineHeight: 20,
+	},
+	medium: {
+		fontSize: 16,
+		lineHeight: 24,
+	},
+};
 
-export function SelectorItem({ wrap = false, selected, size = 'medium', children, ...props }: ContainerProperties & { wrap?: boolean, selected: boolean, size?: 'small' | 'medium', children: React.ReactNode }) {
-    const [animation, setAnimation] = useState(0);
-    const audioRef = useRef<PositionalAudioType>(null)
+export function SelectorItem({
+	wrap = false,
+	selected,
+	size = 'medium',
+	children,
+	...props
+}: ContainerProperties & { wrap?: boolean; selected: boolean; size?: 'small' | 'medium'; children: React.ReactNode }) {
+	const audioRef = useRef<PositionalAudioType>(null);
 
-    const startColor = getColorForAnimation(colors.selectionSurface)
-    const endColor = getColorForAnimation(colors.selectionHover)
-    
-    const { spring } = useSpring({ 
-      spring: animation, 
-      config: config.stiff
-     })
+	const startColor = getColorForAnimation(colors.selectionSurface);
+	const endColor = getColorForAnimation(colors.selectionHover);
 
-    const transformTranslateZ = usePullAnimation(spring)
+	const api = useSpringRef();
+	const { spring } = useSpring({
+		spring: 0,
+		config: config.stiff,
+		ref: api,
+	});
 
-    if (!startColor || !endColor) {
-        return null;
-    }
+	const transformTranslateZ = usePullAnimation(spring);
 
-    const backgroundColor = spring.to([0,1], [`#${startColor.getHexString()}`, `#${endColor.getHexString()}`])
+	if (!startColor || !endColor) {
+		return null;
+	}
 
-    useEffect(() => {
-        return () => {
-          // Stop audio when component unmounts
-          if (audioRef.current) {
-            audioRef.current.stop();
-          }
-        };
-      }, []);
+	const backgroundColor = spring.to([0, 1], [`#${startColor.getHexString()}`, `#${endColor.getHexString()}`]);
 
-      const onClick = useCallback((e: ThreeEvent<MouseEvent>) => {
-        // Stop any currently playing audio before playing again
-        if (audioRef.current) {
-          if (audioRef.current.isPlaying) {
-            audioRef.current.stop();
-          }
-          audioRef.current.play();
-        }
-        props.onClick?.(e);
-        setAnimation(1);
-      }, [props]);
+	useEffect(() => {
+		return () => {
+			// Stop audio when component unmounts
+			if (audioRef.current) {
+				audioRef.current.stop();
+			}
+		};
+	}, []);
+
+	const onClick = useCallback(
+		(e: ThreeEvent<MouseEvent>) => {
+			// Stop any currently playing audio before playing again
+			if (audioRef.current) {
+				if (audioRef.current.isPlaying) {
+					audioRef.current.stop();
+				}
+				audioRef.current.play();
+			}
+			props.onClick?.(e);
+			api.start({ spring: 1 });
+		},
+		[props]
+	);
 
 	return (
 		<AnimatedContainer
-            transformTranslateZ={transformTranslateZ}
-            borderRadius={borderRadius.md}
-            backgroundColor={selected ? colors.selectionPress : backgroundColor}
-            alignItems="center"
-            flexDirection="row"
-            width={wrap ? 'auto' : '100%'}
-            justifyContent="flex-start"
-            onHoverChange={(hover) => setAnimation(Number(hover))}
-            {...props}
-            onClick={onClick}
-        >
-            <PositionalAudio
-            url={`./audio/click.webm`}
-            distance={0.5}
-            autoplay={false}
-            loop={false}
-            ref={audioRef}
-          />
-            <DefaultProperties
-                padding={0}
-                fontFamily="ibm-plex-sans"
-            {...selectorItemSizeVariants[size]}
-            >
-            {children}
-            </DefaultProperties>
-        </AnimatedContainer>
+			transformTranslateZ={transformTranslateZ}
+			borderRadius={borderRadius.md}
+			backgroundColor={selected ? colors.selectionPress : backgroundColor}
+			alignItems="center"
+			flexDirection="row"
+			width={wrap ? 'auto' : '100%'}
+			justifyContent="flex-start"
+			onHoverChange={(hover) => api.start({ spring: Number(hover) })}
+			{...props}
+			onClick={onClick}
+		>
+			<PositionalAudio url={`./audio/click.webm`} distance={0.5} autoplay={false} loop={false} ref={audioRef} />
+			<DefaultProperties padding={0} fontFamily="ibm-plex-sans" {...selectorItemSizeVariants[size]}>
+				{children}
+			</DefaultProperties>
+		</AnimatedContainer>
 	);
 }

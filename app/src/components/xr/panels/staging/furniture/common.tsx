@@ -11,7 +11,7 @@ import { Attribute, AttributeKey } from '@alef/common';
 import { animated, config, useSpring } from '@react-spring/three';
 import { useFrame } from '@react-three/fiber';
 import { Container, Text } from '@react-three/uikit';
-import { ArrowLeftIcon, ArrowRightIcon, ChevronRightIcon, PanelLeftCloseIcon, PanelLeftIcon, SofaIcon } from '@react-three/uikit-lucide';
+import { ArrowLeftIcon, ArrowRightIcon, ChevronLeftIcon, ChevronRightIcon, PanelLeftCloseIcon, PanelLeftIcon, SofaIcon } from '@react-three/uikit-lucide';
 import { ReactNode, Suspense, useRef, useState } from 'react';
 import { proxy, useSnapshot } from 'valtio';
 import { FurnitureSelectItem } from './FurnitureSelectItem';
@@ -22,7 +22,7 @@ const panelState = proxy({
 });
 
 export const FurniturePanelRoot = ({ children }: { children?: ReactNode }) => (
-	<Surface height={500} width={600} flexDirection={'column'} justifyContent={'space-between'} flexWrap={'no-wrap'} gap={10} padding={10}>
+	<Surface height={500} width={700} flexDirection={'column'} justifyContent={'space-between'} flexWrap={'no-wrap'} gap={10} padding={10}>
 		<Suspense>{children}</Suspense>
 	</Surface>
 );
@@ -60,8 +60,8 @@ export const FurniturePanelFilterSidebar = ({ children }: { children?: ReactNode
 
 	const { spring } = useSpring({ spring: visible ? 1 : 0, config: config.default });
 
-	const transformTranslateX = spring.to([0,1], [-180, 0])
-	const transformTranslateZ = spring.to([0, 0.8, 1], [0, 0, 8])
+	const transformTranslateX = spring.to([0, 1], [-180, 0]);
+	const transformTranslateZ = spring.to([0, 0.8, 1], [0, 0, 8]);
 
 	useFrame(() => {
 		const newVisibility = visible || spring.isAnimating;
@@ -94,7 +94,16 @@ export const FurniturePanelFilterSidebar = ({ children }: { children?: ReactNode
 			gap={8}
 			padding={6}
 		>
-			<AnimatedSurface transformTranslateX={transformTranslateX} transformTranslateZ={transformTranslateZ} flexDirection="column" height="100%" width="100%" gap={10} padding={10} flexWrap="no-wrap">
+			<AnimatedSurface
+				transformTranslateX={transformTranslateX}
+				transformTranslateZ={transformTranslateZ}
+				flexDirection="column"
+				height="100%"
+				width="100%"
+				gap={10}
+				padding={10}
+				flexWrap="no-wrap"
+			>
 				<Container marginTop={5} alignItems="center" flexDirection="row" width="100%" justifyContent="space-between">
 					<Heading level={4}>Filters</Heading>
 					<FurniturePanelFilterSidebarCloseButton />
@@ -138,40 +147,32 @@ export const FurniturePanelFilterSidebarCloseButton = () => {
 	);
 };
 
-export const FurnitureCollection = ({ furniture, hasMore, onLoadMore }: { furniture: FurnitureItem[]; hasMore?: boolean; onLoadMore?: () => void }) => {
-	const [scrollbarVisible, setScrollbarVisible] = useState(0);
-
-	const handleEnter = () => {
-		setScrollbarVisible(1);
-	};
-
-	const handleLeave = () => {
-		setScrollbarVisible(0);
-	};
-
+export const FurnitureCollection = ({
+	furniture,
+	hasPrevious,
+	hasNext,
+	onPrevious,
+	onNext,
+}: {
+	furniture: FurnitureItem[];
+	hasPrevious?: boolean;
+	hasNext?: boolean;
+	onPrevious?: () => void;
+	onNext?: () => void;
+}) => {
 	return (
-		<Container
-			flexDirection="column"
-			flexGrow={1}
-			gap={8}
-			flexWrap="wrap"
-			overflow="scroll"
-			onPointerEnter={handleEnter}
-			onPointerLeave={handleLeave}
-			scrollbarOpacity={scrollbarVisible}
-			scrollbarWidth={8}
-			scrollbarBorderRadius={4}
-			paddingBottom={8}
-			scrollbarColor={colors.ink}
-		>
-			{furniture.map((furnitureItem) => (
-				<FurnitureSelectItem key={furnitureItem.id} furnitureItem={furnitureItem} />
-			))}
-			{hasMore && (
-				<Button size="icon" variant="ghost" marginY="auto" onClick={onLoadMore}>
-					<ChevronRightIcon />
-				</Button>
-			)}
+		<Container flexDirection="row" alignItems="center" flexGrow={1} gap={8}>
+			<Button disabled={!hasPrevious} size="icon" variant="ghost" height="100%" onClick={onPrevious}>
+				<ChevronLeftIcon />
+			</Button>
+			<Container flexDirection="column" flexGrow={1} gap={8} flexWrap="wrap">
+				{furniture.map((furnitureItem) => (
+					<FurnitureSelectItem key={furnitureItem.id} furnitureItem={furnitureItem} />
+				))}
+			</Container>
+			<Button disabled={!hasNext} size="icon" variant="ghost" height="100%" onClick={onNext}>
+				<ChevronRightIcon />
+			</Button>
 		</Container>
 	);
 };

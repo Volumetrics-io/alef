@@ -9,6 +9,7 @@ import {
 	FurniturePanelHeader,
 	FurniturePanelNavigation,
 } from './common';
+import { useState } from 'react';
 
 export function OnlineFurniturePanel() {
 	return (
@@ -38,10 +39,27 @@ function FilteredFurniture() {
 	const attributes = useAllFilters();
 	const { data: furniture, fetchNextPage } = useAllFurniture({
 		attributeFilter: attributes,
+		pageSize: 6,
 	});
 
-	const allFurniture = furniture.pages.flatMap((page) => page.items);
-	const hasMore = furniture.pages[furniture.pages.length - 1].pageInfo.hasNextPage;
+	const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
-	return <FurnitureCollection furniture={allFurniture} hasMore={hasMore} onLoadMore={() => fetchNextPage()} />;
+	const goToPrevious = () => {
+		setCurrentPageIndex(currentPageIndex - 1);
+	};
+
+	const goToNext = () => {
+		if (currentPageIndex === furniture.pages.length - 1) {
+			fetchNextPage().then(() => {
+				setCurrentPageIndex(currentPageIndex + 1);
+			});
+		} else {
+			setCurrentPageIndex(currentPageIndex + 1);
+		}
+	};
+
+	const currentPage = furniture.pages[currentPageIndex];
+	const hasMore = currentPage.pageInfo.hasNextPage;
+
+	return <FurnitureCollection furniture={currentPage.items} hasPrevious={currentPageIndex > 0} hasNext={hasMore} onPrevious={goToPrevious} onNext={goToNext} />;
 }

@@ -60,7 +60,7 @@ export const RoomLighting = () => {
 		<>
 			<group rotation={[Math.PI / 2, 0, 0]} ref={meshRef}>
 				<mesh onClick={handleClick}>
-					<planeGeometry args={[xrCeilingPlane.extents[0], xrCeilingPlane.extents[1]]} />
+					<planeGeometry args={xrCeilingPlane?.extents ?? [5, 5]} />
 					<meshStandardMaterial transparent={false} colorWrite={false} color="red" />
 				</mesh>
 				<ambientLight intensity={globalIntensity * 0.3} color={getLightColor(globalColor)} />

@@ -48,6 +48,7 @@ const FurnitureModelRenderer = forwardRef<Group, FurnitureModelRendererProps>(fu
 	const finalRef = useMergedRef(internalRef, ref);
 	return (
 		<Clone
+			// @ts-ignore pointerEvents is not typed
 			pointerEvents={pointerEvents}
 			object={model.scene as any}
 			deep={true}

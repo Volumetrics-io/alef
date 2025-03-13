@@ -85,6 +85,7 @@ export function DragController({ children }: { children: React.ReactNode }) {
 
 		// pointer capture helps keep this handle active as the user moves
 		const container = ref.current;
+		// @ts-expect-error NOTE: This does exist on the event object
 		if (container && (container as unknown as Object3D).setPointerCapture) {
 			// @ts-expect-error NOTE: This does exist on the event object
 			(container as Object3D).setPointerCapture(event.pointerId);

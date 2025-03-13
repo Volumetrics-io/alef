@@ -6,7 +6,7 @@ import { useFrame } from '@react-three/fiber';
 // import { CuboidCollider, } from '@react-three/rapier';
 import { XRPlaneModel, XRSpace } from '@react-three/xr';
 import { forwardRef, useRef } from 'react';
-import { DoubleSide, Object3D, ShadowMaterial, Vector3 } from 'three';
+import { DoubleSide, Object3D, ShadowMaterial } from 'three';
 
 export interface PhysicalXRPlaneProps {
 	/** Whether to add a sensor for snapping moved objects to this plane when they're close */

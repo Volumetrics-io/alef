@@ -8,6 +8,8 @@ import { noEvents, PointerEvents, useXR, XR } from '@react-three/xr';
 import { ReactNode, Suspense } from 'react';
 import { PCFSoftShadowMap } from 'three';
 import { XRToaster } from './XRToaster';
+import { XRPerformanceManager } from './XRPerformanceManager';
+import { PerformanceMonitor } from '@react-three/drei';
 
 export interface SceneWrapperProps {
 	children: ReactNode;
@@ -48,9 +50,16 @@ export function SceneWrapper({ children }: SceneWrapperProps) {
 				>
 					<XR store={xrStore}>
 						<PointerEvents />
-						<Suspense>{children}</Suspense>
-						<NonXRCameraControls />
-						<XRToaster />
+						<PerformanceMonitor
+							bounds={(refreshRate) => {
+								return refreshRate > 90 ? [60, 90] : [45, 60];
+							}}
+						>
+							<XRPerformanceManager />
+							<Suspense>{children}</Suspense>
+							<NonXRCameraControls />
+							<XRToaster />
+						</PerformanceMonitor>
 					</XR>
 				</Canvas>
 				<button

@@ -1,11 +1,14 @@
-import { StageMode, useEditorStageMode } from '@/stores/editorStore';
-import { Box, Icon, Tabs } from '@alef/sys';
+import { StageMode, useDetailsOpen, useEditorStageMode } from '@/stores/editorStore';
+import { Box, Frame, Icon, Tabs } from '@alef/sys';
+import clsx from 'clsx';
 import { ReactNode, Suspense } from 'react';
 import cls from './DesktopUI.module.css';
 import { DesktopFurnitureEditor } from './furniture/DesktopFurnitureEditor';
 import { DesktopOnlineFurniturePicker } from './furniture/DesktopOnlineFurniturePicker';
 import { DesktopLayoutEditor } from './layouts/DesktopLayoutEditor';
 import { DesktopLayoutsPicker } from './layouts/DesktopLayoutsPicker';
+import { DesktopLightEditor } from './lighting/DesktopLightEditor';
+import { DesktopLightsMainEditor } from './lighting/DesktopLightsMainEditor';
 
 export interface DesktopUIProps {
 	children?: ReactNode;
@@ -49,25 +52,39 @@ function DesktopUIMain() {
 					<DesktopOnlineFurniturePicker />
 				</Suspense>
 			</Tabs.Content>
-			<Tabs.Content value="lighting"></Tabs.Content>
+			<Tabs.Content value="lighting">
+				<DesktopLightsMainEditor />
+			</Tabs.Content>
 		</Box>
 	);
 }
 
 function DesktopUISecondary() {
+	const [open, setOpen] = useDetailsOpen();
 	return (
 		<Box className={cls.secondary}>
-			<Tabs.Content value="layouts">
-				<Suspense>
-					<DesktopLayoutEditor />
-				</Suspense>
-			</Tabs.Content>
-			<Tabs.Content value="furniture">
-				<Suspense>
-					<DesktopFurnitureEditor />
-				</Suspense>
-			</Tabs.Content>
-			<Tabs.Content value="lighting"></Tabs.Content>
+			<Frame float="top-left" style={{ left: open ? undefined : -38, padding: '0.25rem' }} className={cls.secondaryToggle}>
+				<Icon name={open ? 'panel-right-close' : 'panel-right-open'} onClick={() => setOpen(!open)} />
+			</Frame>
+			<Box className={clsx(cls.secondaryContent, open && cls.secondaryContentOpen)}>
+				<Box className={cls.secondaryContentInner}>
+					<Tabs.Content value="layouts">
+						<Suspense>
+							<DesktopLayoutEditor />
+						</Suspense>
+					</Tabs.Content>
+					<Tabs.Content value="furniture">
+						<Suspense>
+							<DesktopFurnitureEditor />
+						</Suspense>
+					</Tabs.Content>
+					<Tabs.Content value="lighting">
+						<Suspense>
+							<DesktopLightEditor />
+						</Suspense>
+					</Tabs.Content>
+				</Box>
+			</Box>
 		</Box>
 	);
 }

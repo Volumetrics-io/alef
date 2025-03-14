@@ -16,7 +16,7 @@ export function DesktopLayoutEditor({ className }: DesktopLayoutEditorProps) {
 	}
 
 	return (
-		<Box p className={className} stacked gapped>
+		<Box p="small" className={className} stacked gapped>
 			<Form
 				initialValues={{
 					name: layoutData.name ?? '',

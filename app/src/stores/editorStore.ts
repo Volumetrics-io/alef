@@ -17,6 +17,10 @@ export type EditorStore = {
 	selectedId: PrefixedId<'fp'> | PrefixedId<'lp'> | null;
 	select: (id: PrefixedId<'fp'> | PrefixedId<'lp'> | null) => void;
 
+	// only relevant for 2d mode right now
+	detailsOpen: boolean;
+	setDetailsOpen: (open: boolean) => void;
+
 	closestFloorCenter: SimpleVector3;
 	updateClosestFloorCenter: (center: SimpleVector3) => void;
 
@@ -37,15 +41,21 @@ export const useEditorStore = create<EditorStore>((set, get) => {
 		mode: null,
 		setMode: (mode: StageMode) => set({ mode }),
 		selectedId: null,
-		select: (id) => set({ selectedId: id }),
+		select: (id) => {
+			set({ selectedId: id, detailsOpen: true });
+		},
 		liveIntersections: {},
 		stickyIntersections: {},
 		closestFloorCenter: { x: 0, y: 0, z: 0 },
+		detailsOpen: false,
+		setDetailsOpen: (open) => set({ detailsOpen: open }),
 		updateClosestFloorCenter: (center) => {
 			// this may be called in a tight loop, so avoid assignment/allocation
 			const existing = get().closestFloorCenter;
 			if (existing.x === center.x && existing.y === center.y && existing.z === center.z) return;
-			Object.assign(existing, center);
+			existing.x = center.x;
+			existing.y = center.y;
+			existing.z = center.z;
 			// not actually sure this does anything, but we don't really need the reactivity portion for this.
 			set({ closestFloorCenter: existing });
 		},
@@ -183,4 +193,10 @@ export function useClosestFloorCenterGetter() {
 	return useCallback(() => {
 		return useEditorStore.getState().closestFloorCenter;
 	}, []);
+}
+
+export function useDetailsOpen() {
+	const value = useEditorStore((s) => s.detailsOpen);
+	const set = useEditorStore((s) => s.setDetailsOpen);
+	return [value, set] as const;
 }

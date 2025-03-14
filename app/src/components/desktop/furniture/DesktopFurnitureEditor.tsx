@@ -21,7 +21,7 @@ function DesktopFurnitureEditorImpl({ placement }: { placement: RoomFurniturePla
 	const { swapPrevious, swapNext } = useFurnitureQuickSwap(placement);
 
 	return (
-		<Box stacked gapped full p>
+		<Box stacked gapped full p="small">
 			<Heading level={4}>Quick swap</Heading>
 			<Box gapped layout="center between">
 				<Button onClick={swapPrevious}>

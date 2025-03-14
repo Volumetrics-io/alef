@@ -1,7 +1,8 @@
+import clsx from 'clsx';
 import { forwardRef } from 'react';
 import { withClassName } from '../../hocs/withClassName.js';
 import { withProps } from '../../hocs/withProps.js';
-import { Box } from '../box/Box.js';
+import { Box, BoxProps } from '../box/Box.js';
 import { Frame, FrameProps } from '../frame/Frame.js';
 import { Text } from '../text/Text.js';
 import { Toolbar } from '../toolbar/Toolbar.js';
@@ -36,7 +37,9 @@ export const CardTitle = withClassName(withProps(Text, { strong: true }), cls.ti
 
 export const CardImage = withClassName('img', cls.image);
 
-export const CardGrid = withClassName(Box, cls.grid);
+export const CardGrid = forwardRef<HTMLDivElement, BoxProps & { small?: boolean }>(function CardGrid({ small, ...props }, ref) {
+	return <Box ref={ref} className={clsx(cls.grid, small && cls.gridSmall)} {...props} />;
+});
 
 export const Card = Object.assign(CardRoot, {
 	Main: CardMain,

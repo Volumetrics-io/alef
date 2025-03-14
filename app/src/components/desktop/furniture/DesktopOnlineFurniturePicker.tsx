@@ -8,7 +8,7 @@ import { DesktopFurnitureCollection } from './DesktopFurnitureCollection';
 
 export function DesktopOnlineFurniturePicker() {
 	return (
-		<Box full stacked gapped p>
+		<Box full stacked gapped p="small">
 			<DesktopFurnitureFilters />
 			<Suspense>
 				<DesktopFilteredFurniture />

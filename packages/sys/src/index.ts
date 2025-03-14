@@ -26,6 +26,7 @@ export * from './components/provider/SysProvider.js';
 export * from './components/scrollArea/ScrollArea.js';
 export * from './components/select/Select.js';
 export * from './components/sidebar/Sidebar.js';
+export * from './components/slider/Slider.js';
 export * from './components/spacer/Spacer.js';
 export * from './components/spinner/Spinner.js';
 export * from './components/switch/Switch.js';

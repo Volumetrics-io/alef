@@ -1,5 +1,4 @@
 import { usePerformanceMonitor } from '@react-three/drei';
-// import { usePerformanceStore } from '@/stores/performanceStore';
 // import { FurnitureModelQuality } from '@alef/common';
 import { useXR } from '@react-three/xr';
 export const XRPerformanceManager = () => {
@@ -17,6 +16,7 @@ export const XRPerformanceManager = () => {
 
 	const onChange = ({ factor }: { factor: number }) => {
 		const ffr = 1 - factor;
+
 		if (session) {
 			const baseLayer = session.renderState.layers?.[0];
 			if (!baseLayer) return;

@@ -8,7 +8,6 @@ import { PropertySocketProvider } from '@/services/publicApi/PropertySocketProvi
 import { useMe } from '@/services/publicApi/userHooks';
 import { RoomStoreProvider } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
-import { PerformanceMonitor } from '@react-three/drei';
 import { isDarkMode, setPreferredColorScheme } from '@react-three/uikit';
 import { ReactNode } from 'react';
 import { ModeProvider } from './modes/ModeContext';

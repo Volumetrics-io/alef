@@ -52,31 +52,43 @@ void main() {
 
 export const DepthShader = () => {
 	const shaderSet = useRef(false);
+	const shaderRef = useRef<ShaderMaterial | null>(null);
 
 	useFrame(({ gl: renderer }) => {
-		if (shaderSet.current) return;
 		if (!renderer.xr.hasDepthSensing() || !renderer.xr.getDepthTexture) return;
 		const depthTexture = renderer.xr.getDepthTexture();
 		const depthMesh = renderer.xr.getDepthSensingMesh?.();
 
 		if (!depthMesh) return null;
 
-		const shader = new ShaderMaterial({
-			vertexShader: _occlusion_vertex,
-			fragmentShader: _occlusion_fragment,
-			uniforms: {
-				depthColor: { value: depthTexture },
-				depthWidth: { value: 1680 },
-				depthHeight: { value: 1760 },
-				depthRadius: { value: 0.9 },
-				softness: { value: 0.07 },
-			},
-		});
-		// this should make it obvious if this is being done every frame
-		console.debug('Updating depth shader');
+		// Get the current viewport dimensions
+		const viewport = renderer.xr.getCamera().cameras[0]?.viewport;
 
-		depthMesh.material = shader;
-		shaderSet.current = true;
+		if (!viewport) return;
+
+		if (!shaderSet.current) {
+			const shader = new ShaderMaterial({
+				vertexShader: _occlusion_vertex,
+				fragmentShader: _occlusion_fragment,
+				uniforms: {
+					depthColor: { value: depthTexture },
+					depthWidth: { value: viewport.z },
+					depthHeight: { value: viewport.w },
+					depthRadius: { value: 0.9 },
+					softness: { value: 0.07 },
+				},
+			});
+			// this should make it obvious if this is being done every frame
+			console.debug('Updating depth shader');
+
+			depthMesh.material = shader;
+			shaderRef.current = shader;
+			shaderSet.current = true;
+		} else if (shaderRef.current) {
+			// Update the viewport dimensions every frame
+			shaderRef.current.uniforms.depthWidth.value = viewport.z;
+			shaderRef.current.uniforms.depthHeight.value = viewport.w;
+		}
 	});
 
 	return null;

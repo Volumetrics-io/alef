@@ -52,7 +52,8 @@ export function SceneWrapper({ children }: SceneWrapperProps) {
 						<PointerEvents />
 						<PerformanceMonitor
 							bounds={(refreshRate) => {
-								return refreshRate > 90 ? [60, 90] : [45, 60];
+								console.log('refreshRate', refreshRate);
+								return [Math.max(refreshRate - 30, 45), refreshRate];
 							}}
 						>
 							<XRPerformanceManager />

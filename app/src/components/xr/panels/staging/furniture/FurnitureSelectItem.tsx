@@ -3,7 +3,8 @@ import { colors, getColorForAnimation } from '@/components/xr/ui/theme';
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
 import { useAddFurniture } from '@/stores/roomStore';
 import { config, useSpring, useSpringRef } from '@react-spring/three';
-import { Container, Image } from '@react-three/uikit';
+import { invalidate } from '@react-three/fiber';
+import { Image } from '@react-three/uikit';
 
 export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }) {
 	const api = useSpringRef();
@@ -11,6 +12,7 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 		spring: 0,
 		config: config.default,
 		ref: api,
+		onChange: () => invalidate(),
 	});
 
 	const addFurniture = useAddFurniture();
@@ -37,7 +39,7 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 
 	const borderColor = spring.to([0, 1], [`#${startBorderColor.getHexString()}`, `#${endBorderColor.getHexString()}`]);
 
-	const startBackgroundColor = getColorForAnimation(colors.surface);
+	const startBackgroundColor = getColorForAnimation(colors.paper);
 	const endBackgroundColor = getColorForAnimation(colors.hover);
 
 	if (!startBackgroundColor || !endBackgroundColor) {
@@ -61,9 +63,7 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 			flexShrink={0}
 			alignItems="center"
 		>
-			<Container flexDirection="column" alignItems="center" justifyContent="center" backgroundColor={colors.paper} borderRadius={5} width="100%">
-				<Image pointerEvents="none" src={`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureItem.id}/image.jpg`} width="100%" height="100%" objectFit="cover" />
-			</Container>
+			<Image pointerEvents="none" src={`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureItem.id}/image.jpg`} width="100%" height="100%" objectFit="cover" />
 		</AnimatedSurface>
 	);
 }

@@ -21,7 +21,7 @@ export function RoomRenderer() {
 			<Walls />
 			<PlaneSync />
 			<GlobalSpace>
-				<NonXRPlaneRenderer debug />
+				<NonXRPlaneRenderer />
 				<RoomLighting />
 				{furniturePlacementIds.map((furniturePlacementId) => {
 					return (

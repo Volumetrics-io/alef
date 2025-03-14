@@ -19,5 +19,5 @@ export interface WallProps {
 }
 
 export function Wall({ plane }: WallProps) {
-	return <PhysicalXRPlane plane={plane} debug />;
+	return <PhysicalXRPlane plane={plane} />;
 }

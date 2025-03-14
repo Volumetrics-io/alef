@@ -19,5 +19,5 @@ export interface FloorProps {
 }
 
 export function Floor({ plane }: FloorProps) {
-	return <PhysicalXRPlane plane={plane} debug />;
+	return <PhysicalXRPlane plane={plane} />;
 }

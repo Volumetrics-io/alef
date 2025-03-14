@@ -1,3 +1,4 @@
+import { DEBUG } from '@/services/debug';
 import { usePlanes } from '@/stores/roomStore';
 import { useXR } from '@react-three/xr';
 import { Quaternion } from 'three';
@@ -7,7 +8,7 @@ export interface NonXRPlaneRendererProps {
 	debug?: boolean;
 }
 
-export function NonXRPlaneRenderer({ debug }: NonXRPlaneRendererProps) {
+export function NonXRPlaneRenderer({ debug = DEBUG }: NonXRPlaneRendererProps) {
 	const planes = usePlanes();
 	const isInSession = useXR((s) => !!s.session);
 

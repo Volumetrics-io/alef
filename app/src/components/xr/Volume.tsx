@@ -2,6 +2,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import React, { useContext, useEffect, useMemo, useRef } from 'react';
 import { Group, Material, Matrix4, Mesh, Plane, PlaneHelper, Vector3 } from 'three';
 
+import { DEBUG } from '@/services/debug.js';
 import { PlaneAnchorContext } from './anchors/PlaneAnchor.js';
 
 interface VolumeProps {
@@ -10,7 +11,7 @@ interface VolumeProps {
 	debug?: boolean;
 }
 
-export function Volume({ dimensions = [0, 1, 0], children, debug = false }: VolumeProps) {
+export function Volume({ dimensions = [0, 1, 0], children, debug = DEBUG }: VolumeProps) {
 	const plane = useContext(PlaneAnchorContext);
 	const groupRef = useRef<Group>(null);
 	const { scene } = useThree();

@@ -1,10 +1,10 @@
 import { Root, Text } from '@react-three/uikit';
-import { colors } from './ui/theme';
 import { CircleAlertIcon, CircleCheckIcon, HourglassIcon, InfoIcon } from '@react-three/uikit-lucide';
 import { useEffect } from 'react';
 import toast, { useToaster } from 'react-hot-toast';
 import { BodyAnchor } from './anchors';
 import { Surface } from './ui/Surface';
+import { colors } from './ui/theme';
 
 export function XRToaster({ debug }: { debug?: boolean }) {
 	const { toasts, handlers } = useToaster();

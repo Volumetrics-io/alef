@@ -19,5 +19,5 @@ export interface WallProps {
 }
 
 export function Wall({ plane }: WallProps) {
-	return <PhysicalXRPlane plane={plane} debug={location.search.includes('debug')} />;
+	return <PhysicalXRPlane plane={plane} />;
 }

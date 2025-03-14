@@ -64,7 +64,6 @@ export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(functi
 					<shadowMaterial ref={shadowMaterialRef} side={DoubleSide} shadowSide={DoubleSide} transparent={true} opacity={0} />
 				</XRPlaneModel>
 				<XRPlaneModel renderOrder={-1} plane={plane} position={[0, 0.01, 0]}>
-					{/* temp debug - render plane color when snapping */}
 					<meshBasicMaterial colorWrite={false} color={0x002040} side={DoubleSide} />
 				</XRPlaneModel>
 			</XRSpace>

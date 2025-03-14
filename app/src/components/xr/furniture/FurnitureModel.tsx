@@ -1,9 +1,9 @@
 import { useFurnitureModel } from '@/services/publicApi/furnitureHooks';
 import { usePerformanceStore } from '@/stores/performanceStore';
 import { FurnitureModelQuality, PrefixedId, RANKED_FURNITURE_MODEL_QUALITIES } from '@alef/common';
-import { ErrorBoundary, useMergedRef } from '@alef/sys';
+import { ErrorBoundary } from '@alef/sys';
 import { Bvh, Clone, Detailed, Outlines } from '@react-three/drei';
-import { forwardRef, ReactNode, Suspense, useRef } from 'react';
+import { forwardRef, ReactNode, Suspense, useCallback } from 'react';
 import { Group, Mesh } from 'three';
 
 export interface FurnitureModelProps {
@@ -30,32 +30,44 @@ const FurnitureModelRenderer = forwardRef<Group, FurnitureModelRendererProps>(fu
 	{ furnitureId, outline, castShadow, receiveShadow, pointerEvents = 'auto', quality, transparent = false },
 	ref
 ) {
-	const internalRef = useRef<Group>(null);
 	const model = useFurnitureModel(furnitureId, quality);
 
 	if (!model) return null;
 
-	if (transparent) {
-		model.scene.traverse((child) => {
-			if (child instanceof Mesh) {
-				child.material.transparent = true;
-				child.material.opacity = 0;
-				child.renderOrder = -1;
+	const handleUpdate = useCallback(
+		(self: Group) => {
+			if (transparent) {
+				self.traverse((child) => {
+					if (child instanceof Mesh) {
+						child.material.transparent = true;
+						child.material.opacity = 0;
+						child.renderOrder = -1;
+					}
+				});
+			} else {
+				self.traverse((child) => {
+					if (child instanceof Mesh) {
+						child.material.transparent = false;
+						child.material.opacity = 1;
+						child.renderOrder = 0;
+					}
+				});
 			}
-		});
-	}
+		},
+		[transparent]
+	);
 
-	const finalRef = useMergedRef(internalRef, ref);
 	return (
 		<Clone
 			// @ts-ignore pointerEvents is not typed
 			pointerEvents={pointerEvents}
 			object={model.scene as any}
-			deep={true}
+			deep
 			castShadow={castShadow}
 			receiveShadow={receiveShadow}
-			ref={finalRef}
+			ref={ref}
 			inject={outline ? <Outlines thickness={1} color={qualityColor[quality]} /> : null}
+			onUpdate={handleUpdate}
 		/>
 	);
 });

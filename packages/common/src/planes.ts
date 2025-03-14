@@ -10,31 +10,42 @@ export function mergePlanes(existingPlanes: RoomPlaneData[], newPlanes: UnknownR
 	const mergedIds = new Set<PrefixedId<'rp'>>();
 	let mergedPlanes = [...existingPlanes];
 	for (const newPlane of newPlanes) {
-		const candidates = existingPlanes.filter(
-			(other) => isTypeMatch(other, newPlane) && isNormalClose(other, newPlane) && isPositionClose(other, newPlane) && isSizeClose(other, newPlane)
-		);
-		if (candidates.length === 0) {
+		const matchedPlane = matchPlane(existingPlanes, newPlane);
+		if (!matchedPlane) {
 			const newId = id('rp');
 			mergedPlanes = [...mergedPlanes, { ...newPlane, id: newId }];
 			mergedIds.add(newId);
 		} else {
-			// narrow down to 1 candidate and replace it in the list
-			let finalCandidate = candidates.sort(createDivergenceSorter(newPlane))[0];
 			mergedPlanes = mergedPlanes.map((plane) =>
-				plane === finalCandidate
+				plane === matchedPlane
 					? {
 							...newPlane,
 							id: plane.id,
 						}
 					: plane
 			);
-			mergedIds.add(finalCandidate.id);
+			mergedIds.add(matchedPlane.id);
 		}
 	}
 
 	// remove planes which weren't matched or added
 	mergedPlanes = mergedPlanes.filter((plane) => mergedIds.has(plane.id));
 	return mergedPlanes;
+}
+
+/**
+ * Determines if the given unassigned plane data matches any of the existing planes with IDs.
+ */
+export function matchPlane(existingPlanes: RoomPlaneData[], newPlane: UnknownRoomPlaneData): RoomPlaneData | null {
+	const candidates = existingPlanes.filter(
+		(other) => isTypeMatch(other, newPlane) && isNormalClose(other, newPlane) && isPositionClose(other, newPlane) && isSizeClose(other, newPlane)
+	);
+	if (candidates.length === 0) {
+		return null;
+	}
+	// narrow down to 1 candidate and replace it in the list
+	const finalCandidate = candidates.sort(createDivergenceSorter(newPlane))[0];
+	return finalCandidate;
 }
 
 const divergenceThresholds = {

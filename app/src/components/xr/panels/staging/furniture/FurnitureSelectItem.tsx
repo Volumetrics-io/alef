@@ -5,8 +5,9 @@ import { useAddFurniture } from '@/stores/roomStore';
 import { config, useSpring, useSpringRef } from '@react-spring/three';
 import { invalidate } from '@react-three/fiber';
 import { Image } from '@react-three/uikit';
-
+import { usePerformanceStore } from '@/stores/performanceStore';
 export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }) {
+	const perfMode = usePerformanceStore((state) => state.perfMode);
 	const api = useSpringRef();
 	const { spring } = useSpring({
 		spring: 0,
@@ -26,6 +27,7 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 	};
 
 	const handleHover = (isHovered: boolean) => {
+		if (perfMode) return;
 		api.start({ spring: Number(isHovered) });
 	};
 

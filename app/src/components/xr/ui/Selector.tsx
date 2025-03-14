@@ -8,6 +8,7 @@ import { useRef } from 'react';
 import { ThreeEvent } from '@react-three/fiber';
 import { AnimatedContainer, usePullAnimation } from './Animations';
 import { useSpring, config, useSpringRef } from '@react-spring/three';
+import { usePerformanceStore } from '@/stores/performanceStore';
 export interface SelectorProps {
 	wrap?: boolean;
 	size?: 'small' | 'medium';
@@ -52,6 +53,7 @@ export function SelectorItem({
 	children,
 	...props
 }: ContainerProperties & { wrap?: boolean; selected: boolean; size?: 'small' | 'medium'; children: React.ReactNode }) {
+	const perfMode = usePerformanceStore((state) => state.perfMode);
 	const audioRef = useRef<PositionalAudioType>(null);
 
 	const startColor = getColorForAnimation(colors.selectionSurface);
@@ -91,6 +93,7 @@ export function SelectorItem({
 				audioRef.current.play();
 			}
 			props.onClick?.(e);
+			if (perfMode) return;
 			api.start({ spring: 1 });
 		},
 		[props]
@@ -105,7 +108,10 @@ export function SelectorItem({
 			flexDirection="row"
 			width={wrap ? 'auto' : '100%'}
 			justifyContent="flex-start"
-			onHoverChange={(hover) => api.start({ spring: Number(hover) })}
+			onHoverChange={(hover) => {
+				if (perfMode) return;
+				api.start({ spring: Number(hover) });
+			}}
 			{...props}
 			onClick={onClick}
 		>

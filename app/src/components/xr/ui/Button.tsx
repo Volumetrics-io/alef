@@ -9,7 +9,7 @@ import { PositionalAudio as PositionalAudioType } from 'three';
 import { ThreeEvent } from '@react-three/fiber';
 import { useSpring, config, useSpringRef } from '@react-spring/three';
 import { AnimatedContainer, AnimationProps, usePullAnimation } from './Animations';
-
+import { usePerformanceStore } from '@/stores/performanceStore';
 const buttonVariants = {
 	default: {
 		containerHoverProps: {
@@ -145,6 +145,7 @@ export const Button: (props: ButtonProperties & RefAttributes<ContainerRef>) => 
 			animationProps?: AnimationProps;
 		} = buttonVariants[variant];
 		const sizeProps = buttonSizes[size];
+		const perfMode = usePerformanceStore((state) => state.perfMode);
 
 		const audioRef = useRef<PositionalAudioType>(null);
 
@@ -178,6 +179,7 @@ export const Button: (props: ButtonProperties & RefAttributes<ContainerRef>) => 
 					return;
 				}
 				props.onHoverChange?.(hover);
+				if (perfMode) return;
 				api.start({ spring: Number(hover) });
 			},
 			[props]
@@ -196,6 +198,7 @@ export const Button: (props: ButtonProperties & RefAttributes<ContainerRef>) => 
 					return;
 				}
 				props.onClick?.(e);
+				if (perfMode) return;
 				api.start({ spring: 0 });
 			},
 			[props]

@@ -9,14 +9,16 @@ import {
 	FurniturePanelHeader,
 	FurniturePanelNavigation,
 } from './common';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 
 export function OnlineFurniturePanel() {
 	return (
 		<>
 			<FurnitureFilters />
 			<FurniturePanelHeader />
-			<FilteredFurniture />
+			<Suspense>
+				<FilteredFurniture />
+			</Suspense>
 			<FurniturePanelNavigation />
 		</>
 	);

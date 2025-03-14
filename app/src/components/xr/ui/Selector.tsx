@@ -116,7 +116,7 @@ export function SelectorItem({
 			onClick={onClick}
 		>
 			<PositionalAudio url={`./audio/click.webm`} distance={0.5} autoplay={false} loop={false} ref={audioRef} />
-			<DefaultProperties padding={0} fontFamily="ibm-plex-sans" {...selectorItemSizeVariants[size]}>
+			<DefaultProperties padding={0} {...selectorItemSizeVariants[size]}>
 				{children}
 			</DefaultProperties>
 		</AnimatedContainer>

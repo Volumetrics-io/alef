@@ -1,3 +1,4 @@
+import { usePerformanceStore } from '@/stores/performanceStore';
 import { Text, TextProperties } from '@react-three/uikit';
 
 type HeadingProps = {
@@ -16,5 +17,10 @@ const fontSizes = {
 };
 
 export function Heading({ children, level = 0, ...props }: HeadingProps) {
-	return <Text fontSize={fontSizes[level]} fontFamily="bricolage-grotesque" fontWeight="semi-bold" {...props}>{children}</Text>;
+	const { perfMode } = usePerformanceStore();
+	return (
+		<Text fontSize={fontSizes[level]} fontFamily={perfMode ? undefined : 'bricolage-grotesque'} fontWeight="semi-bold" {...props}>
+			{children}
+		</Text>
+	);
 }

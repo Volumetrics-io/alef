@@ -6,6 +6,7 @@ import { config, useSpring, useSpringRef } from '@react-spring/three';
 import { invalidate } from '@react-three/fiber';
 import { Image } from '@react-three/uikit';
 import { usePerformanceStore } from '@/stores/performanceStore';
+import { Suspense } from 'react';
 export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }) {
 	const perfMode = usePerformanceStore((state) => state.perfMode);
 	const api = useSpringRef();
@@ -66,7 +67,9 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 			flexShrink={0}
 			alignItems="center"
 		>
-			<Image pointerEvents="none" src={`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureItem.id}/image.jpg`} width="100%" height="100%" objectFit="cover" />
+			<Suspense>
+				<Image pointerEvents="none" src={`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureItem.id}/image.jpg`} width="100%" height="100%" objectFit="cover" />
+			</Suspense>
 		</AnimatedSurface>
 	);
 }

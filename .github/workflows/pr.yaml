@@ -1,0 +1,26 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          cache: 'pnpm'
+      - name: Install deps
+        run: pnpm install
+      - name: Build everything
+        run: pnpm run build
+        env:
+          VITE_PUBLIC_API_ORIGIN: ${{ vars.PUBLIC_API_ORIGIN }}
+          VITE_ADMIN_API_ORIGIN: ${{ vars.ADMIN_API_ORIGIN }}
+          VITE_MAIN_UI_ORIGIN: ${{ vars.APP_ORIGIN }}
+          VITE_ADMIN_UI_ORIGIN: ${{ vars.ADMIN_APP_ORIGIN }}

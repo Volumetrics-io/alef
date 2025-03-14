@@ -1,0 +1,25 @@
+@layer components {
+	.root {
+	}
+
+	.item {
+		cursor: pointer;
+		user-select: none;
+		padding: 0.5rem 1rem;
+		align-items: center;
+		justify-content: center;
+
+		/* Control config */
+		--color-border: var(--border-color);
+		--color-text: var(--ink);
+		--color-background: var(--track);
+		--color-background-hover: var(--hover);
+		--color-background-press: var(--paper);
+		--color-text-focus: var(--focus);
+
+		&[data-state='on'] {
+			background-color: var(--happy-paper);
+			color: var(--happy-ink);
+		}
+	}
+}

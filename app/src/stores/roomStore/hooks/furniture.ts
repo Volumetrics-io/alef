@@ -1,4 +1,5 @@
-import { isPrefixedId, PrefixedId } from '@alef/common';
+import { useAllFurniture, useFurnitureDetails } from '@/services/publicApi/furnitureHooks';
+import { isPrefixedId, PrefixedId, RoomFurniturePlacement } from '@alef/common';
 import { useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useRoomStore, useRoomStoreSubscribe } from '../roomStore';
@@ -47,4 +48,37 @@ export function useSubscribeToPlacementPosition(id: PrefixedId<'fp'> | PrefixedI
 export function useUpdateFurniturePlacementTransform(id: PrefixedId<'fp'>) {
 	const set = useRoomStore((s) => s.moveFurniture);
 	return useCallback((transform: { position?: { x: number; y: number; z: number }; rotation?: { x: number; y: number; z: number; w: number } }) => set(id, transform), [id, set]);
+}
+
+export function useFurnitureQuickSwap(furniturePlacement: RoomFurniturePlacement) {
+	const { furnitureId: currentFurnitureId, id } = furniturePlacement;
+	const setFurnitureId = useSetFurniturePlacementFurnitureId();
+	const { data: currentFurniture } = useFurnitureDetails(currentFurnitureId);
+	const { data: furniture } = useAllFurniture({
+		attributeFilter: currentFurniture?.attributes,
+	});
+
+	const furnitureIds = furniture.pages
+		.flatMap((page) => page.items)
+		.map((f) => f.id)
+		.sort();
+
+	const swapPrevious = () => {
+		const index = furnitureIds.findIndex((f) => f === currentFurnitureId);
+		if (index > 0) {
+			setFurnitureId(id, furnitureIds[index - 1]);
+		}
+	};
+
+	const swapNext = () => {
+		const index = furnitureIds.findIndex((f) => f === currentFurnitureId);
+		if (index < furnitureIds.length - 1) {
+			setFurnitureId(id, furnitureIds[index + 1]);
+		}
+	};
+
+	return {
+		swapPrevious,
+		swapNext,
+	};
 }

@@ -44,6 +44,11 @@
 		gap: 1rem;
 	}
 
+	.gridSmall {
+		grid-template-columns: repeat(auto-fill, minmax(min(10rem, 100%), 1fr));
+		gap: 0.5rem;
+	}
+
 	@container (width > 1024px) {
 		.inner {
 			flex-direction: row;

@@ -61,7 +61,7 @@ export type RoomStoreState = RoomState & {
 		}
 	) => Promise<void>;
 	deleteLight: (id: PrefixedId<'lp'>) => Promise<void>;
-	updateGlobalLighting: (update: Partial<RoomGlobalLighting>) => Promise<void>;
+	updateGlobalLighting: (update: Partial<RoomGlobalLighting>, options?: { localOnly?: boolean }) => Promise<void>;
 };
 
 export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | null) =>
@@ -118,20 +118,25 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 
 					async function applyChange(
 						op: Operation,
-						{ historyStack = 'undoStack', disableClearRedo }: { historyStack?: 'undoStack' | 'redoStack'; disableClearRedo?: boolean } = {}
+						{
+							historyStack = 'undoStack',
+							disableClearRedo,
+							localOnly,
+							disableHistory = localOnly,
+						}: { historyStack?: 'undoStack' | 'redoStack'; disableClearRedo?: boolean; localOnly?: boolean; disableHistory?: boolean } = {}
 					): Promise<void> {
 						// apply change and add to undo stack
 						set((state) => {
 							const undo = getUndo(state, op);
 							updateRoom(state, op);
-							if (undo) {
+							if (undo && !disableHistory) {
 								state[historyStack].push(undo);
 							}
 						});
 
 						// send to server
 						// client-only -- don't bother keeping a backlog.
-						if (!socket) return;
+						if (!socket || localOnly) return;
 
 						if (socket?.isClosed) {
 							set((state) => {
@@ -320,12 +325,15 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 								id,
 							});
 						},
-						updateGlobalLighting: async (update) => {
-							await applyChange({
-								type: 'updateGlobalLighting',
-								roomId,
-								data: update,
-							});
+						updateGlobalLighting: async (update, options) => {
+							await applyChange(
+								{
+									type: 'updateGlobalLighting',
+									roomId,
+									data: update,
+								},
+								options
+							);
 						},
 					} satisfies RoomStoreState;
 				})

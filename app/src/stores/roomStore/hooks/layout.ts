@@ -15,7 +15,7 @@ export function useCreateRoomLayout() {
 }
 
 export function useActiveRoomLayoutId() {
-	return useRoomStore(useShallow((s) => [s.viewingLayoutId, s.setViewingLayoutId] as const));
+	return useRoomStore(useShallow((s) => [s.viewingLayoutId || (Object.keys(s.layouts)[0] as PrefixedId<'rl'>), s.setViewingLayoutId] as const));
 }
 
 export function useActiveRoomLayout() {

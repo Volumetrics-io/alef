@@ -1,4 +1,5 @@
 import { Attribute, RoomType } from '@alef/common';
+import { startTransition, useCallback } from 'react';
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { useShallow } from 'zustand/react/shallow';
@@ -40,5 +41,13 @@ export function useAllFilters() {
 }
 
 export function useSetFilters() {
-	return useFilterStore((s) => s.setFilters);
+	const baseSetter = useFilterStore((s) => s.setFilters);
+	return useCallback(
+		(...params: Parameters<FilterStore['setFilters']>) => {
+			startTransition(() => {
+				baseSetter(...params);
+			});
+		},
+		[baseSetter]
+	);
 }

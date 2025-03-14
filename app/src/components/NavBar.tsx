@@ -12,7 +12,7 @@ export const NavBar = forwardRef<HTMLDivElement, NavBarProps>(function NavBar(pr
 	const isDevices = routes.some((r) => r.path === '/devices');
 
 	return (
-		<SysNavBar {...props} background="paper" ref={ref}>
+		<SysNavBar {...props} ref={ref}>
 			<SysNavBar.Start>
 				<Link to="/">
 					<Logo />

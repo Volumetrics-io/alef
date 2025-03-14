@@ -192,7 +192,7 @@ export const Box = forwardRef<HTMLDivElement, BoxProps>(function Box(
 			[cls.separated]: separated,
 
 			[cls.reverse]: reverse === true,
-			[cls.reversedMobile]: reverse === 'mobile',
+			[cls.reverseMobile]: reverse === 'mobile',
 		},
 		className
 	);

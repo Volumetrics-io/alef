@@ -1,4 +1,4 @@
-import { useEditorSelectionReset } from '@/stores/editorStore';
+import { useEditorSelectionReset, useUpdateClosestFloorCenter } from '@/stores/editorStore';
 import { useFurniturePlacementIds } from '@/stores/roomStore';
 import { Suspense } from 'react';
 import { PlaneAnchor } from '../anchors';
@@ -13,6 +13,7 @@ export function RoomRenderer() {
 	const furniturePlacementIds = useFurniturePlacementIds();
 
 	useEditorSelectionReset();
+	useUpdateClosestFloorCenter();
 
 	return (
 		<>

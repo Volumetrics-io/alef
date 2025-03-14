@@ -1,0 +1,80 @@
+.root {
+	display: grid;
+	grid-template-areas: 'main content secondary';
+	grid-template-columns: auto 1fr auto;
+	grid-template-rows: minmax(0, 1fr);
+	flex: 1;
+	min-height: 0;
+	overflow: hidden;
+	height: auto;
+	width: 100%;
+	background-color: var(--track);
+
+	--main-width: 400px;
+	--secondary-width: 300px;
+}
+
+.main {
+	grid-area: main;
+	max-height: 100%;
+	min-height: 0;
+	width: var(--main-width);
+}
+
+.content {
+	grid-area: content;
+	min-width: var(--secondary-width);
+	border: var(--border);
+}
+
+.secondary {
+	grid-area: secondary;
+}
+
+.secondaryContent {
+	width: 0px;
+	transition: width var(--animation-duration) var(--bounce);
+	overflow: hidden;
+	position: relative;
+}
+
+.secondaryContentInner {
+	width: var(--secondary-width);
+	position: absolute;
+	top: 3rem;
+	left: 0;
+	height: calc(100% - 3rem);
+}
+
+.secondaryContentOpen {
+	width: var(--secondary-width);
+}
+
+.secondaryToggle {
+}
+
+/** Smaller size shifts things */
+@media (max-width: 1024px) {
+	.root {
+		grid-template-areas: 'main content' 'secondary content';
+		grid-template-columns: auto 1fr;
+		grid-template-rows: 1fr 1fr;
+	}
+
+	.secondary {
+		border-top: var(--border);
+	}
+
+	.secondaryContent {
+		width: var(--secondary-width);
+	}
+
+	.secondaryToggle {
+		display: none;
+	}
+
+	.secondaryContentInner {
+		height: 100%;
+		top: 0;
+	}
+}

@@ -1,0 +1,48 @@
+@layer components {
+	.root {
+		--size: 20px;
+		position: relative;
+		display: flex;
+		align-items: center;
+		user-select: none;
+		touch-action: none;
+		height: var(--size);
+		border: var(--border);
+		border-radius: 99999px;
+	}
+	.track {
+		background-color: var(--dimmed);
+		border-radius: 99999px;
+		flex-grow: 1;
+		height: 100%;
+		position: relative;
+		overflow: hidden;
+	}
+	.range {
+		position: absolute;
+		background-color: var(--focus);
+		height: 100%;
+	}
+	.thumb {
+		background-color: var(--track);
+		border-radius: 99999px;
+		width: var(--size);
+		height: var(--size);
+		display: block;
+		transition: all var(--animation-duration) var(--bounce);
+
+		&:hover {
+			background-color: var(--hover);
+			box-shadow: 0 0 0 5px var(--border-hover);
+		}
+
+		&:active {
+			background-color: var(--hover);
+			box-shadow: 0 0 0 5px var(--border-press);
+		}
+
+		&:focus-visible {
+			box-shadow: 0 0 0 5px var(--focus);
+		}
+	}
+}

@@ -1,6 +1,6 @@
 import { useLights, useGlobalLighting } from '@/stores/roomStore';
 import { getLightColor } from './getLightColor';
-import { Vector3, Group, Object3D } from 'three';
+import { Vector3, Group } from 'three';
 import { useEffect } from 'react';
 import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
 
@@ -9,7 +9,7 @@ export const ShadowLightTarget = ({ targetRef }: { targetRef: React.RefObject<Gr
 	return <group ref={targetRef}></group>;
 };
 
-export const ShadowLight = ({ target }: { target?: Object3D | null }) => {
+export const ShadowLight = ({ target }: { target?: Group | null }) => {
 	const lights = useLights();
 	const [{ intensity: globalIntensity, color: globalColor }] = useGlobalLighting();
 	const updateShadowMap = useShadowMapUpdate();

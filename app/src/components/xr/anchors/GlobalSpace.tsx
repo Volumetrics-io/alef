@@ -23,7 +23,11 @@ export function GlobalSpace({ children }: GlobalSpaceProps) {
 
 	// if this exists we're in XR.
 	if (primaryXRPlane) {
-		return <XRSpace space={primaryXRPlane.planeSpace}>{children}</XRSpace>;
+		return (
+			<XRSpace space={primaryXRPlane.planeSpace}>
+				<group rotation={[Math.PI, 0, 0]}>{children}</group>
+			</XRSpace>
+		);
 	}
 
 	// otherwise we're not in XR. we use our copied plane state to orient the world.

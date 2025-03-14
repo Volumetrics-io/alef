@@ -1,7 +1,6 @@
 import { AnimatedSurface, usePullAnimation } from '@/components/xr/ui/Animations';
 import { colors, getColorForAnimation } from '@/components/xr/ui/theme';
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
-import { useClosestFloorCenterGetter } from '@/stores/editorStore';
 import { useAddFurniture } from '@/stores/roomStore';
 import { config, useSpring, useSpringRef } from '@react-spring/three';
 import { invalidate } from '@react-three/fiber';
@@ -17,12 +16,11 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 	});
 
 	const addFurniture = useAddFurniture();
-	const getFloorCenter = useClosestFloorCenterGetter();
 
 	const addFurnitureAtCenterOfFloorClosestToUser = () => {
 		addFurniture({
 			furnitureId: furnitureItem.id,
-			position: getFloorCenter(),
+			position: { x: 0, y: 0, z: 0 },
 			rotation: { x: 0, y: 0, z: 0, w: 1 },
 		});
 	};

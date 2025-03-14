@@ -1,5 +1,4 @@
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
-import { useClosestFloorCenterGetter } from '@/stores/editorStore';
 import { useAddFurniture } from '@/stores/roomStore';
 import { Button, Card, CardGrid, Icon, ScrollArea } from '@alef/sys';
 
@@ -29,12 +28,11 @@ export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore }: D
 
 function DesktopFurnitureCard({ item }: { item: FurnitureItem }) {
 	const addFurniture = useAddFurniture();
-	const getFloorCenter = useClosestFloorCenterGetter();
 
 	const add = () => {
 		addFurniture({
 			furnitureId: item.id,
-			position: getFloorCenter(),
+			position: { x: 0, y: 0, z: 0 },
 			rotation: { x: 0, y: 0, z: 0, w: 1 },
 		});
 	};

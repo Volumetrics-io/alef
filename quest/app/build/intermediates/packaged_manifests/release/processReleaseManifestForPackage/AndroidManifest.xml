@@ -34,6 +34,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="com.oculus.permission.USE_SCENE" />
     <uses-permission android:name="com.oculus.permission.HAND_TRACKING" />
 
@@ -57,7 +58,7 @@
 
     <application
         android:name="io.alef.app.twa.Application"
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:appComponentFactory="androidx.core.app.CoreComponentFactory"
         android:extractNativeLibs="false"
         android:icon="@mipmap/ic_launcher"
@@ -127,6 +128,9 @@
             <meta-data
                 android:name="android.support.customtabs.trusted.FALLBACK_STRATEGY"
                 android:value="@string/fallbackType" />
+            <meta-data
+                android:name="com.oculus.ossplash.background"
+                android:value="passthrough-contextual" />
             <meta-data
                 android:name="horizonos.pwa.APP_MODE"
                 android:value="@string/horizonOSAppMode" />

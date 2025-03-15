@@ -93,7 +93,7 @@ export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFal
 						<ErrorBoundary fallback={<MissingModel transparent onClick={onClick} ref={ref} />}>
 							<Bvh onClick={onClick} firstHitOnly>
 								{/* We likely have the original quality model, at minimum, even if others 404. */}
-								<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Original} ref={ref} transparent />
+								<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Low} ref={ref} transparent />
 							</Bvh>
 						</ErrorBoundary>
 					)
@@ -112,13 +112,14 @@ export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFal
 export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode }>(
 	({ errorFallback, maxQuality: preferredMaxQuality = FurnitureModelQuality.Original, debugLod, ...props }, ref) => {
 		const globalMaxQuality = usePerformanceStore((state) => state.maxModelQuality);
-		const maxQualityRank = Math.min(RANKED_FURNITURE_MODEL_QUALITIES.indexOf(preferredMaxQuality), RANKED_FURNITURE_MODEL_QUALITIES.indexOf(globalMaxQuality));
+		const maxQualityRank = Math.max(RANKED_FURNITURE_MODEL_QUALITIES.indexOf(preferredMaxQuality), RANKED_FURNITURE_MODEL_QUALITIES.indexOf(globalMaxQuality));
 		const maxQuality = RANKED_FURNITURE_MODEL_QUALITIES[maxQualityRank];
 
 		const isLowQuality = maxQuality === FurnitureModelQuality.Low || maxQuality === FurnitureModelQuality.Collision;
 
 		const baseLodIndex = lods.findIndex((lod) => lod.quality === maxQuality);
 		const usedLods = lods.slice(baseLodIndex);
+		console.log('maxQuality', maxQuality, 'usedLods', usedLods);
 
 		// FIXME: this JSX structure is kind of a mess of multiple kinds of fallbacks...
 		// perhaps there's a more intuitive way to structure this behavior.

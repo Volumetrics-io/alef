@@ -3,8 +3,9 @@ import { usePerformanceStore } from '@/stores/performanceStore';
 import { FurnitureModelQuality, PrefixedId, RANKED_FURNITURE_MODEL_QUALITIES } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
 import { Bvh, Clone, Detailed, Outlines } from '@react-three/drei';
-import { forwardRef, ReactNode, Suspense } from 'react';
+import { forwardRef, ReactNode, Suspense, useCallback } from 'react';
 import { Group, Mesh } from 'three';
+import { ThreeEvent } from '@react-three/fiber';
 
 export interface FurnitureModelProps {
 	furnitureId: PrefixedId<'f'>;
@@ -83,7 +84,10 @@ const PlaceholderModel = forwardRef<any, { onClick?: () => void }>(function Plac
 });
 
 export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode; onClick?: () => void }>(
-	({ errorFallback, debugLod, onClick, ...props }, ref) => {
+	({ errorFallback, debugLod, onClick, pointerEvents = 'auto', ...props }, ref) => {
+		const stopPropagation = useCallback((e: ThreeEvent<PointerEvent>) => {
+			e.stopPropagation();
+		}, []);
 		return (
 			<ErrorBoundary
 				fallback={
@@ -93,13 +97,28 @@ export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFal
 						<ErrorBoundary fallback={<MissingModel transparent onClick={onClick} ref={ref} />}>
 							<Bvh onClick={onClick} firstHitOnly>
 								{/* We likely have the original quality model, at minimum, even if others 404. */}
-								<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Low} ref={ref} transparent />
+								<mesh>
+									<boxGeometry args={[1, 1, 1]} />
+									<meshBasicMaterial colorWrite={false} color="red" />
+								</mesh>
 							</Bvh>
 						</ErrorBoundary>
 					)
 				}
 			>
-				<Bvh onClick={onClick} firstHitOnly>
+				<Bvh
+					onPointerOver={stopPropagation}
+					onPointerOut={stopPropagation}
+					onPointerEnter={stopPropagation}
+					onPointerLeave={stopPropagation}
+					onPointerMove={stopPropagation}
+					onClick={onClick}
+					firstHitOnly
+					maxDepth={30}
+					maxLeafTris={5}
+					// @ts-ignore
+					pointerEvents={pointerEvents}
+				>
 					<Suspense fallback={<MissingModel transparent ref={ref} />}>
 						<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Collision} ref={ref} transparent />
 					</Suspense>

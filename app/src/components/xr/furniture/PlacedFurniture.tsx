@@ -78,7 +78,8 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 			>
 				{isEditable && (
 					<ConditionalHandle enabled={selected} targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false} apply={applyWithSave}>
-						<CollisionModel furnitureId={furnitureId} onClick={handleClick} />
+						{/* @ts-ignore */}
+						<CollisionModel pointerEventsType={{ deny: 'touch' }} furnitureId={furnitureId} onClick={handleClick} />
 					</ConditionalHandle>
 				)}
 				<FurnitureModel key={furnitureId} furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} receiveShadow={mode !== 'furniture'} pointerEvents="none" />
@@ -86,7 +87,8 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 				{isEditable && selected && <PlacedFurnitureUI placement={placement} height={halfExtents[1] + center.y + 0.2} />}
 				{isEditable && selected && (
 					<Handle targetRef={groupRef as any} rotate={{ x: false, y: true, z: false }} translate="as-rotate" apply={applyWithSave}>
-						<RotationRing radius={hypotenuse + 0.075} position={[0, 0.5, 0]} />
+						{/* @ts-ignore */}
+						<RotationRing pointerEventsType={{ deny: 'touch' }} radius={hypotenuse + 0.075} position={[0, 0.5, 0]} />
 					</Handle>
 				)}
 			</group>

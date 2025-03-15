@@ -19,7 +19,6 @@ export const XRPerformanceManager = () => {
 		if (!session) return;
 		const framerateList = session.supportedFrameRates;
 		if (!framerateList) return;
-		console.log('framerateList', framerateList);
 
 		session.updateTargetFrameRate(framerateList[0]).then(() => console.log('frame rate was applied'));
 	}, [session]);

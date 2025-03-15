@@ -8,12 +8,11 @@ export const xrStore: XRStore = createXRStore({
 	hand: {
 		// disabled since it triggers moving furniture if your hand just intersects
 		// the furniture and can't be cancelled
-		touchPointer: false,
+		touchPointer: true,
 		rayPointer: {
 			rayModel: {
 				color: (pointer) => getRayColor(pointer.getButtonsDown().size > 0),
 				opacity: 0.4,
-
 			},
 			cursorModel: {
 				color: (pointer) => getCursorColor(pointer.getButtonsDown().size > 0),

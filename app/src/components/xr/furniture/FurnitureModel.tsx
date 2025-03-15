@@ -34,28 +34,15 @@ const FurnitureModelRenderer = forwardRef<Group, FurnitureModelRendererProps>(fu
 
 	if (!model) return null;
 
-	const handleUpdate = useCallback(
-		(self: Group) => {
-			if (transparent) {
-				self.traverse((child) => {
-					if (child instanceof Mesh) {
-						child.material.transparent = true;
-						child.material.opacity = 0;
-						child.renderOrder = -1;
-					}
-				});
-			} else {
-				self.traverse((child) => {
-					if (child instanceof Mesh) {
-						child.material.transparent = false;
-						child.material.opacity = 1;
-						child.renderOrder = 0;
-					}
-				});
+	if (transparent) {
+		model.scene.traverse((child) => {
+			if (child instanceof Mesh) {
+				child.material.transparent = true;
+				child.material.opacity = 0;
+				child.renderOrder = -1;
 			}
-		},
-		[transparent]
-	);
+		});
+	}
 
 	return (
 		<Clone
@@ -67,7 +54,6 @@ const FurnitureModelRenderer = forwardRef<Group, FurnitureModelRendererProps>(fu
 			receiveShadow={receiveShadow}
 			ref={ref}
 			inject={outline ? <Outlines thickness={1} color={qualityColor[quality]} /> : null}
-			onUpdate={handleUpdate}
 		/>
 	);
 });

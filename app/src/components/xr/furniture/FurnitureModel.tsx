@@ -3,7 +3,7 @@ import { usePerformanceStore } from '@/stores/performanceStore';
 import { FurnitureModelQuality, PrefixedId, RANKED_FURNITURE_MODEL_QUALITIES } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
 import { Bvh, Clone, Detailed, Outlines } from '@react-three/drei';
-import { forwardRef, ReactNode, Suspense, useCallback } from 'react';
+import { forwardRef, ReactNode, Suspense } from 'react';
 import { Group, Mesh } from 'three';
 
 export interface FurnitureModelProps {

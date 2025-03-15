@@ -58,7 +58,8 @@ export const RoomLighting = () => {
 
 	return (
 		<>
-			<group rotation={[Math.PI / 2, 0, 0]} ref={meshRef}>
+			{/* @ts-ignore */}
+			<group pointerEvents={editable ? 'auto' : 'none'} rotation={[Math.PI / 2, 0, 0]} ref={meshRef}>
 				<mesh onClick={handleClick}>
 					<planeGeometry args={xrCeilingPlane?.extents ?? [5, 5]} />
 					<meshStandardMaterial transparent={false} colorWrite={false} color="red" />

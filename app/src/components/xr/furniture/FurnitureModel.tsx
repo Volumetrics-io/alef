@@ -119,7 +119,6 @@ export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFal
 
 		const baseLodIndex = lods.findIndex((lod) => lod.quality === maxQuality);
 		const usedLods = lods.slice(baseLodIndex);
-		console.log('maxQuality', maxQuality, 'usedLods', usedLods);
 
 		// FIXME: this JSX structure is kind of a mess of multiple kinds of fallbacks...
 		// perhaps there's a more intuitive way to structure this behavior.

@@ -120,7 +120,10 @@ export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFal
 export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode }>(
 	({ errorFallback, maxQuality: preferredMaxQuality = FurnitureModelQuality.Original, debugLod, ...props }, ref) => {
 		const globalMaxQuality = usePerformanceStore((state) => state.maxModelQuality);
-		const maxQualityRank = Math.max(RANKED_FURNITURE_MODEL_QUALITIES.indexOf(preferredMaxQuality), RANKED_FURNITURE_MODEL_QUALITIES.indexOf(globalMaxQuality));
+		// to cap the model quality, we use the smallest of the two: [preferredMaxQuality, globalMaxQuality].
+		// for example, this component may be rendered with a preferred max of Original, but if the global
+		// limit is at Medium, this will be Medium.
+		const maxQualityRank = Math.min(RANKED_FURNITURE_MODEL_QUALITIES.indexOf(preferredMaxQuality), RANKED_FURNITURE_MODEL_QUALITIES.indexOf(globalMaxQuality));
 		const maxQuality = RANKED_FURNITURE_MODEL_QUALITIES[maxQualityRank];
 
 		const isLowQuality = maxQuality === FurnitureModelQuality.Low || maxQuality === FurnitureModelQuality.Collision;

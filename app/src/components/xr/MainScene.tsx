@@ -16,8 +16,8 @@ export function MainScene() {
 		<SceneWrapper full style={{ height: '100vh' }}>
 			<DepthShader />
 			<PropertyRoomStoreProvider>
-				<ModePanel />
 				<RoomRenderer />
+				<ModePanel />
 			</PropertyRoomStoreProvider>
 		</SceneWrapper>
 	);

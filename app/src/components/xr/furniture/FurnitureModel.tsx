@@ -106,23 +106,22 @@ export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFal
 					)
 				}
 			>
-				<Bvh
-					onPointerOver={stopPropagation}
-					onPointerOut={stopPropagation}
-					onPointerEnter={stopPropagation}
-					onPointerLeave={stopPropagation}
-					onPointerMove={stopPropagation}
-					onClick={onClick}
-					firstHitOnly
-					maxDepth={30}
-					maxLeafTris={5}
-					// @ts-ignore
-					pointerEvents={pointerEvents}
-				>
-					<Suspense fallback={<MissingModel transparent ref={ref} />}>
+				<Suspense fallback={<MissingModel transparent ref={ref} />}>
+					<Bvh
+						onPointerOver={stopPropagation}
+						onPointerOut={stopPropagation}
+						onPointerEnter={stopPropagation}
+						onPointerLeave={stopPropagation}
+						onClick={onClick}
+						firstHitOnly
+						maxDepth={30}
+						maxLeafTris={5}
+						// @ts-ignore
+						pointerEvents={pointerEvents}
+					>
 						<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Collision} ref={ref} transparent />
-					</Suspense>
-				</Bvh>
+					</Bvh>
+				</Suspense>
 			</ErrorBoundary>
 		);
 	}

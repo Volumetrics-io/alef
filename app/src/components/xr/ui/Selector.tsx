@@ -106,7 +106,6 @@ export function SelectorItem({
 			backgroundColor={selected ? colors.selectionPress : backgroundColor}
 			alignItems="center"
 			flexDirection="row"
-			width={wrap ? 'auto' : '100%'}
 			justifyContent="flex-start"
 			onHoverChange={(hover) => {
 				if (perfMode) return;

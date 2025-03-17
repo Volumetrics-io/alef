@@ -12,9 +12,10 @@ export function useFurniturePlacement(id: PrefixedId<'fp'>) {
 	return useRoomStore((s) => (s.viewingLayoutId ? (s.layouts[s.viewingLayoutId]?.furniture[id] ?? null) : null));
 }
 
-export function useDeleteFurniturePlacement(id: PrefixedId<'fp'>) {
+export function useDeleteFurniturePlacement(id: PrefixedId<'fp'> | undefined) {
 	const deleteFn = useRoomStore((s) => s.deleteFurniture);
 	return useCallback(() => {
+		if (!id) return;
 		deleteFn(id);
 	}, [deleteFn, id]);
 }

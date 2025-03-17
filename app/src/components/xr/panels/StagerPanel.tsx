@@ -47,25 +47,19 @@ export function StagerPanel() {
 						)}
 					</Container>
 					<UpdatePrompt />
-					{panelState === 'open' && (
-						<>
-							{mode === 'lighting' && <Lighting />}
-							{mode === 'furniture' && (
-								<Suspense>
-									<FurniturePanel />
-								</Suspense>
-							)}
-							{mode === 'layout' && <Layouts />}
-							{mode === 'settings' && <SettingsPanel />}
-							{mode !== null && (
-								<DragController>
-									<Container flexDirection="row" width="70%" gap={10} alignItems="center">
-										<Container backgroundColor={colors.surface} height={15} borderRadius={10} borderColor={colors.border} borderWidth={0.5} flexGrow={1} />
-									</Container>
-								</DragController>
-							)}
-						</>
-					)}
+					<Container flexDirection="column" display={panelState === 'open' ? 'flex' : 'none'}>
+						<Lighting visible={mode === 'lighting'} />
+						<Suspense>
+							<FurniturePanel visible={mode === 'furniture'} />
+						</Suspense>
+						<Layouts visible={mode === 'layout'} />
+						<SettingsPanel visible={mode === 'settings'} />
+						<DragController display={mode !== null ? 'flex' : 'none'}>
+							<Container flexDirection="row" width="70%" gap={10} alignItems="center">
+								<Container backgroundColor={colors.surface} height={15} borderRadius={10} borderColor={colors.border} borderWidth={0.5} flexGrow={1} />
+							</Container>
+						</DragController>
+					</Container>
 				</Defaults>
 			</Root>
 		</DraggableBodyAnchor>

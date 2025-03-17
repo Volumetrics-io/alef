@@ -1,8 +1,9 @@
+import { usePerformanceStore } from '@/stores/performanceStore';
+import { animated, config, SpringValue, useSpring, useSpringRef } from '@react-spring/three';
 import { Container, ContainerProperties, ContainerRef } from '@react-three/uikit';
-import { animated, SpringValue, useSpring, config, useSpringRef } from '@react-spring/three';
+import { ComponentProps } from 'react';
 import { Surface } from './Surface';
 import { colors, getColorForAnimation } from './theme';
-import { usePerformanceStore } from '@/stores/performanceStore';
 
 export type AnimationProps = {
 	from: ContainerProperties;
@@ -32,7 +33,8 @@ export const useWiggleAnimation = (spring: SpringValue<number>) => {
 	return spring.to([0, 0.25, 0.5, 0.75, 1], [0, 1, 0, -1, 0]);
 };
 
-export function AnimatedCursor({ disabled, externalAnimate, ...props }: ContainerProperties & { disabled?: boolean; externalAnimate?: SpringValue<number> }) {
+type AnimatedContainerProperties = ComponentProps<typeof AnimatedContainer>;
+export function AnimatedCursor({ disabled, externalAnimate, ...props }: AnimatedContainerProperties & { disabled?: boolean; externalAnimate?: SpringValue<number> }) {
 	const perfMode = usePerformanceStore((state) => state.perfMode);
 
 	const api = useSpringRef();

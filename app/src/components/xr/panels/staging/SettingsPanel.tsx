@@ -9,12 +9,12 @@ import { HeadsetLogin } from '../../auth/HeadsetLogin';
 import { Heading } from '../../ui/Heading';
 import { Surface } from '../../ui/Surface';
 
-export function SettingsPanel() {
+export function SettingsPanel({ visible }: { visible?: boolean }) {
 	const [isPairing, setIsPairing] = useState(false);
 	const { data: session } = useMe();
 	const isLoggedIn = !!session;
 	return (
-		<Surface flexDirection="column" flexWrap="no-wrap" width={500} height={400} gap={10} padding={20}>
+		<Surface flexDirection="column" flexWrap="no-wrap" width={500} height={400} gap={10} padding={20} display={visible ? 'flex' : 'none'}>
 			<Container marginX="auto" flexDirection="row" gap={6} alignItems="center" justifyContent="center">
 				<SettingsIcon width={20} height={20} />
 				<Heading level={3}>Settings</Heading>

@@ -1,21 +1,21 @@
+import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
 import { useEditorStageMode, useSelectedLightPlacementId } from '@/stores/editorStore';
 import { useDeleteLightPlacement, useGlobalLighting } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
 import { Container } from '@react-three/uikit';
 import { ArrowLeftIcon, SunIcon, Trash } from '@react-three/uikit-lucide';
+import { useCallback, useRef } from 'react';
+import { getLightColor } from '../../lighting/getLightColor';
 import { Button } from '../../ui/Button';
 import { Heading } from '../../ui/Heading';
 import { Slider } from '../../ui/Slider';
 import { Surface } from '../../ui/Surface';
-import { getLightColor } from '../../lighting/getLightColor';
-import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
-import { useCallback, useRef } from 'react';
 
-export const Lighting = () => {
+export const Lighting = ({ visible }: { visible?: boolean }) => {
 	const selectedLightId = useSelectedLightPlacementId();
 
 	return (
-		<Surface flexDirection="column" width={500} height={420}>
+		<Surface flexDirection="column" width={500} height={420} display={visible ? 'flex' : 'none'}>
 			<SelectedLightPane id={selectedLightId} />
 		</Surface>
 	);

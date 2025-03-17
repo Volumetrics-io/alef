@@ -1,9 +1,9 @@
-import { ContainerRef, ContainerProperties } from '@react-three/uikit';
-import { ReactNode, RefAttributes, forwardRef, useState } from 'react';
-import { colors, getColorForAnimation } from './theme.js';
-import { useSpring, config, useSpringRef } from '@react-spring/three';
-import { AnimatedContainer, AnimatedCursor } from './Animations.js';
 import { usePerformanceStore } from '@/stores/performanceStore';
+import { config, useSpring, useSpringRef } from '@react-spring/three';
+import { ContainerProperties, ContainerRef } from '@react-three/uikit';
+import { ReactNode, RefAttributes, forwardRef, useState } from 'react';
+import { AnimatedContainer, AnimatedCursor } from './Animations.js';
+import { colors, getColorForAnimation } from './theme.js';
 export type SwitchProperties = Omit<ContainerProperties, 'children'> & {
 	defaultChecked?: boolean;
 	checked?: boolean;
@@ -62,13 +62,7 @@ export const Switch: (props: SwitchProperties & RefAttributes<ContainerRef>) => 
 				ref={ref}
 				{...props}
 			>
-				<AnimatedCursor
-					// @ts-ignore this works fine
-					marginLeft={position}
-					// @ts-ignore this works fine
-					width={width}
-					externalAnimate={checkedSpring}
-				/>
+				<AnimatedCursor marginLeft={position} width={width} externalAnimate={checkedSpring} />
 			</AnimatedContainer>
 		);
 	}

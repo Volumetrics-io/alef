@@ -3,9 +3,9 @@ import { usePerformanceStore } from '@/stores/performanceStore';
 import { FurnitureModelQuality, PrefixedId, RANKED_FURNITURE_MODEL_QUALITIES } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
 import { Bvh, Clone, Detailed, Outlines } from '@react-three/drei';
+import { ThreeEvent } from '@react-three/fiber';
 import { forwardRef, ReactNode, Suspense, useCallback } from 'react';
 import { Group, Mesh } from 'three';
-import { ThreeEvent } from '@react-three/fiber';
 
 export interface FurnitureModelProps {
 	furnitureId: PrefixedId<'f'>;
@@ -66,10 +66,9 @@ export const MissingModel = forwardRef<any, { onClick?: () => void; transparent?
 				onClick?.();
 			}}
 			ref={ref}
-			renderOrder={transparent ? -1 : 0}
 		>
 			<boxGeometry args={[1, 1, 1]} />
-			<meshBasicMaterial color="red" transparent={transparent} opacity={transparent ? 0 : 1} />
+			<meshBasicMaterial color="red" transparent={transparent} colorWrite={!transparent} />
 		</mesh>
 	);
 });
@@ -92,17 +91,8 @@ export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFal
 			<ErrorBoundary
 				fallback={
 					errorFallback ?? (
-						// add an error boundary here as well just in case the whole furniture is missing or the network is
-						// unavailable.
-						<ErrorBoundary fallback={<MissingModel transparent onClick={onClick} ref={ref} />}>
-							<Bvh onClick={onClick} firstHitOnly>
-								{/* We likely have the original quality model, at minimum, even if others 404. */}
-								<mesh>
-									<boxGeometry args={[1, 1, 1]} />
-									<meshBasicMaterial colorWrite={false} color="red" />
-								</mesh>
-							</Bvh>
-						</ErrorBoundary>
+						// default error fallback is a box
+						<MissingModel transparent onClick={onClick} ref={ref} />
 					)
 				}
 			>

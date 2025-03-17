@@ -2,7 +2,7 @@ import { useEditorStageMode, usePanelState } from '@/stores/editorStore';
 import { Container, Root } from '@react-three/uikit';
 import { Defaults } from '../ui/Defaults';
 import { useXR } from '@react-three/xr';
-import { Suspense, useMemo, useState } from 'react';
+import { Suspense, useMemo } from 'react';
 import { Vector3 } from 'three';
 import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
 import { DragController } from '../controls/Draggable';

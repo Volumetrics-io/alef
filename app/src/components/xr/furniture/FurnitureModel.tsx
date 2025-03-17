@@ -82,8 +82,8 @@ const PlaceholderModel = forwardRef<any, { onClick?: () => void }>(function Plac
 	);
 });
 
-export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode; onClick?: () => void }>(
-	({ errorFallback, debugLod, onClick, pointerEvents = 'auto', ...props }, ref) => {
+export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode; onClick?: () => void; enabled?: boolean }>(
+	({ errorFallback, debugLod, onClick, pointerEvents = 'auto', enabled, ...props }, ref) => {
 		const stopPropagation = useCallback((e: ThreeEvent<PointerEvent>) => {
 			e.stopPropagation();
 		}, []);
@@ -92,7 +92,7 @@ export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFal
 				fallback={
 					errorFallback ?? (
 						// default error fallback is a box
-						<MissingModel transparent onClick={onClick} ref={ref} />
+						<MissingModel transparent onClick={enabled ? onClick : undefined} ref={ref} />
 					)
 				}
 			>
@@ -106,6 +106,7 @@ export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFal
 						firstHitOnly
 						maxDepth={30}
 						maxLeafTris={5}
+						enabled={enabled}
 						// @ts-ignore
 						pointerEvents={pointerEvents}
 					>

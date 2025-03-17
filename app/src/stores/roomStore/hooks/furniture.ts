@@ -1,4 +1,5 @@
 import { useAllFurniture, useFurnitureDetails } from '@/services/publicApi/furnitureHooks';
+import { useSelect } from '@/stores/editorStore';
 import { isPrefixedId, PrefixedId, RoomFurniturePlacement } from '@alef/common';
 import { useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
@@ -29,7 +30,15 @@ export function useSetFurniturePlacementFurnitureId() {
 }
 
 export function useAddFurniture() {
-	return useRoomStore((s) => s.addFurniture);
+	const add = useRoomStore((s) => s.addFurniture);
+	const select = useSelect();
+	return useCallback(
+		async (placement: Omit<RoomFurniturePlacement, 'id'>) => {
+			const id = await add(placement);
+			select(id);
+		},
+		[add, select]
+	);
 }
 
 export function useSubscribeToPlacementPosition(id: PrefixedId<'fp'> | PrefixedId<'lp'>, callback: (position: { x: number; y: number; z: number }) => void) {

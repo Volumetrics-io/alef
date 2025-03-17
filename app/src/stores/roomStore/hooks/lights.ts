@@ -1,4 +1,5 @@
-import { PrefixedId } from '@alef/common';
+import { useSelect } from '@/stores/editorStore';
+import { PrefixedId, RoomLightPlacement } from '@alef/common';
 import { useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useRoomStore } from '../roomStore';
@@ -23,7 +24,15 @@ export function useDeleteLightPlacement(id: PrefixedId<'lp'>) {
 }
 
 export function useAddLight() {
-	return useRoomStore((s) => s.addLight);
+	const add = useRoomStore((s) => s.addLight);
+	const select = useSelect();
+	return useCallback(
+		async (light: Omit<RoomLightPlacement, 'id'>) => {
+			const id = await add(light);
+			select(id);
+		},
+		[add, select]
+	);
 }
 
 export function useMoveLight(id: PrefixedId<'lp'>) {

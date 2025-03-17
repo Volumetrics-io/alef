@@ -41,7 +41,7 @@ export type RoomStoreState = RoomState & {
 	deleteLayout: (id: PrefixedId<'rl'>) => void;
 
 	// furniture APIs
-	addFurniture: (init: Omit<RoomFurniturePlacement, 'id'>) => Promise<string>;
+	addFurniture: (init: Omit<RoomFurniturePlacement, 'id'>) => Promise<PrefixedId<'fp'>>;
 	updateFurnitureId: (id: PrefixedId<'fp'>, furnitureId: PrefixedId<'f'>) => Promise<void>;
 	moveFurniture: (
 		id: PrefixedId<'fp'>,
@@ -53,7 +53,7 @@ export type RoomStoreState = RoomState & {
 	deleteFurniture: (id: PrefixedId<'fp'>) => Promise<void>;
 
 	// light APIs
-	addLight: (init: Omit<RoomLightPlacement, 'id'>) => Promise<string>;
+	addLight: (init: Omit<RoomLightPlacement, 'id'>) => Promise<PrefixedId<'lp'>>;
 	moveLight: (
 		id: PrefixedId<'lp'>,
 		transform: {

@@ -75,7 +75,7 @@ export const MissingModel = forwardRef<any, { onClick?: () => void; transparent?
 
 const PlaceholderModel = forwardRef<any, { onClick?: () => void }>(function PlaceholderModel({ onClick }, ref) {
 	return (
-		<mesh onClick={onClick} ref={ref}>
+		<mesh onClick={onClick} ref={ref} position={[0, 0.5, 0]}>
 			<sphereGeometry args={[0.5, 8, 8]} />
 			<meshBasicMaterial color="white" transparent opacity={0.5} />
 		</mesh>

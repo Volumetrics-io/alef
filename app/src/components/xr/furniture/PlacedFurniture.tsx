@@ -1,15 +1,15 @@
 import { useAABB } from '@/hooks/useAABB';
-import { useSelect, useIsSelected, useIsEditorStageMode, useSetPanelState } from '@/stores/editorStore';
+import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
+import { useIsEditorStageMode, useIsSelected, useSelect, useSetPanelState } from '@/stores/editorStore';
 import { useFurniturePlacement, useFurniturePlacementFurnitureId, useUpdateFurniturePlacementTransform } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
+import { Bvh } from '@react-three/drei';
 import { defaultApply, Handle, HandleState } from '@react-three/handle';
-import { ComponentPropsWithoutRef, useCallback, useRef, useState } from 'react';
+import { ComponentPropsWithoutRef, startTransition, useCallback, useRef, useState } from 'react';
 import { BackSide, Group, Object3D } from 'three';
 import { colors } from '../ui/theme';
 import { CollisionModel, FurnitureModel, MissingModel } from './FurnitureModel';
-import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
-import { Bvh } from '@react-three/drei';
 
 export interface PlacedFurnitureProps {
 	furniturePlacementId: PrefixedId<'fp'>;
@@ -31,8 +31,10 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	const isEditable = ready && mode;
 
 	const handleClick = useCallback(() => {
-		select(furniturePlacementId);
-		setPanelState('hidden');
+		startTransition(() => {
+			select(furniturePlacementId);
+			setPanelState('hidden');
+		});
 	}, [select, furniturePlacementId]);
 
 	const applyWithSave = useCallback(
@@ -67,13 +69,12 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 			>
 				{isEditable && (
 					<ConditionalHandle enabled={selected} targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false} apply={applyWithSave}>
-						{/* @ts-ignore */}
+						{/* @ts-expect-error - pointerEventsType not included in typings */}
 						<CollisionModel pointerEventsType={{ deny: 'touch' }} furnitureId={furnitureId} onClick={handleClick} />
 					</ConditionalHandle>
 				)}
 
-				{/* @ts-ignore */}
-				<RotationHandle enabled={selected} targetRef={groupRef as any} apply={applyWithSave} radius={hypotenuse + 0.075} position={[0, 0.5, 0]} />
+				{selected && <RotationHandle targetRef={groupRef as any} apply={applyWithSave} radius={hypotenuse + 0.075} position={[0, 0.5, 0]} />}
 				<FurnitureModel key={furnitureId} furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} receiveShadow={mode} pointerEvents="none" />
 			</group>
 		</ErrorBoundary>
@@ -85,23 +86,17 @@ function ConditionalHandle({ enabled, ...props }: ComponentPropsWithoutRef<typeo
 	return <Handle {...props} />;
 }
 
-function RotationHandle({
-	enabled,
-	radius,
-	position,
-	...props
-}: ComponentPropsWithoutRef<typeof Handle> & { enabled: boolean; radius: number; position: [number, number, number] }) {
+function RotationHandle({ radius, position, ...props }: ComponentPropsWithoutRef<typeof Handle> & { radius: number; position: [number, number, number] }) {
 	const [hovered, setHovered] = useState(false);
-	if (!enabled) return null;
 	return (
-		<ConditionalHandle enabled={enabled} rotate={{ x: false, y: true, z: false }} translate="as-rotate" {...props}>
+		<Handle rotate={{ x: false, y: true, z: false }} translate="as-rotate" {...props}>
 			<Bvh onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} position={position} rotation={[Math.PI / 2, 0, 0]} renderOrder={-2}>
 				<mesh>
 					<torusGeometry args={[radius, 0.025, 32]} />
 					<meshPhongMaterial color={colors.focus.value} emissive={colors.focus.value} emissiveIntensity={0.5} />
 				</mesh>
 				<mesh
-					// @ts-ignore - not sure why this keeps coming up when it's wrong
+					// @ts-expect-error - pointerEvents not included in typings
 					pointerEvents="none"
 				>
 					<torusGeometry args={[radius, 0.03, 32]} />
@@ -113,6 +108,6 @@ function RotationHandle({
 					/>
 				</mesh>
 			</Bvh>
-		</ConditionalHandle>
+		</Handle>
 	);
 }

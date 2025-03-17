@@ -1,20 +1,20 @@
 import { useEditorStageMode, usePanelState } from '@/stores/editorStore';
 import { Container, Root } from '@react-three/uikit';
-import { Defaults } from '../ui/Defaults';
 import { useXR } from '@react-three/xr';
 import { Suspense, useMemo } from 'react';
 import { Vector3 } from 'three';
 import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
 import { DragController } from '../controls/Draggable';
+import { Defaults } from '../ui/Defaults';
 import { colors } from '../ui/theme';
+import { Navigation } from './navigation';
+import { UndoControls } from './staging/common/UndoControls';
 import { FurniturePanel } from './staging/furniture/FurniturePanel';
+import { SelectedFurnitureWidget } from './staging/furniture/SelectedFurnitureUI';
 import { Layouts } from './staging/Layouts';
 import { Lighting } from './staging/Lighting';
 import { SettingsPanel } from './staging/SettingsPanel';
 import { UpdatePrompt } from './UpdatePrompt';
-import { Navigation } from './navigation';
-import { UndoControls } from './staging/common/UndoControls';
-import { SelectedFurnitureWidget } from './staging/furniture/SelectedFurniturUI';
 export function StagerPanel() {
 	const [panelState] = usePanelState();
 	const [mode] = useEditorStageMode();
@@ -37,7 +37,7 @@ export function StagerPanel() {
 		<DraggableBodyAnchor follow={panelState !== 'open'} position={position} lockY={true} distance={0.15}>
 			<Root pixelSize={0.001} alignItems={panelState === 'hidden' ? 'center' : undefined} flexDirection="column" gap={10}>
 				<Defaults>
-					{panelState === 'hidden' && mode === 'furniture' && <SelectedFurnitureWidget />}
+					<Suspense>{panelState === 'hidden' && mode === 'furniture' && <SelectedFurnitureWidget />}</Suspense>
 					<Container flexDirection="row" justifyContent="space-between">
 						<Navigation />
 						{panelState === 'open' && (

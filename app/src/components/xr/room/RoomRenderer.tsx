@@ -11,7 +11,6 @@ import { Walls } from './Walls';
 
 export function RoomRenderer() {
 	const furniturePlacementIds = useFurniturePlacementIds();
-
 	useEditorSelectionReset();
 	useUpdateClosestFloorCenter();
 

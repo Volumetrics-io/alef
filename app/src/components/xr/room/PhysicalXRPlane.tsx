@@ -60,10 +60,10 @@ export const PhysicalXRPlane = forwardRef<Object3D, PhysicalXRPlaneProps>(functi
 			{/* {snapSensor && <CuboidCollider args={sensorHalfExtents} position={[0, 0.2, 0]} sensor />} */}
 			{/* </RigidBody> */}
 			<XRSpace space={plane.planeSpace} ref={ref}>
-				<XRPlaneModel renderOrder={-1} plane={plane} receiveShadow={true}>
+				<XRPlaneModel pointerEvents="none" renderOrder={-1} plane={plane} receiveShadow={true}>
 					<shadowMaterial ref={shadowMaterialRef} side={DoubleSide} shadowSide={DoubleSide} transparent={true} opacity={0} />
 				</XRPlaneModel>
-				<XRPlaneModel renderOrder={-1} plane={plane} position={[0, 0.01, 0]}>
+				<XRPlaneModel pointerEvents="none" renderOrder={-1} plane={plane} position={[0, 0.01, 0]}>
 					<meshBasicMaterial colorWrite={false} color={0x002040} side={DoubleSide} />
 				</XRPlaneModel>
 			</XRSpace>

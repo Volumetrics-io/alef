@@ -70,7 +70,7 @@ export function Draggable({ fixed, children }: { fixed?: boolean; children: Reac
 	);
 }
 
-export function DragController({ children }: { children: React.ReactNode }) {
+export function DragController({ children, display }: { children: React.ReactNode; display?: 'flex' | 'none' }) {
 	const context = useContext(DragContext);
 	const ref = useRef<ContainerRef>(null);
 
@@ -93,7 +93,7 @@ export function DragController({ children }: { children: React.ReactNode }) {
 	};
 
 	return (
-		<Container ref={ref} onPointerDown={handlePointerDown} padding={10} paddingBottom={30} width="100%" justifyContent="center" alignItems="center">
+		<Container ref={ref} onPointerDown={handlePointerDown} padding={10} paddingBottom={30} width="100%" justifyContent="center" alignItems="center" display={display}>
 			{children}
 		</Container>
 	);

@@ -10,7 +10,12 @@ import { usePlanes } from './roomStore';
 
 export type StageMode = 'lighting' | 'furniture' | 'layout' | 'settings' | null;
 
+export type PanelState = 'open' | 'closed' | 'hidden';
+
 export type EditorStore = {
+	panelState: PanelState;
+	setPanelState: (panelState: PanelState) => void;
+
 	mode: StageMode;
 	setMode: (mode: StageMode) => void;
 
@@ -38,6 +43,8 @@ export type EditorStore = {
 
 export const useEditorStore = create<EditorStore>((set, get) => {
 	return {
+		panelState: 'closed',
+		setPanelState: (panelState: PanelState) => set({ panelState }),
 		mode: null,
 		setMode: (mode: StageMode) => set({ mode }),
 		selectedId: null,
@@ -87,7 +94,11 @@ export const useEditorStore = create<EditorStore>((set, get) => {
 });
 
 export function useSelect() {
-	return useEditorStore((s) => s.select);
+	return useEditorStore(useShallow((s) => s.select));
+}
+
+export function useIsSelected(id: PrefixedId<'fp'> | PrefixedId<'lp'>) {
+	return useEditorStore(useShallow((s) => s.selectedId === id && s.mode === 'furniture'));
 }
 
 export function useEditorSelectionReset() {
@@ -108,12 +119,20 @@ export function useSelectedLightPlacementId() {
 	return useEditorStore(({ selectedId }) => (selectedId && isPrefixedId(selectedId, 'lp') && selectedId) || null);
 }
 
+export function usePanelState() {
+	return useEditorStore(useShallow((s) => [s.panelState, s.setPanelState] as const));
+}
+
+export function useSetPanelState() {
+	return useEditorStore(useShallow((s) => s.setPanelState));
+}
+
 export function useEditorStageMode() {
 	return useEditorStore(useShallow((s) => [s.mode, s.setMode] as const));
 }
 
 export function useIsEditorStageMode(value: StageMode) {
-	return useEditorStore((s) => s.mode === value);
+	return useEditorStore(useShallow((s) => s.mode === value));
 }
 
 export function useUpdateClosestFloorCenter() {

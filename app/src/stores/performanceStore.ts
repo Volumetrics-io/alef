@@ -2,18 +2,18 @@ import { FurnitureModelQuality } from '@alef/common';
 import { create } from 'zustand';
 
 export type PerformanceStore = {
-	framebufferScale: number;
-	setFramebufferScale: (scale: number) => void;
+	perfMode: boolean;
+	setPerfMode: (mode: boolean) => void;
 	maxModelQuality: FurnitureModelQuality;
 	setMaxModelQuality: (quality: FurnitureModelQuality) => void;
 };
 
 export const usePerformanceStore = create<PerformanceStore>((set) => {
 	return {
-		framebufferScale: 1.0,
-		setFramebufferScale: (scale) => {
-			console.debug(`Setting framebuffer scale to ${scale}`);
-			set({ framebufferScale: scale });
+		perfMode: false,
+		setPerfMode: (mode) => {
+			console.debug(`Setting perf mode to ${mode}`);
+			set({ perfMode: mode });
 		},
 		maxModelQuality: FurnitureModelQuality.Medium,
 		setMaxModelQuality: (quality) => {

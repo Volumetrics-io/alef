@@ -51,7 +51,7 @@ function LayoutItem({ layoutId, onEdit }: { layoutId: PrefixedId<'rl'>; onEdit?:
 			<Button onClick={() => set(layoutId)} justifyContent="space-between" flexGrow={1} gap={4}>
 				<Container margin="auto" flexDirection="row" gap={4} alignItems="center">
 					<LayoutIcon icon={layoutData?.icon ?? layoutData?.type ?? 'living-room'} />
-					<Text fontFamily="ibm-plex-sans">{layoutData?.name ?? 'Unnamed layout'}</Text>
+					<Text>{layoutData?.name ?? 'Unnamed layout'}</Text>
 				</Container>
 				{active === layoutId ? <CheckIcon /> : <Container width={24} height={24} />}
 			</Button>
@@ -73,7 +73,7 @@ function NewLayoutButton({ onNew }: { onNew: (id: PrefixedId<'rl'>) => void }) {
 				onNew(id);
 			}}
 		>
-			<Text fontFamily="ibm-plex-sans">Add Layout</Text>
+			<Text>Add Layout</Text>
 		</Button>
 	);
 }

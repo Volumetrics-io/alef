@@ -1,4 +1,5 @@
 import { useGeoStore } from '@/stores/geoStore';
+import { usePerformanceStore } from '@/stores/performanceStore';
 import { xrStore } from '@/stores/xrStore';
 import { Box, BoxProps, ErrorBoundary, Icon } from '@alef/sys';
 import { reversePainterSortStable } from '@pmndrs/uikit';
@@ -10,6 +11,8 @@ import { PCFSoftShadowMap } from 'three';
 import { XRToaster } from './XRToaster';
 import { XRPerformanceManager } from './XRPerformanceManager';
 import { PerformanceMonitor } from '@react-three/drei';
+import { FurnitureModelQuality } from '@alef/common';
+import { ActivePointer } from './controls/ActivePointer';
 
 export interface SceneWrapperProps extends BoxProps {
 	children: ReactNode;
@@ -17,6 +20,7 @@ export interface SceneWrapperProps extends BoxProps {
 
 export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 	const geoStore = useGeoStore();
+	const { perfMode, setPerfMode, setMaxModelQuality } = usePerformanceStore((state) => state);
 	return (
 		<Box {...rest}>
 			<ErrorBoundary
@@ -38,6 +42,10 @@ export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 						state.gl.setTransparentSort(reversePainterSortStable);
 						state.gl.shadowMap.autoUpdate = false;
 						state.gl.shadowMap.type = PCFSoftShadowMap;
+						if (new URLSearchParams(window.location.search).get('directLaunch') === 'true') {
+							setPerfMode(true);
+							setMaxModelQuality(FurnitureModelQuality.Low);
+						}
 						// @ts-ignore it does
 						if (window.getDigitalGoodsService !== undefined) {
 							if (navigator.xr) {
@@ -45,14 +53,13 @@ export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 							}
 						}
 					}}
-					shadows={true}
+					shadows={perfMode}
 					camera={{ position: [-5, 5, 5] }}
 				>
 					<XR store={xrStore}>
 						<PointerEvents />
 						<PerformanceMonitor
 							bounds={(refreshRate) => {
-								console.log('refreshRate', refreshRate);
 								return [Math.max(refreshRate - 30, 45), refreshRate];
 							}}
 						>
@@ -60,6 +67,7 @@ export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 							<Suspense>{children}</Suspense>
 							<NonXRCameraControls />
 							<XRToaster />
+							<ActivePointer />
 						</PerformanceMonitor>
 					</XR>
 				</Canvas>

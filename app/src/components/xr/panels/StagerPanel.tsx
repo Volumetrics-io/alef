@@ -1,123 +1,71 @@
-import { useRescanRoom } from '@/hooks/useRescanRoom';
-import { useEditorStageMode } from '@/stores/editorStore';
-import { Container, FontFamilyProvider, Root } from '@react-three/uikit';
-import { Defaults } from '@react-three/uikit-default';
-import { BoxIcon, HouseIcon, Menu, SettingsIcon, Sofa, SunIcon, X } from '@react-three/uikit-lucide';
+import { useEditorStageMode, usePanelState } from '@/stores/editorStore';
+import { Container, Root } from '@react-three/uikit';
 import { useXR } from '@react-three/xr';
-import { Suspense, useMemo, useState } from 'react';
+import { Suspense, useMemo } from 'react';
 import { Vector3 } from 'three';
 import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
 import { DragController } from '../controls/Draggable';
-import { Button } from '../ui/Button';
-import { Selector, SelectorItem } from '../ui/Selector';
+import { Defaults } from '../ui/Defaults';
 import { colors } from '../ui/theme';
+import { Navigation } from './navigation';
 import { UndoControls } from './staging/common/UndoControls';
 import { FurniturePanel } from './staging/furniture/FurniturePanel';
+import { SelectedFurnitureWidget } from './staging/furniture/SelectedFurnitureUI';
 import { Layouts } from './staging/Layouts';
 import { Lighting } from './staging/Lighting';
 import { SettingsPanel } from './staging/SettingsPanel';
 import { UpdatePrompt } from './UpdatePrompt';
-
 export function StagerPanel() {
-	const [mode, setMode] = useEditorStageMode();
-	const [isOpen, setIsOpen] = useState(false);
+	const [panelState] = usePanelState();
+	const [mode] = useEditorStageMode();
 	const isInXR = useXR((s) => !!s.session);
 
 	const position = useMemo(() => {
 		if (!isInXR) {
 			return new Vector3(-0.1, 0, 0.75);
 		}
-		if (isOpen) {
+		if (panelState === 'open') {
 			return new Vector3(0, -0.15, 0.75);
 		}
+		if (panelState === 'hidden') {
+			return new Vector3(0.5, -0.3, 0.6);
+		}
 		return new Vector3(0, 0.2, 0.75);
-	}, [isOpen, isInXR]);
-
-	const { canRescan, rescanRoom } = useRescanRoom();
+	}, [panelState, isInXR]);
 
 	return (
-		<DraggableBodyAnchor follow={!isOpen} position={position} lockY={true} distance={0.15}>
-			<Root pixelSize={0.001} flexDirection="column" gap={10}>
+		<DraggableBodyAnchor follow={panelState !== 'open'} position={position} lockY={true} distance={0.15}>
+			<Root pixelSize={0.001} alignItems={panelState === 'hidden' ? 'center' : undefined} flexDirection="column" gap={10}>
 				<Defaults>
-					<FontFamilyProvider
-						ibm-plex-sans={{
-							thin: './fonts/msdf/ibm-plex/IBMPlexSans-Thin.json',
-							'extra-light': './fonts/msdf/ibm-plex/IBMPlexSans-ExtraLight.json',
-							light: './fonts/msdf/ibm-plex/IBMPlexSans-Light.json',
-							medium: './fonts/msdf/ibm-plex/IBMPlexSans-Medium.json',
-							normal: './fonts/msdf/ibm-plex/IBMPlexSans-Regular.json',
-							'semi-bold': './fonts/msdf/ibm-plex/IBMPlexSans-SemiBold.json',
-							bold: './fonts/msdf/ibm-plex/IBMPlexSans-Bold.json',
-							'extra-bold': './fonts/msdf/ibm-plex/IBMPlexSans-ExtraBold.json',
-						}}
-						bricolage-grotesque={{
-							thin: './fonts/msdf/bricolage/BricolageGrotesque-Thin.json',
-							'extra-light': './fonts/msdf/bricolage/BricolageGrotesque-ExtraLight.json',
-							light: './fonts/msdf/bricolage/BricolageGrotesque-Light.json',
-							medium: './fonts/msdf/bricolage/BricolageGrotesque-Medium.json',
-							normal: './fonts/msdf/bricolage/BricolageGrotesque-Regular.json',
-							'semi-bold': './fonts/msdf/bricolage/BricolageGrotesque-SemiBold.json',
-							bold: './fonts/msdf/bricolage/BricolageGrotesque-Bold.json',
-							'extra-bold': './fonts/msdf/bricolage/BricolageGrotesque-ExtraBold.json',
-						}}
-					>
-						<Container alignItems="center" flexGrow={0} flexShrink={0} gap={4} marginX="auto">
-							<Button
-								size="icon"
-								variant={isOpen ? 'destructive' : 'default'}
-								onClick={() => {
-									setMode(null);
-									setIsOpen(!isOpen);
-								}}
-							>
-								{isOpen ? <X /> : <Menu />}
-							</Button>
-							{isOpen && (
-								<>
-									<Selector flexDirection="row" size="small">
-										<SelectorItem selected={mode === 'layout'} onClick={() => setMode('layout')}>
-											<HouseIcon />
-										</SelectorItem>
-										<SelectorItem selected={mode === 'furniture'} onClick={() => setMode('furniture')}>
-											<Sofa />
-										</SelectorItem>
-										<SelectorItem selected={mode === 'lighting'} onClick={() => setMode('lighting')}>
-											<SunIcon />
-										</SelectorItem>
-										<SelectorItem selected={mode === 'settings'} onClick={() => setMode('settings')}>
-											<SettingsIcon />
-										</SelectorItem>
-									</Selector>
-									{canRescan && (
-										<Button size="icon" onClick={() => rescanRoom()}>
-											<BoxIcon />
-										</Button>
-									)}
-								</>
-							)}
-							{isOpen && <UndoControls />}
-						</Container>
-						<UpdatePrompt />
-						{isOpen && (
-							<>
-								{mode === 'lighting' && <Lighting />}
-								{mode === 'furniture' && (
-									<Suspense>
-										<FurniturePanel />
-									</Suspense>
-								)}
-								{mode === 'layout' && <Layouts />}
-								{mode === 'settings' && <SettingsPanel />}
-								{mode !== null && (
-									<DragController>
-										<Container flexDirection="row" width="70%" gap={10} alignItems="center">
-											<Container backgroundColor={colors.surface} height={15} borderRadius={10} borderColor={colors.border} borderWidth={0.5} flexGrow={1} />
-										</Container>
-									</DragController>
-								)}
-							</>
+					<Suspense>{panelState === 'hidden' && mode === 'furniture' && <SelectedFurnitureWidget />}</Suspense>
+					<Container flexDirection="row" justifyContent="space-between">
+						<Navigation />
+						{panelState === 'open' && (
+							<Container flexGrow={0} flexShrink={0} gap={10}>
+								<UndoControls />
+							</Container>
 						)}
-					</FontFamilyProvider>
+					</Container>
+					<UpdatePrompt />
+					{panelState === 'open' && (
+						<>
+							{mode === 'lighting' && <Lighting />}
+							{mode === 'furniture' && (
+								<Suspense>
+									<FurniturePanel />
+								</Suspense>
+							)}
+							{mode === 'layout' && <Layouts />}
+							{mode === 'settings' && <SettingsPanel />}
+							{mode !== null && (
+								<DragController>
+									<Container flexDirection="row" width="70%" gap={10} alignItems="center">
+										<Container backgroundColor={colors.surface} height={15} borderRadius={10} borderColor={colors.border} borderWidth={0.5} flexGrow={1} />
+									</Container>
+								</DragController>
+							)}
+						</>
+					)}
 				</Defaults>
 			</Root>
 		</DraggableBodyAnchor>

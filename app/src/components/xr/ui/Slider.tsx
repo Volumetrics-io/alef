@@ -4,9 +4,11 @@ import { ReactNode, RefAttributes, forwardRef, useImperativeHandle, useMemo, use
 import { EventHandlers, ThreeEvent } from '@react-three/fiber/dist/declarations/src/core/events.js';
 import { Vector3 } from 'three';
 import { Signal, computed } from '@preact/signals-core';
-import { config } from '@react-spring/three';
+import { config, useSpringRef } from '@react-spring/three';
 import { useSpring } from '@react-spring/three';
 import { AnimatedContainer, AnimatedCursor } from './Animations';
+import { usePerformanceStore } from '@/stores/performanceStore';
+
 const vectorHelper = new Vector3();
 
 export type SliderProperties = {
@@ -22,6 +24,7 @@ export type SliderProperties = {
 
 export const Slider: (props: SliderProperties & RefAttributes<ContainerRef>) => ReactNode = forwardRef(
 	({ disabled = false, value: providedValue, defaultValue, onValueChange, min = 0, max = 100, step = 1, ...props }, ref) => {
+		const perfMode = usePerformanceStore((state) => state.perfMode);
 		const [uncontrolled, setUncontrolled] = useState(defaultValue);
 		const value = providedValue ?? uncontrolled ?? 50;
 		const percentage = useMemo(
@@ -82,9 +85,8 @@ export const Slider: (props: SliderProperties & RefAttributes<ContainerRef>) => 
 		}, [max, min, hasProvidedValue, step]);
 		useImperativeHandle(ref, () => internalRef.current!);
 
-		const [animate, setAnimate] = useState(0);
-
-		const { spring: colorSpring } = useSpring({ spring: animate, config: config.default });
+		const api = useSpringRef();
+		const { spring: colorSpring } = useSpring({ spring: 0, config: config.default, ref: api });
 
 		const startBorderColor = getColorForAnimation(colors.border);
 		const endBorderColor = getColorForAnimation(colors.faded);
@@ -103,8 +105,14 @@ export const Slider: (props: SliderProperties & RefAttributes<ContainerRef>) => 
 				width="100%"
 				alignItems="center"
 				ref={internalRef}
-				onPointerEnter={() => setAnimate(1)}
-				onPointerLeave={() => setAnimate(0)}
+				onPointerEnter={() => {
+					if (perfMode) return;
+					api.start({ spring: 1 });
+				}}
+				onPointerLeave={() => {
+					if (perfMode) return;
+					api.start({ spring: 0 });
+				}}
 				{...props}
 				{...(disabled ? {} : handler)}
 			>
@@ -131,7 +139,7 @@ export const Slider: (props: SliderProperties & RefAttributes<ContainerRef>) => 
 						borderWidth={props.color ? 2 : 0}
 						backgroundColor={props.color ?? colors.focus}
 					>
-						<AnimatedCursor disabled={disabled} externalAnimate={animate} />
+						<AnimatedCursor disabled={disabled} externalAnimate={colorSpring} />
 					</AnimatedContainer>
 				</AnimatedContainer>
 			</Container>

@@ -3,6 +3,7 @@ import { usePerformanceStore } from '@/stores/performanceStore';
 import { FurnitureModelQuality, PrefixedId, RANKED_FURNITURE_MODEL_QUALITIES } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
 import { Bvh, Clone, Detailed, Outlines } from '@react-three/drei';
+import { ThreeEvent } from '@react-three/fiber';
 import { forwardRef, ReactNode, Suspense, useCallback } from 'react';
 import { Group, Mesh } from 'three';
 
@@ -34,28 +35,15 @@ const FurnitureModelRenderer = forwardRef<Group, FurnitureModelRendererProps>(fu
 
 	if (!model) return null;
 
-	const handleUpdate = useCallback(
-		(self: Group) => {
-			if (transparent) {
-				self.traverse((child) => {
-					if (child instanceof Mesh) {
-						child.material.transparent = true;
-						child.material.opacity = 0;
-						child.renderOrder = -1;
-					}
-				});
-			} else {
-				self.traverse((child) => {
-					if (child instanceof Mesh) {
-						child.material.transparent = false;
-						child.material.opacity = 1;
-						child.renderOrder = 0;
-					}
-				});
+	if (transparent) {
+		model.scene.traverse((child) => {
+			if (child instanceof Mesh) {
+				child.material.transparent = true;
+				child.material.opacity = 0;
+				child.renderOrder = -1;
 			}
-		},
-		[transparent]
-	);
+		});
+	}
 
 	return (
 		<Clone
@@ -67,7 +55,6 @@ const FurnitureModelRenderer = forwardRef<Group, FurnitureModelRendererProps>(fu
 			receiveShadow={receiveShadow}
 			ref={ref}
 			inject={outline ? <Outlines thickness={1} color={qualityColor[quality]} /> : null}
-			onUpdate={handleUpdate}
 		/>
 	);
 });
@@ -79,10 +66,9 @@ export const MissingModel = forwardRef<any, { onClick?: () => void; transparent?
 				onClick?.();
 			}}
 			ref={ref}
-			renderOrder={transparent ? -1 : 0}
 		>
 			<boxGeometry args={[1, 1, 1]} />
-			<meshBasicMaterial color="red" transparent={transparent} opacity={transparent ? 0 : 1} />
+			<meshBasicMaterial color="red" transparent={transparent} colorWrite={!transparent} />
 		</mesh>
 	);
 });
@@ -97,27 +83,35 @@ const PlaceholderModel = forwardRef<any, { onClick?: () => void }>(function Plac
 });
 
 export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode; onClick?: () => void }>(
-	({ errorFallback, debugLod, onClick, ...props }, ref) => {
+	({ errorFallback, debugLod, onClick, pointerEvents = 'auto', ...props }, ref) => {
+		const stopPropagation = useCallback((e: ThreeEvent<PointerEvent>) => {
+			e.stopPropagation();
+		}, []);
 		return (
 			<ErrorBoundary
 				fallback={
 					errorFallback ?? (
-						// add an error boundary here as well just in case the whole furniture is missing or the network is
-						// unavailable.
-						<ErrorBoundary fallback={<MissingModel transparent onClick={onClick} ref={ref} />}>
-							<Bvh onClick={onClick} firstHitOnly>
-								{/* We likely have the original quality model, at minimum, even if others 404. */}
-								<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Original} ref={ref} transparent />
-							</Bvh>
-						</ErrorBoundary>
+						// default error fallback is a box
+						<MissingModel transparent onClick={onClick} ref={ref} />
 					)
 				}
 			>
-				<Bvh onClick={onClick} firstHitOnly>
-					<Suspense fallback={<MissingModel transparent ref={ref} />}>
+				<Suspense fallback={<MissingModel transparent ref={ref} />}>
+					<Bvh
+						onPointerOver={stopPropagation}
+						onPointerOut={stopPropagation}
+						onPointerEnter={stopPropagation}
+						onPointerLeave={stopPropagation}
+						onClick={onClick}
+						firstHitOnly
+						maxDepth={30}
+						maxLeafTris={5}
+						// @ts-ignore
+						pointerEvents={pointerEvents}
+					>
 						<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Collision} ref={ref} transparent />
-					</Suspense>
-				</Bvh>
+					</Bvh>
+				</Suspense>
 			</ErrorBoundary>
 		);
 	}
@@ -126,6 +120,9 @@ export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFal
 export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode }>(
 	({ errorFallback, maxQuality: preferredMaxQuality = FurnitureModelQuality.Original, debugLod, ...props }, ref) => {
 		const globalMaxQuality = usePerformanceStore((state) => state.maxModelQuality);
+		// to cap the model quality, we use the smallest of the two: [preferredMaxQuality, globalMaxQuality].
+		// for example, this component may be rendered with a preferred max of Original, but if the global
+		// limit is at Medium, this will be Medium.
 		const maxQualityRank = Math.min(RANKED_FURNITURE_MODEL_QUALITIES.indexOf(preferredMaxQuality), RANKED_FURNITURE_MODEL_QUALITIES.indexOf(globalMaxQuality));
 		const maxQuality = RANKED_FURNITURE_MODEL_QUALITIES[maxQualityRank];
 

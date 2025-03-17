@@ -12,6 +12,7 @@ import { XRToaster } from './XRToaster';
 import { XRPerformanceManager } from './XRPerformanceManager';
 import { PerformanceMonitor } from '@react-three/drei';
 import { FurnitureModelQuality } from '@alef/common';
+import { ActivePointer } from './controls/ActivePointer';
 
 export interface SceneWrapperProps extends BoxProps {
 	children: ReactNode;
@@ -66,6 +67,7 @@ export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 							<Suspense>{children}</Suspense>
 							<NonXRCameraControls />
 							<XRToaster />
+							<ActivePointer />
 						</PerformanceMonitor>
 					</XR>
 				</Canvas>

@@ -7,11 +7,11 @@ import { OfflineFurniturePanel } from './OfflineFurniturePanel';
 import { OnlineFurniturePanel } from './OnlineFurniturePanel';
 import { FurniturePanelRoot } from './common';
 
-export function FurniturePanel({ visible }: { visible?: boolean }) {
+export function FurniturePanel() {
 	const isOnline = useIsOnline();
 
 	return (
-		<FurniturePanelRoot display={visible ? 'flex' : 'none'}>
+		<FurniturePanelRoot>
 			<ErrorBoundary
 				fallback={
 					<Container width="100%" height="100%" justifyContent="center" alignItems="center">

@@ -11,11 +11,11 @@ import { Heading } from '../../ui/Heading';
 import { Slider } from '../../ui/Slider';
 import { Surface } from '../../ui/Surface';
 
-export const Lighting = ({ visible }: { visible?: boolean }) => {
+export const Lighting = () => {
 	const selectedLightId = useSelectedLightPlacementId();
 
 	return (
-		<Surface flexDirection="column" width={500} height={420} display={visible ? 'flex' : 'none'}>
+		<Surface flexDirection="column" width={500} height={420}>
 			<SelectedLightPane id={selectedLightId} />
 		</Surface>
 	);

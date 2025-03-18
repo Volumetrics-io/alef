@@ -106,11 +106,10 @@ export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFal
 						firstHitOnly
 						maxDepth={30}
 						maxLeafTris={5}
-						enabled={enabled}
 						// @ts-ignore
-						pointerEvents={pointerEvents}
+						pointerEvents={enabled === false ? 'none' : pointerEvents}
 					>
-						<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Collision} ref={ref} transparent />
+						<FurnitureModelRenderer furnitureId={props.furnitureId} quality={FurnitureModelQuality.Collision} ref={ref} transparent />
 					</Bvh>
 				</Suspense>
 			</ErrorBoundary>

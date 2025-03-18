@@ -10,7 +10,7 @@ import { Heading } from '../../ui/Heading';
 import { RoomTypePicker } from '../../ui/RoomTypePicker';
 import { Surface } from '../../ui/Surface';
 
-export function Layouts({ readonly, visible }: { readonly?: boolean; visible?: boolean }) {
+export function Layouts({ readonly }: { readonly?: boolean }) {
 	const layoutIds = useRoomLayoutIds();
 	const [_mode, setMode] = useEditorStageMode();
 
@@ -18,7 +18,7 @@ export function Layouts({ readonly, visible }: { readonly?: boolean; visible?: b
 
 	return (
 		<>
-			<Surface flexDirection="column" flexWrap="no-wrap" flexGrow={1} height={420} width={500} gap={10} padding={10} display={visible ? 'flex' : 'none'}>
+			<Surface flexDirection="column" flexWrap="no-wrap" flexGrow={1} height={420} width={500} gap={10} padding={10}>
 				<Container marginX="auto" flexDirection="row" gap={4} alignItems="center" justifyContent="center">
 					<HouseIcon width={20} height={20} />
 					<Heading level={3}>Layouts</Heading>
@@ -39,7 +39,7 @@ export function Layouts({ readonly, visible }: { readonly?: boolean; visible?: b
 					)}
 				</Container>
 			</Surface>
-			{editingId && <EditLayout layoutId={editingId} onClose={() => setEditingId(null)} visible={visible && !readonly} />}
+			{editingId && <EditLayout layoutId={editingId} onClose={() => setEditingId(null)} />}
 		</>
 	);
 }

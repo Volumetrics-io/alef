@@ -3,16 +3,18 @@ import { colors, getColorForAnimation } from '@/components/xr/ui/theme';
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
 import { usePerformanceStore } from '@/stores/performanceStore';
 import { useAddFurniture } from '@/stores/roomStore';
-import { config, useSpring } from '@react-spring/three';
+import { config, useSpring, useSpringRef } from '@react-spring/three';
 import { Image } from '@react-three/uikit';
-import { Suspense, useState } from 'react';
+import { Suspense } from 'react';
 
 export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }) {
 	const perfMode = usePerformanceStore((state) => state.perfMode);
-	const [hovered, setHovered] = useState(false);
+
+	const api = useSpringRef();
 	const { value } = useSpring({
-		value: hovered ? 1 : 0,
+		value: 0,
 		config: config.default,
+		ref: api,
 	});
 
 	const addFurniture = useAddFurniture();
@@ -27,7 +29,7 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 
 	const handleHover = (isHovered: boolean) => {
 		if (perfMode) return;
-		setHovered(isHovered);
+		api.start({ value: Number(isHovered) });
 	};
 
 	const transformTranslateZ = usePullAnimation(value);

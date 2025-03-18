@@ -1,7 +1,7 @@
 import { AnimatedSurface, usePullAnimation } from '@/components/xr/ui/Animations';
 import { colors, getColorForAnimation } from '@/components/xr/ui/theme';
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
-import { useIsSelectedModelId, useSelectedModelId, useSetSelectedModelId } from '@/stores/editorStore';
+import { useIsSelectedModelId, useSetSelectedModelId } from '@/stores/editorStore';
 import { usePerformanceStore } from '@/stores/performanceStore';
 import { config, useSpring, useSpringRef } from '@react-spring/three';
 import { Image } from '@react-three/uikit';

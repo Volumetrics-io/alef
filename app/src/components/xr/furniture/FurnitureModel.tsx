@@ -1,4 +1,4 @@
-import { useFurnitureModel } from '@/services/publicApi/furnitureHooks';
+import { useFurnitureDetails, useFurnitureModel } from '@/services/publicApi/furnitureHooks';
 import { usePerformanceStore } from '@/stores/performanceStore';
 import { FurnitureModelQuality, PrefixedId, RANKED_FURNITURE_MODEL_QUALITIES } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
@@ -6,6 +6,7 @@ import { Bvh, Clone, Detailed, Outlines } from '@react-three/drei';
 import { ThreeEvent } from '@react-three/fiber';
 import { forwardRef, ReactNode, Suspense, useCallback } from 'react';
 import { Group, Mesh } from 'three';
+import { SimpleBox } from './SimpleBox';
 
 export interface FurnitureModelProps {
 	furnitureId: PrefixedId<'f'>;
@@ -73,13 +74,13 @@ export const MissingModel = forwardRef<any, { onClick?: () => void; transparent?
 	);
 });
 
-const PlaceholderModel = forwardRef<any, { onClick?: () => void }>(function PlaceholderModel({ onClick }, ref) {
-	return (
-		<mesh onClick={onClick} ref={ref} position={[0, 0.5, 0]}>
-			<sphereGeometry args={[0.5, 8, 8]} />
-			<meshBasicMaterial color="white" transparent opacity={0.5} />
-		</mesh>
-	);
+const PlaceholderModel = forwardRef<any, { onClick?: () => void; furnitureId: PrefixedId<'f'> }>(function PlaceholderModel({ onClick, furnitureId }, ref) {
+	const { data } = useFurnitureDetails(furnitureId);
+	// data contains metadata about measured dimensions, which we can use to show a more accurate placeholder.
+	const hasDimensions = data?.measuredDimensionsX && data?.measuredDimensionsY && data?.measuredDimensionsZ;
+	const dimensions: [number, number, number] = hasDimensions ? [data.measuredDimensionsX!, data.measuredDimensionsY!, data.measuredDimensionsZ!] : [1, 1, 1];
+
+	return <SimpleBox size={dimensions} position={[0, dimensions[1] / 2, 0]} onClick={onClick} ref={ref} />;
 });
 
 export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode; onClick?: () => void; enabled?: boolean }>(
@@ -148,7 +149,7 @@ export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFal
 						// unavailable.
 						<ErrorBoundary fallback={<MissingModel ref={ref} />}>
 							{/* While the original model loads, show some kind of geometry to let the user know there's something here. */}
-							<Suspense fallback={<PlaceholderModel ref={ref} />}>
+							<Suspense fallback={<PlaceholderModel furnitureId={props.furnitureId} ref={ref} />}>
 								{/* We likely have the original quality model, at minimum, even if others 404. */}
 								<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Original} ref={ref} />
 							</Suspense>
@@ -161,20 +162,20 @@ export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFal
 					fallback={
 						isLowQuality ? (
 							// if this component is rendering the lowest quality model already, just show a placeholder as it fetches.
-							<PlaceholderModel ref={ref} />
+							<PlaceholderModel furnitureId={props.furnitureId} ref={ref} />
 						) : (
 							/*
 								When attempting to render the low quality fallback model, we might also not have that... show a
 								generic placeholder instead to avoid fallback to the error box above and at least present
 								something to the user while loading the main model.
 							*/
-							<ErrorBoundary fallback={<PlaceholderModel ref={ref} />}>
+							<ErrorBoundary fallback={<PlaceholderModel furnitureId={props.furnitureId} ref={ref} />}>
 								{/*
 									The loading state for the loading state, lol. While we load the low quality model to display
 									until the higher quality one is available, we show a placeholder to let the user know something
 									is coming. Even the low quality model may have a noticeable delay!
 								*/}
-								<Suspense fallback={<PlaceholderModel ref={ref} />}>
+								<Suspense fallback={<PlaceholderModel furnitureId={props.furnitureId} ref={ref} />}>
 									<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Low} ref={ref} />
 								</Suspense>
 							</ErrorBoundary>

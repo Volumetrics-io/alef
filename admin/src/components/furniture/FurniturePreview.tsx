@@ -1,26 +1,26 @@
+import { useAABB } from '@/hooks/useAABB';
 import { adminApiClient } from '@/services/adminApi';
 import { setSnapshotNonce, useSnapshotNonce } from '@/state/snapshotNonces';
 import { FurnitureModelQuality, PrefixedId } from '@alef/common';
 import { Box, Control, ErrorBoundary, Icon, Select } from '@alef/sys';
 import { Environment, OrbitControls, useGLTF } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { FurnitureSnapshot } from './FurnitureSnapshot';
-import { removeNeedsScreenshot } from '@/stores/furnitureStore';
-import { useAABB } from '@/hooks/useAABB';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { Vector3 } from 'three';
-
+import { FurnitureSnapshot } from './FurnitureSnapshot';
 
 export interface FurniturePreviewProps {
 	furnitureId: PrefixedId<'f'>;
 	nonce?: string | null;
+	onMetadataUpdated?: (error?: Error) => void;
+	forceUpdate?: boolean;
 }
 
-export function FurniturePreview({ furnitureId, nonce = 'none' }: FurniturePreviewProps) {
+export function FurniturePreview({ furnitureId, nonce = 'none', onMetadataUpdated, forceUpdate }: FurniturePreviewProps) {
 	const [quality, setQuality] = useState<FurnitureModelQuality>(FurnitureModelQuality.Original);
 	const modelSrc = `${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureId}/model?nonce=${nonce}&quality=${quality}`;
 
-	const { ref: canvasRef, triggerScreenshot, onModelLoaded } = useScreenshot(furnitureId);
+	const { canvasRef, updateMetadata, onModelLoaded, ready } = useProcessModelMeta(furnitureId, forceUpdate, onMetadataUpdated);
 
 	return (
 		<Box stacked>
@@ -36,6 +36,8 @@ export function FurniturePreview({ furnitureId, nonce = 'none' }: FurniturePrevi
 						No model
 					</Box>
 				}
+				// when a model is unavailable, trigger the update with the error
+				onError={onMetadataUpdated}
 				key={quality}
 			>
 				<Canvas
@@ -51,10 +53,12 @@ export function FurniturePreview({ furnitureId, nonce = 'none' }: FurniturePrevi
 					<Environment preset="city" />
 					<ambientLight intensity={1} />
 					<OrbitControls makeDefault target={[0, 0.6, 0]} />
-					<FurnitureModel modelSrc={modelSrc} onLoaded={onModelLoaded} />
+					<Suspense>
+						<FurnitureModel modelSrc={modelSrc} onLoaded={onModelLoaded} />
+					</Suspense>
 				</Canvas>
 			</ErrorBoundary>
-			<Control float="bottom-right" onClick={() => triggerScreenshot()}>
+			<Control float="bottom-right" onClick={() => updateMetadata()} disabled={!ready}>
 				<FurnitureSnapshot furnitureId={furnitureId} />
 				<Box float="bottom-right">
 					<Icon name="refresh-cw" />
@@ -64,7 +68,7 @@ export function FurniturePreview({ furnitureId, nonce = 'none' }: FurniturePrevi
 	);
 }
 
-function FurnitureModel({ modelSrc, onLoaded }: { modelSrc: string; onLoaded?: () => void }) {
+function FurnitureModel({ modelSrc, onLoaded }: { modelSrc: string; onLoaded?: (size: { x: number; y: number; z: number }) => void }) {
 	const { scene } = useGLTF(modelSrc, undefined, undefined, (loader) => {
 		loader.setWithCredentials(true);
 	});
@@ -72,16 +76,13 @@ function FurnitureModel({ modelSrc, onLoaded }: { modelSrc: string; onLoaded?: (
 	const { size, ref: aabbRef } = useAABB();
 	const centered = useRef(false);
 
-	useEffect(() => {
-		if (scene) {
-			aabbRef(scene);
-		}
-	}, [scene]);
-
+	const onLoadedRef = useRef(onLoaded);
+	onLoadedRef.current = onLoaded;
 	useEffect(() => {
 		if (Math.max(size.x, size.y, size.z) < 0.01) {
 			return;
 		}
+
 		if (!centered.current) {
 			// Cast scene to Object3D to avoid type issues
 			// Calculate the camera position based on the bounding box
@@ -91,15 +92,16 @@ function FurnitureModel({ modelSrc, onLoaded }: { modelSrc: string; onLoaded?: (
 			camera.position.copy(cameraPosition);
 			centered.current = true;
 			// Only call onLoaded after we've centered the camera
+			requestAnimationFrame(() => {
+				onLoadedRef.current?.(size);
+			});
 		}
-		onLoaded?.();
+	}, [size, camera]);
 
-	}, [size]); // Only depend on scene changes
-
-	return <primitive object={scene} />;
+	return <primitive object={scene} ref={aabbRef} />;
 }
 
-export function useHasImage(imageSrc: string) {
+function useHasImage(imageSrc: string) {
 	const [hasImage, setHasImage] = useState<boolean | undefined>(undefined);
 	useEffect(() => {
 		const img = new Image();
@@ -111,19 +113,23 @@ export function useHasImage(imageSrc: string) {
 	return hasImage;
 }
 
-function useScreenshot(furnitureId: PrefixedId<'f'>) {
+function useProcessModelMeta(furnitureId: PrefixedId<'f'>, force?: boolean, onUpdate?: (error?: Error) => void) {
 	const ref = useRef<HTMLCanvasElement>(null);
-	const [isModelLoaded, setIsModelLoaded] = useState(false);
+	const [modelSize, setModelSize] = useState<{ x: number; y: number; z: number } | null>(null);
+	const isModelLoaded = !!modelSize;
 	const nonce = useSnapshotNonce(furnitureId);
 	const imageSrc = `${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${furnitureId}/image.jpg?nonce=${nonce}`;
 	const hasImage = useHasImage(imageSrc);
 
-	const needsScreenshot = hasImage === false && !nonce && isModelLoaded;
+	const needsScreenshot = (force || (hasImage === false && !nonce)) && isModelLoaded;
 
-	const triggerScreenshot = useCallback(
+	const updateRef = useRef(onUpdate);
+	updateRef.current = onUpdate;
+	const updateMetadata = useCallback(
 		async (abortSignal?: AbortSignal) => {
 			const canvas = ref.current;
 			if (!canvas) return;
+			if (!modelSize) return;
 
 			try {
 				const blob = await new Promise<Blob>((resolve, reject) =>
@@ -135,37 +141,44 @@ function useScreenshot(furnitureId: PrefixedId<'f'>) {
 				const file = new File([blob], 'screenshot.jpg', { type: 'image/jpg' });
 
 				if (abortSignal?.aborted) return;
+				// update model size
+				await adminApiClient.furniture[':id'].dimensions.$put({
+					json: modelSize,
+					param: { id: furnitureId },
+				});
 				// send snapshot to server
 				await adminApiClient.furniture[':id'].image.$put({
 					param: { id: furnitureId },
 					form: { file },
 				});
 				setSnapshotNonce(furnitureId, new Date().toUTCString());
-				removeNeedsScreenshot(furnitureId);
+				updateRef.current?.();
 			} catch (err) {
 				if (err instanceof Error && err.name === 'AbortError') {
 					return;
 				}
 				console.error(err);
+				updateRef.current?.(err as Error);
 			}
 		},
-		[furnitureId]
+		[furnitureId, modelSize]
 	);
 
 	useEffect(() => {
 		if (needsScreenshot) {
 			// capture canvas image
 			const abortController = new AbortController();
-			triggerScreenshot(abortController.signal);
+			updateMetadata(abortController.signal);
 			return () => {
 				abortController.abort();
 			};
 		}
-	}, [needsScreenshot, triggerScreenshot]);
+	}, [needsScreenshot, updateMetadata]);
 
 	return {
-		ref,
-		triggerScreenshot,
-		onModelLoaded: useCallback(() => setIsModelLoaded(true), []),
+		canvasRef: ref,
+		updateMetadata,
+		onModelLoaded: setModelSize,
+		ready: isModelLoaded,
 	};
 }

@@ -8,7 +8,7 @@ import { Floors } from './Floors';
 import { NonXRPlaneRenderer } from './NonXRPlaneRenderer';
 import { PlaneSync } from './PlaneSync';
 import { Walls } from './Walls';
-
+import { SpawnFurniture } from '../furniture/SpawnFurniture';
 export function RoomRenderer() {
 	const furniturePlacementIds = useFurniturePlacementIds();
 	useEditorSelectionReset();
@@ -20,6 +20,7 @@ export function RoomRenderer() {
 			<Walls />
 			<PlaneSync />
 			<GlobalSpace>
+				<SpawnFurniture />
 				<NonXRPlaneRenderer />
 				<RoomLighting />
 				{furniturePlacementIds.map((furniturePlacementId) => {

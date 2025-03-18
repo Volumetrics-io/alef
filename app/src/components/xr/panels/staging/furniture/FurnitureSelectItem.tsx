@@ -1,14 +1,16 @@
 import { AnimatedSurface, usePullAnimation } from '@/components/xr/ui/Animations';
 import { colors, getColorForAnimation } from '@/components/xr/ui/theme';
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
+import { useIsSelectedModelId, useSelectedModelId, useSetSelectedModelId } from '@/stores/editorStore';
 import { usePerformanceStore } from '@/stores/performanceStore';
-import { useAddFurniture } from '@/stores/roomStore';
 import { config, useSpring, useSpringRef } from '@react-spring/three';
 import { Image } from '@react-three/uikit';
 import { Suspense } from 'react';
 
 export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }) {
 	const perfMode = usePerformanceStore((state) => state.perfMode);
+	const setSelectedModelId = useSetSelectedModelId();
+	const isSelected = useIsSelectedModelId(furnitureItem.id);
 
 	const api = useSpringRef();
 	const { value } = useSpring({
@@ -17,18 +19,13 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 		ref: api,
 	});
 
-	const addFurniture = useAddFurniture();
-
-	const addFurnitureAtCenterOfFloorClosestToUser = () => {
-		addFurniture({
-			furnitureId: furnitureItem.id,
-			position: { x: 0, y: 0, z: 0 },
-			rotation: { x: 0, y: 0, z: 0, w: 1 },
-		});
+	const onClick = () => {
+		setSelectedModelId(furnitureItem.id);
 	};
 
 	const handleHover = (isHovered: boolean) => {
 		if (perfMode) return;
+		if (isSelected) return;
 		api.start({ value: Number(isHovered) });
 	};
 
@@ -55,9 +52,9 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 	return (
 		<AnimatedSurface
 			onHoverChange={handleHover}
-			onClick={addFurnitureAtCenterOfFloorClosestToUser}
+			onClick={onClick}
 			transformTranslateZ={transformTranslateZ}
-			borderColor={borderColor}
+			borderColor={isSelected ? colors.focus : borderColor}
 			backgroundColor={backgroundColor}
 			height="48%"
 			minWidth="32%"

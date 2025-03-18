@@ -22,6 +22,9 @@ export type EditorStore = {
 	selectedId: PrefixedId<'fp'> | PrefixedId<'lp'> | null;
 	select: (id: PrefixedId<'fp'> | PrefixedId<'lp'> | null) => void;
 
+	selectedModelId: PrefixedId<'f'> | null;
+	setSelectedModelId: (id: PrefixedId<'f'> | null) => void;
+
 	// only relevant for 2d mode right now
 	detailsOpen: boolean;
 	setDetailsOpen: (open: boolean) => void;
@@ -51,6 +54,8 @@ export const useEditorStore = create<EditorStore>((set, get) => {
 		select: (id) => {
 			set({ selectedId: id, detailsOpen: true });
 		},
+		selectedModelId: null,
+		setSelectedModelId: (id) => set({ selectedModelId: id }),
 		liveIntersections: {},
 		stickyIntersections: {},
 		closestFloorCenter: { x: 0, y: 0, z: 0 },
@@ -99,6 +104,18 @@ export function useSelect() {
 
 export function useIsSelected(id: PrefixedId<'fp'> | PrefixedId<'lp'>) {
 	return useEditorStore(useShallow((s) => s.selectedId === id && s.mode === 'furniture'));
+}
+
+export function useSetSelectedModelId() {
+	return useEditorStore((s) => s.setSelectedModelId);
+}
+
+export function useSelectedModelId() {
+	return useEditorStore((s) => s.selectedModelId);
+}
+
+export function useIsSelectedModelId(id: PrefixedId<'f'>) {
+	return useEditorStore((s) => s.selectedModelId === id);
 }
 
 export function useEditorSelectionReset() {

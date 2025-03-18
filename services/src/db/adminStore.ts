@@ -130,13 +130,14 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 			.execute();
 	}
 
-	async insertFurniture(data: { name: string; attributes?: { key: string; value: string }[] }) {
+	async insertFurniture(data: { name: string; attributes?: { key: string; value: string }[]; originalFileName?: string }) {
 		const furnitureId = id('f');
 		await this.#db
 			.insertInto('Furniture')
 			.values({
 				id: furnitureId,
 				name: data.name,
+				originalFileName: data.originalFileName || null,
 			})
 			.executeTakeFirstOrThrow();
 
@@ -149,20 +150,35 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 		return { id: furnitureId };
 	}
 
-	async updateFurniture(id: string, data: Pick<FurnitureUpdate, 'name'>) {
+	async updateFurniture(id: string, data: Pick<FurnitureUpdate, 'name' | 'measuredDimensionsX' | 'measuredDimensionsY' | 'measuredDimensionsZ'>) {
 		assertPrefixedId(id, 'f');
 		await this.#db.updateTable('Furniture').set(data).where('id', '=', id).execute();
 	}
 
-	async uploadFurnitureModel(id: string, modelStream: ReadableStream, quality: FurnitureModelQuality = FurnitureModelQuality.Original) {
+	async uploadFurnitureModel(
+		id: string,
+		modelStream: ReadableStream,
+		quality: FurnitureModelQuality = FurnitureModelQuality.Original,
+		dimensions?: { x: number; y: number; z: number } | null
+	) {
 		assertPrefixedId(id, 'f');
 		await this.env.FURNITURE_MODELS_BUCKET.put(getFurnitureModelPath(id, quality), modelStream);
-		await this.#db.updateTable('Furniture').set({ modelUpdatedAt: new Date() }).where('id', '=', id).execute();
+		await this.#db
+			.updateTable('Furniture')
+			.set({
+				modelUpdatedAt: new Date(),
+				measuredDimensionsX: dimensions?.x || null,
+				measuredDimensionsY: dimensions?.y || null,
+				measuredDimensionsZ: dimensions?.z || null,
+			})
+			.where('id', '=', id)
+			.execute();
 	}
 
 	async uploadFurnitureImage(id: string, imageStream: ReadableStream) {
 		assertPrefixedId(id, 'f');
 		await this.env.FURNITURE_MODELS_BUCKET.put(getFurniturePreviewImagePath(id), imageStream);
+		await this.#db.updateTable('Furniture').set({ screenshotUpdatedAt: new Date() }).where('id', '=', id).execute();
 	}
 
 	async deleteFurniture(id: string) {
@@ -205,6 +221,21 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 		}
 		const attributeId = attr.id;
 		await this.#db.deleteFrom('FurnitureAttribute').where('furnitureId', '=', furnitureId).where('attributeId', '=', attributeId).execute();
+	}
+
+	/**
+	 * Lists all furniture in need of further processing,
+	 * like taking a screenshot or measuring dimensions
+	 */
+	async listUnprocessedFurniture() {
+		const query = this.#db
+			.selectFrom('Furniture')
+			.where((eb) =>
+				eb.or([eb('screenshotUpdatedAt', 'is', null), eb('measuredDimensionsX', 'is', null), eb('measuredDimensionsY', 'is', null), eb('measuredDimensionsZ', 'is', null)])
+			)
+			.select(['id', 'screenshotUpdatedAt', 'measuredDimensionsX', 'measuredDimensionsY', 'measuredDimensionsZ']);
+		console.log(query.compile().sql);
+		return query.execute();
 	}
 
 	async deleteDevice(id: PrefixedId<'d'>) {

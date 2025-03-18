@@ -80,6 +80,7 @@ export function BulkFurnitureUploader() {
 				json: {
 					name,
 					attributes,
+					originalFileName: name,
 				},
 			})
 		);

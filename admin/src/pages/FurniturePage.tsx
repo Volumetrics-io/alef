@@ -2,6 +2,7 @@ import { AddFurniture } from '@/components/furniture/AddFurniture';
 import { BulkFurnitureDelete } from '@/components/furniture/BulkFurnitureDelete';
 import { BulkFurnitureUploader } from '@/components/furniture/BulkFurnitureUploader';
 import { FurnitureBrowser } from '@/components/furniture/FurnitureBrowser';
+import { FurnitureProcessingQueue } from '@/components/furniture/FurnitureProcessingQueue';
 import { Box, Button, Frame, Heading, Icon } from '@alef/sys';
 import { Link } from '@verdant-web/react-router';
 
@@ -30,6 +31,7 @@ const FurniturePage = () => {
 			<Box full p>
 				<FurnitureBrowser />
 			</Box>
+			<FurnitureProcessingQueue />
 		</Box>
 	);
 };

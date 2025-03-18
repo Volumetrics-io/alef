@@ -2,7 +2,6 @@ import { adminApiClient } from '@/services/adminApi';
 import { FurnitureData } from '@/services/publicApi';
 import { queryClient } from '@/services/queryClient';
 import { handleErrors } from '@/services/utils';
-import { useFurnitureStore } from '@/stores/furnitureStore';
 import { Box, Button, Card, Dialog, Form, Frame, Icon, Input, ScrollArea } from '@alef/sys';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -15,8 +14,7 @@ export interface FurnitureCardProps {
 }
 
 export function FurnitureCard({ furniture }: FurnitureCardProps) {
-	const { focusedFurniture } = useFurnitureStore();
-	const [open, setOpen] = useState(focusedFurniture === furniture.id);
+	const [open, setOpen] = useState(false);
 	const { mutate: deleteSelf, isPending: isDeleting } = useMutation({
 		mutationFn: () => handleErrors(adminApiClient.furniture[':id'].$delete({ param: { id: furniture.id } })),
 		onSuccess: () => {
@@ -25,10 +23,6 @@ export function FurnitureCard({ furniture }: FurnitureCardProps) {
 			});
 		},
 	});
-
-	useEffect(() => {
-		setOpen(focusedFurniture === furniture.id);
-	}, [focusedFurniture, furniture.id]);
 
 	const { mutate: updateSelf, isPending: isUpdating } = useMutation({
 		mutationFn: (data: { name: string }) => handleErrors(adminApiClient.furniture[':id'].$put({ param: { id: furniture.id }, json: data })),
@@ -45,7 +39,12 @@ export function FurnitureCard({ furniture }: FurnitureCardProps) {
 				<Dialog.Trigger asChild>
 					<Card.Main align="center">
 						<FurnitureSnapshot furnitureId={furniture.id} />
-						<Box float="top-left" gapped align="center">
+						<Box float="top-left" gapped align="center" wrap>
+							{furniture.measuredDimensionsX && (
+								<Frame p="squeeze">
+									{furniture.measuredDimensionsX.toFixed(2)}x{furniture.measuredDimensionsY?.toFixed(2)}x{furniture.measuredDimensionsZ?.toFixed(2)}
+								</Frame>
+							)}
 							{furniture.attributes.map((attr: { key: string; value: string }) => (
 								<Frame key={`${attr.key}:${attr.value}`} p="squeeze">
 									{attr.key}: {attr.value}

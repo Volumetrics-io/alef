@@ -25,7 +25,7 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 		return this.#db
 			.selectFrom('Furniture')
 			.where('id', '=', id)
-			.select((eb) => ['id', 'name', 'modelUpdatedAt', this.selectFurnitureAttributes(eb)])
+			.select((eb) => ['id', 'name', 'modelUpdatedAt', 'measuredDimensionsX', 'measuredDimensionsY', 'measuredDimensionsZ', this.selectFurnitureAttributes(eb)])
 			.executeTakeFirst();
 	}
 
@@ -62,7 +62,17 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 	}
 
 	async listFurniture({ attributeFilters, page, pageSize }: { attributeFilters?: Attribute[]; page?: number; pageSize?: number }) {
-		let builder = this.#db.selectFrom('Furniture').select((eb) => ['Furniture.id', 'Furniture.name', 'Furniture.modelUpdatedAt', this.selectFurnitureAttributes(eb)]);
+		let builder = this.#db
+			.selectFrom('Furniture')
+			.select((eb) => [
+				'Furniture.id',
+				'Furniture.name',
+				'Furniture.modelUpdatedAt',
+				'Furniture.measuredDimensionsX',
+				'Furniture.measuredDimensionsY',
+				'Furniture.measuredDimensionsZ',
+				this.selectFurnitureAttributes(eb),
+			]);
 
 		if (attributeFilters) {
 			// Separate attributes by key
@@ -112,7 +122,6 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 			builder = builder.limit(pageSize + 1).offset(pageSize * page);
 		}
 
-		console.log(builder.compile().sql, builder.compile().parameters);
 		const result = await builder.execute();
 
 		const hasNextPage = !!pageSize && result.length > pageSize;

@@ -1,9 +1,10 @@
-import { Container } from '@react-three/uikit';
-import { Button } from '../ui/Button';
-import { Menu, X, House, Sofa, Sun, Settings, Box, Minimize } from '@react-three/uikit-lucide';
-import { Selector, SelectorItem } from '../ui/Selector';
-import { useEditorStageMode, usePanelState } from '@/stores/editorStore';
 import { useRescanRoom } from '@/hooks/useRescanRoom';
+import { firstTimeUserXROnboarding } from '@/onboarding/firstTimeUserXR';
+import { useEditorStageMode, usePanelState } from '@/stores/editorStore';
+import { Container } from '@react-three/uikit';
+import { Box, House, Menu, Minimize, Settings, Sofa, Sun, X } from '@react-three/uikit-lucide';
+import { Button } from '../ui/Button';
+import { Selector, SelectorItem } from '../ui/Selector';
 
 export const Navigation = () => {
 	const [mode, setMode] = useEditorStageMode();
@@ -23,6 +24,7 @@ export const Navigation = () => {
 						setMode(null);
 					}
 					setPanelState(panelState === 'open' ? 'closed' : 'open');
+					firstTimeUserXROnboarding.completeStep('welcome');
 				}}
 			>
 				{panelState === 'open' ? <X /> : <ModeIcon />}

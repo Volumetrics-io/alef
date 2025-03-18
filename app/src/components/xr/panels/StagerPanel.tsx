@@ -1,10 +1,13 @@
+import { firstTimeUserXROnboarding } from '@/onboarding/firstTimeUserXR';
 import { useEditorStageMode, usePanelState } from '@/stores/editorStore';
-import { Container, Root } from '@react-three/uikit';
+import { Container, Root, Text } from '@react-three/uikit';
 import { useXR } from '@react-three/xr';
 import { Suspense, useMemo } from 'react';
 import { Vector3 } from 'three';
 import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
 import { DragController } from '../controls/Draggable';
+import { OnboardingDot } from '../onboarding/OnboardingDot';
+import { OnboardingFrame } from '../onboarding/OnboardingFrame';
 import { Defaults } from '../ui/Defaults';
 import { colors } from '../ui/theme';
 import { Navigation } from './navigation';
@@ -35,7 +38,7 @@ export function StagerPanel() {
 
 	return (
 		<DraggableBodyAnchor follow={panelState !== 'open'} position={position} lockY={true} distance={0.15}>
-			<Root pixelSize={0.001} alignItems={panelState === 'hidden' ? 'center' : undefined} flexDirection="column" gap={10}>
+			<Root pixelSize={0.001} alignItems={panelState === 'hidden' ? 'center' : undefined} flexDirection="column" positionType="relative" gap={10}>
 				<Defaults>
 					<Suspense>{panelState === 'hidden' && mode === 'furniture' && <SelectedFurnitureWidget />}</Suspense>
 					<Container flexDirection="row" justifyContent="space-between">
@@ -47,6 +50,9 @@ export function StagerPanel() {
 						)}
 					</Container>
 					<UpdatePrompt />
+					<OnboardingFrame onboarding={firstTimeUserXROnboarding} step="welcome">
+						<Text>Welcome to Alef! Tap this menu to get started</Text>
+					</OnboardingFrame>
 					{panelState === 'open' && (
 						<>
 							{mode === 'lighting' && <Lighting />}
@@ -66,6 +72,7 @@ export function StagerPanel() {
 							)}
 						</>
 					)}
+					<OnboardingDot onboarding={firstTimeUserXROnboarding} step="welcome" />
 				</Defaults>
 			</Root>
 		</DraggableBodyAnchor>

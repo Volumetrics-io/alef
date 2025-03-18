@@ -10,6 +10,7 @@
 	},
 	"dependencies": {
 		"@a-type/auth-fetch": "catalog:",
+		"@a-type/onboarding": "1.0.3",
 		"@alef/common": "workspace:*",
 		"@alef/services": "workspace:*",
 		"@alef/sys": "workspace:*",

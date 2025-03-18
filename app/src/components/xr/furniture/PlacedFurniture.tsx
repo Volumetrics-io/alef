@@ -24,8 +24,6 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	const setPanelState = useSetPanelState();
 	const updateShadowMap = useShadowMapUpdate();
 
-	console.log('furniture mode', isFurnitureMode);
-
 	const groupRef = useRef<Group>(null);
 	const move = useUpdateFurniturePlacementTransform(furniturePlacementId);
 

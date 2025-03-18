@@ -136,8 +136,6 @@ export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFal
 		const baseLodIndex = lods.findIndex((lod) => lod.quality === maxQuality);
 		const usedLods = lods.slice(baseLodIndex);
 
-		return <PlaceholderModel furnitureId={props.furnitureId} ref={ref} />;
-
 		// FIXME: this JSX structure is kind of a mess of multiple kinds of fallbacks...
 		// perhaps there's a more intuitive way to structure this behavior.
 		return (

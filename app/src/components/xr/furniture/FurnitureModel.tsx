@@ -1,4 +1,4 @@
-import { useFurnitureModel } from '@/services/publicApi/furnitureHooks';
+import { useFurnitureDetails, useFurnitureModel } from '@/services/publicApi/furnitureHooks';
 import { usePerformanceStore } from '@/stores/performanceStore';
 import { FurnitureModelQuality, PrefixedId, RANKED_FURNITURE_MODEL_QUALITIES } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
@@ -73,11 +73,16 @@ export const MissingModel = forwardRef<any, { onClick?: () => void; transparent?
 	);
 });
 
-const PlaceholderModel = forwardRef<any, { onClick?: () => void }>(function PlaceholderModel({ onClick }, ref) {
+const PlaceholderModel = forwardRef<any, { onClick?: () => void; furnitureId: PrefixedId<'f'> }>(function PlaceholderModel({ onClick, furnitureId }, ref) {
+	const { data } = useFurnitureDetails(furnitureId);
+	// data contains metadata about measured dimensions, which we can use to show a more accurate placeholder.
+	const hasDimensions = data?.measuredDimensionsX && data?.measuredDimensionsY && data?.measuredDimensionsZ;
+	const dimensions: [number, number, number] = hasDimensions ? [data.measuredDimensionsX!, data.measuredDimensionsY!, data.measuredDimensionsZ!] : [1, 1, 1];
+
 	return (
-		<mesh onClick={onClick} ref={ref}>
-			<sphereGeometry args={[0.5, 8, 8]} />
-			<meshBasicMaterial color="white" transparent opacity={0.5} />
+		<mesh onClick={onClick} ref={ref} position={[0, dimensions[1] / 2, 0]}>
+			<boxGeometry args={dimensions} attach="geometry" />
+			<meshBasicMaterial wireframe wireframeLinewidth={4} color="white" />
 		</mesh>
 	);
 });
@@ -131,6 +136,8 @@ export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFal
 		const baseLodIndex = lods.findIndex((lod) => lod.quality === maxQuality);
 		const usedLods = lods.slice(baseLodIndex);
 
+		return <PlaceholderModel furnitureId={props.furnitureId} ref={ref} />;
+
 		// FIXME: this JSX structure is kind of a mess of multiple kinds of fallbacks...
 		// perhaps there's a more intuitive way to structure this behavior.
 		return (
@@ -144,7 +151,7 @@ export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFal
 						// unavailable.
 						<ErrorBoundary fallback={<MissingModel ref={ref} />}>
 							{/* While the original model loads, show some kind of geometry to let the user know there's something here. */}
-							<Suspense fallback={<PlaceholderModel ref={ref} />}>
+							<Suspense fallback={<PlaceholderModel furnitureId={props.furnitureId} ref={ref} />}>
 								{/* We likely have the original quality model, at minimum, even if others 404. */}
 								<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Original} ref={ref} />
 							</Suspense>
@@ -157,20 +164,20 @@ export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFal
 					fallback={
 						isLowQuality ? (
 							// if this component is rendering the lowest quality model already, just show a placeholder as it fetches.
-							<PlaceholderModel ref={ref} />
+							<PlaceholderModel furnitureId={props.furnitureId} ref={ref} />
 						) : (
 							/*
 								When attempting to render the low quality fallback model, we might also not have that... show a
 								generic placeholder instead to avoid fallback to the error box above and at least present
 								something to the user while loading the main model.
 							*/
-							<ErrorBoundary fallback={<PlaceholderModel ref={ref} />}>
+							<ErrorBoundary fallback={<PlaceholderModel furnitureId={props.furnitureId} ref={ref} />}>
 								{/*
 									The loading state for the loading state, lol. While we load the low quality model to display
 									until the higher quality one is available, we show a placeholder to let the user know something
 									is coming. Even the low quality model may have a noticeable delay!
 								*/}
-								<Suspense fallback={<PlaceholderModel ref={ref} />}>
+								<Suspense fallback={<PlaceholderModel furnitureId={props.furnitureId} ref={ref} />}>
 									<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Low} ref={ref} />
 								</Suspense>
 							</ErrorBoundary>

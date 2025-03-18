@@ -85,6 +85,11 @@ export interface FurnitureTable {
 	name: string;
 
 	modelUpdatedAt: DateColumnOptional;
+	screenshotUpdatedAt: DateColumnOptional;
+	originalFileName: string | null;
+	measuredDimensionsX: number | null;
+	measuredDimensionsY: number | null;
+	measuredDimensionsZ: number | null;
 }
 export type Furniture = Selectable<FurnitureTable>;
 export type NewFurniture = Insertable<FurnitureTable>;

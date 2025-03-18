@@ -6,6 +6,7 @@ import { Bvh, Clone, Detailed, Outlines } from '@react-three/drei';
 import { ThreeEvent } from '@react-three/fiber';
 import { forwardRef, ReactNode, Suspense, useCallback } from 'react';
 import { Group, Mesh } from 'three';
+import { SimpleBox } from './SimpleBox';
 
 export interface FurnitureModelProps {
 	furnitureId: PrefixedId<'f'>;
@@ -79,12 +80,7 @@ const PlaceholderModel = forwardRef<any, { onClick?: () => void; furnitureId: Pr
 	const hasDimensions = data?.measuredDimensionsX && data?.measuredDimensionsY && data?.measuredDimensionsZ;
 	const dimensions: [number, number, number] = hasDimensions ? [data.measuredDimensionsX!, data.measuredDimensionsY!, data.measuredDimensionsZ!] : [1, 1, 1];
 
-	return (
-		<mesh onClick={onClick} ref={ref} position={[0, dimensions[1] / 2, 0]}>
-			<boxGeometry args={dimensions} attach="geometry" />
-			<meshBasicMaterial wireframe wireframeLinewidth={4} color="white" />
-		</mesh>
-	);
+	return <SimpleBox size={dimensions} position={[0, dimensions[1] / 2, 0]} onClick={onClick} ref={ref} />;
 });
 
 export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode; onClick?: () => void }>(

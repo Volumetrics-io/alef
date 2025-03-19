@@ -26,21 +26,23 @@ interface FurnitureModelRendererProps {
 	castShadow?: boolean;
 	quality: FurnitureModelQuality;
 	transparent?: boolean;
+	colorWrite?: boolean;
 }
 
 const FurnitureModelRenderer = forwardRef<Group, FurnitureModelRendererProps>(function FurnitureModelRenderer(
-	{ furnitureId, outline, castShadow, receiveShadow, pointerEvents = 'auto', quality, transparent = false },
+	{ furnitureId, outline, castShadow, receiveShadow, pointerEvents = 'auto', quality, transparent = false, colorWrite = true },
 	ref
 ) {
 	const model = useFurnitureModel(furnitureId, quality);
 
 	if (!model) return null;
 
-	if (transparent) {
+	if (transparent || colorWrite === false) {
 		model.scene.traverse((child) => {
 			if (child instanceof Mesh) {
 				child.material.transparent = true;
-				child.material.opacity = 0;
+				child.material.opacity = 0.5;
+				child.material.colorWrite = colorWrite;
 				child.renderOrder = -1;
 			}
 		});
@@ -83,8 +85,8 @@ const PlaceholderModel = forwardRef<any, { onClick?: () => void; furnitureId: Pr
 	return <SimpleBox size={dimensions} position={[0, dimensions[1] / 2, 0]} onClick={onClick} ref={ref} />;
 });
 
-export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode; onClick?: () => void; enabled?: boolean }>(
-	({ errorFallback, debugLod, onClick, pointerEvents = 'auto', enabled, ...props }, ref) => {
+export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode; onClick?: () => void; enabled?: boolean; colorWrite?: boolean }>(
+	({ errorFallback, debugLod, onClick, pointerEvents = 'auto', enabled, colorWrite = false, ...props }, ref) => {
 		const stopPropagation = useCallback((e: ThreeEvent<PointerEvent>) => {
 			e.stopPropagation();
 		}, []);
@@ -114,6 +116,7 @@ export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFal
 							quality={FurnitureModelQuality.Collision}
 							ref={ref}
 							transparent
+							colorWrite={colorWrite}
 						/>
 					</Bvh>
 				</Suspense>

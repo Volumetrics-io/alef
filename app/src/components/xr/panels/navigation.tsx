@@ -33,6 +33,7 @@ export const Navigation = () => {
 			</Button>
 			{panelState === 'open' && (
 				<Button variant="secondary" size="icon" onClick={() => setPanelState('hidden')}>
+					<OnboardingDot onboarding={firstTimeUserXROnboarding} step="minimize" />
 					<Minimize />
 				</Button>
 			)}

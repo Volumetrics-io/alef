@@ -1,7 +1,7 @@
 import { firstTimeUserXROnboarding } from '@/onboarding/firstTimeUserXR';
 import { useEditorStageMode, usePanelState } from '@/stores/editorStore';
 import { Container, Root, Text } from '@react-three/uikit';
-import { HouseIcon, SofaIcon, SunIcon } from '@react-three/uikit-lucide';
+import { HouseIcon, MinimizeIcon, SofaIcon, SunIcon } from '@react-three/uikit-lucide';
 import { useXR } from '@react-three/xr';
 import { Suspense, useMemo } from 'react';
 import { Vector3 } from 'three';
@@ -112,6 +112,13 @@ function Onboarding() {
 					<Text>Point and select the </Text>
 					<SunIcon />
 					<Text> icon to adjust lighting.</Text>
+				</Container>
+			</OnboardingFrame>
+			<OnboardingFrame {...commonProps} step="minimize">
+				<Container flexDirection="row" flexWrap="wrap" gap={5} alignItems="center">
+					<Text>Use the</Text>
+					<MinimizeIcon />
+					<Text>icon to minimize this menu while you're working.</Text>
 				</Container>
 			</OnboardingFrame>
 		</>

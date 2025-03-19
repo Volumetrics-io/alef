@@ -1,5 +1,3 @@
-// import SunLight from '@/components/xr/lighting/SunLight.tsx';
-
 import { Redirect } from '@/components/Redirect';
 import { isHeadset } from '@/services/os';
 import { useMe } from '@/services/publicApi/userHooks';

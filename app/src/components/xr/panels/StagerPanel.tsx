@@ -8,6 +8,7 @@ import { DragController } from '../controls/Draggable';
 import { Defaults } from '../ui/Defaults';
 import { colors } from '../ui/theme';
 import { Navigation } from './navigation';
+import { RescanPrompt } from './RescanPrompt';
 import { UndoControls } from './staging/common/UndoControls';
 import { FurniturePanel } from './staging/furniture/FurniturePanel';
 import { SelectedFurnitureWidget } from './staging/furniture/SelectedFurnitureUI';
@@ -47,6 +48,7 @@ export function StagerPanel() {
 						)}
 					</Container>
 					<UpdatePrompt />
+					<RescanPrompt />
 					{panelState === 'open' && (
 						<>
 							{mode === 'lighting' && <Lighting />}

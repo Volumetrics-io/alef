@@ -1,10 +1,13 @@
+import { firstTimeUserXROnboarding } from '@/onboarding/firstTimeUserXR';
 import { useEditorStageMode, usePanelState } from '@/stores/editorStore';
-import { Container, Root } from '@react-three/uikit';
+import { Container, Root, Text } from '@react-three/uikit';
+import { HouseIcon, MinimizeIcon, SofaIcon, SunIcon } from '@react-three/uikit-lucide';
 import { useXR } from '@react-three/xr';
 import { Suspense, useMemo } from 'react';
 import { Vector3 } from 'three';
 import { DraggableBodyAnchor } from '../anchors/DraggableBodyAnchor';
 import { DragController } from '../controls/Draggable';
+import { OnboardingFrame } from '../onboarding/OnboardingFrame';
 import { Defaults } from '../ui/Defaults';
 import { colors } from '../ui/theme';
 import { Navigation } from './navigation';
@@ -15,6 +18,7 @@ import { Layouts } from './staging/Layouts';
 import { Lighting } from './staging/Lighting';
 import { SettingsPanel } from './staging/SettingsPanel';
 import { UpdatePrompt } from './UpdatePrompt';
+
 export function StagerPanel() {
 	const [panelState] = usePanelState();
 	const [mode] = useEditorStageMode();
@@ -35,8 +39,9 @@ export function StagerPanel() {
 
 	return (
 		<DraggableBodyAnchor follow={panelState !== 'open'} position={position} lockY={true} distance={0.15}>
-			<Root pixelSize={0.001} alignItems={panelState === 'hidden' ? 'center' : undefined} flexDirection="column" gap={10}>
+			<Root pixelSize={0.001} alignItems={panelState === 'hidden' ? 'center' : undefined} flexDirection="column" positionType="relative" gap={10}>
 				<Defaults>
+					<Onboarding />
 					<Suspense>{panelState === 'hidden' && mode === 'furniture' && <SelectedFurnitureWidget />}</Suspense>
 					<Container flexDirection="row" justifyContent="space-between">
 						<Navigation />
@@ -69,5 +74,53 @@ export function StagerPanel() {
 				</Defaults>
 			</Root>
 		</DraggableBodyAnchor>
+	);
+}
+
+function Onboarding() {
+	const commonProps = {
+		onboarding: firstTimeUserXROnboarding,
+		positionType: 'absolute',
+		positionTop: -20,
+		positionLeft: 0,
+		transformTranslateY: '-100%',
+	} as const;
+	return (
+		<>
+			<OnboardingFrame {...commonProps} step="welcome">
+				<Text>Welcome to Alef! Tap this menu to get started</Text>
+			</OnboardingFrame>
+			<OnboardingFrame {...commonProps} step="layouts">
+				<Text>Your room can have multiple layouts. We made an empty one for you to start with.</Text>
+				<Container flexDirection={'row'} flexWrap="wrap" gap={5} alignItems="center">
+					<Text>Point and select the </Text>
+					<HouseIcon />
+					<Text> icon to edit layouts.</Text>
+				</Container>
+			</OnboardingFrame>
+			<OnboardingFrame {...commonProps} step="furniture">
+				<Text>Choose from a variety of furniture to fill your room.</Text>
+				<Container flexDirection={'row'} flexWrap="wrap" gap={5} alignItems="center">
+					<Text>Point and select the </Text>
+					<SofaIcon />
+					<Text> icon to add furniture.</Text>
+				</Container>
+			</OnboardingFrame>
+			<OnboardingFrame {...commonProps} step="lighting">
+				<Text>Place lights on the ceiling to match your room, and Alef's lighting engine will compute furniture shadows and ambient light.</Text>
+				<Container flexDirection={'row'} flexWrap="wrap" gap={5} alignItems="center">
+					<Text>Point and select the </Text>
+					<SunIcon />
+					<Text> icon to adjust lighting.</Text>
+				</Container>
+			</OnboardingFrame>
+			<OnboardingFrame {...commonProps} step="minimize">
+				<Container flexDirection="row" flexWrap="wrap" gap={5} alignItems="center">
+					<Text>Use the</Text>
+					<MinimizeIcon />
+					<Text>icon to minimize this menu while you're working.</Text>
+				</Container>
+			</OnboardingFrame>
+		</>
 	);
 }

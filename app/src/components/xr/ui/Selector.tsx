@@ -113,7 +113,7 @@ export function SelectorItem({
 			alignItems="center"
 			flexDirection="row"
 			justifyContent="flex-start"
-			onHoverChange={(hover) => {
+			onHoverChange={(hover: boolean) => {
 				if (perfMode) return;
 				api.start({ spring: Number(hover) });
 			}}

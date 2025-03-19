@@ -3,6 +3,7 @@ import { DepthShader } from '@/components/xr/shaders/DepthShader';
 
 import { PropertyRoomStoreProvider } from '@/components/core/PropertyRoomStoreProvider.js';
 import { useColorTheme } from '@/hooks/useColorTheme';
+import { AdaptiveEvents } from '@react-three/drei';
 import { useMode } from './modes/ModeContext';
 import { StagerPanel } from './panels/StagerPanel';
 import { ViewerPanel } from './panels/ViewerPanel';
@@ -15,6 +16,7 @@ export function MainScene() {
 	return (
 		<SceneWrapper full style={{ height: '100vh' }}>
 			<DepthShader />
+			<AdaptiveEvents />
 			<PropertyRoomStoreProvider>
 				<RoomRenderer />
 				<ModePanel />

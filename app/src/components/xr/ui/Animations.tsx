@@ -1,6 +1,6 @@
 import { usePerformanceStore } from '@/stores/performanceStore';
-import { animated, config, SpringValue, useSpring, useSpringRef } from '@react-spring/three';
-import { Container, ContainerProperties, ContainerRef } from '@react-three/uikit';
+import { animated, config, SpringValue, useSpring, useSpringRef } from '@react-spring/web';
+import { Container, ContainerProperties } from '@react-three/uikit';
 import { ComponentProps } from 'react';
 import { Surface } from './Surface';
 import { colors, getColorForAnimation } from './theme';
@@ -10,15 +10,7 @@ export type AnimationProps = {
 	to: ContainerProperties;
 };
 
-function StaticContainer({ children, ref, ...props }: ContainerProperties & { children?: React.ReactNode; ref?: React.Ref<ContainerRef> }) {
-	return (
-		<Container {...props} ref={ref}>
-			{children}
-		</Container>
-	);
-}
-export const AnimatedContainer = animated(StaticContainer);
-
+export const AnimatedContainer = animated(Container);
 export const AnimatedSurface = animated(Surface);
 
 export const usePullAnimation = (spring: SpringValue<number>) => {

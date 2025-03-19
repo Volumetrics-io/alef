@@ -34,12 +34,16 @@ export class AlefError extends Error {
 		return new AlefError(AlefErrorCode.Unknown, String(err), err);
 	};
 
+	private extraHeaders: HeadersInit = {};
+
 	constructor(
 		public code: AlefErrorCode,
 		message: string = `AlefError ${code}`,
-		public cause?: unknown
+		public cause?: unknown,
+		options?: { headers?: HeadersInit }
 	) {
 		super(message);
+		this.extraHeaders = options?.headers || {};
 	}
 
 	get statusCode() {
@@ -55,6 +59,7 @@ export class AlefError extends Error {
 		return {
 			'X-Alef-Error': String(this.code),
 			'X-Alef-Error-Message': this.message,
+			...this.extraHeaders,
 		};
 	}
 

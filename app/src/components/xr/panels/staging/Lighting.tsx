@@ -47,10 +47,6 @@ const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
 			</Container>
 			<Container flexDirection="column" gap={50} flexGrow={1}>
 				<Container flexDirection="column" gap={10}>
-					<Heading level={4}>Room lights</Heading>
-					<Text>While this panel is open, point and select on the ceiling to add new room lights, or select an existing light to modify it.</Text>
-				</Container>
-				<Container flexDirection="column" gap={10}>
 					<Heading level={4}>Brightness</Heading>
 					<Slider defaultValue={lightIntensityRef.current} min={0} max={2} step={0.01} onValueChange={(v) => (lightIntensityRef.current = v)} onPointerUp={updateIntensity} />
 				</Container>

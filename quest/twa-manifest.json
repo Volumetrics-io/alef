@@ -15,7 +15,7 @@
 	"enableNotifications": true,
 	"enableMicrophone": false,
 	"enableXRScene": true,
-	"startUrl": "/?directLaunch=true",
+	"startUrl": "headset/?directLaunch=true",
 	"iconUrl": "https://app.alef.io/icons/512.png",
 	"maskableIconUrl": "https://app.alef.io/icons/512.png",
 	"splashScreenFadeOutDuration": 300,

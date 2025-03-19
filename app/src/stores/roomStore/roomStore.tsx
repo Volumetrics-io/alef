@@ -354,10 +354,10 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 						viewingLayoutId,
 					};
 				},
-				migrate(persistedState) {
+				migrate(persistedState: any) {
 					return {
 						messageBacklog: [],
-						viewingLayoutId: undefined,
+						viewingLayoutId: persistedState?.viewingLayoutId,
 						...migrateRoomState(persistedState),
 					};
 				},

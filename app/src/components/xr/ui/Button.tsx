@@ -1,15 +1,13 @@
-import { colors, getColorForAnimation } from './theme';
-import { borderRadius } from '@react-three/uikit-default';
-import { RefAttributes, useCallback, useRef, useEffect } from 'react';
-import { ReactNode } from 'react';
-import { forwardRef } from 'react';
-import { ContainerRef, DefaultProperties, ContainerProperties, AllOptionalProperties } from '@react-three/uikit';
-import { PositionalAudio } from '@react-three/drei';
-import { PositionalAudio as PositionalAudioType } from 'three';
-import { ThreeEvent } from '@react-three/fiber';
-import { useSpring, config, useSpringRef } from '@react-spring/three';
-import { AnimatedContainer, AnimationProps, usePullAnimation } from './Animations';
 import { usePerformanceStore } from '@/stores/performanceStore';
+import { config, useSpring, useSpringRef } from '@react-spring/web';
+import { PositionalAudio } from '@react-three/drei';
+import { ThreeEvent } from '@react-three/fiber';
+import { AllOptionalProperties, ContainerProperties, ContainerRef, DefaultProperties } from '@react-three/uikit';
+import { borderRadius } from '@react-three/uikit-default';
+import { forwardRef, ReactNode, RefAttributes, useCallback, useEffect, useRef } from 'react';
+import { PositionalAudio as PositionalAudioType } from 'three';
+import { AnimatedContainer, AnimationProps, usePullAnimation } from './Animations';
+import { colors, getColorForAnimation } from './theme';
 const buttonVariants = {
 	default: {
 		containerHoverProps: {

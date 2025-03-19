@@ -7,13 +7,7 @@ export function handleError(reason: unknown): Response {
 		if (reason.code > AlefError.Code.InternalServerError) {
 			console.error('Unexpected AlefError:', reason);
 		}
-		return new Response(JSON.stringify(reason.body), {
-			status: reason.statusCode,
-			headers: {
-				'Content-Type': 'application/json',
-				...reason.headers,
-			},
-		});
+		return reason.toResponse();
 	}
 
 	if (reason instanceof AuthError) {

@@ -18,7 +18,13 @@ async function getRequestSessionOrThrow(ctx: Context): Promise<SessionWithPrefix
 	} catch (err) {
 		if (err instanceof AuthError) {
 			if (err.message === AuthError.Messages.SessionExpired) {
-				throw new AlefError(AlefError.Code.SessionExpired, 'Session expired. Please refresh your session or log in again.');
+				throw new AlefError(AlefError.Code.SessionExpired, 'Session expired. Please refresh your session or log in again.', err);
+			} else if (err.message === AuthError.Messages.InvalidSession) {
+				// remove the invalid session
+				const { headers } = sessions.clearSession(ctx);
+				throw new AlefError(AlefError.Code.SessionInvalid, 'Invalid session. Please log in again.', err, {
+					headers,
+				});
 			}
 		}
 		throw err;

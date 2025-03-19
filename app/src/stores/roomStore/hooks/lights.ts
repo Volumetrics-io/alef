@@ -35,9 +35,10 @@ export function useAddLight() {
 	);
 }
 
-export function useCanAddLights() {
-	const lights = useLights();
-	return useCallback(() => Object.keys(lights).length < 6, [lights]);
+export function useCanAddLights(maxLights = 6, lights = useLights()) {
+	return useCallback(() => {
+		return Object.keys(lights).length < maxLights;
+	}, [lights, maxLights]);
 }
 
 export function useMoveLight(id: PrefixedId<'lp'>) {

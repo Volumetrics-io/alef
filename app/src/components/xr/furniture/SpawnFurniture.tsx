@@ -2,8 +2,6 @@ import { useAddFurniture, usePlanes } from '@/stores/roomStore';
 import { Euler, Vector3, DoubleSide, Quaternion } from 'three';
 import { forwardRef, useRef } from 'react';
 import { Group } from 'three';
-
-import { colors } from '../ui/theme';
 import { useIsEditorStageMode, useSelectedModelId, useSetSelectedModelId, useSetPanelState } from '@/stores/editorStore';
 import { CollisionModel } from './FurnitureModel';
 import { useFrame } from '@react-three/fiber';

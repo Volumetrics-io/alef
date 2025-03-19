@@ -60,8 +60,6 @@ export const RoomLighting = () => {
 	};
 
 	const onEnd = (e: any) => {
-		if (!editable) return;
-		if (!canAddLights()) return;
 		if (!cursorRef.current) return;
 		cursorRef.current.visible = false;
 		cursorRef.current.position.set(e.point.x, e.point.y - 0.001, e.point.z);
@@ -69,7 +67,6 @@ export const RoomLighting = () => {
 
 	const handleClick = useCallback(
 		(event: any) => {
-			console.log('handleClick', event);
 			if (!editable) return;
 			if (!canAddLights()) return;
 			const position = new Vector3(event.localPoint.x, event.localPoint.y, event.localPoint.z);

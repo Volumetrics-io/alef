@@ -1,4 +1,4 @@
-import { useXR } from '@react-three/xr';
+import { useXR, useXRPlanes } from '@react-three/xr';
 
 const sessionRescannedMap = new WeakMap<XRSession, boolean>();
 
@@ -15,4 +15,12 @@ export function useRescanRoom() {
 
 	const canRescan = session && !sessionRescannedMap.get(session);
 	return { canRescan, rescanRoom };
+}
+
+export function useNeedsRoomScan() {
+	const session = useXR((s) => s.session);
+	const canRescan = session && !sessionRescannedMap.get(session);
+	// if we don't have walls, we need a rescan
+	const walls = useXRPlanes('wall');
+	return walls.length === 0 && canRescan;
 }

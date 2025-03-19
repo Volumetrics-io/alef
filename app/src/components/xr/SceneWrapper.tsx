@@ -13,7 +13,7 @@ import { XRPerformanceManager } from './XRPerformanceManager';
 import { PerformanceMonitor } from '@react-three/drei';
 import { FurnitureModelQuality } from '@alef/common';
 import { ActivePointer } from './controls/ActivePointer';
-
+import { SplashScreen } from './ui/SplashScreen';
 export interface SceneWrapperProps extends BoxProps {
 	children: ReactNode;
 }
@@ -64,7 +64,7 @@ export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 							}}
 						>
 							<XRPerformanceManager />
-							<Suspense>{children}</Suspense>
+							<Suspense fallback={<SplashScreen />}>{children}</Suspense>
 							<NonXRCameraControls />
 							<XRToaster />
 							<ActivePointer />

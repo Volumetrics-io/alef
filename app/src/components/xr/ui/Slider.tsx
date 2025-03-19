@@ -1,13 +1,13 @@
-import { Container, ContainerRef, ContainerProperties } from '@react-three/uikit';
-import { colors, getColorForAnimation } from './theme.js';
-import { ReactNode, RefAttributes, forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { EventHandlers, ThreeEvent } from '@react-three/fiber/dist/declarations/src/core/events.js';
-import { Vector3 } from 'three';
-import { Signal, computed } from '@preact/signals-core';
-import { config, useSpringRef } from '@react-spring/three';
-import { useSpring } from '@react-spring/three';
-import { AnimatedContainer, AnimatedCursor } from './Animations';
 import { usePerformanceStore } from '@/stores/performanceStore';
+import { Signal, computed } from '@preact/signals-core';
+import { useSpring } from '@react-spring/three';
+import { config, useSpringRef } from '@react-spring/web';
+import { EventHandlers, ThreeEvent } from '@react-three/fiber/dist/declarations/src/core/events.js';
+import { Container, ContainerProperties, ContainerRef } from '@react-three/uikit';
+import { ReactNode, RefAttributes, forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { Vector3 } from 'three';
+import { AnimatedContainer, AnimatedCursor } from './Animations';
+import { colors, getColorForAnimation } from './theme.js';
 
 const vectorHelper = new Vector3();
 

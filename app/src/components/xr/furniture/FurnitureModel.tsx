@@ -2,7 +2,7 @@ import { useFurnitureDetails, useFurnitureModel } from '@/services/publicApi/fur
 import { usePerformanceStore } from '@/stores/performanceStore';
 import { FurnitureModelQuality, PrefixedId, RANKED_FURNITURE_MODEL_QUALITIES } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
-import { Bvh, Clone, Detailed, Outlines } from '@react-three/drei';
+import { Bvh, Clone, Detailed, Outlines, Preload } from '@react-three/drei';
 import { ThreeEvent } from '@react-three/fiber';
 import { forwardRef, ReactNode, Suspense, useCallback } from 'react';
 import { DoubleSide, Group, Mesh } from 'three';
@@ -92,7 +92,15 @@ export const SimpleCollisionModel = forwardRef<Mesh, FurnitureModelProps & { err
 		const hasDimensions = data?.measuredDimensionsX && data?.measuredDimensionsY && data?.measuredDimensionsZ;
 		const dimensions: [number, number, number] = hasDimensions ? [data.measuredDimensionsX!, data.measuredDimensionsY!, data.measuredDimensionsZ!] : [1, 1, 1];
 		return (
-			<mesh {...props} position={[0, dimensions[1] / 2, 0]} onClick={onClick} renderOrder={1000} ref={ref}>
+			<mesh
+				{...props}
+				// @ts-ignore pointerEvents is not typed
+				pointerEvents={enabled === false ? 'none' : pointerEvents}
+				position={[0, dimensions[1] / 2, 0]}
+				onClick={onClick}
+				renderOrder={1000}
+				ref={ref}
+			>
 				<boxGeometry args={dimensions} />
 				<meshBasicMaterial colorWrite={colorWrite} depthWrite={false} color="red" side={DoubleSide} />
 			</mesh>
@@ -115,6 +123,7 @@ export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFal
 				}
 			>
 				<Suspense fallback={<MissingModel transparent ref={ref} />}>
+					<Preload all />
 					<Bvh
 						onPointerOver={stopPropagation}
 						onPointerOut={stopPropagation}
@@ -194,12 +203,14 @@ export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFal
 									is coming. Even the low quality model may have a noticeable delay!
 								*/}
 								<Suspense fallback={<PlaceholderModel furnitureId={props.furnitureId} ref={ref} />}>
+									<Preload all />
 									<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Low} ref={ref} />
 								</Suspense>
 							</ErrorBoundary>
 						)
 					}
 				>
+					<Preload all />
 					<Detailed distances={usedLods.map((lod) => lod.distance)}>
 						{usedLods.map((lod) => (
 							<FurnitureModelRenderer {...props} quality={lod.quality} outline={debugLod} ref={ref} key={lod.quality} />

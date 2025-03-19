@@ -1,14 +1,13 @@
-import { Container, ContainerProperties, DefaultProperties } from '@react-three/uikit';
-import { colors, getColorForAnimation } from './theme';
-import { borderRadius } from '@react-three/uikit-default';
-import { useCallback, useEffect } from 'react';
-import { PositionalAudio } from '@react-three/drei';
-import { PositionalAudio as PositionalAudioType } from 'three';
-import { useRef } from 'react';
-import { ThreeEvent } from '@react-three/fiber';
-import { AnimatedContainer, usePullAnimation } from './Animations';
-import { useSpring, config, useSpringRef } from '@react-spring/three';
 import { usePerformanceStore } from '@/stores/performanceStore';
+import { config, useSpring, useSpringRef } from '@react-spring/web';
+import { PositionalAudio } from '@react-three/drei';
+import { ThreeEvent } from '@react-three/fiber';
+import { Container, ContainerProperties, DefaultProperties } from '@react-three/uikit';
+import { borderRadius } from '@react-three/uikit-default';
+import { useCallback, useEffect, useRef } from 'react';
+import { PositionalAudio as PositionalAudioType } from 'three';
+import { AnimatedContainer, usePullAnimation } from './Animations';
+import { colors, getColorForAnimation } from './theme';
 export interface SelectorProps {
 	wrap?: boolean;
 	size?: 'small' | 'medium';

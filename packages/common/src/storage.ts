@@ -1,4 +1,4 @@
-import { PrefixedId } from './ids';
+import { PrefixedId } from './ids.js';
 
 export enum FurnitureModelQuality {
 	Original = 'original',

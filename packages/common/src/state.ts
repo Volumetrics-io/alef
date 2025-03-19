@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { AlefError } from './error';
-import { id, isPrefixedId, PrefixedId } from './ids';
-import { Operation } from './operations';
-import { mergePlanes } from './planes';
+import { AlefError } from './error.js';
+import { id, isPrefixedId, PrefixedId } from './ids.js';
+import { Operation } from './operations.js';
+import { mergePlanes } from './planes.js';
 
 export const ROOM_STATE_VERSION = 1;
 

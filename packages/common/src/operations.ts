@@ -1,5 +1,5 @@
-import { PrefixedId } from './ids';
-import { RoomFurniturePlacement, RoomGlobalLighting, RoomLayout, RoomLightPlacement, UnknownRoomPlaneData, Updates } from './state';
+import { PrefixedId } from './ids.js';
+import { RoomFurniturePlacement, RoomGlobalLighting, RoomLayout, RoomLightPlacement, UnknownRoomPlaneData, Updates } from './state.js';
 
 export interface CreateLayoutOperation {
 	type: 'createLayout';

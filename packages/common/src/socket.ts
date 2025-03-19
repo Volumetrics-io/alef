@@ -1,7 +1,7 @@
-import { AlefErrorCode } from './error';
-import { PrefixedId } from './ids';
-import { Operation } from './operations';
-import { RoomLayout, RoomState } from './state';
+import { AlefErrorCode } from './error.js';
+import { PrefixedId } from './ids.js';
+import { Operation } from './operations.js';
+import { RoomLayout, RoomState } from './state.js';
 
 export interface BaseServerMessage {
 	/**

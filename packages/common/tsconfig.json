@@ -5,7 +5,10 @@
 		"rootDir": "./src",
 		"lib": ["es2021", "es2022", "esnext"],
 		"customConditions": ["development"],
-		"declaration": true
+		"declaration": true,
+		"target": "ES2024",
+		"moduleResolution": "nodenext",
+		"module": "NodeNext"
 	},
 	"include": ["src/**/*.ts", "src/**/*.mts"]
 }

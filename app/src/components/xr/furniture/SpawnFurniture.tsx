@@ -1,6 +1,6 @@
 import { useAddFurniture, usePlanes } from '@/stores/roomStore';
 import { Euler, Vector3, DoubleSide, Quaternion } from 'three';
-import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useRef } from 'react';
 import { Group } from 'three';
 
 import { colors } from '../ui/theme';

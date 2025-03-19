@@ -21,8 +21,8 @@ const panelState = proxy({
 	showFilters: false,
 });
 
-export const FurniturePanelRoot = ({ children, display }: { children?: ReactNode; display?: 'flex' | 'none' }) => (
-	<Surface height={500} width={700} flexDirection={'column'} justifyContent={'space-between'} flexWrap={'no-wrap'} gap={10} padding={10} display={display}>
+export const FurniturePanelRoot = ({ children }: { children?: ReactNode }) => (
+	<Surface height={500} width={700} flexDirection={'column'} justifyContent={'space-between'} flexWrap={'no-wrap'} gap={10} padding={10}>
 		<Suspense>{children}</Suspense>
 	</Surface>
 );

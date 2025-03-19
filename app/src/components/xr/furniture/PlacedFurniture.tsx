@@ -9,7 +9,7 @@ import { defaultApply, Handle, HandleState } from '@react-three/handle';
 import { ComponentPropsWithoutRef, startTransition, useCallback, useRef, useState } from 'react';
 import { BackSide, Group, Object3D } from 'three';
 import { colors } from '../ui/theme';
-import { CollisionModel, FurnitureModel, MissingModel } from './FurnitureModel';
+import { FurnitureModel, MissingModel, SimpleCollisionModel } from './FurnitureModel';
 
 export interface PlacedFurnitureProps {
 	furniturePlacementId: PrefixedId<'fp'>;
@@ -20,15 +20,14 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	const placement = useFurniturePlacement(furniturePlacementId);
 	const select = useSelect();
 	const selected = useIsSelected(furniturePlacementId);
-	const mode = useIsEditorStageMode('furniture');
+	const isFurnitureMode = useIsEditorStageMode('furniture');
 	const setPanelState = useSetPanelState();
 	const updateShadowMap = useShadowMapUpdate();
 
 	const groupRef = useRef<Group>(null);
 	const move = useUpdateFurniturePlacementTransform(furniturePlacementId);
 
-	const { halfExtents, size, ref: modelRef, ready } = useAABB();
-	const isEditable = ready && mode;
+	const { halfExtents, size, ref: modelRef } = useAABB();
 
 	const handleClick = useCallback(() => {
 		startTransition(() => {
@@ -43,6 +42,10 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 				// not sure how or why, but this has occurred.
 				return;
 			}
+			if (!selected) {
+				// do not apply handle changes if this item is not selected.
+				return;
+			}
 			defaultApply(state, target);
 
 			if (state.last) {
@@ -53,7 +56,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 				});
 			}
 		},
-		[move]
+		[move, selected]
 	);
 
 	const hypotenuse = Math.sqrt(halfExtents[0] * halfExtents[0] + halfExtents[2] * halfExtents[2]);
@@ -67,35 +70,34 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 				position={[placement.position.x, placement.position.y, placement.position.z]}
 				quaternion={[placement.rotation.x, placement.rotation.y, placement.rotation.z, placement.rotation.w]}
 			>
-				{isEditable && (
-					<ConditionalHandle enabled={selected} targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false} apply={applyWithSave}>
-						{/* @ts-expect-error - pointerEventsType not included in typings */}
-						<CollisionModel pointerEventsType={{ deny: 'touch' }} furnitureId={furnitureId} onClick={handleClick} />
-					</ConditionalHandle>
-				)}
+				<Handle targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false} apply={applyWithSave}>
+					{/* @ts-expect-error - pointerEventsType not included in typings */}
+					<SimpleCollisionModel pointerEventsType={{ deny: 'touch' }} furnitureId={furnitureId} onClick={handleClick} enabled={isFurnitureMode} />
+				</Handle>
 
-				{selected && <RotationHandle targetRef={groupRef as any} apply={applyWithSave} radius={hypotenuse + 0.075} position={[0, 0.5, 0]} />}
-				<FurnitureModel key={furnitureId} furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} receiveShadow={mode} pointerEvents="none" />
+				<RotationHandle targetRef={groupRef as any} apply={applyWithSave} radius={hypotenuse + 0.075} position={[0, 0.5, 0]} visible={selected} />
+				<FurnitureModel key={furnitureId} furnitureId={furnitureId} ref={modelRef} castShadow={size.y > 0.2} receiveShadow={isFurnitureMode} pointerEvents="none" />
 			</group>
 		</ErrorBoundary>
 	);
 }
 
-function ConditionalHandle({ enabled, ...props }: ComponentPropsWithoutRef<typeof Handle> & { enabled: boolean }) {
-	if (!enabled) return <>{props.children}</>;
-	return <Handle {...props} />;
-}
-
-function RotationHandle({ radius, position, ...props }: ComponentPropsWithoutRef<typeof Handle> & { radius: number; position: [number, number, number] }) {
+function RotationHandle({
+	radius,
+	position,
+	visible,
+	...props
+}: ComponentPropsWithoutRef<typeof Handle> & { radius: number; position: [number, number, number]; visible?: boolean }) {
 	const [hovered, setHovered] = useState(false);
 	return (
 		<Handle rotate={{ x: false, y: true, z: false }} translate="as-rotate" {...props}>
-			<Bvh onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} position={position} rotation={[Math.PI / 2, 0, 0]} renderOrder={-2}>
-				<mesh>
+			<Bvh onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} position={position} rotation={[Math.PI / 2, 0, 0]} renderOrder={-2} enabled={visible}>
+				<mesh visible={visible}>
 					<torusGeometry args={[radius, 0.025, 32]} />
 					<meshPhongMaterial color={colors.focus.value} emissive={colors.focus.value} emissiveIntensity={0.5} />
 				</mesh>
 				<mesh
+					visible={visible}
 					// @ts-expect-error - pointerEvents not included in typings
 					pointerEvents="none"
 				>

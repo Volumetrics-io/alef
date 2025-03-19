@@ -9,6 +9,7 @@ import { Button } from '../../ui/Button';
 import { Heading } from '../../ui/Heading';
 import { RoomTypePicker } from '../../ui/RoomTypePicker';
 import { Surface } from '../../ui/Surface';
+
 export function Layouts({ readonly }: { readonly?: boolean }) {
 	const layoutIds = useRoomLayoutIds();
 	const [_mode, setMode] = useEditorStageMode();
@@ -38,7 +39,7 @@ export function Layouts({ readonly }: { readonly?: boolean }) {
 					)}
 				</Container>
 			</Surface>
-			{!readonly && editingId && <EditLayout layoutId={editingId} onClose={() => setEditingId(null)} />}
+			{editingId && <EditLayout layoutId={editingId} onClose={() => setEditingId(null)} />}
 		</>
 	);
 }
@@ -78,7 +79,7 @@ function NewLayoutButton({ onNew }: { onNew: (id: PrefixedId<'rl'>) => void }) {
 	);
 }
 
-function EditLayout({ layoutId, onClose }: { layoutId: PrefixedId<'rl'>; onClose: () => void }) {
+function EditLayout({ layoutId, onClose, visible }: { layoutId: PrefixedId<'rl'>; onClose: () => void; visible?: boolean }) {
 	const layoutData = useRoomLayout(layoutId);
 
 	const [editingType, setEditingType] = useState<RoomType>((layoutData?.type as RoomType) ?? 'living-room');
@@ -107,7 +108,7 @@ function EditLayout({ layoutId, onClose }: { layoutId: PrefixedId<'rl'>; onClose
 	};
 
 	return (
-		<Container positionType="absolute" alignItems="center" justifyContent="center" width="100%" height="100%" padding={10}>
+		<Container positionType="absolute" alignItems="center" justifyContent="center" width="100%" height="100%" padding={10} visibility={visible ? 'visible' : 'hidden'}>
 			<Surface padding={10} zIndexOffset={10} flexDirection="column" gap={4} flexGrow={1} flexShrink={0} flexBasis={0}>
 				<Text fontSize={18} textAlign="center" marginBottom={5}>
 					Choose Layout

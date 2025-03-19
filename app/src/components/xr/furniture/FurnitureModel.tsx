@@ -5,7 +5,7 @@ import { ErrorBoundary } from '@alef/sys';
 import { Bvh, Clone, Detailed, Outlines } from '@react-three/drei';
 import { ThreeEvent } from '@react-three/fiber';
 import { forwardRef, ReactNode, Suspense, useCallback } from 'react';
-import { Group, Mesh } from 'three';
+import { DoubleSide, Group, Mesh } from 'three';
 import { SimpleBox } from './SimpleBox';
 
 export interface FurnitureModelProps {
@@ -26,21 +26,23 @@ interface FurnitureModelRendererProps {
 	castShadow?: boolean;
 	quality: FurnitureModelQuality;
 	transparent?: boolean;
+	colorWrite?: boolean;
 }
 
 const FurnitureModelRenderer = forwardRef<Group, FurnitureModelRendererProps>(function FurnitureModelRenderer(
-	{ furnitureId, outline, castShadow, receiveShadow, pointerEvents = 'auto', quality, transparent = false },
+	{ furnitureId, outline, castShadow, receiveShadow, pointerEvents = 'auto', quality, transparent = false, colorWrite = true },
 	ref
 ) {
 	const model = useFurnitureModel(furnitureId, quality);
 
 	if (!model) return null;
 
-	if (transparent) {
+	if (transparent || colorWrite === false) {
 		model.scene.traverse((child) => {
 			if (child instanceof Mesh) {
 				child.material.transparent = true;
-				child.material.opacity = 0;
+				child.material.opacity = 0.5;
+				child.material.colorWrite = colorWrite;
 				child.renderOrder = -1;
 			}
 		});
@@ -83,8 +85,23 @@ const PlaceholderModel = forwardRef<any, { onClick?: () => void; furnitureId: Pr
 	return <SimpleBox size={dimensions} position={[0, dimensions[1] / 2, 0]} onClick={onClick} ref={ref} />;
 });
 
-export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode; onClick?: () => void }>(
-	({ errorFallback, debugLod, onClick, pointerEvents = 'auto', ...props }, ref) => {
+export const SimpleCollisionModel = forwardRef<Mesh, FurnitureModelProps & { errorFallback?: ReactNode; onClick?: () => void; enabled?: boolean; colorWrite?: boolean }>(
+	({ errorFallback, debugLod, onClick, pointerEvents = 'auto', enabled, colorWrite = false, ...props }, ref) => {
+		const { data } = useFurnitureDetails(props.furnitureId);
+		// data contains metadata about measured dimensions, which we can use to show a more accurate placeholder.
+		const hasDimensions = data?.measuredDimensionsX && data?.measuredDimensionsY && data?.measuredDimensionsZ;
+		const dimensions: [number, number, number] = hasDimensions ? [data.measuredDimensionsX!, data.measuredDimensionsY!, data.measuredDimensionsZ!] : [1, 1, 1];
+		return (
+			<mesh {...props} position={[0, dimensions[1] / 2, 0]} onClick={onClick} renderOrder={1000} ref={ref}>
+				<boxGeometry args={dimensions} />
+				<meshBasicMaterial colorWrite={colorWrite} depthWrite={false} color="red" side={DoubleSide} />
+			</mesh>
+		);
+	}
+);
+
+export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode; onClick?: () => void; enabled?: boolean; colorWrite?: boolean }>(
+	({ errorFallback, debugLod, onClick, pointerEvents = 'auto', enabled, colorWrite = false, ...props }, ref) => {
 		const stopPropagation = useCallback((e: ThreeEvent<PointerEvent>) => {
 			e.stopPropagation();
 		}, []);
@@ -93,7 +110,7 @@ export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFal
 				fallback={
 					errorFallback ?? (
 						// default error fallback is a box
-						<MissingModel transparent onClick={onClick} ref={ref} />
+						<MissingModel transparent onClick={enabled ? onClick : undefined} ref={ref} />
 					)
 				}
 			>
@@ -107,10 +124,15 @@ export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFal
 						firstHitOnly
 						maxDepth={30}
 						maxLeafTris={5}
-						// @ts-ignore
-						pointerEvents={pointerEvents}
 					>
-						<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Collision} ref={ref} transparent />
+						<FurnitureModelRenderer
+							pointerEvents={enabled === false ? 'none' : pointerEvents}
+							furnitureId={props.furnitureId}
+							quality={FurnitureModelQuality.Collision}
+							ref={ref}
+							transparent
+							colorWrite={colorWrite}
+						/>
 					</Bvh>
 				</Suspense>
 			</ErrorBoundary>

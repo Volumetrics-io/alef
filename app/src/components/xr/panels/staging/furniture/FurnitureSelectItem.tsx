@@ -1,38 +1,35 @@
 import { AnimatedSurface, usePullAnimation } from '@/components/xr/ui/Animations';
 import { colors, getColorForAnimation } from '@/components/xr/ui/theme';
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
-import { useAddFurniture } from '@/stores/roomStore';
-import { config, useSpring, useSpringRef } from '@react-spring/three';
-import { invalidate } from '@react-three/fiber';
-import { Image } from '@react-three/uikit';
+import { useIsSelectedModelId, useSetSelectedModelId } from '@/stores/editorStore';
 import { usePerformanceStore } from '@/stores/performanceStore';
+import { config, useSpring, useSpringRef } from '@react-spring/three';
+import { Image } from '@react-three/uikit';
 import { Suspense } from 'react';
+
 export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }) {
 	const perfMode = usePerformanceStore((state) => state.perfMode);
+	const setSelectedModelId = useSetSelectedModelId();
+	const isSelected = useIsSelectedModelId(furnitureItem.id);
+
 	const api = useSpringRef();
-	const { spring } = useSpring({
-		spring: 0,
+	const { value } = useSpring({
+		value: 0,
 		config: config.default,
 		ref: api,
-		onChange: () => invalidate(),
 	});
 
-	const addFurniture = useAddFurniture();
-
-	const addFurnitureAtCenterOfFloorClosestToUser = () => {
-		addFurniture({
-			furnitureId: furnitureItem.id,
-			position: { x: 0, y: 0, z: 0 },
-			rotation: { x: 0, y: 0, z: 0, w: 1 },
-		});
+	const onClick = () => {
+		setSelectedModelId(furnitureItem.id);
 	};
 
 	const handleHover = (isHovered: boolean) => {
 		if (perfMode) return;
-		api.start({ spring: Number(isHovered) });
+		if (isSelected) return;
+		api.start({ value: Number(isHovered) });
 	};
 
-	const transformTranslateZ = usePullAnimation(spring);
+	const transformTranslateZ = usePullAnimation(value);
 
 	const startBorderColor = getColorForAnimation(colors.border);
 	const endBorderColor = getColorForAnimation(colors.faded);
@@ -41,7 +38,7 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 		return null;
 	}
 
-	const borderColor = spring.to([0, 1], [`#${startBorderColor.getHexString()}`, `#${endBorderColor.getHexString()}`]);
+	const borderColor = value.to([0, 1], [`#${startBorderColor.getHexString()}`, `#${endBorderColor.getHexString()}`]);
 
 	const startBackgroundColor = getColorForAnimation(colors.paper);
 	const endBackgroundColor = getColorForAnimation(colors.hover);
@@ -50,14 +47,14 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 		return null;
 	}
 
-	const backgroundColor = spring.to([0, 1], [`#${startBackgroundColor.getHexString()}`, `#${endBackgroundColor.getHexString()}`]);
+	const backgroundColor = value.to([0, 1], [`#${startBackgroundColor.getHexString()}`, `#${endBackgroundColor.getHexString()}`]);
 
 	return (
 		<AnimatedSurface
 			onHoverChange={handleHover}
-			onClick={addFurnitureAtCenterOfFloorClosestToUser}
+			onClick={onClick}
 			transformTranslateZ={transformTranslateZ}
-			borderColor={borderColor}
+			borderColor={isSelected ? colors.focus : borderColor}
 			backgroundColor={backgroundColor}
 			height="48%"
 			minWidth="32%"

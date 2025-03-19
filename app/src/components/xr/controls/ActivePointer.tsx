@@ -6,7 +6,6 @@ export const ActivePointer = () => {
 	if (!session) return null;
 
 	session.addEventListener('select', (e: XRInputSourceEvent) => {
-		console.log('selectstart', e.inputSource.handedness);
 		setActivePointer(e.inputSource.handedness);
 	});
 };

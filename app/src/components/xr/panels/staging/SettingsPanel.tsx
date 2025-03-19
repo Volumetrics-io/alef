@@ -1,6 +1,8 @@
 import { Button } from '@/components/xr/ui/Button';
 import { useColorTheme } from '@/hooks/useColorTheme';
+import { fetch } from '@/services/fetch';
 import { useMe } from '@/services/publicApi/userHooks';
+import { queryClient } from '@/services/queryClient';
 import { Container, Text } from '@react-three/uikit';
 import { ToggleGroup, ToggleGroupItem } from '@react-three/uikit-default';
 import { SettingsIcon } from '@react-three/uikit-lucide';
@@ -19,11 +21,13 @@ export function SettingsPanel() {
 				<SettingsIcon width={20} height={20} />
 				<Heading level={3}>Settings</Heading>
 			</Container>
-			{!isLoggedIn && (
+			{!isLoggedIn ? (
 				<>
 					<Login onPair={() => setIsPairing(!isPairing)} />
 					{isPairing && <HeadsetLogin onCancel={() => setIsPairing(false)} />}
 				</>
+			) : (
+				<Logout />
 			)}
 			<ToggleTheme />
 		</Surface>
@@ -43,10 +47,29 @@ function SettingsItem({ label, children }: { label: string; children: React.Reac
 
 function Login({ onPair }: { onPair: () => void }) {
 	return (
-		<SettingsItem label="Login">
+		<SettingsItem label="Log in">
 			<Text>Login to access more features.</Text>
 			<Button onClick={onPair}>
 				<Text>Get started</Text>
+			</Button>
+		</SettingsItem>
+	);
+}
+
+function Logout() {
+	return (
+		<SettingsItem label="Log out">
+			<Text>Log out on this device.</Text>
+			<Button
+				onClick={async () => {
+					await fetch(`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/auth/logout`, {
+						method: 'POST',
+						credentials: 'include',
+					});
+					queryClient.clear();
+				}}
+			>
+				<Text>Log out</Text>
 			</Button>
 		</SettingsItem>
 	);

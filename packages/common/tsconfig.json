@@ -6,7 +6,7 @@
 		"lib": ["es2021", "es2022", "esnext"],
 		"customConditions": ["development"],
 		"declaration": true,
-		"target": "ES2024",
+		"target": "ES6",
 		"moduleResolution": "nodenext",
 		"module": "NodeNext"
 	},

@@ -20,7 +20,7 @@ export function OnboardingFrame<TOnboarding extends Onboarding<any>>({ onboardin
 	}
 
 	return (
-		<Surface flexDirection="column" gap={10} padding={15} backgroundColor={colors.secondaryPaper} width={300} {...rest}>
+		<Surface flexDirection="column" gap={10} padding={15} backgroundColor={colors.secondarySurface} width={300} {...rest}>
 			{children}
 			<Container flexDirection="row" gap={5} justifyContent="flex-end" alignItems="center">
 				<Button onClick={next}>

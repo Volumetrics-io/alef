@@ -10,6 +10,7 @@ import { useFrame } from '@react-three/fiber';
 import { PrefixedId } from '@alef/common';
 import { useThree } from '@react-three/fiber';
 import { useMergedRef } from '@alef/sys';
+import { Cursor } from '../ui/Cursor';
 export const SpawnFurniture = () => {
 	const storedFloorPlanes = usePlanes((p) => p.label === 'floor');
 	const mode = useIsEditorStageMode('furniture');
@@ -71,21 +72,9 @@ export const SpawnFurniture = () => {
 				</mesh>
 			</group>
 
-			<group visible={false} ref={spawnPointRef} position={[0, 0.1, 0]}>
+			<Cursor visible={false} ref={spawnPointRef} position={[0, 0.1, 0]}>
 				<GhostModel furnitureId={selectedModelId} ref={modelRef} />
-				{/* <PlaceholderModel furnitureId={selectedModelId} /> */}
-
-				{/* @ts-ignore - pointerEvents not included in typings */}
-				<mesh renderOrder={1000} rotation={[-Math.PI / 2, 0, 0]} pointerEvents="none">
-					<ringGeometry args={[0.25, 0.3, 64]} />
-					<meshBasicMaterial color={colors.focus.value} />
-				</mesh>
-				{/* @ts-ignore - pointerEvents not included in typings */}
-				<mesh renderOrder={1000} rotation={[-Math.PI / 2, 0, 0]} pointerEvents="none">
-					<ringGeometry args={[0.4, 0.43, 64]} />
-					<meshBasicMaterial color={colors.focus.value} />
-				</mesh>
-			</group>
+			</Cursor>
 		</group>
 	);
 };

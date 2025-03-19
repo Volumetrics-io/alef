@@ -35,6 +35,11 @@ export function useAddLight() {
 	);
 }
 
+export function useCanAddLights() {
+	const lights = useLights();
+	return useCallback(() => Object.keys(lights).length < 6, [lights]);
+}
+
 export function useMoveLight(id: PrefixedId<'lp'>) {
 	const moveFn = useRoomStore((s) => s.moveLight);
 	return useCallback(

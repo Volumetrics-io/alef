@@ -92,7 +92,15 @@ export const SimpleCollisionModel = forwardRef<Mesh, FurnitureModelProps & { err
 		const hasDimensions = data?.measuredDimensionsX && data?.measuredDimensionsY && data?.measuredDimensionsZ;
 		const dimensions: [number, number, number] = hasDimensions ? [data.measuredDimensionsX!, data.measuredDimensionsY!, data.measuredDimensionsZ!] : [1, 1, 1];
 		return (
-			<mesh {...props} position={[0, dimensions[1] / 2, 0]} onClick={onClick} renderOrder={1000} ref={ref}>
+			<mesh
+				{...props}
+				// @ts-ignore pointerEvents is not typed
+				pointerEvents={enabled === false ? 'none' : pointerEvents}
+				position={[0, dimensions[1] / 2, 0]}
+				onClick={onClick}
+				renderOrder={1000}
+				ref={ref}
+			>
 				<boxGeometry args={dimensions} />
 				<meshBasicMaterial colorWrite={colorWrite} depthWrite={false} color="red" side={DoubleSide} />
 			</mesh>

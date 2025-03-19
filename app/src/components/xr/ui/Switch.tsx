@@ -1,5 +1,5 @@
 import { usePerformanceStore } from '@/stores/performanceStore';
-import { config, useSpring, useSpringRef } from '@react-spring/three';
+import { config, useSpring, useSpringRef } from '@react-spring/web';
 import { ContainerProperties, ContainerRef } from '@react-three/uikit';
 import { ReactNode, RefAttributes, forwardRef, useState } from 'react';
 import { AnimatedContainer, AnimatedCursor } from './Animations.js';

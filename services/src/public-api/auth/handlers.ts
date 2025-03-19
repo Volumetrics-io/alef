@@ -9,6 +9,7 @@ export const authHandlers = createHandlers<Context<Env>>({
 	adapter: honoAdapter,
 	getRedirectConfig: (ctx) => ({
 		defaultReturnToOrigin: ctx.env.UI_ORIGIN,
+		allowedReturnToOrigin: (origin) => origin === ctx.env.UI_ORIGIN,
 	}),
 	providers: {
 		google: new GoogleProvider({

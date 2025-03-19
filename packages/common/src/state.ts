@@ -265,8 +265,8 @@ export function getDefaultRoomState(idOverride?: PrefixedId<'r'>): RoomState {
 		},
 		lights: {},
 		globalLighting: {
-			color: 2.7,
-			intensity: 0.8,
+			color: 6.5,
+			intensity: 1.7,
 		},
 	};
 }

@@ -5,7 +5,7 @@ import { ErrorBoundary } from '@alef/sys';
 import { Bvh, Clone, Detailed, Outlines } from '@react-three/drei';
 import { ThreeEvent } from '@react-three/fiber';
 import { forwardRef, ReactNode, Suspense, useCallback } from 'react';
-import { Group, Mesh } from 'three';
+import { DoubleSide, Group, Mesh } from 'three';
 import { SimpleBox } from './SimpleBox';
 
 export interface FurnitureModelProps {
@@ -84,6 +84,21 @@ const PlaceholderModel = forwardRef<any, { onClick?: () => void; furnitureId: Pr
 
 	return <SimpleBox size={dimensions} position={[0, dimensions[1] / 2, 0]} onClick={onClick} ref={ref} />;
 });
+
+export const SimpleCollisionModel = forwardRef<Mesh, FurnitureModelProps & { errorFallback?: ReactNode; onClick?: () => void; enabled?: boolean; colorWrite?: boolean }>(
+	({ errorFallback, debugLod, onClick, pointerEvents = 'auto', enabled, colorWrite = false, ...props }, ref) => {
+		const { data } = useFurnitureDetails(props.furnitureId);
+		// data contains metadata about measured dimensions, which we can use to show a more accurate placeholder.
+		const hasDimensions = data?.measuredDimensionsX && data?.measuredDimensionsY && data?.measuredDimensionsZ;
+		const dimensions: [number, number, number] = hasDimensions ? [data.measuredDimensionsX!, data.measuredDimensionsY!, data.measuredDimensionsZ!] : [1, 1, 1];
+		return (
+			<mesh {...props} position={[0, dimensions[1] / 2, 0]} onClick={onClick} renderOrder={1000} ref={ref}>
+				<boxGeometry args={dimensions} />
+				<meshBasicMaterial colorWrite={colorWrite} depthWrite={false} color="red" side={DoubleSide} />
+			</mesh>
+		);
+	}
+);
 
 export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode; onClick?: () => void; enabled?: boolean; colorWrite?: boolean }>(
 	({ errorFallback, debugLod, onClick, pointerEvents = 'auto', enabled, colorWrite = false, ...props }, ref) => {

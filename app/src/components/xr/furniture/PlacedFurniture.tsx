@@ -9,7 +9,7 @@ import { defaultApply, Handle, HandleState } from '@react-three/handle';
 import { ComponentPropsWithoutRef, startTransition, useCallback, useRef, useState } from 'react';
 import { BackSide, Group, Object3D } from 'three';
 import { colors } from '../ui/theme';
-import { CollisionModel, FurnitureModel, MissingModel } from './FurnitureModel';
+import { FurnitureModel, MissingModel, SimpleCollisionModel } from './FurnitureModel';
 
 export interface PlacedFurnitureProps {
 	furniturePlacementId: PrefixedId<'fp'>;
@@ -72,7 +72,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 			>
 				<Handle targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false} apply={applyWithSave}>
 					{/* @ts-expect-error - pointerEventsType not included in typings */}
-					<CollisionModel pointerEventsType={{ deny: 'touch' }} furnitureId={furnitureId} onClick={handleClick} enabled={isFurnitureMode} />
+					<SimpleCollisionModel pointerEventsType={{ deny: 'touch' }} furnitureId={furnitureId} onClick={handleClick} enabled={isFurnitureMode} />
 				</Handle>
 
 				<RotationHandle targetRef={groupRef as any} apply={applyWithSave} radius={hypotenuse + 0.075} position={[0, 0.5, 0]} visible={selected} />

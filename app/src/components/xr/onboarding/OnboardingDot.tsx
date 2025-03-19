@@ -29,14 +29,14 @@ export function OnboardingDot<TOnboarding extends Onboarding<any>>({ onboarding,
 	if (!show) return null;
 
 	return (
-		<Content positionType="absolute" positionLeft={-25} positionTop={-25} width={50} height={50}>
+		<Content pointerEvents="none" positionType="absolute" positionLeft={-50} positionTop={-50} width={100} height={100} transformTranslateZ={-50}>
 			<group position={position}>
 				<mesh ref={pulseRef}>
-					<sphereGeometry args={[0.08, 32, 32]} />
+					<sphereGeometry args={[0.8, 32, 32]} />
 					<meshBasicMaterial color={colors.focus.peek()} transparent opacity={0.5} />
 				</mesh>
 				<mesh>
-					<sphereGeometry args={[0.005, 32, 32]} />
+					<sphereGeometry args={[0.05, 32, 32]} />
 					<meshBasicMaterial color={colors.focus.peek()} />
 				</mesh>
 			</group>

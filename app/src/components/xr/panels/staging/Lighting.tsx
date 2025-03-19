@@ -1,15 +1,15 @@
+import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
 import { useEditorStageMode, useSelectedLightPlacementId } from '@/stores/editorStore';
 import { useDeleteLightPlacement, useGlobalLighting } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
-import { Container } from '@react-three/uikit';
+import { Container, Text } from '@react-three/uikit';
 import { ArrowLeftIcon, SunIcon, Trash } from '@react-three/uikit-lucide';
+import { useCallback, useRef } from 'react';
+import { getLightColor } from '../../lighting/getLightColor';
 import { Button } from '../../ui/Button';
 import { Heading } from '../../ui/Heading';
 import { Slider } from '../../ui/Slider';
 import { Surface } from '../../ui/Surface';
-import { getLightColor } from '../../lighting/getLightColor';
-import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
-import { useCallback, useRef } from 'react';
 
 export const Lighting = () => {
 	const selectedLightId = useSelectedLightPlacementId();
@@ -46,6 +46,10 @@ const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
 				<Heading level={3}>Lighting</Heading>
 			</Container>
 			<Container flexDirection="column" gap={50} flexGrow={1}>
+				<Container flexDirection="column" gap={10}>
+					<Heading level={4}>Room lights</Heading>
+					<Text>While this panel is open, point and select on the ceiling to add new room lights, or select an existing light to modify it.</Text>
+				</Container>
 				<Container flexDirection="column" gap={10}>
 					<Heading level={4}>Brightness</Heading>
 					<Slider defaultValue={lightIntensityRef.current} min={0} max={2} step={0.01} onValueChange={(v) => (lightIntensityRef.current = v)} onPointerUp={updateIntensity} />

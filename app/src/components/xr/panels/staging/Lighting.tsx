@@ -13,16 +13,14 @@ import { Surface } from '../../ui/Surface';
 import { Selector, SelectorItem } from '../../ui/Selector';
 
 export const Lighting = () => {
-	const selectedLightId = useSelectedLightPlacementId();
-
 	return (
 		<Surface flexDirection="column" width={500} height={420}>
-			<SelectedLightPane id={selectedLightId} />
+			<LightPane />
 		</Surface>
 	);
 };
 
-const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
+const LightPane = () => {
 	const [, setMode] = useEditorStageMode();
 	const [{ intensity: globalIntensity, color: globalColor }, updateGlobal] = useGlobalLighting();
 	const lightColorRef = useRef(globalColor);

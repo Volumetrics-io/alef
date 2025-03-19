@@ -2,7 +2,7 @@ import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
 import { useEditorStageMode, useSelectedLightPlacementId } from '@/stores/editorStore';
 import { useDeleteLightPlacement, useGlobalLighting } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
-import { Container, Text } from '@react-three/uikit';
+import { Container } from '@react-three/uikit';
 import { ArrowLeftIcon, SunIcon, Trash } from '@react-three/uikit-lucide';
 import { useCallback, useRef } from 'react';
 import { getLightColor } from '../../lighting/getLightColor';

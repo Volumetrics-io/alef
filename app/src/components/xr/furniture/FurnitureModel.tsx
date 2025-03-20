@@ -62,13 +62,18 @@ const FurnitureModelRenderer = forwardRef<Group, FurnitureModelRendererProps>(fu
 	);
 });
 
-export const MissingModel = forwardRef<any, { onClick?: () => void; transparent?: boolean }>(function MissingModel({ onClick, transparent }, ref) {
+export const MissingModel = forwardRef<any, { onClick?: () => void; transparent?: boolean; pointerEvents?: 'none' | 'auto' }>(function MissingModel(
+	{ onClick, transparent, pointerEvents },
+	ref
+) {
 	return (
 		<mesh
 			onClick={() => {
 				onClick?.();
 			}}
 			ref={ref}
+			// @ts-expect-error pointerEvents is not typed
+			pointerEvents={pointerEvents}
 		>
 			<boxGeometry args={[1, 1, 1]} />
 			<meshBasicMaterial color="red" transparent={transparent} colorWrite={!transparent} />
@@ -76,13 +81,16 @@ export const MissingModel = forwardRef<any, { onClick?: () => void; transparent?
 	);
 });
 
-const PlaceholderModel = forwardRef<any, { onClick?: () => void; furnitureId: PrefixedId<'f'> }>(function PlaceholderModel({ onClick, furnitureId }, ref) {
+const PlaceholderModel = forwardRef<any, { onClick?: () => void; furnitureId: PrefixedId<'f'>; transparent?: boolean; pointerEvents?: 'none' | 'auto' }>(function PlaceholderModel(
+	{ onClick, furnitureId, transparent, pointerEvents },
+	ref
+) {
 	const { data } = useFurnitureDetails(furnitureId);
 	// data contains metadata about measured dimensions, which we can use to show a more accurate placeholder.
 	const hasDimensions = data?.measuredDimensionsX && data?.measuredDimensionsY && data?.measuredDimensionsZ;
 	const dimensions: [number, number, number] = hasDimensions ? [data.measuredDimensionsX!, data.measuredDimensionsY!, data.measuredDimensionsZ!] : [1, 1, 1];
 
-	return <SimpleBox size={dimensions} position={[0, dimensions[1] / 2, 0]} onClick={onClick} ref={ref} />;
+	return <SimpleBox pointerEvents={pointerEvents} transparent={transparent} size={dimensions} position={[0, dimensions[1] / 2, 0]} onClick={onClick} ref={ref} />;
 });
 
 export const SimpleCollisionModel = forwardRef<Mesh, FurnitureModelProps & { errorFallback?: ReactNode; onClick?: () => void; enabled?: boolean; colorWrite?: boolean }>(
@@ -118,11 +126,11 @@ export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFal
 				fallback={
 					errorFallback ?? (
 						// default error fallback is a box
-						<MissingModel transparent onClick={enabled ? onClick : undefined} ref={ref} />
+						<PlaceholderModel furnitureId={props.furnitureId} transparent onClick={enabled ? onClick : undefined} ref={ref} pointerEvents={pointerEvents} />
 					)
 				}
 			>
-				<Suspense fallback={<MissingModel transparent ref={ref} />}>
+				<Suspense fallback={<PlaceholderModel furnitureId={props.furnitureId} transparent ref={ref} pointerEvents={pointerEvents} />}>
 					<Preload all />
 					<Bvh
 						onPointerOver={stopPropagation}

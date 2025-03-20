@@ -63,7 +63,6 @@ export const CeilingLight = ({ id, ...props }: { id: PrefixedId<'lp'> }) => {
 				penumbra={0.2} // Soft edges
 				decay={0.5} // Physical light falloff
 				distance={20} // Maximum range
-				position={[0, 0, 0]}
 				intensity={globalIntensity} // Compensate for directional nature
 				color={getLightColor(globalColor)}
 				{...props}

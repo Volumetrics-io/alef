@@ -28,7 +28,14 @@ const selectorSizeVariants = {
 
 export function Selector({ size = 'medium', children, ...props }: SelectorProps & ContainerProperties & { children: React.ReactNode }) {
 	return (
-		<Container backgroundColor={colors.selectionSurface} flexShrink={0} borderRadius={borderRadius.md} borderWidth={1} borderColor={colors.border} {...props}>
+		<Container
+			backgroundColor={props.backgroundColor ?? colors.selectionSurface}
+			flexShrink={0}
+			borderRadius={borderRadius.md}
+			borderWidth={1}
+			borderColor={colors.border}
+			{...props}
+		>
 			<DefaultProperties {...selectorSizeVariants[size]}>{children}</DefaultProperties>
 		</Container>
 	);
@@ -106,7 +113,7 @@ export function SelectorItem({
 			alignItems="center"
 			flexDirection="row"
 			justifyContent="flex-start"
-			onHoverChange={(hover) => {
+			onHoverChange={(hover: boolean) => {
 				if (perfMode) return;
 				api.start({ spring: Number(hover) });
 			}}

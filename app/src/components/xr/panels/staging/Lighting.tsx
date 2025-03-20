@@ -1,31 +1,31 @@
 import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
-import { useEditorStageMode, useSelectedLightPlacementId } from '@/stores/editorStore';
-import { useDeleteLightPlacement, useGlobalLighting } from '@/stores/roomStore';
+import { useEditorStageMode, useSelectedLightPlacementId, useSelect } from '@/stores/editorStore';
+import { useDeleteLightPlacement, useGlobalLighting, useLightPlacementIds } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
-import { Container } from '@react-three/uikit';
-import { ArrowLeftIcon, SunIcon, Trash } from '@react-three/uikit-lucide';
+import { Container, Text } from '@react-three/uikit';
+import { ArrowLeftIcon, LightbulbIcon, SunIcon, Trash } from '@react-three/uikit-lucide';
 import { useCallback, useRef } from 'react';
 import { getLightColor } from '../../lighting/getLightColor';
 import { Button } from '../../ui/Button';
 import { Heading } from '../../ui/Heading';
 import { Slider } from '../../ui/Slider';
 import { Surface } from '../../ui/Surface';
+import { Selector, SelectorItem } from '../../ui/Selector';
 
 export const Lighting = () => {
-	const selectedLightId = useSelectedLightPlacementId();
-
 	return (
-		<Surface flexDirection="column" width={500} height={420}>
-			<SelectedLightPane id={selectedLightId} />
+		<Surface flexDirection="column" width={500} height={420} padding={10}>
+			<LightPane />
 		</Surface>
 	);
 };
 
-const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
+const LightPane = () => {
 	const [, setMode] = useEditorStageMode();
 	const [{ intensity: globalIntensity, color: globalColor }, updateGlobal] = useGlobalLighting();
 	const lightColorRef = useRef(globalColor);
 	const lightIntensityRef = useRef(globalIntensity);
+	const lightIds = useLightPlacementIds();
 
 	const updateShadowMap = useShadowMapUpdate();
 
@@ -45,12 +45,12 @@ const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
 				<SunIcon width={20} height={20} />
 				<Heading level={3}>Lighting</Heading>
 			</Container>
-			<Container flexDirection="column" gap={50} flexGrow={1}>
-				<Container flexDirection="column" gap={10}>
+			<Container flexDirection="column" gap={8} flexShrink={1}>
+				<Container flexDirection="column" gap={4} flexGrow={1} flexShrink={0}>
 					<Heading level={4}>Brightness</Heading>
 					<Slider defaultValue={lightIntensityRef.current} min={0} max={2} step={0.01} onValueChange={(v) => (lightIntensityRef.current = v)} onPointerUp={updateIntensity} />
 				</Container>
-				<Container flexDirection="column" gap={10} width="100%">
+				<Container flexDirection="column" gap={4} width="100%" flexGrow={1} flexShrink={0}>
 					<Heading level={4}>Warmth</Heading>
 					<Slider
 						defaultValue={lightColorRef.current}
@@ -62,23 +62,61 @@ const SelectedLightPane = ({ id }: { id: PrefixedId<'lp'> | null }) => {
 						onPointerUp={updateColor}
 					/>
 				</Container>
+				<Container flexDirection="column" gap={4} width="100%" flexShrink={2}>
+					<Heading level={4}>Lights</Heading>
+					<Selector
+						size="small"
+						display={lightIds.length > 0 ? 'flex' : 'none'}
+						flexDirection="column"
+						backgroundColor={undefined}
+						width="100%"
+						flexShrink={2}
+						paddingRight={10}
+						overflow="scroll"
+					>
+						{lightIds.map((id) => (
+							<LightItem key={id} id={id} />
+						))}
+					</Selector>
+				</Container>
 			</Container>
-			<Container flexDirection="row" gap={4} width="100%" paddingRight={6} justifyContent="space-between">
+			<Container flexDirection="row" width="100%">
 				<Button onClick={() => setMode('furniture')}>
 					<ArrowLeftIcon />
 				</Button>
-				{id && <DeleteButton id={id} />}
 			</Container>
 		</Container>
 	);
 };
 
-function DeleteButton({ id }: { id: PrefixedId<'lp'> }) {
+function LightItem({ id }: { id: PrefixedId<'lp'> }) {
+	const selectedLightId = useSelectedLightPlacementId();
+	const select = useSelect();
+
+	return (
+		<SelectorItem flexShrink={0} justifyContent="space-between" onClick={() => select(id)} selected={selectedLightId === id}>
+			<Container flexDirection="row" gap={10} alignItems="center">
+				<Text>Ceiling Light</Text>
+				<LightbulbIcon />
+			</Container>
+			<DeleteButton id={id} visible={selectedLightId === id} />
+		</SelectorItem>
+	);
+}
+
+function DeleteButton({ id, visible }: { id: PrefixedId<'lp'>; visible?: boolean }) {
 	const deleteLight = useDeleteLightPlacement(id);
 	return (
-		<Container flexDirection="row" gap={10} alignItems="center">
-			<Button variant="destructive" onClick={deleteLight}>
-				<Trash />
+		<Container flexDirection="row" gap={10} flexShrink={0} alignItems="center" visibility={visible ? 'visible' : 'hidden'}>
+			<Button
+				variant="destructive"
+				onClick={() => {
+					if (!visible) return;
+					deleteLight();
+				}}
+				visibility={visible ? 'visible' : 'hidden'}
+			>
+				<Trash visibility={visible ? 'visible' : 'hidden'} />
 			</Button>
 		</Container>
 	);

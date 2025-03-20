@@ -12,6 +12,7 @@ import { noEvents, PointerEvents, useXR, XR } from '@react-three/xr';
 import { Perf } from 'r3f-perf';
 import { ReactNode, Suspense } from 'react';
 import { PCFSoftShadowMap } from 'three';
+import { useShallow } from 'zustand/react/shallow';
 import { ActivePointer } from './controls/ActivePointer';
 import { SplashScreen } from './ui/SplashScreen';
 import { XRPerformanceManager } from './XRPerformanceManager';
@@ -22,9 +23,9 @@ export interface SceneWrapperProps extends BoxProps {
 }
 
 export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
-	const geoStore = useGeoStore();
-	const { perfMode, setPerfMode, setMaxModelQuality } = usePerformanceStore((state) => state);
-	const { setSplashScreen } = useEditorStore();
+	const fetchLocation = useGeoStore((s) => s.fetchLocation);
+	const [perfMode, setPerfMode, setMaxModelQuality] = usePerformanceStore(useShallow((state) => [state.perfMode, state.setPerfMode, state.setMaxModelQuality]));
+	const setSplashScreen = useEditorStore((s) => s.setSplashScreen);
 	return (
 		<Box {...rest}>
 			<ErrorBoundary
@@ -96,7 +97,7 @@ export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 					}}
 					onClick={() => {
 						xrStore.enterAR();
-						geoStore.fetchLocation();
+						fetchLocation();
 					}}
 				>
 					Enter AR

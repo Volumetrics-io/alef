@@ -27,7 +27,7 @@ export const useWiggleAnimation = (spring: SpringValue<number>) => {
 
 type AnimatedContainerProperties = ComponentProps<typeof AnimatedContainer>;
 export function AnimatedCursor({ disabled, externalAnimate, ...props }: AnimatedContainerProperties & { disabled?: boolean; externalAnimate?: SpringValue<number> }) {
-	const perfMode = usePerformanceStore((state) => state.perfMode);
+	const qualityLevel = usePerformanceStore((state) => state.qualityLevel);
 
 	const api = useSpringRef();
 	const { spring } = useSpring({
@@ -70,7 +70,7 @@ export function AnimatedCursor({ disabled, externalAnimate, ...props }: Animated
 			backgroundColor={disabled ? colors.surface : animateBackgroundColor}
 			onHoverChange={(hover) => {
 				if (externalAnimate == null) {
-					if (perfMode) return;
+					if (qualityLevel === 'low') return;
 					api.start({ spring: Number(hover) });
 				}
 			}}

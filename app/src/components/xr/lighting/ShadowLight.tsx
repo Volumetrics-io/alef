@@ -1,9 +1,9 @@
-import { useLights, useGlobalLighting } from '@/stores/roomStore';
-import { getLightColor } from './getLightColor';
-import { Vector3, Group } from 'three';
-import { useEffect } from 'react';
 import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
 import { usePerformanceStore } from '@/stores/performanceStore';
+import { useGlobalLighting, useLights } from '@/stores/roomStore';
+import { useEffect } from 'react';
+import { Group, Vector3 } from 'three';
+import { getLightColor } from './getLightColor';
 // Component to create a target for the shadow light
 export const ShadowLightTarget = ({ targetRef }: { targetRef: React.RefObject<Group> }) => {
 	return <group ref={targetRef}></group>;
@@ -14,7 +14,7 @@ export const ShadowLight = ({ target }: { target?: Group | null }) => {
 	const [{ intensity: globalIntensity, color: globalColor }] = useGlobalLighting();
 	const updateShadowMap = useShadowMapUpdate();
 	const averageLightPosition = new Vector3();
-	const perfMode = usePerformanceStore((state) => state.perfMode);
+	const qualityLevel = usePerformanceStore((state) => state.qualityLevel);
 
 	// Count the actual valid lights
 	const validLights = Object.values(lights).filter((light) => !!light);
@@ -54,7 +54,7 @@ export const ShadowLight = ({ target }: { target?: Group | null }) => {
 			position={averageLightPosition.toArray()}
 			intensity={globalIntensity}
 			color={getLightColor(globalColor)}
-			castShadow={perfMode}
+			castShadow={qualityLevel === 'high'}
 			shadow-mapSize-width={2048}
 			shadow-mapSize-height={2048}
 			shadow-camera-far={5}

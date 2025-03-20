@@ -1,24 +1,21 @@
-import { FurnitureModelQuality } from '@alef/common';
 import { create } from 'zustand';
 
+export type QualityLevel = 'low' | 'high';
+
 export type PerformanceStore = {
-	perfMode: boolean;
-	setPerfMode: (mode: boolean) => void;
-	maxModelQuality: FurnitureModelQuality;
-	setMaxModelQuality: (quality: FurnitureModelQuality) => void;
+	qualityLevel: QualityLevel;
+	setQualityLevel: (level: QualityLevel) => void;
 };
 
 export const usePerformanceStore = create<PerformanceStore>((set) => {
+	// run in high-performance/low-quality mode if directLaunch is enabled, which
+	// is set by the PWA/TWA app
+	const perfMode = new URLSearchParams(window.location.search).get('directLaunch') === 'true';
 	return {
-		perfMode: false,
-		setPerfMode: (mode) => {
-			console.debug(`Setting perf mode to ${mode}`);
-			set({ perfMode: mode });
-		},
-		maxModelQuality: FurnitureModelQuality.Medium,
-		setMaxModelQuality: (quality) => {
-			console.debug(`Setting max model quality to ${quality}`);
-			set({ maxModelQuality: quality });
+		qualityLevel: perfMode ? 'low' : 'high',
+		setQualityLevel: (level) => {
+			console.debug(`Setting rendering quality level to ${level}`);
+			set({ qualityLevel: level });
 		},
 	};
 });

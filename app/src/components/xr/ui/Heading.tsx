@@ -17,9 +17,9 @@ const fontSizes = {
 };
 
 export function Heading({ children, level = 0, ...props }: HeadingProps) {
-	const { perfMode } = usePerformanceStore();
+	const qualityLevel = usePerformanceStore((s) => s.qualityLevel);
 	return (
-		<Text fontSize={fontSizes[level]} fontFamily={perfMode ? undefined : 'bricolage-grotesque'} fontWeight="semi-bold" {...props}>
+		<Text fontSize={fontSizes[level]} fontFamily={qualityLevel === 'low' ? undefined : 'bricolage-grotesque'} fontWeight="semi-bold" {...props}>
 			{children}
 		</Text>
 	);

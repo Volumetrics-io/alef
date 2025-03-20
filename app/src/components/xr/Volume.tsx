@@ -14,7 +14,7 @@ interface VolumeProps {
 export function Volume({ dimensions = [0, 1, 0], children, debug = DEBUG }: VolumeProps) {
 	const plane = useContext(PlaneAnchorContext);
 	const groupRef = useRef<Group>(null);
-	const { scene } = useThree();
+	const scene = useThree((s) => s.scene);
 
 	// Create planes once
 	const clippingPlanesRef = useRef<Plane[]>([

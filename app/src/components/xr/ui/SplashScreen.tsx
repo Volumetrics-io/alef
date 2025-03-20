@@ -1,11 +1,13 @@
-import { Image, Root } from '@react-three/uikit';
-import { BodyAnchor } from '../anchors';
 import { useEditorStore } from '@/stores/editorStore';
-import { useEffect } from 'react';
+import { Image, Root } from '@react-three/uikit';
 import { useXR } from '@react-three/xr';
+import { useEffect } from 'react';
+import { useShallow } from 'zustand/react/shallow';
+import { BodyAnchor } from '../anchors';
+
 export const SplashScreen = ({ time = 5 }: { time?: number }) => {
 	const { session } = useXR();
-	const { splashScreen, setSplashScreen } = useEditorStore();
+	const [splashScreen, setSplashScreen] = useEditorStore(useShallow((s) => [s.splashScreen, s.setSplashScreen]));
 
 	useEffect(() => {
 		if (splashScreen && session) {

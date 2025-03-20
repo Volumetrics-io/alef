@@ -1,11 +1,12 @@
+import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
 import { useSetSunlightIntensity } from '@/stores/environmentStore';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useXR, useXRPlanes } from '@react-three/xr';
 import React, { useEffect, useRef } from 'react';
 import SunCalc from 'suncalc';
 import { AmbientLight, DirectionalLight, Object3D, Quaternion, Vector3 } from 'three';
+import { useShallow } from 'zustand/react/shallow';
 import { useGeoStore } from '../../../stores/geoStore';
-import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
 
 // Define the LightData type
 interface LightData {
@@ -93,12 +94,9 @@ const calculateSunData = (latitude: number, longitude: number): LightData => {
 };
 
 const SunLight: React.FC = () => {
-	const { scene } = useThree();
+	const scene = useThree((s) => s.scene);
 	const lightTarget = useRef<Object3D>(null);
-	const {
-		position: { latitude, longitude },
-		error,
-	} = useGeoStore();
+	const [{ latitude, longitude }, error] = useGeoStore(useShallow((s) => [s.position, s.error]));
 	const windowPlanes = useXRPlanes('window');
 
 	// Refs for light objects

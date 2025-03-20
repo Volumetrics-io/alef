@@ -72,7 +72,7 @@ function FurnitureModel({ modelSrc, onLoaded }: { modelSrc: string; onLoaded?: (
 	const { scene } = useGLTF(modelSrc, undefined, undefined, (loader) => {
 		loader.setWithCredentials(true);
 	});
-	const { camera } = useThree();
+	const camera = useThree((s) => s.camera);
 	const { size, ref: aabbRef } = useAABB();
 	const centered = useRef(false);
 

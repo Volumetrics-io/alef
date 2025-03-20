@@ -8,7 +8,7 @@ import { Image } from '@react-three/uikit';
 import { Suspense } from 'react';
 
 export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }) {
-	const perfMode = usePerformanceStore((state) => state.perfMode);
+	const qualityLevel = usePerformanceStore((state) => state.qualityLevel);
 	const setSelectedModelId = useSetSelectedModelId();
 	const isSelected = useIsSelectedModelId(furnitureItem.id);
 
@@ -24,7 +24,7 @@ export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: Furnitur
 	};
 
 	const handleHover = (isHovered: boolean) => {
-		if (perfMode) return;
+		if (qualityLevel === 'low') return;
 		if (isSelected) return;
 		api.start({ value: Number(isHovered) });
 	};

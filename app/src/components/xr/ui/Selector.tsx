@@ -59,7 +59,7 @@ export function SelectorItem({
 	children,
 	...props
 }: ContainerProperties & { wrap?: boolean; selected: boolean; size?: 'small' | 'medium'; children: React.ReactNode }) {
-	const perfMode = usePerformanceStore((state) => state.perfMode);
+	const qualityLevel = usePerformanceStore((state) => state.qualityLevel);
 	const audioRef = useRef<PositionalAudioType>(null);
 
 	const startColor = getColorForAnimation(colors.selectionSurface);
@@ -99,7 +99,7 @@ export function SelectorItem({
 				audioRef.current.play();
 			}
 			props.onClick?.(e);
-			if (perfMode) return;
+			if (qualityLevel === 'low') return;
 			api.start({ spring: 1 });
 		},
 		[props]
@@ -114,7 +114,7 @@ export function SelectorItem({
 			flexDirection="row"
 			justifyContent="flex-start"
 			onHoverChange={(hover: boolean) => {
-				if (perfMode) return;
+				if (qualityLevel === 'low') return;
 				api.start({ spring: Number(hover) });
 			}}
 			{...props}

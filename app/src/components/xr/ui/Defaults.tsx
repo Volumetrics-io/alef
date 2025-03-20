@@ -1,8 +1,8 @@
-import { Defaults as UIDefaults } from '@react-three/uikit-default';
 import { usePerformanceStore } from '@/stores/performanceStore';
 import { FontFamilyProvider } from '@react-three/uikit';
+import { Defaults as UIDefaults } from '@react-three/uikit-default';
 export const Defaults = ({ children }: { children: React.ReactNode }) => {
-	const { perfMode } = usePerformanceStore();
+	const qualityLevel = usePerformanceStore((s) => s.qualityLevel);
 
 	const ibmPlexSans = {
 		thin: './fonts/msdf/ibm-plex/IBMPlexSans-Thin.json',
@@ -28,7 +28,7 @@ export const Defaults = ({ children }: { children: React.ReactNode }) => {
 
 	return (
 		<UIDefaults>
-			{!perfMode ? (
+			{qualityLevel === 'high' ? (
 				<FontFamilyProvider ibm-plex-sans={ibmPlexSans} bricolage-grotesque={bricolageGrotesque}>
 					{children}
 				</FontFamilyProvider>

@@ -24,7 +24,7 @@ export type SliderProperties = {
 
 export const Slider: (props: SliderProperties & RefAttributes<ContainerRef>) => ReactNode = forwardRef(
 	({ disabled = false, value: providedValue, defaultValue, onValueChange, min = 0, max = 100, step = 1, ...props }, ref) => {
-		const perfMode = usePerformanceStore((state) => state.perfMode);
+		const qualityLevel = usePerformanceStore((state) => state.qualityLevel);
 		const [uncontrolled, setUncontrolled] = useState(defaultValue);
 		const value = providedValue ?? uncontrolled ?? 50;
 		const percentage = useMemo(
@@ -106,11 +106,11 @@ export const Slider: (props: SliderProperties & RefAttributes<ContainerRef>) => 
 				alignItems="center"
 				ref={internalRef}
 				onPointerEnter={() => {
-					if (perfMode) return;
+					if (qualityLevel === 'low') return;
 					api.start({ spring: 1 });
 				}}
 				onPointerLeave={() => {
-					if (perfMode) return;
+					if (qualityLevel === 'low') return;
 					api.start({ spring: 0 });
 				}}
 				{...props}

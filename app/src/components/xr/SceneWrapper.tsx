@@ -1,18 +1,15 @@
-import { useEditorStore } from '@/stores/editorStore';
 import { useGeoStore } from '@/stores/geoStore';
 import { usePerformanceStore } from '@/stores/performanceStore';
 import { xrStore } from '@/stores/xrStore';
-import { FurnitureModelQuality } from '@alef/common';
 import { Box, BoxProps, ErrorBoundary, Icon } from '@alef/sys';
 import { reversePainterSortStable } from '@pmndrs/uikit';
 import { PerformanceMonitor } from '@react-three/drei';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitHandles } from '@react-three/handle';
 import { noEvents, PointerEvents, useXR, XR } from '@react-three/xr';
 import { Perf } from 'r3f-perf';
-import { ReactNode, Suspense } from 'react';
+import { ReactNode, Suspense, useEffect } from 'react';
 import { PCFSoftShadowMap } from 'three';
-import { useShallow } from 'zustand/react/shallow';
 import { ActivePointer } from './controls/ActivePointer';
 import { SplashScreen } from './ui/SplashScreen';
 import { XRPerformanceManager } from './XRPerformanceManager';
@@ -23,9 +20,6 @@ export interface SceneWrapperProps extends BoxProps {
 }
 
 export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
-	const fetchLocation = useGeoStore((s) => s.fetchLocation);
-	const [perfMode, setPerfMode, setMaxModelQuality] = usePerformanceStore(useShallow((state) => [state.perfMode, state.setPerfMode, state.setMaxModelQuality]));
-	const setSplashScreen = useEditorStore((s) => s.setSplashScreen);
 	return (
 		<Box {...rest}>
 			<ErrorBoundary
@@ -45,13 +39,6 @@ export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 						state.gl.setClearColor(0xefffff);
 						state.gl.localClippingEnabled = true;
 						state.gl.setTransparentSort(reversePainterSortStable);
-						state.gl.shadowMap.autoUpdate = false;
-						state.gl.shadowMap.type = PCFSoftShadowMap;
-						if (new URLSearchParams(window.location.search).get('directLaunch') === 'true') {
-							setPerfMode(true);
-							setSplashScreen(true);
-							setMaxModelQuality(FurnitureModelQuality.Low);
-						}
 						// @ts-ignore it does
 						if (window.getDigitalGoodsService !== undefined) {
 							if (navigator.xr) {
@@ -59,11 +46,15 @@ export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 							}
 						}
 					}}
-					shadows={perfMode}
+					shadows={{
+						autoUpdate: false,
+						type: PCFSoftShadowMap,
+					}}
 					camera={{ position: [-5, 5, 5] }}
 				>
 					<XR store={xrStore}>
 						<PointerEvents />
+						<QualityControl />
 						{import.meta.env.DEV && <Perf />}
 						<SplashScreen time={5} />
 						<PerformanceMonitor
@@ -97,7 +88,7 @@ export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 					}}
 					onClick={() => {
 						xrStore.enterAR();
-						fetchLocation();
+						useGeoStore.getState().fetchLocation();
 					}}
 				>
 					Enter AR
@@ -110,4 +101,19 @@ export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 function NonXRCameraControls() {
 	const isInSession = useXR((s) => !!s.session);
 	return <OrbitHandles enabled={!isInSession} />;
+}
+
+function QualityControl() {
+	const renderer = useThree((s) => s.gl);
+	useEffect(() => {
+		return usePerformanceStore.subscribe((state) => {
+			const qualityLevel = state.qualityLevel;
+			if (qualityLevel === 'low') {
+				renderer.shadowMap.enabled = false;
+			} else {
+				renderer.shadowMap.enabled = true;
+			}
+		});
+	}, [renderer]);
+	return null;
 }

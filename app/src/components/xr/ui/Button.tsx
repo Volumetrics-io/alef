@@ -4,7 +4,7 @@ import { PositionalAudio } from '@react-three/drei';
 import { ThreeEvent } from '@react-three/fiber';
 import { AllOptionalProperties, ContainerProperties, ContainerRef, DefaultProperties } from '@react-three/uikit';
 import { borderRadius } from '@react-three/uikit-default';
-import { forwardRef, ReactNode, RefAttributes, useCallback, useEffect, useRef } from 'react';
+import { forwardRef, ReactNode, RefAttributes, useEffect, useRef } from 'react';
 import { PositionalAudio as PositionalAudioType } from 'three';
 import { AnimatedContainer, AnimationProps, usePullAnimation } from './Animations';
 import { colors, getColorForAnimation } from './theme';
@@ -143,7 +143,7 @@ export const Button: (props: ButtonProperties & RefAttributes<ContainerRef>) => 
 			animationProps?: AnimationProps;
 		} = buttonVariants[variant];
 		const sizeProps = buttonSizes[size];
-		const perfMode = usePerformanceStore((state) => state.perfMode);
+		const qualityLevel = usePerformanceStore((state) => state.qualityLevel);
 
 		const audioRef = useRef<PositionalAudioType>(null);
 
@@ -171,36 +171,30 @@ export const Button: (props: ButtonProperties & RefAttributes<ContainerRef>) => 
 			};
 		}, []);
 
-		const onHoverChange = useCallback(
-			(hover: boolean) => {
-				if (disabled) {
-					return;
-				}
-				props.onHoverChange?.(hover);
-				if (perfMode) return;
-				api.start({ spring: Number(hover) });
-			},
-			[props]
-		);
+		const onHoverChange = (hover: boolean) => {
+			if (disabled) {
+				return;
+			}
+			props.onHoverChange?.(hover);
+			if (qualityLevel === 'low') return;
+			api.start({ spring: Number(hover) });
+		};
 
-		const onClick = useCallback(
-			(e: ThreeEvent<MouseEvent>) => {
-				// Stop any currently playing audio before playing again
-				if (audioRef.current) {
-					if (audioRef.current.isPlaying) {
-						audioRef.current.stop();
-					}
-					audioRef.current.play();
+		const onClick = (e: ThreeEvent<MouseEvent>) => {
+			// Stop any currently playing audio before playing again
+			if (audioRef.current) {
+				if (audioRef.current.isPlaying) {
+					audioRef.current.stop();
 				}
-				if (disabled) {
-					return;
-				}
-				props.onClick?.(e);
-				if (perfMode) return;
-				api.start({ spring: 0 });
-			},
-			[props]
-		);
+				audioRef.current.play();
+			}
+			if (disabled) {
+				return;
+			}
+			props.onClick?.(e);
+			if (qualityLevel === 'low') return;
+			api.start({ spring: 0 });
+		};
 
 		return (
 			<AnimatedContainer

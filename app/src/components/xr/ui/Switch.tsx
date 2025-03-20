@@ -13,7 +13,7 @@ export type SwitchProperties = Omit<ContainerProperties, 'children'> & {
 
 export const Switch: (props: SwitchProperties & RefAttributes<ContainerRef>) => ReactNode = forwardRef(
 	({ defaultChecked, checked: providedChecked, disabled = false, onCheckedChange, ...props }, ref) => {
-		const perfMode = usePerformanceStore((state) => state.perfMode);
+		const qualityLevel = usePerformanceStore((state) => state.qualityLevel);
 		const [uncontrolled, setUncontrolled] = useState(defaultChecked ?? false);
 		const checked = providedChecked ?? uncontrolled;
 
@@ -46,7 +46,7 @@ export const Switch: (props: SwitchProperties & RefAttributes<ContainerRef>) => 
 				backgroundColor={animateBackgroundColor}
 				cursor={disabled ? undefined : 'pointer'}
 				onHoverChange={(hover) => {
-					if (perfMode) return;
+					if (qualityLevel === 'low') return;
 					api.start({ spring: Number(hover) });
 				}}
 				onClick={

@@ -1,14 +1,13 @@
+import { useFurnitureModel } from '@/services/publicApi/furnitureHooks';
+import { useIsEditorStageMode, useSelectedModelId, useSetPanelState, useSetSelectedModelId } from '@/stores/editorStore';
 import { useAddFurniture, usePlanes } from '@/stores/roomStore';
-import { Euler, Vector3, DoubleSide, Quaternion } from 'three';
-import { forwardRef, useRef } from 'react';
-import { Group } from 'three';
-import { useIsEditorStageMode, useSelectedModelId, useSetSelectedModelId, useSetPanelState } from '@/stores/editorStore';
-import { CollisionModel } from './FurnitureModel';
-import { useFrame } from '@react-three/fiber';
 import { PrefixedId } from '@alef/common';
-import { useThree } from '@react-three/fiber';
 import { useMergedRef } from '@alef/sys';
+import { useFrame, useThree } from '@react-three/fiber';
+import { forwardRef, Suspense, useEffect, useRef } from 'react';
+import { DoubleSide, Euler, Group, Quaternion, Vector3 } from 'three';
 import { Cursor } from '../ui/Cursor';
+import { CollisionModel } from './FurnitureModel';
 export const SpawnFurniture = () => {
 	const storedFloorPlanes = usePlanes((p) => p.label === 'floor');
 	const mode = useIsEditorStageMode('furniture');
@@ -71,7 +70,9 @@ export const SpawnFurniture = () => {
 			</group>
 
 			<Cursor visible={false} ref={spawnPointRef} position={[0, 0.1, 0]}>
-				<GhostModel furnitureId={selectedModelId} ref={modelRef} />
+				<Suspense>
+					<GhostModel furnitureId={selectedModelId} ref={modelRef} />
+				</Suspense>
 			</Cursor>
 		</group>
 	);
@@ -90,6 +91,14 @@ const GhostModel = forwardRef<Group, { furnitureId: PrefixedId<'f'> | null }>(({
 		localCameraPos: new Vector3(),
 		originalRotation: new Euler(),
 	});
+
+	// preload models while placing
+	useEffect(() => {
+		if (furnitureId) {
+			useFurnitureModel.preload(furnitureId);
+		}
+	}, [furnitureId]);
+
 	useFrame(() => {
 		if (!groupRef.current) return;
 		if (!furnitureId) return;

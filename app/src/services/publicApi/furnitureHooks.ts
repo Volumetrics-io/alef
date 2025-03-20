@@ -1,5 +1,5 @@
 import { publicApiOrigin } from '@/env';
-import { AlefError, AttributeKey, formatAttribute, FurnitureModelQuality } from '@alef/common';
+import { AlefError, AttributeKey, formatAttribute, FurnitureModelQuality, PrefixedId } from '@alef/common';
 import { useGLTF } from '@react-three/drei';
 import { useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import type { InferResponseType } from 'hono/client';
@@ -51,7 +51,7 @@ export function useFurnitureAttributes(key: AttributeKey) {
 	});
 }
 
-export function useFurnitureDetails(furnitureId: string) {
+export function useFurnitureDetails(furnitureId: PrefixedId<'f'>) {
 	return useSuspenseQuery({
 		queryKey: ['id', furnitureId],
 		queryFn: async () => {
@@ -60,11 +60,22 @@ export function useFurnitureDetails(furnitureId: string) {
 		},
 	});
 }
-export function useFurnitureModel(furnitureId: string, quality: FurnitureModelQuality = FurnitureModelQuality.Original) {
+export function useFurnitureModel(furnitureId: PrefixedId<'f'>, quality: FurnitureModelQuality = FurnitureModelQuality.Original) {
 	const src = `${publicApiOrigin}/furniture/${furnitureId}/model?quality=${quality}`;
 	return useGLTF(src, true, true, (loader) => {
 		loader.setWithCredentials(true);
 	});
 }
+useFurnitureModel.preload = (
+	furnitureId: PrefixedId<'f'>,
+	qualities: FurnitureModelQuality[] = [FurnitureModelQuality.Original, FurnitureModelQuality.Low, FurnitureModelQuality.Medium, FurnitureModelQuality.Collision]
+) => {
+	for (const quality of qualities) {
+		const src = `${publicApiOrigin}/furniture/${furnitureId}/model?quality=${quality}`;
+		useGLTF.preload(src, true, true, (loader) => {
+			loader.setWithCredentials(true);
+		});
+	}
+};
 
 export type FurnitureItem = InferResponseType<typeof publicApiClient.furniture.$get>['items'][0];

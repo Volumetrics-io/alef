@@ -1,5 +1,6 @@
 @layer components {
 	.root {
+		--thickness: 2px;
 		--size: 20px;
 		position: relative;
 		display: flex;
@@ -7,22 +8,38 @@
 		user-select: none;
 		touch-action: none;
 		height: var(--size);
-		border: var(--border);
+		border-width: var(--thickness);
+		border-style: solid;
+		border-color: var(--border-color);
 		border-radius: 99999px;
+		transition: all var(--animation-duration) ease;
+		transform: translate3d(0, 0, 0);
+
+		&:hover {
+			border-color: var(--border-hover);
+			transform: scale(1.01);
+		}
 	}
+
 	.track {
-		background-color: var(--dimmed);
+		background-color: var(--paper);
 		border-radius: 99999px;
 		flex-grow: 1;
 		height: 100%;
 		position: relative;
 		overflow: hidden;
+
+		.root:hover & {
+			background-color: var(--hover);
+		}
 	}
+
 	.range {
 		position: absolute;
 		background-color: var(--focus);
 		height: 100%;
 	}
+
 	.thumb {
 		background-color: var(--track);
 		border-radius: 99999px;
@@ -30,19 +47,24 @@
 		height: var(--size);
 		display: block;
 		transition: all var(--animation-duration) var(--bounce);
+		border-width: var(--thickness);
+		border-style: solid;
+		border-color: var(--border-color);
 
-		&:hover {
+		.root:hover & {
 			background-color: var(--hover);
-			box-shadow: 0 0 0 5px var(--border-hover);
+			border-color: var(--border-hover);
+			transform: scale(1.01);
 		}
 
 		&:active {
 			background-color: var(--hover);
-			box-shadow: 0 0 0 5px var(--border-press);
+			border-color: var(--border-press);
 		}
 
 		&:focus-visible {
-			box-shadow: 0 0 0 5px var(--focus);
+			border-color: var(--focus);
+			transform: scale(1.01);
 		}
 	}
 }

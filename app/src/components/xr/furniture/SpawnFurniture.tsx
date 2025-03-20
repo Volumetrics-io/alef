@@ -1,80 +1,52 @@
 import { useFurnitureModel } from '@/services/publicApi/furnitureHooks';
 import { useIsEditorStageMode, useSelectedModelId, useSetPanelState, useSetSelectedModelId } from '@/stores/editorStore';
-import { useAddFurniture, usePlanes } from '@/stores/roomStore';
-import { PrefixedId } from '@alef/common';
+import { useAddFurniture, usePrimaryFloorPlane } from '@/stores/roomStore';
+import { PrefixedId, SimpleVector3 } from '@alef/common';
 import { useMergedRef } from '@alef/sys';
 import { useFrame, useThree } from '@react-three/fiber';
-import { forwardRef, Suspense, useEffect, useRef } from 'react';
-import { DoubleSide, Euler, Group, Quaternion, Vector3 } from 'three';
-import { Cursor } from '../ui/Cursor';
+import { forwardRef, useEffect, useRef } from 'react';
+import { Euler, Group, Quaternion, Vector3 } from 'three';
+import { PlanePlacement } from '../anchors/PlanePlacement';
 import { CollisionModel } from './FurnitureModel';
+
 export const SpawnFurniture = () => {
-	const storedFloorPlanes = usePlanes((p) => p.label === 'floor');
-	const mode = useIsEditorStageMode('furniture');
+	const enabled = useIsEditorStageMode('furniture');
 	const selectedModelId = useSelectedModelId();
 	const setSelectedModelId = useSetSelectedModelId();
 	const setPanelState = useSetPanelState();
 	// detect primary floor, its origin length should be very small
-	const primaryFloor = storedFloorPlanes.find((p) => Math.sqrt(p.origin.x * p.origin.x + p.origin.y * p.origin.y + p.origin.z * p.origin.z) < 0.01);
-	const extents = primaryFloor?.extents ?? [10, 10];
+	const primaryFloor = usePrimaryFloorPlane() ?? {
+		id: 'rp-default-floor',
+		origin: { x: 0, y: 0, z: 0 },
+		extents: [10, 10],
+		orientation: { x: 0, y: 0, z: 0, w: 1 },
+		label: 'floor',
+	};
 
-	const spawnPointRef = useRef<Group>(null);
 	const modelRef = useRef<Group>(null);
-
-	const quaternionRef = useRef<Quaternion>(new Quaternion());
 
 	const addFurniture = useAddFurniture();
 
-	const addFurnitureAtSpawnPoint = (e: any) => {
+	const addFurnitureAtPoint = (point: SimpleVector3) => {
 		if (!selectedModelId) return;
-		if (!spawnPointRef.current || !modelRef.current) return;
-		modelRef.current.getWorldQuaternion(quaternionRef.current);
+
+		const orientation = new Quaternion();
+		if (modelRef.current) {
+			modelRef.current.getWorldQuaternion(orientation);
+		}
 		addFurniture({
 			furnitureId: selectedModelId,
-			position: { x: e.localPoint.x, y: 0, z: e.localPoint.y },
-			rotation: modelRef.current.quaternion,
+			position: point,
+			rotation: orientation,
 		});
 		setSelectedModelId(null);
 		setPanelState('hidden');
-		spawnPointRef.current.visible = false;
-	};
-
-	const onStart = (e: any) => {
-		if (!spawnPointRef.current) return;
-		if (!selectedModelId) return;
-		spawnPointRef.current.visible = true;
-		spawnPointRef.current.position.set(e.localPoint.x, 0.001, e.localPoint.y);
-	};
-
-	const onMove = (e: any) => {
-		if (!spawnPointRef.current) return;
-		if (!selectedModelId) return;
-		spawnPointRef.current.position.set(e.localPoint.x, 0.001, e.localPoint.y);
-	};
-
-	const onEnd = (e: any) => {
-		if (!spawnPointRef.current) return;
-		if (!selectedModelId) return;
-		spawnPointRef.current.visible = false;
-		spawnPointRef.current.position.set(e.localPoint.x, 0.001, e.localPoint.y);
 	};
 
 	return (
-		<group>
-			<group rotation={[Math.PI / 2, 0, 0]}>
-				{/* @ts-ignore - pointerEvents not included in typings */}
-				<mesh pointerEvents={mode && selectedModelId ? 'auto' : 'none'} onPointerEnter={onStart} onPointerMove={onMove} onPointerLeave={onEnd} onClick={addFurnitureAtSpawnPoint}>
-					<planeGeometry args={extents} />
-					<meshBasicMaterial colorWrite={false} depthTest={false} color="red" side={DoubleSide} />
-				</mesh>
-			</group>
-
-			<Cursor visible={false} ref={spawnPointRef} position={[0, 0.1, 0]}>
-				<Suspense>
-					<GhostModel furnitureId={selectedModelId} ref={modelRef} />
-				</Suspense>
-			</Cursor>
-		</group>
+		<PlanePlacement onPlace={addFurnitureAtPoint} plane={primaryFloor} enabled={enabled && !!selectedModelId}>
+			<GhostModel furnitureId={selectedModelId} ref={modelRef} />
+		</PlanePlacement>
 	);
 };
 

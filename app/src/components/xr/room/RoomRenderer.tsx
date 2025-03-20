@@ -3,12 +3,13 @@ import { useFurniturePlacementIds } from '@/stores/roomStore';
 import { Suspense } from 'react';
 import { GlobalSpace } from '../anchors/GlobalSpace';
 import { PlacedFurniture } from '../furniture/PlacedFurniture';
+import { SpawnFurniture } from '../furniture/SpawnFurniture';
 import { RoomLighting } from '../lighting/RoomLighting';
+import { SpawnLight } from '../lighting/SpawnLight';
 import { Floors } from './Floors';
 import { NonXRPlaneRenderer } from './NonXRPlaneRenderer';
 import { PlaneSync } from './PlaneSync';
 import { Walls } from './Walls';
-import { SpawnFurniture } from '../furniture/SpawnFurniture';
 export function RoomRenderer() {
 	const furniturePlacementIds = useFurniturePlacementIds();
 	useEditorSelectionReset();
@@ -21,6 +22,7 @@ export function RoomRenderer() {
 			<PlaneSync />
 			<GlobalSpace>
 				<SpawnFurniture />
+				<SpawnLight />
 				<NonXRPlaneRenderer />
 				<RoomLighting />
 				{furniturePlacementIds.map((furniturePlacementId) => {

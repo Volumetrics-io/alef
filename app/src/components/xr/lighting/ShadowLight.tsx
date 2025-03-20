@@ -4,9 +4,10 @@ import { useGlobalLighting, useLights } from '@/stores/roomStore';
 import { useEffect } from 'react';
 import { Group, Vector3 } from 'three';
 import { getLightColor } from './getLightColor';
+
 // Component to create a target for the shadow light
 export const ShadowLightTarget = ({ targetRef }: { targetRef: React.RefObject<Group> }) => {
-	return <group ref={targetRef}></group>;
+	return <group position={[0, 0, 0]} ref={targetRef}></group>;
 };
 
 export const ShadowLight = ({ target }: { target?: Group | null }) => {

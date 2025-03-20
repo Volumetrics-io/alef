@@ -4,7 +4,7 @@ import cls from './Logo.module.css';
 
 export const Logo = withClassName(
 	withProps('img', {
-		src: '/icons/192.png',
+		src: '/icons/main.png',
 		width: 32,
 		height: 32,
 		alt: 'The Alef logo, a three dimensional rounded pyramid with polychromatic hues',

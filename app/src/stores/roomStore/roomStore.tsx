@@ -12,9 +12,11 @@ import {
 	RoomLayout,
 	RoomLightPlacement,
 	RoomState,
+	RoomType,
 	UnknownRoomPlaneData,
 	updateRoom,
 } from '@alef/common';
+import { sentenceCase } from 'change-case';
 import { useEffect, useRef } from 'react';
 import { createStore, useStore } from 'zustand';
 import { persist, subscribeWithSelector } from 'zustand/middleware';
@@ -34,7 +36,7 @@ export type RoomStoreState = RoomState & {
 	/**
 	 * Creates an empty new room layout and sets it as the current layout
 	 */
-	createLayout: (data?: { name?: string }) => Promise<PrefixedId<'rl'>>;
+	createLayout: (data?: { name?: string; type?: RoomType }) => Promise<PrefixedId<'rl'>>;
 	setViewingLayoutId: (id: PrefixedId<'rl'>) => void;
 	updateLayout: (data: Pick<RoomLayout, 'id' | 'name' | 'icon' | 'type'>) => void;
 	updatePlanes: (planes: UnknownRoomPlaneData[]) => void;
@@ -207,16 +209,21 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 						},
 
 						createLayout: async (data) => {
-							const name = data?.name || `Layout ${Object.keys(get().layouts).length + 1}`;
+							let name = data?.name;
+							const type: RoomType = data?.type || 'living-room';
+							if (!name) {
+								// name it after the room type, incrementing as needed
+								const nameFromType = sentenceCase(type);
+								const othersWithName = Object.values(get().layouts).filter((layout) => layout?.name?.startsWith(nameFromType)).length;
+								name = `${nameFromType}${othersWithName > 0 ? ' ' + (othersWithName + 1) : ''}`;
+							}
 							const layoutId = id('rl');
 							await applyChange({
 								type: 'createLayout',
 								roomId,
-								data: { id: layoutId, name },
+								data: { id: layoutId, name, type },
 							});
-							if (!get().viewingLayoutId) {
-								set({ viewingLayoutId: layoutId });
-							}
+							set({ viewingLayoutId: layoutId });
 
 							return layoutId;
 						},

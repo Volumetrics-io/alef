@@ -5,6 +5,7 @@ import { ReactNode, Suspense } from 'react';
 import cls from './DesktopUI.module.css';
 import { DesktopFurnitureEditor } from './furniture/DesktopFurnitureEditor';
 import { DesktopOnlineFurniturePicker } from './furniture/DesktopOnlineFurniturePicker';
+import { DesktopAddLayout } from './layouts/DesktopAddLayout';
 import { DesktopLayoutEditor } from './layouts/DesktopLayoutEditor';
 import { DesktopLayoutsPicker } from './layouts/DesktopLayoutsPicker';
 import { DesktopLightEditor } from './lighting/DesktopLightEditor';
@@ -31,7 +32,7 @@ export function DesktopUI({ children }: DesktopUIProps) {
 function DesktopUIMain() {
 	return (
 		<Box className={cls.main} stacked>
-			<Tabs.List>
+			<Tabs.List className={cls.tabs}>
 				<Tabs.Trigger value="layouts">
 					<Icon name="house" />
 				</Tabs.Trigger>
@@ -44,7 +45,10 @@ function DesktopUIMain() {
 			</Tabs.List>
 			<Tabs.Content value="layouts">
 				<Suspense>
-					<DesktopLayoutsPicker />
+					<Box p="small" full stacked justify="between">
+						<DesktopLayoutsPicker />
+						<DesktopAddLayout />
+					</Box>
 				</Suspense>
 			</Tabs.Content>
 			<Tabs.Content value="furniture">

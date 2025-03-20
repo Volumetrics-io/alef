@@ -9,7 +9,11 @@ export interface NonXRPlaneRendererProps {
 }
 
 export function NonXRPlaneRenderer({ debug = DEBUG }: NonXRPlaneRendererProps) {
-	const planes = usePlanes();
+	const planes = usePlanes(
+		// filter out planes we don't care about -- we only care about planes
+		// that define the structure of the room, not any existing contents.
+		(p) => p.label === 'floor' || p.label === 'wall' || p.label === 'ceiling' || p.label === 'door' || p.label === 'window'
+	);
 	const isInSession = useXR((s) => !!s.session);
 
 	if (isInSession && !debug) {

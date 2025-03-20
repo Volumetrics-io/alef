@@ -1,5 +1,5 @@
 import { usePrimaryXRFloorPlane } from '@/hooks/usePrimaryXRFloorPlane';
-import { usePlanes } from '@/stores/roomStore';
+import { usePrimaryFloorPlane } from '@/stores/roomStore';
 import { XRSpace } from '@react-three/xr';
 import { ReactNode } from 'react';
 
@@ -13,10 +13,8 @@ export interface GlobalSpaceProps {
  * you're in headset or not.
  */
 export function GlobalSpace({ children }: GlobalSpaceProps) {
-	const storedFloorPlanes = usePlanes((p) => p.label === 'floor');
-
 	// detect primary floor, its origin length should be very small
-	const primaryFloor = storedFloorPlanes.find((p) => Math.sqrt(p.origin.x * p.origin.x + p.origin.y * p.origin.y + p.origin.z * p.origin.z) < 0.01);
+	const primaryFloor = usePrimaryFloorPlane();
 
 	// now let's find the matching XR floor plane
 	const primaryXRPlane = usePrimaryXRFloorPlane();

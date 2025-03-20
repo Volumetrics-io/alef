@@ -9,6 +9,10 @@
 	--border: var(--thickness) solid var(--border-color);
 	--border-shadow: inset 0px 0px 0px var(--thickness) var(--border-color);
 
+	--radius-sm: 0.25rem;
+	--radius-md: 0.5rem;
+	--radius-lg: 1rem;
+
 	--toolbar-height: 5rem;
 
 	/* Shadows */
@@ -24,8 +28,8 @@
 /* Light theme */
 :root {
 	/* GLOBAL */
-	--paper: hsl(230, 100%, 98%);
-	--hover: hsl(230, 100%, 99%);
+	--paper: hsl(230, 50%, 98%);
+	--hover: hsl(230, 0%, 99%);
 	--track: hsl(230, 100%, 100%);
 	--ink: hsl(0, 0%, 20%);
 	--faded: hsl(0, 0%, 50%);

@@ -1,26 +1,27 @@
-import { SimpleQuaternion, SimpleVector3 } from '@alef/common';
+import { DEBUG } from '@/services/debug';
+import { RoomPlaneData } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
+import { GroupProps } from '@react-three/fiber';
 import { Quaternion, Vector3 } from 'three';
 
-export interface DemoPlaneProps {
-	orientation: SimpleQuaternion;
-	center: SimpleVector3;
-	dimensions: [number, number];
-	label: string;
-	id?: string;
+export interface DemoPlaneProps extends GroupProps {
+	plane: RoomPlaneData;
 }
 
-export function DemoPlane({ orientation: rawOrientation, center: rawCenter, dimensions, label }: DemoPlaneProps) {
+export function RoomPlane({ plane, ...rest }: DemoPlaneProps) {
+	const { orientation: rawOrientation, origin: rawCenter, extents: dimensions, label } = plane;
 	const orientation = new Quaternion().copy(rawOrientation);
 	const center = new Vector3().copy(rawCenter);
 
+	const color = DEBUG ? (debugColors[label] ?? 'pink') : 'white';
+
 	return (
 		<ErrorBoundary fallback={null}>
-			<group rotation={[Math.PI, 0, 0]}>
+			<group rotation={[Math.PI, 0, 0]} {...rest}>
 				<group position={center} quaternion={orientation}>
 					<mesh receiveShadow rotation={[Math.PI / 2, 0, 0]}>
 						<planeGeometry args={dimensions} />
-						<meshPhysicalMaterial color={labelColors[label] ?? 'pink'} />
+						<meshPhysicalMaterial color={color} />
 					</mesh>
 				</group>
 			</group>
@@ -28,7 +29,7 @@ export function DemoPlane({ orientation: rawOrientation, center: rawCenter, dime
 	);
 }
 
-const labelColors: Record<string, string> = {
+const debugColors: Record<string, string> = {
 	wall: 'white',
 	floor: 'blue',
 	ceiling: 'green',

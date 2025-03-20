@@ -9,6 +9,7 @@ import { StagerPanel } from './panels/StagerPanel';
 import { ViewerPanel } from './panels/ViewerPanel';
 import { RoomRenderer } from './room/RoomRenderer';
 import { SceneWrapper } from './SceneWrapper';
+import { useEditorStore } from '@/stores/editorStore';
 
 export function MainScene() {
 	useColorTheme();
@@ -29,5 +30,7 @@ export default MainScene;
 
 function ModePanel() {
 	const mode = useMode();
+	const { splashScreen } = useEditorStore();
+	if (splashScreen) return null;
 	return mode === 'staging' ? <StagerPanel /> : <ViewerPanel />;
 }

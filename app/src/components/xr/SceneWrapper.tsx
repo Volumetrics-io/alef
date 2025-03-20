@@ -14,6 +14,7 @@ import { PerformanceMonitor } from '@react-three/drei';
 import { FurnitureModelQuality } from '@alef/common';
 import { ActivePointer } from './controls/ActivePointer';
 import { SplashScreen } from './ui/SplashScreen';
+import { useEditorStore } from '@/stores/editorStore';
 export interface SceneWrapperProps extends BoxProps {
 	children: ReactNode;
 }
@@ -21,6 +22,7 @@ export interface SceneWrapperProps extends BoxProps {
 export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 	const geoStore = useGeoStore();
 	const { perfMode, setPerfMode, setMaxModelQuality } = usePerformanceStore((state) => state);
+	const { setSplashScreen } = useEditorStore();
 	return (
 		<Box {...rest}>
 			<ErrorBoundary
@@ -44,6 +46,7 @@ export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 						state.gl.shadowMap.type = PCFSoftShadowMap;
 						if (new URLSearchParams(window.location.search).get('directLaunch') === 'true') {
 							setPerfMode(true);
+							setSplashScreen(true);
 							setMaxModelQuality(FurnitureModelQuality.Low);
 						}
 						// @ts-ignore it does
@@ -58,13 +61,14 @@ export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 				>
 					<XR store={xrStore}>
 						<PointerEvents />
+						<SplashScreen time={5} />
 						<PerformanceMonitor
 							bounds={(refreshRate) => {
 								return [Math.max(refreshRate - 30, 45), refreshRate];
 							}}
 						>
 							<XRPerformanceManager />
-							<Suspense fallback={<SplashScreen />}>{children}</Suspense>
+							<Suspense>{children}</Suspense>
 							<NonXRCameraControls />
 							<XRToaster />
 							<ActivePointer />

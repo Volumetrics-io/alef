@@ -1,5 +1,5 @@
 import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
-import { useEditorStageMode, useSelectedLightPlacementId, useSelect } from '@/stores/editorStore';
+import { useEditorStageMode, useLightIsSelected, useSelect } from '@/stores/editorStore';
 import { useDeleteLightPlacement, useGlobalLighting, useLightPlacementIds } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
@@ -8,9 +8,9 @@ import { useCallback, useRef } from 'react';
 import { getLightColor } from '../../lighting/getLightColor';
 import { Button } from '../../ui/Button';
 import { Heading } from '../../ui/Heading';
+import { Selector, SelectorItem } from '../../ui/Selector';
 import { Slider } from '../../ui/Slider';
 import { Surface } from '../../ui/Surface';
-import { Selector, SelectorItem } from '../../ui/Selector';
 
 export const Lighting = () => {
 	return (
@@ -90,16 +90,16 @@ const LightPane = () => {
 };
 
 function LightItem({ id }: { id: PrefixedId<'lp'> }) {
-	const selectedLightId = useSelectedLightPlacementId();
+	const isSelected = useLightIsSelected(id);
 	const select = useSelect();
 
 	return (
-		<SelectorItem flexShrink={0} justifyContent="space-between" onClick={() => select(id)} selected={selectedLightId === id}>
+		<SelectorItem flexShrink={0} justifyContent="space-between" onClick={() => select(id)} selected={isSelected}>
 			<Container flexDirection="row" gap={10} alignItems="center">
 				<Text>Ceiling Light</Text>
 				<LightbulbIcon />
 			</Container>
-			<DeleteButton id={id} visible={selectedLightId === id} />
+			<DeleteButton id={id} visible={isSelected} />
 		</SelectorItem>
 	);
 }

@@ -14,7 +14,6 @@ export type PanelState = 'open' | 'closed' | 'hidden';
 
 export type EditorStore = {
 	splashScreen: boolean;
-	setSplashScreen: (splashScreen: boolean) => void;
 
 	panelState: PanelState;
 	setPanelState: (panelState: PanelState) => void;
@@ -50,10 +49,13 @@ export type EditorStore = {
 export const useEditorStore = create<EditorStore>((set, get) => {
 	// enable the splash screen by default when rendering in the PWA
 	const splashScreen = new URLSearchParams(window.location.search).get('directLaunch') === 'true';
+	if (splashScreen) {
+		// close splash screen after 5 seconds
+		setTimeout(() => set({ splashScreen: false }), 5000);
+	}
 
 	return {
 		splashScreen,
-		setSplashScreen: (splashScreen: boolean) => set({ splashScreen }),
 		panelState: 'closed',
 		setPanelState: (panelState: PanelState) => set({ panelState }),
 		mode: null,
@@ -142,6 +144,10 @@ export function useSelectedFurniturePlacementId() {
 
 export function useSelectedLightPlacementId() {
 	return useEditorStore(({ selectedId }) => (selectedId && isPrefixedId(selectedId, 'lp') && selectedId) || null);
+}
+
+export function useLightIsSelected(lightPlacementId: PrefixedId<'lp'>) {
+	return useEditorStore(({ selectedId }) => selectedId === lightPlacementId);
 }
 
 export function usePanelState() {

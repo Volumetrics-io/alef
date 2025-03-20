@@ -1,24 +1,11 @@
 import { useEditorStore } from '@/stores/editorStore';
 import { Image, Root } from '@react-three/uikit';
-import { useXR } from '@react-three/xr';
-import { useEffect } from 'react';
-import { useShallow } from 'zustand/react/shallow';
 import { BodyAnchor } from '../anchors';
 
-export const SplashScreen = ({ time = 5 }: { time?: number }) => {
-	const { session } = useXR();
-	const [splashScreen, setSplashScreen] = useEditorStore(useShallow((s) => [s.splashScreen, s.setSplashScreen]));
+export const SplashScreen = () => {
+	const show = useEditorStore((s) => s.splashScreen);
 
-	useEffect(() => {
-		if (splashScreen && session) {
-			const timeout = setTimeout(() => {
-				setSplashScreen(false);
-			}, time * 1000);
-			return () => clearTimeout(timeout);
-		}
-	}, [splashScreen, setSplashScreen, time, session]);
-
-	if (!splashScreen || !session) return null;
+	if (!show) return null;
 
 	return (
 		<BodyAnchor lockY position={[0, -0.25, 0.7]} follow distance={0.15}>

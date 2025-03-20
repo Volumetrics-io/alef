@@ -57,7 +57,7 @@ export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 						<PointerEvents />
 						<QualityControl />
 						{import.meta.env.DEV && <Perf />}
-						<SplashScreen time={5} />
+						<SplashScreen />
 						<ErrorBoundary fallback={<XRError />}>
 							<PerformanceMonitor
 								bounds={(refreshRate) => {

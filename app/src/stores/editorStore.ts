@@ -13,6 +13,9 @@ export type StageMode = 'lighting' | 'furniture' | 'layout' | 'settings' | null;
 export type PanelState = 'open' | 'closed' | 'hidden';
 
 export type EditorStore = {
+	splashScreen: boolean;
+	setSplashScreen: (splashScreen: boolean) => void;
+
 	panelState: PanelState;
 	setPanelState: (panelState: PanelState) => void;
 
@@ -46,6 +49,8 @@ export type EditorStore = {
 
 export const useEditorStore = create<EditorStore>((set, get) => {
 	return {
+		splashScreen: false,
+		setSplashScreen: (splashScreen: boolean) => set({ splashScreen }),
 		panelState: 'closed',
 		setPanelState: (panelState: PanelState) => set({ panelState }),
 		mode: null,

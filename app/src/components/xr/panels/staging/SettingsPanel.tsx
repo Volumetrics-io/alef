@@ -8,6 +8,7 @@ import { ToggleGroup, ToggleGroupItem } from '@react-three/uikit-default';
 import { SettingsIcon } from '@react-three/uikit-lucide';
 import { useState } from 'react';
 import { HeadsetLogin } from '../../auth/HeadsetLogin';
+import { ErrorSimulatorButton } from '../../debug/ErrorSimulatorButton';
 import { Heading } from '../../ui/Heading';
 import { Surface } from '../../ui/Surface';
 
@@ -30,6 +31,7 @@ export function SettingsPanel() {
 				<Logout />
 			)}
 			<ToggleTheme />
+			<ErrorSimulatorButton />
 		</Surface>
 	);
 }

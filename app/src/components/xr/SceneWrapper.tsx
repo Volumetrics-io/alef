@@ -12,6 +12,7 @@ import { ReactNode, Suspense, useEffect } from 'react';
 import { PCFSoftShadowMap } from 'three';
 import { ActivePointer } from './controls/ActivePointer';
 import { SplashScreen } from './ui/SplashScreen';
+import { XRError } from './XRError';
 import { XRPerformanceManager } from './XRPerformanceManager';
 import { XRToaster } from './XRToaster';
 
@@ -57,17 +58,19 @@ export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 						<QualityControl />
 						{import.meta.env.DEV && <Perf />}
 						<SplashScreen time={5} />
-						<PerformanceMonitor
-							bounds={(refreshRate) => {
-								return [Math.max(refreshRate - 30, 45), refreshRate];
-							}}
-						>
-							<XRPerformanceManager />
-							<Suspense>{children}</Suspense>
-							<NonXRCameraControls />
-							<XRToaster />
-							<ActivePointer />
-						</PerformanceMonitor>
+						<ErrorBoundary fallback={<XRError />}>
+							<PerformanceMonitor
+								bounds={(refreshRate) => {
+									return [Math.max(refreshRate - 30, 45), refreshRate];
+								}}
+							>
+								<XRPerformanceManager />
+								<Suspense>{children}</Suspense>
+								<NonXRCameraControls />
+								<XRToaster />
+								<ActivePointer />
+							</PerformanceMonitor>
+						</ErrorBoundary>
 					</XR>
 				</Canvas>
 				<button

@@ -49,20 +49,20 @@ export const RoomLighting = () => {
 		if (!canAddLights()) return;
 		if (!cursorRef.current) return;
 		cursorRef.current.visible = true;
-		cursorRef.current.position.set(e.point.x, e.point.y - 0.001, e.point.z);
+		cursorRef.current.position.set(e.localPoint.x, e.localPoint.y, e.localPoint.z + 0.001);
 	};
 
 	const onMove = (e: any) => {
 		if (!editable) return;
 		if (!canAddLights()) return;
 		if (!cursorRef.current) return;
-		cursorRef.current.position.set(e.point.x, e.point.y - 0.001, e.point.z);
+		cursorRef.current.position.set(e.localPoint.x, e.localPoint.y, e.localPoint.z + 0.001);
 	};
 
 	const onEnd = (e: any) => {
 		if (!cursorRef.current) return;
 		cursorRef.current.visible = false;
-		cursorRef.current.position.set(e.point.x, e.point.y - 0.001, e.point.z);
+		cursorRef.current.position.set(e.localPoint.x, e.localPoint.y, e.localPoint.z + 0.001);
 	};
 
 	const handleClick = useCallback(
@@ -102,8 +102,8 @@ export const RoomLighting = () => {
 					return <CeilingLight key={id} id={id} />;
 				})}
 				<ShadowLight target={targetRef.current} />
+				<Cursor visible={false} ref={cursorRef} position={[0, 0.1, 0]} color={getLightColor(globalColor)} scale={0.5} rotation={[Math.PI / 2, 0, 0]} />
 			</group>
-			<Cursor visible={false} ref={cursorRef} position={[0, 0.1, 0]} color={getLightColor(globalColor)} scale={0.5} />
 			<ShadowLightTarget targetRef={targetRef} />
 		</>
 	);

@@ -14,7 +14,7 @@ import { Selector, SelectorItem } from '../../ui/Selector';
 
 export const Lighting = () => {
 	return (
-		<Surface flexDirection="column" width={500} height={420}>
+		<Surface flexDirection="column" width={500} height={420} padding={10}>
 			<LightPane />
 		</Surface>
 	);
@@ -45,12 +45,12 @@ const LightPane = () => {
 				<SunIcon width={20} height={20} />
 				<Heading level={3}>Lighting</Heading>
 			</Container>
-			<Container flexDirection="column" gap={20} flexGrow={1}>
-				<Container flexDirection="column" gap={10}>
+			<Container flexDirection="column" gap={8} flexShrink={1}>
+				<Container flexDirection="column" gap={4} flexGrow={1} flexShrink={0}>
 					<Heading level={4}>Brightness</Heading>
 					<Slider defaultValue={lightIntensityRef.current} min={0} max={2} step={0.01} onValueChange={(v) => (lightIntensityRef.current = v)} onPointerUp={updateIntensity} />
 				</Container>
-				<Container flexDirection="column" gap={10} width="100%">
+				<Container flexDirection="column" gap={4} width="100%" flexGrow={1} flexShrink={0}>
 					<Heading level={4}>Warmth</Heading>
 					<Slider
 						defaultValue={lightColorRef.current}
@@ -62,15 +62,16 @@ const LightPane = () => {
 						onPointerUp={updateColor}
 					/>
 				</Container>
-				<Container flexDirection="column" gap={10} width="100%" flexGrow={1} flexShrink={0}>
+				<Container flexDirection="column" gap={4} width="100%" flexShrink={2}>
 					<Heading level={4}>Lights</Heading>
 					<Selector
+						size="small"
 						display={lightIds.length > 0 ? 'flex' : 'none'}
 						flexDirection="column"
 						backgroundColor={undefined}
 						width="100%"
+						flexShrink={2}
 						paddingRight={10}
-						flexShrink={1}
 						overflow="scroll"
 					>
 						{lightIds.map((id) => (
@@ -79,7 +80,7 @@ const LightPane = () => {
 					</Selector>
 				</Container>
 			</Container>
-			<Container flexDirection="row" gap={4} width="100%" paddingRight={6} justifyContent="space-between">
+			<Container flexDirection="row" width="100%">
 				<Button onClick={() => setMode('furniture')}>
 					<ArrowLeftIcon />
 				</Button>

@@ -24,7 +24,7 @@ export function DesktopLayoutsPicker({ className }: DesktopLayoutsPickerProps) {
 function LayoutSelector() {
 	const layoutIds = useRoomLayoutIds();
 	return (
-		<Box gapped stacked>
+		<Box gapped stacked p="small">
 			{layoutIds.map((layoutId) => (
 				<Suspense key={layoutId} fallback={<Button />}>
 					<LayoutItem layoutId={layoutId} />

@@ -1,6 +1,7 @@
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
 import { useSetSelectedModelId } from '@/stores/editorStore';
 import { Button, Card, CardGrid, Icon, ScrollArea } from '@alef/sys';
+import cls from './DesktopFurnitureCollection.module.css';
 
 export interface DesktopFurnitureCollectionProps {
 	furniture: FurnitureItem[];
@@ -11,7 +12,7 @@ export interface DesktopFurnitureCollectionProps {
 export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore }: DesktopFurnitureCollectionProps) {
 	return (
 		<ScrollArea>
-			<CardGrid small>
+			<CardGrid small p="small">
 				{furniture.map((item) => (
 					<DesktopFurnitureCard key={item.id} item={item} />
 				))}
@@ -34,8 +35,8 @@ function DesktopFurnitureCard({ item }: { item: FurnitureItem }) {
 	};
 
 	return (
-		<Card>
-			<Card.Main onClick={add}>
+		<Card onClick={add} className={cls.card}>
+			<Card.Main>
 				<Card.Image src={`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${item.id}/image.jpg`} />
 			</Card.Main>
 			<Card.Details>

@@ -8,6 +8,11 @@
 		font-weight: var(--weight-medium);
 	}
 
+	.button:disabled,
+	.button[data-disabled='true'] {
+		cursor: default;
+	}
+
 	.default {
 		/* Control config */
 		--color-border: var(--border-color);

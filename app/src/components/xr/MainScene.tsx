@@ -3,13 +3,13 @@ import { DepthShader } from '@/components/xr/shaders/DepthShader';
 
 import { PropertyRoomStoreProvider } from '@/components/core/PropertyRoomStoreProvider.js';
 import { useColorTheme } from '@/hooks/useColorTheme';
+import { useEditorStore } from '@/stores/editorStore';
 import { AdaptiveEvents } from '@react-three/drei';
 import { useMode } from './modes/ModeContext';
 import { StagerPanel } from './panels/StagerPanel';
 import { ViewerPanel } from './panels/ViewerPanel';
 import { RoomRenderer } from './room/RoomRenderer';
 import { SceneWrapper } from './SceneWrapper';
-import { useEditorStore } from '@/stores/editorStore';
 
 export function MainScene() {
 	useColorTheme();
@@ -30,7 +30,7 @@ export default MainScene;
 
 function ModePanel() {
 	const mode = useMode();
-	const { splashScreen } = useEditorStore();
+	const splashScreen = useEditorStore((s) => s.splashScreen);
 	if (splashScreen) return null;
 	return mode === 'staging' ? <StagerPanel /> : <ViewerPanel />;
 }

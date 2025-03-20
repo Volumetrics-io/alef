@@ -1,20 +1,22 @@
+import { useEditorStore } from '@/stores/editorStore';
 import { useGeoStore } from '@/stores/geoStore';
 import { usePerformanceStore } from '@/stores/performanceStore';
 import { xrStore } from '@/stores/xrStore';
+import { FurnitureModelQuality } from '@alef/common';
 import { Box, BoxProps, ErrorBoundary, Icon } from '@alef/sys';
 import { reversePainterSortStable } from '@pmndrs/uikit';
+import { PerformanceMonitor } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { OrbitHandles } from '@react-three/handle';
 import { noEvents, PointerEvents, useXR, XR } from '@react-three/xr';
+import { Perf } from 'r3f-perf';
 import { ReactNode, Suspense } from 'react';
 import { PCFSoftShadowMap } from 'three';
-import { XRToaster } from './XRToaster';
-import { XRPerformanceManager } from './XRPerformanceManager';
-import { PerformanceMonitor } from '@react-three/drei';
-import { FurnitureModelQuality } from '@alef/common';
 import { ActivePointer } from './controls/ActivePointer';
 import { SplashScreen } from './ui/SplashScreen';
-import { useEditorStore } from '@/stores/editorStore';
+import { XRPerformanceManager } from './XRPerformanceManager';
+import { XRToaster } from './XRToaster';
+
 export interface SceneWrapperProps extends BoxProps {
 	children: ReactNode;
 }
@@ -61,6 +63,7 @@ export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 				>
 					<XR store={xrStore}>
 						<PointerEvents />
+						{import.meta.env.DEV && <Perf />}
 						<SplashScreen time={5} />
 						<PerformanceMonitor
 							bounds={(refreshRate) => {

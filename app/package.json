@@ -37,6 +37,7 @@
 		"hono": "catalog:",
 		"immer": "^10.1.1",
 		"optics-ts": "^2.4.1",
+		"r3f-perf": "^7.2.3",
 		"react": "catalog:",
 		"react-dom": "catalog:",
 		"react-hot-toast": "2.5.1",

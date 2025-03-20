@@ -1,4 +1,8 @@
 export function getLightColor(kelvin: number): string {
+	return colorObjectToHextString(getLightColorObject(kelvin));
+}
+
+export function getLightColorObject(kelvin: number): { r: number; g: number; b: number } {
 	// Invert the scale: 10 is warmest (lowest kelvin), 0 is coldest (highest kelvin)
 	const invertedKelvin = 11.5 - kelvin;
 	const clampedKelvin = Math.max(1.5, Math.min(10, invertedKelvin));
@@ -38,6 +42,9 @@ export function getLightColor(kelvin: number): string {
 		}
 	}
 
-	// Convert RGB to hexadecimal format
-	return `#${((1 << 24) + (Math.round(red) << 16) + (Math.round(green) << 8) + Math.round(blue)).toString(16).slice(1).toUpperCase()}`;
+	return { r: red, g: green, b: blue };
+}
+
+export function colorObjectToHextString(color: { r: number; g: number; b: number }): string {
+	return `#${((1 << 24) + (Math.round(color.r) << 16) + (Math.round(color.g) << 8) + Math.round(color.b)).toString(16).slice(1).toUpperCase()}`;
 }

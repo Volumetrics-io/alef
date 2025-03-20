@@ -47,12 +47,12 @@ export const CeilingLight = ({ id, ...props }: { id: PrefixedId<'lp'> }) => {
 			{editable && (
 				<group>
 					<mesh position={[0, 0, 0.01]} visible={hovered || selected}>
-						<ringGeometry args={[0.125, 0.16, 32]} />
+						<ringGeometry args={[0.125, 0.16, 16]} />
 						<meshBasicMaterial color="white" />
 					</mesh>
 					<Handle targetRef={groupRef as any} translate={{ x: true, y: true, z: false }} scale={false} rotate={false}>
 						<mesh onClick={handleClick} renderOrder={editable ? -1 : 0} onPointerUp={handlePointerUp}>
-							<sphereGeometry args={[0.1, 32, 32]} />
+							<sphereGeometry args={[0.1, 8, 8]} />
 							<meshBasicMaterial color={getLightColor(globalColor)} transparent={true} opacity={globalIntensity} />
 						</mesh>
 					</Handle>

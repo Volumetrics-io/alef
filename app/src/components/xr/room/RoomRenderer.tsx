@@ -1,11 +1,13 @@
 import { useEditorSelectionReset, useUpdateClosestFloorCenter } from '@/stores/editorStore';
 import { useFurniturePlacementIds } from '@/stores/roomStore';
+import { Environment } from '@react-three/drei';
 import { Suspense } from 'react';
 import { GlobalSpace } from '../anchors/GlobalSpace';
 import { PlacedFurniture } from '../furniture/PlacedFurniture';
 import { SpawnFurniture } from '../furniture/SpawnFurniture';
 import { RoomLighting } from '../lighting/RoomLighting';
 import { SpawnLight } from '../lighting/SpawnLight';
+import { NotXR } from '../util/NotXR';
 import { Floors } from './Floors';
 import { NonXRPlaneRenderer } from './NonXRPlaneRenderer';
 import { PlaneSync } from './PlaneSync';
@@ -17,6 +19,9 @@ export function RoomRenderer() {
 
 	return (
 		<>
+			<NotXR>
+				<Environment preset="apartment" environmentIntensity={0.1} />
+			</NotXR>
 			<Floors />
 			<Walls />
 			<PlaneSync />

@@ -13,7 +13,7 @@ export function CeilingLightModel(props: CeilingLightModelProps) {
 				<meshBasicMaterial color={getLightColor(globalColor)} transparent={true} opacity={globalIntensity} />
 			</mesh>
 			<spotLight
-				position={[0, 0.5, 0]} // Position the light slightly above the ceiling
+				position={[0, 0.1, 0]} // Position the light slightly above the ceiling
 				angle={Math.PI / 2.5} // 60 degrees spread
 				penumbra={0.2} // Soft edges
 				decay={0.5} // Physical light falloff

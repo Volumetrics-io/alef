@@ -54,7 +54,7 @@ export function PlanePlacement({ plane, onPlace, children, enabled, bothSides }:
 	};
 
 	return (
-		<group rotation={[Math.PI, 0, 0]}>
+		<group rotation={[Math.PI, 0, 0]} visible={enabled}>
 			<group position={[plane.origin.x, plane.origin.y, plane.origin.z]} quaternion={[plane.orientation.x, plane.orientation.y, plane.orientation.z, plane.orientation.w]}>
 				<mesh
 					rotation={[Math.PI / 2, 0, 0]}
@@ -64,7 +64,7 @@ export function PlanePlacement({ plane, onPlace, children, enabled, bothSides }:
 					onPointerMove={onMove as any}
 					onPointerLeave={onLeave as any}
 					onClick={onClick as any}
-					renderOrder={DEBUG ? 1 : -1}
+					renderOrder={DEBUG ? 1 : 0}
 				>
 					<planeGeometry args={plane.extents} />
 					<meshBasicMaterial color="yellow" colorWrite={DEBUG && enabled} transparent={!DEBUG} />
@@ -79,7 +79,7 @@ export function PlanePlacement({ plane, onPlace, children, enabled, bothSides }:
 							onPointerMove={onBacksideMove as any}
 							onPointerLeave={onLeave as any}
 							onClick={onClick as any}
-							renderOrder={DEBUG ? 1 : -1}
+							renderOrder={DEBUG ? 1 : 0}
 						>
 							<planeGeometry args={plane.extents} />
 							<meshBasicMaterial color="yellow" colorWrite={DEBUG && enabled} transparent={!DEBUG} />

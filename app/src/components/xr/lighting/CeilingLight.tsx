@@ -25,7 +25,7 @@ export const CeilingLight = ({ id }: { id: PrefixedId<'lp'> }) => {
 				return;
 			}
 
-			if (!selected) {
+			if (!editable) {
 				return;
 			}
 
@@ -38,7 +38,7 @@ export const CeilingLight = ({ id }: { id: PrefixedId<'lp'> }) => {
 				});
 			}
 		},
-		[move, selected, updateShadowMap]
+		[move, editable, updateShadowMap]
 	);
 
 	const handleClick = () => {
@@ -63,7 +63,7 @@ export const CeilingLight = ({ id }: { id: PrefixedId<'lp'> }) => {
 		<group position={new Vector3().copy(light.position)} ref={groupRef}>
 			<mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 0.01]} visible={hovered || selected}>
 				<ringGeometry args={[0.125, 0.16, 16]} />
-				<meshBasicMaterial color="white" />
+				<meshBasicMaterial color="white" side={2} />
 			</mesh>
 			<Handle targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false} apply={applyWithSave}>
 				<CeilingLightModel onClick={handleClick} renderOrder={editable ? -1 : 0} />

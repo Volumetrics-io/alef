@@ -1,5 +1,4 @@
 import { DEBUG } from '@/services/debug';
-import { usePrimaryFloorPlane } from '@/stores/roomStore';
 import { RoomPlaneData, SimpleVector3 } from '@alef/common';
 import { PointerEvent } from '@pmndrs/pointer-events';
 import { ThreeEvent } from '@react-three/fiber';
@@ -23,16 +22,10 @@ export function PlanePlacement({ plane, onPlace, children, enabled, bothSides }:
 	const onMove = (e: ThreeEvent<PointerEvent>) => {
 		if (!cursorRef.current) return;
 		cursorRef.current.visible = true;
+		const flipY = e.target.userData.flipY;
 		// neg Y because of all the flipping we had to do to even line these
 		// things up together...
-		cursorRef.current.position.set(e.localPoint.x, 0.001, -e.localPoint.y);
-	};
-
-	const onBacksideMove = (e: ThreeEvent<PointerEvent>) => {
-		if (!cursorRef.current) return;
-		cursorRef.current.visible = true;
-		// Y correction not needed as we flipped again
-		cursorRef.current.position.set(e.localPoint.x, 0.001, e.localPoint.y);
+		cursorRef.current.position.set(e.localPoint.x, 0.001, e.localPoint.y * (flipY ? -1 : 1));
 	};
 
 	const onLeave = (_e: ThreeEvent<PointerEvent>) => {
@@ -40,14 +33,20 @@ export function PlanePlacement({ plane, onPlace, children, enabled, bothSides }:
 		cursorRef.current.visible = false;
 	};
 
-	const primaryFloorPlane = usePrimaryFloorPlane();
 	const onClick = (e: ThreeEvent<PointerEvent>) => {
 		if (!cursorRef.current) return;
+		const flipY = e.target.userData.flipY;
+		console.log(plane.origin, e.localPoint);
 		// compute the position relative to the primary floor plane (global space)
 		const worldPosition = {
-			x: e.point.x - (primaryFloorPlane?.origin.x ?? 0),
-			y: e.point.y - (primaryFloorPlane?.origin.y ?? 0),
-			z: e.point.z - (primaryFloorPlane?.origin.z ?? 0),
+			x: plane.origin.x + e.localPoint.x,
+			y: -plane.origin.y + 0.001,
+			// NOTE: this double flip logic is an arbitrary fix based on experimentation.
+			// I think the "bothSides" aspect is actually more to do with where bothSides
+			// is used (ceiling) than the fact that it's 'both sides' and might mean we
+			// have to flip again for planes oriented downward? idk. who knows what happens
+			// if we tried walls...
+			z: plane.origin.z + (flipY ? -1 : 1) * (bothSides ? -1 : 1) * e.localPoint.y,
 		};
 		onPlace(worldPosition);
 		cursorRef.current.visible = false;
@@ -65,6 +64,7 @@ export function PlanePlacement({ plane, onPlace, children, enabled, bothSides }:
 					onPointerLeave={onLeave as any}
 					onClick={onClick as any}
 					renderOrder={DEBUG ? 1 : 0}
+					userData={{ flipY: true }}
 				>
 					<planeGeometry args={plane.extents} />
 					<meshBasicMaterial color="yellow" colorWrite={DEBUG && enabled} transparent={!DEBUG} />
@@ -75,11 +75,12 @@ export function PlanePlacement({ plane, onPlace, children, enabled, bothSides }:
 							rotation={[Math.PI / 2, 0, 0]}
 							// @ts-ignore
 							pointerEvents={enabled ? 'auto' : 'none'}
-							onPointerEnter={onBacksideMove as any}
-							onPointerMove={onBacksideMove as any}
+							onPointerEnter={onMove as any}
+							onPointerMove={onMove as any}
 							onPointerLeave={onLeave as any}
 							onClick={onClick as any}
 							renderOrder={DEBUG ? 1 : 0}
+							userData={{ flipY: false }}
 						>
 							<planeGeometry args={plane.extents} />
 							<meshBasicMaterial color="yellow" colorWrite={DEBUG && enabled} transparent={!DEBUG} />

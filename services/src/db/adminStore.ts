@@ -243,9 +243,11 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 	}
 
 	async deleteUnusedAttributeValues() {
-		return this.#db
+		const res = await this.#db
 			.deleteFrom('Attribute')
 			.where('id', 'not in', (eb) => eb.selectFrom('FurnitureAttribute').select('attributeId').distinct())
 			.execute();
+
+		return res.length;
 	}
 }

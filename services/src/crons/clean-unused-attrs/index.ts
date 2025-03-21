@@ -7,6 +7,6 @@ interface Env {
 export default {
 	async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext) {
 		const result = await env.ADMIN_STORE.deleteUnusedAttributeValues();
-		console.log('Deleted unused attribute values', result.length);
+		console.log('Deleted unused attribute values', result);
 	},
 };

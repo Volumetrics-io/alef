@@ -76,10 +76,10 @@ jobs:
           workingDirectory: ./homepage
           command: pages deploy dist --project-name=homepage
 
-      - name: 'Deploy cron: cleanup unused attributes'
+      - name: 'Deploy cron: clean unused attributes'
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           packageManager: pnpm
           workingDirectory: ./services
-          command: deploy -c ./src/cron/cleanup-unused-attrs/wrangler.toml
+          command: deploy -c ./src/crons/clean-unused-attrs/wrangler.toml

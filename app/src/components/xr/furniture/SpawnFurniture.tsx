@@ -1,12 +1,13 @@
 import { useFurnitureModel } from '@/services/publicApi/furnitureHooks';
 import { useIsEditorStageMode, useSelectedModelId, useSetPanelState, useSetSelectedModelId } from '@/stores/editorStore';
 import { useAddFurniture, usePrimaryFloorPlane } from '@/stores/roomStore';
-import { PrefixedId, SimpleVector3 } from '@alef/common';
+import { PrefixedId } from '@alef/common';
 import { useMergedRef } from '@alef/sys';
 import { useFrame, useThree } from '@react-three/fiber';
 import { forwardRef, useEffect, useRef } from 'react';
 import { Euler, Group, Quaternion, Vector3 } from 'three';
 import { PlanePlacement } from '../anchors/PlanePlacement';
+import { getGlobalTransform } from '../userData/globalRoot';
 import { CollisionModel } from './FurnitureModel';
 
 export const SpawnFurniture = () => {
@@ -27,17 +28,31 @@ export const SpawnFurniture = () => {
 
 	const addFurniture = useAddFurniture();
 
-	const addFurnitureAtPoint = (point: SimpleVector3) => {
+	const addFurnitureAtPoint = () => {
 		if (!selectedModelId) return;
+		const model = modelRef.current;
+		if (!model) return;
 
 		const orientation = new Quaternion();
-		if (modelRef.current) {
-			modelRef.current.getWorldQuaternion(orientation);
-		}
+		const position = new Vector3();
+
+		const globalTransform = getGlobalTransform(model);
+		globalTransform.decompose(position, orientation, new Vector3());
+
 		addFurniture({
 			furnitureId: selectedModelId,
-			position: point,
-			rotation: orientation,
+			position: {
+				x: position.x,
+				// hardcode y = 0
+				y: 0,
+				z: position.z,
+			},
+			rotation: {
+				x: orientation.x,
+				y: orientation.y,
+				z: orientation.z,
+				w: orientation.w,
+			},
 		});
 		setSelectedModelId(null);
 		setPanelState('hidden');

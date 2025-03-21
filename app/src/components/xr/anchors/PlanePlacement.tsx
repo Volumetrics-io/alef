@@ -1,14 +1,15 @@
 import { DEBUG } from '@/services/debug';
-import { RoomPlaneData, SimpleVector3 } from '@alef/common';
+import { RoomPlaneData } from '@alef/common';
 import { PointerEvent } from '@pmndrs/pointer-events';
 import { ThreeEvent } from '@react-three/fiber';
 import { ReactNode, Suspense, useRef } from 'react';
-import { Group, Vector3 } from 'three';
+import { Group, Matrix4, Vector3 } from 'three';
 import { Cursor } from '../ui/Cursor';
+import { getGlobalTransform } from '../userData/globalRoot';
 
 export interface PlanePlacementProps {
 	plane: RoomPlaneData;
-	onPlace: (worldPosition: SimpleVector3) => void;
+	onPlace: (worldMatrix: Matrix4) => void;
 	// children are rendered within the placement cursor, use for a preview
 	// item, etc.
 	children?: ReactNode;
@@ -35,20 +36,10 @@ export function PlanePlacement({ plane, onPlace, children, enabled, bothSides }:
 
 	const onClick = (e: ThreeEvent<PointerEvent>) => {
 		if (!cursorRef.current) return;
-		const flipY = e.target.userData.flipY;
-		console.log(plane.origin, e.localPoint);
-		// compute the position relative to the primary floor plane (global space)
-		const worldPosition = {
-			x: plane.origin.x + e.localPoint.x,
-			y: -plane.origin.y + 0.001,
-			// NOTE: this double flip logic is an arbitrary fix based on experimentation.
-			// I think the "bothSides" aspect is actually more to do with where bothSides
-			// is used (ceiling) than the fact that it's 'both sides' and might mean we
-			// have to flip again for planes oriented downward? idk. who knows what happens
-			// if we tried walls...
-			z: plane.origin.z + (flipY ? -1 : 1) * (bothSides ? -1 : 1) * e.localPoint.y,
-		};
-		onPlace(worldPosition);
+		// drop to 0 for the final position
+		cursorRef.current.position.set(e.localPoint.x, 0, e.localPoint.y);
+		onPlace(getGlobalTransform(cursorRef.current));
+
 		cursorRef.current.visible = false;
 	};
 

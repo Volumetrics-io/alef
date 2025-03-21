@@ -1,6 +1,6 @@
 import { useIsEditorStageMode } from '@/stores/editorStore';
 import { useAddLight } from '@/stores/roomStore';
-import { SimpleVector3 } from '@alef/common';
+import { Matrix4, Vector3 } from 'three';
 import { usePrimaryCeilingPlane } from '../../../stores/roomStore/hooks/layout';
 import { PlanePlacement } from '../anchors/PlanePlacement';
 import { CeilingLightModel } from './CeilingLightModel';
@@ -19,9 +19,15 @@ export const SpawnLight = () => {
 
 	const addLight = useAddLight();
 
-	const addLightAtPoint = (point: SimpleVector3) => {
+	const addLightAtPoint = (matrix: Matrix4) => {
+		const point = new Vector3();
+		point.setFromMatrixPosition(matrix);
 		addLight({
-			position: point,
+			position: {
+				x: point.x,
+				y: point.y,
+				z: point.z,
+			},
 		});
 	};
 

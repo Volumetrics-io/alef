@@ -6,7 +6,7 @@ import { useMergedRef } from '@alef/sys';
 import { useFrame, useThree } from '@react-three/fiber';
 import { forwardRef, useEffect, useRef } from 'react';
 import { Euler, Group, Quaternion, Vector3 } from 'three';
-import { PlanePlacement } from '../anchors/PlanePlacement';
+import { PlanePlacement } from '../controls/PlanePlacement';
 import { getGlobalTransform } from '../userData/globalRoot';
 import { CollisionModel } from './FurnitureModel';
 

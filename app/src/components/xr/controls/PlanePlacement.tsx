@@ -1,12 +1,13 @@
 import { DEBUG } from '@/services/debug';
 import { RoomPlaneData } from '@alef/common';
 import { PointerEvent } from '@pmndrs/pointer-events';
+import { ColorRepresentation } from '@pmndrs/uikit';
 import { ThreeEvent } from '@react-three/fiber';
+import { useXR } from '@react-three/xr';
 import { ReactNode, Suspense, useRef } from 'react';
 import { Group, Matrix4, Vector3 } from 'three';
 import { Cursor } from '../ui/Cursor';
 import { getGlobalTransform } from '../userData/globalRoot';
-import { ColorRepresentation } from '@pmndrs/uikit';
 
 export interface PlanePlacementProps {
 	plane: RoomPlaneData;
@@ -46,6 +47,8 @@ export function PlanePlacement({ plane, onPlace, children, enabled, bothSides, c
 		cursorRef.current.visible = false;
 	};
 
+	const isXr = useXR((s) => !!s.session);
+
 	return (
 		<group rotation={[Math.PI, 0, 0]} visible={enabled}>
 			<group position={[plane.origin.x, plane.origin.y, plane.origin.z]} quaternion={[plane.orientation.x, plane.orientation.y, plane.orientation.z, plane.orientation.w]}>
@@ -57,11 +60,11 @@ export function PlanePlacement({ plane, onPlace, children, enabled, bothSides, c
 					onPointerMove={onMove as any}
 					onPointerLeave={onLeave as any}
 					onClick={onClick as any}
-					renderOrder={DEBUG ? 1 : -1}
+					renderOrder={DEBUG ? 1 : isXr ? -1 : 0}
 					userData={{ flipY: true }}
 				>
 					<planeGeometry args={plane.extents} />
-					<meshBasicMaterial color="yellow" colorWrite={DEBUG && false} />
+					<meshBasicMaterial color="yellow" colorWrite={DEBUG} />
 				</mesh>
 				{bothSides && (
 					<group rotation={[Math.PI, 0, 0]}>
@@ -77,7 +80,7 @@ export function PlanePlacement({ plane, onPlace, children, enabled, bothSides, c
 							userData={{ flipY: false }}
 						>
 							<planeGeometry args={plane.extents} />
-							<meshBasicMaterial color="yellow" colorWrite={DEBUG && false} transparent={!DEBUG} />
+							<meshBasicMaterial color="yellow" colorWrite={DEBUG} transparent={!DEBUG} />
 						</mesh>
 					</group>
 				)}

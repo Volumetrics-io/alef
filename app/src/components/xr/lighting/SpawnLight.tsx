@@ -2,7 +2,7 @@ import { useIsEditorStageMode } from '@/stores/editorStore';
 import { useAddLight, useGlobalLighting } from '@/stores/roomStore';
 import { Matrix4, Vector3 } from 'three';
 import { usePrimaryCeilingPlane } from '../../../stores/roomStore/hooks/layout';
-import { PlanePlacement } from '../anchors/PlanePlacement';
+import { PlanePlacement } from '../controls/PlanePlacement';
 import { CeilingLightModel } from './CeilingLightModel';
 import { getLightColor } from './getLightColor';
 export const SpawnLight = () => {

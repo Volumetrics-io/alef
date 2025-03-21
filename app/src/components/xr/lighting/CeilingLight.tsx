@@ -60,8 +60,13 @@ export const CeilingLight = ({ id }: { id: PrefixedId<'lp'> }) => {
 	}
 
 	return (
-		<group position={new Vector3().copy(light.position)} ref={groupRef}>
-			<mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 0.01]} visible={hovered || selected}>
+		<group
+			position={new Vector3().copy(light.position)}
+			// @ts-ignore
+			pointerEvents={editable ? 'auto' : 'none'}
+			ref={groupRef}
+		>
+			<mesh rotation={[Math.PI / 2, 0, 0]} position={[0, 0, 0.01]} visible={editable && (hovered || selected)}>
 				<ringGeometry args={[0.125, 0.16, 16]} />
 				<meshBasicMaterial color="white" side={2} />
 			</mesh>

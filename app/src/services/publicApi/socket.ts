@@ -1,4 +1,4 @@
-import { AlefError, ClientMessageWithoutId, PrefixedId, ServerMessage, ServerMessageByType, ServerMessageType } from '@alef/common';
+import { AlefError, ClientMessage, ClientMessageWithoutId, createClientMessage, PrefixedId, ServerMessage, ServerMessageByType, ServerMessageType } from '@alef/common';
 import toast from 'react-hot-toast';
 import { publicApiClient } from './client';
 
@@ -54,7 +54,7 @@ export async function connectToSocket(propertyId: PrefixedId<'p'>): Promise<Prop
 		expectedType?: Response
 	): Promise<ServerMessageByType<Response>> {
 		const messageId = Math.random().toString().slice(2);
-		(message as any).messageId = messageId;
+		const fullMessage: ClientMessage = createClientMessage({ ...message, messageId });
 		const response = new Promise<ServerMessage>((resolve, reject) => {
 			const unsub = websocket.onMessage(function handler(message) {
 				if (message.responseTo === messageId && (!expectedType || message.type === expectedType)) {
@@ -67,7 +67,7 @@ export async function connectToSocket(propertyId: PrefixedId<'p'>): Promise<Prop
 				reject(new Error('Request timed out'));
 			}, 5000);
 		});
-		websocket.send(JSON.stringify(message));
+		websocket.send(JSON.stringify(fullMessage));
 		return response as any;
 	}
 

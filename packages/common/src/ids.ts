@@ -23,7 +23,7 @@ export function id<Prefix extends ResourceIdPrefix>(prefix: Prefix): PrefixedId<
 }
 
 export function isPrefixedId<Prefix extends ResourceIdPrefix = ResourceIdPrefix>(id: string, prefix?: Prefix): id is PrefixedId<Prefix> {
-	return id.includes('-') && (!prefix || id.startsWith(prefix + '-'));
+	return !!id && id.includes('-') && (!prefix || id.startsWith(prefix + '-'));
 }
 
 export function idToType(id: string): ResourceTypeName {

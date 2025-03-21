@@ -6,6 +6,7 @@ import { ReactNode, Suspense, useRef } from 'react';
 import { Group, Matrix4, Vector3 } from 'three';
 import { Cursor } from '../ui/Cursor';
 import { getGlobalTransform } from '../userData/globalRoot';
+import { ColorRepresentation } from '@pmndrs/uikit';
 
 export interface PlanePlacementProps {
 	plane: RoomPlaneData;
@@ -15,9 +16,11 @@ export interface PlanePlacementProps {
 	children?: ReactNode;
 	enabled?: boolean;
 	bothSides?: boolean;
+	cursorScale?: number;
+	cursorColor?: string | ColorRepresentation;
 }
 
-export function PlanePlacement({ plane, onPlace, children, enabled, bothSides }: PlanePlacementProps) {
+export function PlanePlacement({ plane, onPlace, children, enabled, bothSides, cursorScale, cursorColor }: PlanePlacementProps) {
 	const cursorRef = useRef<Group>(null);
 
 	const onMove = (e: ThreeEvent<PointerEvent>) => {
@@ -79,7 +82,7 @@ export function PlanePlacement({ plane, onPlace, children, enabled, bothSides }:
 					</group>
 				)}
 				<group rotation={[Math.PI, 0, 0]}>
-					<Cursor visible={false} ref={cursorRef} position={[0, 0.1, 0]}>
+					<Cursor visible={false} ref={cursorRef} position={[0, 0.1, 0]} scale={cursorScale} color={cursorColor}>
 						<Suspense>{children}</Suspense>
 					</Cursor>
 				</group>

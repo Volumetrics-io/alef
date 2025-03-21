@@ -1,12 +1,13 @@
 import { useIsEditorStageMode } from '@/stores/editorStore';
-import { useAddLight } from '@/stores/roomStore';
+import { useAddLight, useGlobalLighting } from '@/stores/roomStore';
 import { Matrix4, Vector3 } from 'three';
 import { usePrimaryCeilingPlane } from '../../../stores/roomStore/hooks/layout';
 import { PlanePlacement } from '../anchors/PlanePlacement';
 import { CeilingLightModel } from './CeilingLightModel';
-
+import { getLightColor } from './getLightColor';
 export const SpawnLight = () => {
 	const enabled = useIsEditorStageMode('lighting');
+	const [{ color: globalColor }] = useGlobalLighting();
 
 	const primaryCeiling = usePrimaryCeilingPlane() ?? {
 		id: 'rp-default-ceiling',
@@ -32,7 +33,7 @@ export const SpawnLight = () => {
 	};
 
 	return (
-		<PlanePlacement onPlace={addLightAtPoint} plane={primaryCeiling} enabled={enabled} bothSides>
+		<PlanePlacement onPlace={addLightAtPoint} plane={primaryCeiling} enabled={enabled} cursorScale={0.5} cursorColor={getLightColor(globalColor)} bothSides>
 			<CeilingLightModel />
 		</PlanePlacement>
 	);

@@ -1,4 +1,5 @@
 import { useGlobalLighting } from '@/stores/roomStore';
+import { useIsEditorStageMode } from '@/stores/editorStore';
 import { MeshProps } from '@react-three/fiber';
 import { getLightColor } from './getLightColor';
 
@@ -6,10 +7,12 @@ export interface CeilingLightModelProps extends MeshProps {}
 
 export function CeilingLightModel(props: CeilingLightModelProps) {
 	const [{ intensity: globalIntensity, color: globalColor }] = useGlobalLighting();
+	const enabled = useIsEditorStageMode('lighting');
+
 	return (
 		<group>
-			<mesh {...props}>
-				<sphereGeometry args={[0.1, 8, 8]} />
+			<mesh {...props} visible={enabled}>
+				<sphereGeometry args={[0.1, 16, 16]} />
 				<meshBasicMaterial color={getLightColor(globalColor)} transparent={true} opacity={globalIntensity} />
 			</mesh>
 			<spotLight

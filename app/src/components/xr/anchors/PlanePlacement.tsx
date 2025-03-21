@@ -3,7 +3,7 @@ import { RoomPlaneData } from '@alef/common';
 import { PointerEvent } from '@pmndrs/pointer-events';
 import { ThreeEvent } from '@react-three/fiber';
 import { ReactNode, Suspense, useRef } from 'react';
-import { Group, Matrix4, Vector3, DoubleSide } from 'three';
+import { Group, Matrix4, Vector3 } from 'three';
 import { Cursor } from '../ui/Cursor';
 import { getGlobalTransform } from '../userData/globalRoot';
 import { ColorRepresentation } from '@pmndrs/uikit';

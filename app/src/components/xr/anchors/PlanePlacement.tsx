@@ -3,7 +3,7 @@ import { RoomPlaneData } from '@alef/common';
 import { PointerEvent } from '@pmndrs/pointer-events';
 import { ThreeEvent } from '@react-three/fiber';
 import { ReactNode, Suspense, useRef } from 'react';
-import { Group, Matrix4, Vector3 } from 'three';
+import { Group, Matrix4, Vector3, DoubleSide } from 'three';
 import { Cursor } from '../ui/Cursor';
 import { getGlobalTransform } from '../userData/globalRoot';
 import { ColorRepresentation } from '@pmndrs/uikit';
@@ -57,11 +57,11 @@ export function PlanePlacement({ plane, onPlace, children, enabled, bothSides, c
 					onPointerMove={onMove as any}
 					onPointerLeave={onLeave as any}
 					onClick={onClick as any}
-					renderOrder={DEBUG ? 1 : 0}
+					renderOrder={DEBUG ? 1 : -1}
 					userData={{ flipY: true }}
 				>
 					<planeGeometry args={plane.extents} />
-					<meshBasicMaterial color="yellow" colorWrite={DEBUG && enabled} transparent={!DEBUG} />
+					<meshBasicMaterial color="yellow" colorWrite={DEBUG && false} />
 				</mesh>
 				{bothSides && (
 					<group rotation={[Math.PI, 0, 0]}>
@@ -77,7 +77,7 @@ export function PlanePlacement({ plane, onPlace, children, enabled, bothSides, c
 							userData={{ flipY: false }}
 						>
 							<planeGeometry args={plane.extents} />
-							<meshBasicMaterial color="yellow" colorWrite={DEBUG && enabled} transparent={!DEBUG} />
+							<meshBasicMaterial color="yellow" colorWrite={DEBUG && false} transparent={!DEBUG} />
 						</mesh>
 					</group>
 				)}

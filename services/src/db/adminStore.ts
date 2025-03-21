@@ -150,7 +150,7 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 		return { id: furnitureId };
 	}
 
-	async updateFurniture(id: string, data: Pick<FurnitureUpdate, 'name' | 'measuredDimensionsX' | 'measuredDimensionsY' | 'measuredDimensionsZ'>) {
+	async updateFurniture(id: string, data: Pick<FurnitureUpdate, 'name' | 'measuredDimensionsX' | 'measuredDimensionsY' | 'measuredDimensionsZ' | 'madePublicAt'>) {
 		assertPrefixedId(id, 'f');
 		await this.#db.updateTable('Furniture').set(data).where('id', '=', id).execute();
 	}
@@ -234,7 +234,6 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 				eb.or([eb('screenshotUpdatedAt', 'is', null), eb('measuredDimensionsX', 'is', null), eb('measuredDimensionsY', 'is', null), eb('measuredDimensionsZ', 'is', null)])
 			)
 			.select(['id', 'screenshotUpdatedAt', 'measuredDimensionsX', 'measuredDimensionsY', 'measuredDimensionsZ']);
-		console.log(query.compile().sql);
 		return query.execute();
 	}
 

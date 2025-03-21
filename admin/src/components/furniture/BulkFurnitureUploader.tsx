@@ -1,7 +1,7 @@
-import { adminApiClient } from '@/services/adminApi';
+import { adminApiClient, useUploadFurnitureModels, useValidateModelDirectory } from '@/services/adminApi';
 import { queryClient } from '@/services/queryClient';
 import { handleErrors } from '@/services/utils';
-import { Attribute, FurnitureModelQuality } from '@alef/common';
+import { Attribute } from '@alef/common';
 import { Box, Button, CardGrid, Dialog, Frame, Heading, Icon, ScrollArea } from '@alef/sys';
 import { ChangeEvent, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -28,24 +28,9 @@ export function BulkFurnitureUploader() {
 	};
 	const [uploading, setUploading] = useState(false);
 
-	const directoryError = useMemo(() => {
-		if (!directory) return false;
-		for (let i = 0; i < directory.length; i++) {
-			const file = directory[i];
-
-			// ignore excess files
-			if (file.name === '.DS_Store') continue;
-
-			// file should be in a subfolder
-			const subpath = file.webkitRelativePath.split('/');
-			if (subpath.length !== 3) return `File ${file.name} should be in a subfolder`;
-			// file should be a gltf
-			if (!file.name.endsWith('.gltf') && !file.name.endsWith('.glb')) return `File ${file.name} should be a gltf`;
-			// file should be named original, medium or low
-			const filename = file.name.split('.')[0];
-			if (!Object.values(FurnitureModelQuality).includes(filename as any)) return `File ${file.name} should be named original, medium or low`;
-		}
-	}, [directory]);
+	const { error: directoryError } = useValidateModelDirectory(directory, {
+		nested: true,
+	});
 
 	const grouped = useMemo<Record<string, File[]>>(() => {
 		if (!directory) return {};
@@ -64,37 +49,7 @@ export function BulkFurnitureUploader() {
 		return groups;
 	}, [directory]);
 
-	const singleUpload = async (name: string, dir: File[]) => {
-		const byQuality = dir.reduce(
-			(acc, file) => {
-				const filename = file.name.split('.')[0];
-				if (Object.values(FurnitureModelQuality).includes(filename as any)) acc[filename as FurnitureModelQuality] = file;
-				return acc;
-			},
-			{} as Record<FurnitureModelQuality, File>
-		);
-
-		// create furniture entry
-		const furniture = await handleErrors(
-			adminApiClient.furniture.$post({
-				json: {
-					name,
-					attributes,
-					originalFileName: name,
-				},
-			})
-		);
-
-		// upload models
-		await Promise.all(
-			Object.entries(byQuality).map(([quality, file]) =>
-				adminApiClient.furniture[':id'].model.$put({
-					param: { id: furniture.id },
-					form: { file, quality: quality as FurnitureModelQuality },
-				})
-			)
-		);
-	};
+	const singleUpload = useUploadFurnitureModels();
 
 	const bulkUpload = async () => {
 		if (!directory) return;
@@ -103,7 +58,17 @@ export function BulkFurnitureUploader() {
 		try {
 			const results = await Promise.allSettled(
 				Object.entries(grouped).map(async ([name, dir]) => {
-					await singleUpload(name, dir);
+					// create furniture entry
+					const furniture = await handleErrors(
+						adminApiClient.furniture.$post({
+							json: {
+								name,
+								attributes,
+								originalFileName: name,
+							},
+						})
+					);
+					await singleUpload(furniture.id, dir);
 					progressState.completed[name] = true;
 				})
 			);

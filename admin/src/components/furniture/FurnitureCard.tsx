@@ -2,9 +2,10 @@ import { adminApiClient } from '@/services/adminApi';
 import { FurnitureData } from '@/services/publicApi';
 import { queryClient } from '@/services/queryClient';
 import { handleErrors } from '@/services/utils';
-import { Box, Button, Card, Dialog, Form, Frame, Icon, Input, ScrollArea } from '@alef/sys';
+import { Box, Button, Card, Dialog, Form, Frame, Icon, Input, ScrollArea, Switch } from '@alef/sys';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { AttributesField } from './AttributesField';
 import { FurnitureModelUpload } from './FurnitureModelUpload';
 import { FurniturePreview } from './FurniturePreview';
@@ -22,6 +23,9 @@ export function FurnitureCard({ furniture }: FurnitureCardProps) {
 				queryKey: ['furniture'],
 			});
 		},
+		onError: (error) => {
+			toast.error(error.message);
+		},
 	});
 
 	const { mutate: updateSelf, isPending: isUpdating } = useMutation({
@@ -31,7 +35,22 @@ export function FurnitureCard({ furniture }: FurnitureCardProps) {
 				queryKey: ['furniture'],
 			});
 		},
+		onError: (error) => {
+			toast.error(error.message);
+		},
 	});
+
+	const togglePublic = async () => {
+		if (furniture.madePublicAt) {
+			if (!confirm('If you revert this item to private, any placements by users will break. Are you sure?')) {
+				return;
+			}
+		}
+		const newPublicStatus = furniture.madePublicAt ? false : true;
+		updateSelf({
+			isPublic: newPublicStatus,
+		});
+	};
 
 	return (
 		<Card key={furniture.id}>
@@ -55,6 +74,7 @@ export function FurnitureCard({ furniture }: FurnitureCardProps) {
 				</Dialog.Trigger>
 				<Dialog.Content title={furniture.name}>
 					<ScrollArea>
+						<FurnitureModelUpload furnitureId={furniture.id} />
 						<FurnitureEditorContent furniture={furniture} />
 						<FurniturePreview furnitureId={furniture.id} key={furniture.modelUpdatedAt} nonce={furniture.modelUpdatedAt} />
 					</ScrollArea>
@@ -62,8 +82,11 @@ export function FurnitureCard({ furniture }: FurnitureCardProps) {
 			</Dialog>
 			<Card.Details justify="between">
 				<NameEditor value={furniture.name} onChange={(name) => updateSelf({ name })} disabled={isUpdating} />
-				<Box gapped>
-					<FurnitureModelUpload furnitureId={furniture.id} />
+				<Box gapped align="center">
+					<Box gapped align="center">
+						<Switch checked={!!furniture.madePublicAt} onCheckedChange={togglePublic} />
+						{furniture.madePublicAt ? 'Public' : 'Private'}
+					</Box>
 					<Button color="destructive" onClick={() => deleteSelf()} loading={isDeleting}>
 						<Icon name="trash" />
 					</Button>

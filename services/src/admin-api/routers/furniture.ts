@@ -118,7 +118,8 @@ export const furnitureRouter = new Hono<Env>()
 		zValidator(
 			'json',
 			z.object({
-				name: z.string(),
+				name: z.string().optional(),
+				isPublic: z.boolean().optional(),
 			})
 		),
 		zValidator(
@@ -129,8 +130,8 @@ export const furnitureRouter = new Hono<Env>()
 		),
 		async (ctx) => {
 			const { id } = ctx.req.valid('param');
-			const { name } = ctx.req.valid('json');
-			await ctx.env.ADMIN_STORE.updateFurniture(id, { name });
+			const { name, isPublic } = ctx.req.valid('json');
+			await ctx.env.ADMIN_STORE.updateFurniture(id, { name, madePublicAt: isPublic ? new Date() : null });
 			return ctx.json({ ok: true });
 		}
 	)

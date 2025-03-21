@@ -241,4 +241,11 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 	async deleteDevice(id: PrefixedId<'d'>) {
 		await this.#db.deleteFrom('Device').where('id', '=', id).execute();
 	}
+
+	async deleteUnusedAttributeValues() {
+		return this.#db
+			.deleteFrom('Attribute')
+			.where('id', 'not in', (eb) => eb.selectFrom('FurnitureAttribute').select('attributeId').distinct())
+			.execute();
+	}
 }

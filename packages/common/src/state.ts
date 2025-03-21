@@ -1,23 +1,23 @@
 import { z } from 'zod';
 import { AlefError } from './error.js';
 import { id, isPrefixedId, PrefixedId } from './ids.js';
-import { Operation } from './operations.js';
+import { Operation, operationShape } from './operations.js';
 import { mergePlanes } from './planes.js';
 
 export const ROOM_STATE_VERSION = 1;
 
 export const simpleVector3Shape = z.object({
-	x: z.number(),
-	y: z.number(),
-	z: z.number(),
+	x: z.number().safe(),
+	y: z.number().safe(),
+	z: z.number().safe(),
 });
 export type SimpleVector3 = z.infer<typeof simpleVector3Shape>;
 
 export const simpleQuaternionShape = z.object({
-	x: z.number(),
-	y: z.number(),
-	z: z.number(),
-	w: z.number(),
+	x: z.number().safe(),
+	y: z.number().safe(),
+	z: z.number().safe(),
+	w: z.number().safe(),
 });
 export type SimpleQuaternion = z.infer<typeof simpleQuaternionShape>;
 
@@ -84,6 +84,9 @@ export type UnknownRoomPlaneData = Omit<RoomPlaneData, 'id'>;
 export type Updates<T extends { id: any }> = T extends { id: infer U } ? { id: U } & Partial<Omit<T, 'id'>> : T;
 
 export function updateRoom(state: RoomState, change: Operation) {
+	// validate the operation
+	// this will throw if the operation is invalid.
+	operationShape.parse(change);
 	switch (change.type) {
 		case 'updatePlanes':
 			state.planes = mergePlanes(state.planes, change.planes);

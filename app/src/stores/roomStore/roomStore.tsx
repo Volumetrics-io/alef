@@ -125,14 +125,20 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 							disableHistory = localOnly,
 						}: { historyStack?: 'undoStack' | 'redoStack'; disableClearRedo?: boolean; localOnly?: boolean; disableHistory?: boolean } = {}
 					): Promise<void> {
-						// apply change and add to undo stack
-						set((state) => {
-							const undo = getUndo(state, op);
-							updateRoom(state, op);
-							if (undo && !disableHistory) {
-								state[historyStack].push(undo);
-							}
-						});
+						try {
+							// apply change and add to undo stack
+							set((state) => {
+								const undo = getUndo(state, op);
+								updateRoom(state, op);
+								if (undo && !disableHistory) {
+									state[historyStack].push(undo);
+								}
+							});
+						} catch (err) {
+							console.error('Failed to apply operation:', op, err);
+							// do nothing, ignore this change.
+							return;
+						}
 
 						// send to server
 						// client-only -- don't bother keeping a backlog.

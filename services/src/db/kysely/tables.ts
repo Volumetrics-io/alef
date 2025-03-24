@@ -111,8 +111,8 @@ export interface FurnitureAttributeTable {
 	createdAt: CreatedAt;
 	updatedAt: UpdatedAt;
 
-	furnitureId: string;
-	attributeId: string;
+	furnitureId: PrefixedId<'f'>;
+	attributeId: PrefixedId<'at'>;
 }
 export type FurnitureAttribute = Selectable<FurnitureAttributeTable>;
 export type NewFurnitureAttribute = Insertable<FurnitureAttributeTable>;

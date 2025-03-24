@@ -1,0 +1,20 @@
+name = "clean-unused-attrs-cron"
+compatibility_date = "2025-01-01"
+main = "index.ts"
+account_id = "ad8af7aeb571031ffc236c411f39afe7"
+
+compatibility_flags = ['nodejs_compat']
+
+[observability]
+enabled = true
+head_sampling_rate = 1 # optional. default = 1.
+
+[[services]]
+binding = "ADMIN_STORE"
+service = "db-service"
+entrypoint = "AdminStore"
+
+[triggers]
+# Schedule cron triggers:
+# - At 15:00 (3 PM UTC) every monday
+crons = ["00 15 * * 1"]

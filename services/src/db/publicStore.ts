@@ -20,13 +20,24 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 	}
 
 	// Furniture APIs
-	async getFurniture(id: PrefixedId<'f'>) {
+	async getFurniture(
+		id: PrefixedId<'f'>,
+		{
+			includeNonPublic,
+		}: {
+			includeNonPublic?: boolean;
+		} = {}
+	) {
 		assertPrefixedId(id, 'f');
-		return this.#db
+		let builder = this.#db
 			.selectFrom('Furniture')
 			.where('id', '=', id)
-			.select((eb) => ['id', 'name', 'modelUpdatedAt', 'measuredDimensionsX', 'measuredDimensionsY', 'measuredDimensionsZ', this.selectFurnitureAttributes(eb)])
-			.executeTakeFirst();
+			.select((eb) => ['id', 'name', 'modelUpdatedAt', 'measuredDimensionsX', 'measuredDimensionsY', 'measuredDimensionsZ', 'madePublicAt', this.selectFurnitureAttributes(eb)]);
+		if (!includeNonPublic) {
+			builder = builder.where('madePublicAt', 'is not', null);
+		}
+
+		return builder.executeTakeFirst();
 	}
 
 	async getFurnitureModelResponse(id: PrefixedId<'f'>, quality = FurnitureModelQuality.Original) {
@@ -61,7 +72,7 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 		).as('attributes');
 	}
 
-	async listFurniture({ attributeFilters, page, pageSize }: { attributeFilters?: Attribute[]; page?: number; pageSize?: number }) {
+	async listFurniture({ attributeFilters, page, pageSize, includeNonPublic }: { attributeFilters?: Attribute[]; page?: number; pageSize?: number; includeNonPublic?: boolean }) {
 		let builder = this.#db
 			.selectFrom('Furniture')
 			.select((eb) => [
@@ -71,8 +82,13 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 				'Furniture.measuredDimensionsX',
 				'Furniture.measuredDimensionsY',
 				'Furniture.measuredDimensionsZ',
+				'Furniture.madePublicAt',
 				this.selectFurnitureAttributes(eb),
 			]);
+
+		if (!includeNonPublic) {
+			builder = builder.where('Furniture.madePublicAt', 'is not', null);
+		}
 
 		if (attributeFilters) {
 			// Separate attributes by key

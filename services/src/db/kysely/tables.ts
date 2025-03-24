@@ -90,6 +90,9 @@ export interface FurnitureTable {
 	measuredDimensionsX: number | null;
 	measuredDimensionsY: number | null;
 	measuredDimensionsZ: number | null;
+
+	/** When we decide a furniture piece is ready to ship to users. */
+	madePublicAt: DateColumnOptional;
 }
 export type Furniture = Selectable<FurnitureTable>;
 export type NewFurniture = Insertable<FurnitureTable>;

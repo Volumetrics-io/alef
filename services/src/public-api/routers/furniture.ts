@@ -3,6 +3,7 @@ import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { z } from 'zod';
 import { wrapRpcData } from '../../helpers/wrapRpcData';
+import { sessions } from '../auth/session';
 import { Env } from '../config/ctx';
 
 const formattedAttrSchema = z.string().regex(/^[^:]+:[^:]+$/);
@@ -19,6 +20,9 @@ export const furnitureRouter = new Hono<Env>()
 			})
 		),
 		async (ctx) => {
+			const session = await sessions.getSession(ctx);
+			const showNonPublic = !!session && session.isProductAdmin;
+
 			// not using validated version here because .queries gives the coerced array version,
 			// easier to work with...
 			const attribute = ctx.req.queries('attribute') || [];
@@ -40,6 +44,7 @@ export const furnitureRouter = new Hono<Env>()
 				attributeFilters: keyValues,
 				page,
 				pageSize: pageSize || 10,
+				includeNonPublic: showNonPublic,
 			});
 			return ctx.json(wrapRpcData(furniture));
 		}
@@ -70,7 +75,12 @@ export const furnitureRouter = new Hono<Env>()
 			})
 		),
 		async (ctx) => {
-			const furniture = await ctx.env.PUBLIC_STORE.getFurniture(ctx.req.valid('param').id);
+			const session = await sessions.getSession(ctx);
+			const showNonPublic = !!session && session.isProductAdmin;
+
+			const furniture = await ctx.env.PUBLIC_STORE.getFurniture(ctx.req.valid('param').id, {
+				includeNonPublic: showNonPublic,
+			});
 			if (!furniture) {
 				throw new AlefError(AlefError.Code.NotFound, 'Furniture not found');
 			}

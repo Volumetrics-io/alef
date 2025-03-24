@@ -29,7 +29,7 @@ export function FurnitureCard({ furniture }: FurnitureCardProps) {
 	});
 
 	const { mutate: updateSelf, isPending: isUpdating } = useMutation({
-		mutationFn: (data: { name: string }) => handleErrors(adminApiClient.furniture[':id'].$put({ param: { id: furniture.id }, json: data })),
+		mutationFn: (data: { name?: string; isPublic?: boolean }) => handleErrors(adminApiClient.furniture[':id'].$put({ param: { id: furniture.id }, json: data })),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
 				queryKey: ['furniture'],

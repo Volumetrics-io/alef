@@ -1,4 +1,4 @@
-import { createHandlers, GoogleProvider, honoAdapter } from '@a-type/auth';
+import { createHandlers, GoogleCloudflareProvider, honoAdapter } from '@a-type/auth';
 import { Context } from 'hono';
 import { Env } from '../config/ctx.js';
 import { email } from '../services/email.js';
@@ -12,7 +12,7 @@ export const authHandlers = createHandlers<Context<Env>>({
 		allowedReturnToOrigin: (origin) => origin === ctx.env.UI_ORIGIN,
 	}),
 	providers: {
-		google: new GoogleProvider({
+		google: new GoogleCloudflareProvider({
 			getConfig(ctx) {
 				return {
 					clientId: ctx.env.GOOGLE_AUTH_CLIENT_ID,

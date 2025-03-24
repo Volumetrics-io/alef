@@ -1,6 +1,6 @@
 import { useActiveRoomLayoutId, useRoomLayout, useRoomLayoutIds } from '@/stores/roomStore';
 import { PrefixedId, RoomType } from '@alef/common';
-import { Box, Heading, ScrollArea, Sidebar } from '@alef/sys';
+import { Box, Button, Heading, Icon, ScrollArea } from '@alef/sys';
 import { Suspense } from 'react';
 import { DesktopLayoutIcon } from '../common/DesktopLayoutIcon';
 
@@ -11,7 +11,7 @@ export interface DesktopLayoutsPickerProps {
 export function DesktopLayoutsPicker({ className }: DesktopLayoutsPickerProps) {
 	return (
 		<Box stacked gapped className={className}>
-			<Box p="small">
+			<Box>
 				<Heading level={3}>Layouts</Heading>
 			</Box>
 			<ScrollArea>
@@ -24,13 +24,13 @@ export function DesktopLayoutsPicker({ className }: DesktopLayoutsPickerProps) {
 function LayoutSelector() {
 	const layoutIds = useRoomLayoutIds();
 	return (
-		<Sidebar>
+		<Box gapped stacked p="small">
 			{layoutIds.map((layoutId) => (
-				<Suspense key={layoutId} fallback={<Sidebar.Item />}>
+				<Suspense key={layoutId} fallback={<Button />}>
 					<LayoutItem layoutId={layoutId} />
 				</Suspense>
 			))}
-		</Sidebar>
+		</Box>
 	);
 }
 
@@ -39,9 +39,10 @@ function LayoutItem({ layoutId }: { layoutId: PrefixedId<'rl'> }) {
 	const [active, set] = useActiveRoomLayoutId();
 
 	return (
-		<Sidebar.Item onClick={() => set(layoutId)} data-active={active === layoutId}>
+		<Button justify="start" onClick={() => set(layoutId)}>
 			<DesktopLayoutIcon type={(layoutData?.type as RoomType) ?? 'living-room'} />
-			<Sidebar.Label>{layoutData?.name ?? '(deleted)'}</Sidebar.Label>
-		</Sidebar.Item>
+			{layoutData?.name ?? '(deleted)'}
+			{active === layoutId && <Icon name="check" style={{ marginLeft: 'auto' }} />}
+		</Button>
 	);
 }

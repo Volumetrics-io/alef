@@ -1,6 +1,6 @@
 @layer components {
 	.root {
-		padding: 1rem;
+		padding: 0.5rem 1rem;
 		min-height: var(--toolbar-height);
 		width: 100%;
 		flex-shrink: 0;

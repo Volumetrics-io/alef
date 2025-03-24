@@ -41,6 +41,7 @@
 		"react": "catalog:",
 		"react-dom": "catalog:",
 		"react-hot-toast": "2.5.1",
+		"react-hotkeys-hook": "^4.6.1",
 		"suncalc": "^1.9.0",
 		"three": "catalog:",
 		"valtio": "^2.1.3",

@@ -35,10 +35,12 @@
 		height: 1.5rem;
 	}
 
-	.control:hover {
+	.control:hover:not(:disabled):not([data-disabled='true']) {
 		border-color: var(--color-border-hover, var(--color-border));
 		background-color: var(--color-background-hover, var(--color-background));
 		color: var(--color-text-hover, var(--color-text));
+		transform: scale(1.02);
+		transition: transform var(--animation-duration) ease;
 	}
 
 	.control:active {

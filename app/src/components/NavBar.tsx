@@ -15,7 +15,7 @@ export const NavBar = forwardRef<HTMLDivElement, NavBarProps>(function NavBar(pr
 		<SysNavBar {...props} ref={ref}>
 			<SysNavBar.Start>
 				<Link to="/">
-					<Logo />
+					<Logo style={{ width: 40, height: 'auto' }} />
 				</Link>
 				<UpdatePrompt />
 			</SysNavBar.Start>

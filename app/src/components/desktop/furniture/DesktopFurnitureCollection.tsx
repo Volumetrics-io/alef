@@ -1,6 +1,8 @@
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
-import { useAddFurniture } from '@/stores/roomStore';
+import { useSetSelectedModelId } from '@/stores/editorStore';
 import { Button, Card, CardGrid, Icon, ScrollArea } from '@alef/sys';
+import { useHotkeys } from 'react-hotkeys-hook';
+import cls from './DesktopFurnitureCollection.module.css';
 
 export interface DesktopFurnitureCollectionProps {
 	furniture: FurnitureItem[];
@@ -9,9 +11,14 @@ export interface DesktopFurnitureCollectionProps {
 }
 
 export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore }: DesktopFurnitureCollectionProps) {
+	const setSelectedModelId = useSetSelectedModelId();
+	useHotkeys('esc', () => {
+		setSelectedModelId(null);
+	});
+
 	return (
 		<ScrollArea>
-			<CardGrid small>
+			<CardGrid small p="small">
 				{furniture.map((item) => (
 					<DesktopFurnitureCard key={item.id} item={item} />
 				))}
@@ -27,19 +34,15 @@ export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore }: D
 }
 
 function DesktopFurnitureCard({ item }: { item: FurnitureItem }) {
-	const addFurniture = useAddFurniture();
+	const setSelectedModelId = useSetSelectedModelId();
 
 	const add = () => {
-		addFurniture({
-			furnitureId: item.id,
-			position: { x: 0, y: 0, z: 0 },
-			rotation: { x: 0, y: 0, z: 0, w: 1 },
-		});
+		setSelectedModelId(item.id);
 	};
 
 	return (
-		<Card>
-			<Card.Main onClick={add}>
+		<Card onClick={add} className={cls.card}>
+			<Card.Main>
 				<Card.Image src={`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${item.id}/image.jpg`} />
 			</Card.Main>
 			<Card.Details>

@@ -2,14 +2,18 @@ import { DEBUG } from '@/services/debug';
 import { usePlanes } from '@/stores/roomStore';
 import { useXR } from '@react-three/xr';
 import { Quaternion } from 'three';
-import { DemoPlane } from './DemoPlane';
+import { RoomPlane } from './RoomPlane';
 
 export interface NonXRPlaneRendererProps {
 	debug?: boolean;
 }
 
 export function NonXRPlaneRenderer({ debug = DEBUG }: NonXRPlaneRendererProps) {
-	const planes = usePlanes();
+	const planes = usePlanes(
+		// filter out planes we don't care about -- we only care about planes
+		// that define the structure of the room, not any existing contents.
+		(p) => p.label === 'floor' || p.label === 'wall' || p.label === 'ceiling' || p.label === 'door' || p.label === 'window'
+	);
 	const isInSession = useXR((s) => !!s.session);
 
 	if (isInSession && !debug) {
@@ -19,14 +23,13 @@ export function NonXRPlaneRenderer({ debug = DEBUG }: NonXRPlaneRendererProps) {
 	if (!planes.length) {
 		// TODO: default walls? ceiling?
 		const quat = new Quaternion().setFromAxisAngle({ x: 0, y: 1, z: 0 }, 0);
-		return <DemoPlane orientation={quat} center={{ x: 0, y: 0, z: 0 }} dimensions={[10, 10]} label="floor" />;
+		return <RoomPlane plane={{ orientation: quat, origin: { x: 0, y: 0, z: 0 }, extents: [10, 10], label: 'floor', id: 'rp-default-floor' }} />;
 	}
 
 	return (
-		// when debugging, bring the planes in a tiny bit so they render over the actual walls.
 		<group>
-			{planes.map((plane, index) => {
-				return <DemoPlane key={index} orientation={plane.orientation} center={plane.origin} dimensions={plane.extents} label={plane.label} />;
+			{planes.map((plane) => {
+				return <RoomPlane key={plane.id} plane={plane} />;
 			})}
 		</group>
 	);

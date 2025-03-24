@@ -1,7 +1,7 @@
 import { useAABB } from '@/hooks/useAABB';
-import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
+import { useShadowControls } from '@/hooks/useShadowMapUpdate';
 import { useIsEditorStageMode, useIsSelected, useSelect, useSetPanelState } from '@/stores/editorStore';
-import { useFurniturePlacement, useFurniturePlacementFurnitureId, useUpdateFurniturePlacementTransform } from '@/stores/roomStore';
+import { useFurniturePlacement, useFurniturePlacementFurnitureId, useSubscribeToPlacementPosition, useUpdateFurniturePlacementTransform } from '@/stores/roomStore';
 import { PrefixedId } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
 import { Bvh } from '@react-three/drei';
@@ -22,10 +22,16 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	const selected = useIsSelected(furniturePlacementId);
 	const isFurnitureMode = useIsEditorStageMode('furniture');
 	const setPanelState = useSetPanelState();
-	const updateShadowMap = useShadowMapUpdate();
+	const shadowControls = useShadowControls();
 
 	const groupRef = useRef<Group>(null);
 	const move = useUpdateFurniturePlacementTransform(furniturePlacementId);
+	// update for remote position changes
+	useSubscribeToPlacementPosition(furniturePlacementId, (position) => {
+		if (position) {
+			groupRef.current?.position.copy(position);
+		}
+	});
 
 	const { halfExtents, size, ref: modelRef } = useAABB();
 
@@ -46,17 +52,23 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 				// do not apply handle changes if this item is not selected.
 				return;
 			}
+
+			if (state.first) {
+				// disable shadows while moving
+				shadowControls.disable();
+			}
+
 			defaultApply(state, target);
 
 			if (state.last) {
-				updateShadowMap();
+				shadowControls.enable();
 				move({
 					position: target.position,
 					rotation: target.quaternion,
 				});
 			}
 		},
-		[move, selected]
+		[move, selected, shadowControls]
 	);
 
 	const hypotenuse = Math.sqrt(halfExtents[0] * halfExtents[0] + halfExtents[2] * halfExtents[2]);

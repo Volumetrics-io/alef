@@ -1,7 +1,8 @@
 import { usePrimaryXRFloorPlane } from '@/hooks/usePrimaryXRFloorPlane';
-import { usePlanes } from '@/stores/roomStore';
+import { usePrimaryFloorPlane } from '@/stores/roomStore';
 import { XRSpace } from '@react-three/xr';
 import { ReactNode } from 'react';
+import { makeGlobalRootUserData } from '../userData/globalRoot';
 
 export interface GlobalSpaceProps {
 	children?: ReactNode;
@@ -13,10 +14,8 @@ export interface GlobalSpaceProps {
  * you're in headset or not.
  */
 export function GlobalSpace({ children }: GlobalSpaceProps) {
-	const storedFloorPlanes = usePlanes((p) => p.label === 'floor');
-
 	// detect primary floor, its origin length should be very small
-	const primaryFloor = storedFloorPlanes.find((p) => Math.sqrt(p.origin.x * p.origin.x + p.origin.y * p.origin.y + p.origin.z * p.origin.z) < 0.01);
+	const primaryFloor = usePrimaryFloorPlane();
 
 	// now let's find the matching XR floor plane
 	const primaryXRPlane = usePrimaryXRFloorPlane();
@@ -25,7 +24,9 @@ export function GlobalSpace({ children }: GlobalSpaceProps) {
 	if (primaryXRPlane) {
 		return (
 			<XRSpace space={primaryXRPlane.planeSpace}>
-				<group rotation={[Math.PI, 0, 0]}>{children}</group>
+				<group rotation={[Math.PI, 0, 0]} userData={makeGlobalRootUserData()}>
+					{children}
+				</group>
 			</XRSpace>
 		);
 	}
@@ -33,12 +34,12 @@ export function GlobalSpace({ children }: GlobalSpaceProps) {
 	// otherwise we're not in XR. we use our copied plane state to orient the world.
 	if (!primaryFloor) {
 		// 0,0,0 is all we got
-		return <group>{children}</group>;
+		return <group userData={makeGlobalRootUserData()}>{children}</group>;
 	}
 
 	const { origin, orientation } = primaryFloor;
 	return (
-		<group position={[origin.x, origin.y, origin.z]} quaternion={[orientation.x, orientation.y, orientation.z, orientation.w]}>
+		<group position={[origin.x, origin.y, origin.z]} quaternion={[orientation.x, orientation.y, orientation.z, orientation.w]} userData={makeGlobalRootUserData()}>
 			{children}
 		</group>
 	);

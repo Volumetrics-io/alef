@@ -45,3 +45,38 @@ export function useUpdatePlanes() {
 export function usePlanes(filter?: (p: RoomPlaneData) => boolean) {
 	return useRoomStore(useShallow((s) => (filter ? s.planes.filter(filter) : s.planes)));
 }
+
+export function usePrimaryFloorPlane() {
+	const candidates = usePlanes((p) => p.label === 'floor');
+	const primaryFloor = candidates.find((p) => Math.sqrt(p.origin.x * p.origin.x + p.origin.y * p.origin.y + p.origin.z * p.origin.z) < 0.01);
+	return primaryFloor ?? null;
+}
+
+/**
+ * Uses a heuristic to determine which ceiling is above the
+ * primary floor.
+ */
+export function usePrimaryCeilingPlane() {
+	const floor = usePrimaryFloorPlane();
+	const candidates = usePlanes((p) => p.label === 'ceiling');
+
+	if (!floor || candidates.length === 0) {
+		return null;
+	}
+
+	// suppose we had a multi-level house; the ceiling of a first story room would
+	// actually be the closest to the floor of a second story room. so we don't use
+	// nearest distance, we use closest X,Z distance and the closest Y that's greater
+	// than floor.y
+	const primaryCeiling = candidates
+		.filter((p) => p.origin.y > floor.origin.y)
+		.reduce((closest, candidate) => {
+			const closestXZDistance = Math.sqrt(closest.origin.x ** 2 + closest.origin.z ** 2);
+			const candidateXZDistance = Math.sqrt(candidate.origin.x ** 2 + candidate.origin.z ** 2);
+			if (candidateXZDistance < closestXZDistance) {
+				return candidate;
+			}
+			return closest;
+		}, candidates[0]);
+	return primaryCeiling ?? null;
+}

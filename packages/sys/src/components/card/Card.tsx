@@ -12,7 +12,7 @@ export interface CardRootProps extends FrameProps {}
 
 export const CardRoot = forwardRef<HTMLDivElement, CardRootProps>(function CardRoot({ className, children, separated, ...props }, ref) {
 	return (
-		<Frame ref={ref} container className={cls.root} {...props}>
+		<Frame ref={ref} container className={clsx(cls.root, className)} {...props}>
 			<Box stacked separated={separated} className={cls.inner}>
 				{children}
 			</Box>

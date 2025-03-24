@@ -1,3 +1,4 @@
+import { useShadowControls } from '@/hooks/useShadowMapUpdate';
 import { useFurnitureDetails, useFurnitureModel } from '@/services/publicApi/furnitureHooks';
 import { usePerformanceStore } from '@/stores/performanceStore';
 import { FurnitureModelQuality, PrefixedId, RANKED_FURNITURE_MODEL_QUALITIES } from '@alef/common';
@@ -34,6 +35,7 @@ const FurnitureModelRenderer = forwardRef<Group, FurnitureModelRendererProps>(fu
 	ref
 ) {
 	const model = useFurnitureModel(furnitureId, quality);
+	const shadowControls = useShadowControls();
 
 	if (!model) return null;
 
@@ -58,6 +60,10 @@ const FurnitureModelRenderer = forwardRef<Group, FurnitureModelRendererProps>(fu
 			receiveShadow={receiveShadow}
 			ref={ref}
 			inject={outline ? <Outlines thickness={1} color={qualityColor[quality]} /> : null}
+			onUpdate={() => {
+				// update shadow map when this model loads in
+				shadowControls.update();
+			}}
 		/>
 	);
 });

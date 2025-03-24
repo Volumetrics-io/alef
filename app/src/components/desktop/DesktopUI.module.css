@@ -19,12 +19,14 @@
 	max-height: 100%;
 	min-height: 0;
 	width: var(--main-width);
+	padding-top: 0.5rem;
 }
 
 .content {
 	grid-area: content;
 	min-width: var(--secondary-width);
-	border: var(--border);
+	border-left: var(--border);
+	border-right: var(--border);
 }
 
 .secondary {
@@ -51,6 +53,10 @@
 }
 
 .secondaryToggle {
+}
+
+.tabs {
+	align-self: center;
 }
 
 /** Smaller size shifts things */

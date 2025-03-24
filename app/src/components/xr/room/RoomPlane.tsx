@@ -50,7 +50,8 @@ function RoomPlaneBox({ extents, color, depth }: { extents: [number, number]; co
 			meshRef.current.visible = true;
 			meshRef.current.getWorldDirection(tempVec);
 			const camDir = getCameraForward();
-			if (tempVec.dot(camDir) < 0) {
+			// using a threshold makes pop-out less noticeable
+			if (tempVec.dot(camDir) < -0.9) {
 				meshRef.current.visible = false;
 			}
 		}

@@ -11,7 +11,7 @@ const DesktopModePage = () => {
 			<NavBar />
 			<PropertyRoomStoreProvider>
 				<DesktopUI>
-					<SceneWrapper full>
+					<SceneWrapper full disableEnterXR>
 						<RoomRenderer />
 					</SceneWrapper>
 				</DesktopUI>

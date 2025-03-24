@@ -1,7 +1,7 @@
 import { useGeoStore } from '@/stores/geoStore';
 import { usePerformanceStore } from '@/stores/performanceStore';
 import { xrStore } from '@/stores/xrStore';
-import { Box, BoxProps, ErrorBoundary, Icon } from '@alef/sys';
+import { Box, BoxProps, Button, ErrorBoundary, Icon } from '@alef/sys';
 import { reversePainterSortStable } from '@pmndrs/uikit';
 import { PerformanceMonitor } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
@@ -18,9 +18,10 @@ import { XRToaster } from './XRToaster';
 
 export interface SceneWrapperProps extends BoxProps {
 	children: ReactNode;
+	disableEnterXR?: boolean;
 }
 
-export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
+export function SceneWrapper({ children, disableEnterXR, ...rest }: SceneWrapperProps) {
 	return (
 		<Box {...rest}>
 			<ErrorBoundary
@@ -73,29 +74,24 @@ export function SceneWrapper({ children, ...rest }: SceneWrapperProps) {
 						</ErrorBoundary>
 					</XR>
 				</Canvas>
-				<button
-					style={{
-						position: 'fixed',
-						bottom: '0',
-						left: '50%',
-						transform: 'translateX(-50%)',
-						background: 'black',
-						borderRadius: '0.5rem',
-						border: 'none',
-						fontWeight: 'bold',
-						color: 'white',
-						padding: '1rem 2rem',
-						cursor: 'pointer',
-						fontSize: '1.5rem',
-						boxShadow: '0px 0px 20px rgba(0,0,0,1)',
-					}}
-					onClick={() => {
-						xrStore.enterAR();
-						useGeoStore.getState().fetchLocation();
-					}}
-				>
-					Enter AR
-				</button>
+				{!disableEnterXR && (
+					<Button
+						style={{
+							position: 'fixed',
+							bottom: '1rem',
+							left: '50%',
+							transform: 'translateX(-50%)',
+							fontSize: '1.25rem',
+						}}
+						color="suggested"
+						onClick={() => {
+							xrStore.enterAR();
+							useGeoStore.getState().fetchLocation();
+						}}
+					>
+						Enter AR
+					</Button>
+				)}
 			</ErrorBoundary>
 		</Box>
 	);

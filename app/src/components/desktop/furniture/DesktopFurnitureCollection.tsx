@@ -1,5 +1,6 @@
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
 import { useSetSelectedModelId } from '@/stores/editorStore';
+import { PrefixedId } from '@alef/common';
 import { Button, Card, CardGrid, Icon, ScrollArea } from '@alef/sys';
 import { useHotkeys } from 'react-hotkeys-hook';
 import cls from './DesktopFurnitureCollection.module.css';
@@ -8,9 +9,10 @@ export interface DesktopFurnitureCollectionProps {
 	furniture: FurnitureItem[];
 	hasMore?: boolean;
 	onLoadMore?: () => void;
+	onSelect?: (id: PrefixedId<'f'>) => void;
 }
 
-export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore }: DesktopFurnitureCollectionProps) {
+export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore, onSelect }: DesktopFurnitureCollectionProps) {
 	const setSelectedModelId = useSetSelectedModelId();
 	useHotkeys('esc', () => {
 		setSelectedModelId(null);
@@ -18,9 +20,9 @@ export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore }: D
 
 	return (
 		<ScrollArea>
-			<CardGrid small p="small">
+			<CardGrid p="small">
 				{furniture.map((item) => (
-					<DesktopFurnitureCard key={item.id} item={item} />
+					<DesktopFurnitureCard key={item.id} item={item} onSelect={onSelect} />
 				))}
 			</CardGrid>
 			{hasMore && (
@@ -33,11 +35,12 @@ export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore }: D
 	);
 }
 
-function DesktopFurnitureCard({ item }: { item: FurnitureItem }) {
+function DesktopFurnitureCard({ item, onSelect }: { item: FurnitureItem; onSelect?: (id: PrefixedId<'f'>) => void }) {
 	const setSelectedModelId = useSetSelectedModelId();
 
 	const add = () => {
 		setSelectedModelId(item.id);
+		onSelect?.(item.id);
 	};
 
 	return (

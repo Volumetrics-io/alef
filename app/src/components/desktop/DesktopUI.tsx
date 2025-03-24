@@ -3,8 +3,9 @@ import { Box, Frame, Icon, Tabs } from '@alef/sys';
 import clsx from 'clsx';
 import { ReactNode, Suspense } from 'react';
 import cls from './DesktopUI.module.css';
+import { DesktopAddFurniture } from './furniture/DesktopAddFurniture';
 import { DesktopFurnitureEditor } from './furniture/DesktopFurnitureEditor';
-import { DesktopOnlineFurniturePicker } from './furniture/DesktopOnlineFurniturePicker';
+import { DesktopPlacedFurnitureList } from './furniture/DesktopPlacedFurnitureList';
 import { DesktopAddLayout } from './layouts/DesktopAddLayout';
 import { DesktopLayoutEditor } from './layouts/DesktopLayoutEditor';
 import { DesktopLayoutsPicker } from './layouts/DesktopLayoutsPicker';
@@ -53,7 +54,10 @@ function DesktopUIMain() {
 			</Tabs.Content>
 			<Tabs.Content value="furniture">
 				<Suspense>
-					<DesktopOnlineFurniturePicker />
+					<Box p="small" full stacked justify="between">
+						<DesktopPlacedFurnitureList />
+						<DesktopAddFurniture />
+					</Box>
 				</Suspense>
 			</Tabs.Content>
 			<Tabs.Content value="lighting">

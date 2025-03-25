@@ -312,6 +312,6 @@ export function getDemoRoomState(idOverride?: PrefixedId<'r'>): RoomState {
 		...getEmptyRoomState(idOverride),
 		planes: DEMO_ROOM_PLANES.map((p) => ({ id: id('rp'), ...p })),
 		planesUpdatedAt: null, // don't mark an update time; if the device detects planes it should immediately overwrite ours.
-		lights: Object.fromEntries(DEMO_ROOM_LIGHTS.map((l, i) => [id(`lp`), { id: id(`lp`), ...l }])),
+		lights: Object.fromEntries(DEMO_ROOM_LIGHTS.map((l) => [id(`lp`), { id: id(`lp`), ...l }])),
 	};
 }

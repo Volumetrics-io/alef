@@ -26,6 +26,10 @@ const routes = makeRoutes([
 		component: lazy(() => import('./CompleteSignupPage.js')),
 	},
 	{
+		path: '/coming-soon',
+		component: lazy(() => import('./ComingSoonPage.js')),
+	},
+	{
 		path: '/devices',
 		component: Outlet,
 		children: [

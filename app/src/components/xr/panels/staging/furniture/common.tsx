@@ -8,7 +8,7 @@ import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
 import { useEditorStageMode } from '@/stores/editorStore';
 import { useAllFilters, useCategoryFilter, useSetFilters } from '@/stores/FilterStore';
 import { Attribute, AttributeKey } from '@alef/common';
-import { animated, config, useSpring } from '@react-spring/three';
+import { animated, useSpring } from '@react-spring/three';
 import { useFrame } from '@react-three/fiber';
 import { Container, Text } from '@react-three/uikit';
 import { ArrowLeftIcon, ArrowRightIcon, ChevronLeftIcon, ChevronRightIcon, PanelLeftCloseIcon, PanelLeftIcon, SofaIcon } from '@react-three/uikit-lucide';
@@ -58,10 +58,9 @@ export const FurniturePanelFilterSidebar = ({ children }: { children?: ReactNode
 	const scrollbarVisible = useRef(0);
 	const [isVisible, setIsVisible] = useState(false);
 
-	const { spring } = useSpring({ spring: visible ? 1 : 0, config: config.default });
+	const { spring } = useSpring({ spring: visible ? 1 : 0, config: { tension: 100, friction: 15 } });
 
-	const transformTranslateX = spring.to([0, 1], [-180, 0]);
-	const transformTranslateZ = spring.to([0, 0.8, 1], [0, 0, 8]);
+	const transformTranslateX = spring.to([0, 1], [-220, 0]);
 
 	useFrame(() => {
 		const newVisibility = visible || spring.isAnimating;
@@ -94,16 +93,7 @@ export const FurniturePanelFilterSidebar = ({ children }: { children?: ReactNode
 			gap={8}
 			padding={6}
 		>
-			<AnimatedSurface
-				transformTranslateX={transformTranslateX}
-				transformTranslateZ={transformTranslateZ}
-				flexDirection="column"
-				height="100%"
-				width="100%"
-				gap={10}
-				padding={10}
-				flexWrap="no-wrap"
-			>
+			<AnimatedSurface transformTranslateX={transformTranslateX} flexDirection="column" height="100%" width="100%" gap={10} padding={10} flexWrap="no-wrap">
 				<Container marginTop={5} alignItems="center" flexDirection="row" width="100%" justifyContent="space-between">
 					<Heading level={4}>Filters</Heading>
 					<FurniturePanelFilterSidebarCloseButton />
@@ -233,7 +223,7 @@ function FurnitureAttributePickerItem({ attribute }: { attribute: Attribute }) {
 					if (selected) {
 						return prev.filter((a) => !(a.key === attribute.key && a.value === attribute.value));
 					} else {
-						return [...prev, attribute];
+						return [...prev.filter((a) => a.key !== attribute.key), attribute];
 					}
 				})
 			}

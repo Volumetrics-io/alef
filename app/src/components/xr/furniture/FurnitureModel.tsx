@@ -238,8 +238,8 @@ export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFal
 );
 
 const lods = [
-	{ quality: FurnitureModelQuality.Original, distance: 1.5 },
-	{ quality: FurnitureModelQuality.Medium, distance: 2 },
+	{ quality: FurnitureModelQuality.Original, distance: 2 },
+	{ quality: FurnitureModelQuality.Medium, distance: 3 },
 	{ quality: FurnitureModelQuality.Low, distance: 4 },
 ];
 

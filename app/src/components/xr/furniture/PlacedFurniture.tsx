@@ -103,8 +103,8 @@ function RotationHandle({
 	const [hovered, setHovered] = useState(false);
 	return (
 		<Handle rotate={{ x: false, y: true, z: false }} translate="as-rotate" {...props}>
-			{/*  @ts-ignore */}
 			<Bvh
+				// @ts-ignore - pointerEvents not included in typings
 				pointerEvents={visible ? 'auto' : 'none'}
 				onPointerEnter={() => setHovered(true)}
 				onPointerLeave={() => setHovered(false)}

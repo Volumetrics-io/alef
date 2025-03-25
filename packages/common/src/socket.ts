@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { AlefErrorCode } from './error.js';
 import { isPrefixedId, PrefixedId } from './ids.js';
-import { operationShape } from './operations.js';
-import { roomLayoutShape, roomStateShape } from './state.js';
+import { operationShape } from './rooms/operations.js';
+import { roomLayoutShape, roomStateShape } from './rooms/state.js';
 
 /**
  *

@@ -57,7 +57,7 @@ export function SceneWrapper({ children, disableEnterXR, ...rest }: SceneWrapper
 					<XR store={xrStore}>
 						<PointerEvents />
 						<QualityControl />
-						{import.meta.env.DEV && <Perf />}
+						{import.meta.env.DEV && <Perf position="bottom-right" />}
 						<SplashScreen />
 						<ErrorBoundary fallback={<XRError />}>
 							<PerformanceMonitor

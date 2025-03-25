@@ -1,5 +1,5 @@
 import { id, PrefixedId } from './ids.js';
-import { RoomPlaneData, UnknownRoomPlaneData } from './state.js';
+import type { RoomPlaneData, UnknownRoomPlaneData } from './rooms/state.js';
 
 /**
  * Compares a new or updated planes with a list of preexisting detected planes. If the plane appears

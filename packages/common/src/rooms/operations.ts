@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { isPrefixedId, PrefixedId } from './ids.js';
+import { isPrefixedId, PrefixedId } from '../ids.js';
 import { roomFurniturePlacementShape, roomGlobalLightingShape, roomLayoutShape, roomLightPlacementShape, roomPlaneDataShape } from './state.js';
 
 export const createLayoutOperationShape = z.object({

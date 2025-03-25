@@ -1,4 +1,4 @@
-import { AlefError, getDefaultRoomState, id, migrateRoomState, Operation, PrefixedId, RoomState, updateRoom } from '@alef/common';
+import { AlefError, getDemoRoomState, id, migrateRoomState, Operation, PrefixedId, RoomState, updateRoom } from '@alef/common';
 import { DurableObject } from 'cloudflare:workers';
 import { Bindings } from '../config/ctx';
 import { PropertySocketHandler } from './sockets/PropertySocketHandler';
@@ -36,7 +36,7 @@ export class Property extends DurableObject<Bindings> {
 			if (!Object.keys(this.#rooms).length) {
 				// if no rooms exist, insert a default room.
 				const roomId = id('r');
-				this.#rooms[roomId] = getDefaultRoomState(roomId);
+				this.#rooms[roomId] = getDemoRoomState(roomId);
 				await this.#saveState();
 			}
 		});
@@ -91,7 +91,7 @@ export class Property extends DurableObject<Bindings> {
 
 	createRoom() {
 		const roomId = id('r');
-		this.#rooms[roomId] = getDefaultRoomState(roomId);
+		this.#rooms[roomId] = getDemoRoomState(roomId);
 		this.#saveState();
 		return this.#rooms[roomId];
 	}

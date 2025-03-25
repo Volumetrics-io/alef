@@ -1,6 +1,6 @@
 import { PropertySocket } from '@/services/publicApi/socket';
 import {
-	getDefaultRoomState,
+	getDemoRoomState,
 	getUndo,
 	id,
 	migrateRoomState,
@@ -177,13 +177,15 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 						}
 					}
 
+					const defaultState = getDemoRoomState(roomId);
+					const firstLayoutId = Object.keys(defaultState.layouts)[0] as PrefixedId<'rl'> | undefined;
 					return {
-						...getDefaultRoomState(roomId),
+						...defaultState,
 						id: roomId,
 						operationBacklog: [],
 						undoStack: [],
 						redoStack: [],
-						viewingLayoutId: undefined,
+						viewingLayoutId: firstLayoutId,
 
 						undo: () => {
 							const undo = get().undoStack[get().undoStack.length - 1];

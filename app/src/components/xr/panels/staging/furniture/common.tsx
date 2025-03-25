@@ -8,7 +8,7 @@ import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
 import { useEditorStageMode } from '@/stores/editorStore';
 import { useAllFilters, useCategoryFilter, useSetFilters } from '@/stores/FilterStore';
 import { Attribute, AttributeKey } from '@alef/common';
-import { animated, config, useSpring } from '@react-spring/three';
+import { animated, useSpring } from '@react-spring/three';
 import { useFrame } from '@react-three/fiber';
 import { Container, Text } from '@react-three/uikit';
 import { ArrowLeftIcon, ArrowRightIcon, ChevronLeftIcon, ChevronRightIcon, PanelLeftCloseIcon, PanelLeftIcon, SofaIcon } from '@react-three/uikit-lucide';

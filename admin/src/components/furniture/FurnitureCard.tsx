@@ -80,10 +80,10 @@ export function FurnitureCard({ furniture }: FurnitureCardProps) {
 					</ScrollArea>
 				</Dialog.Content>
 			</Dialog>
-			<Card.Details justify="between">
+			<Card.Details stacked full padded={false}>
 				<NameEditor value={furniture.name} onChange={(name) => updateSelf({ name })} disabled={isUpdating} />
-				<Box gapped align="center">
-					<Box gapped align="center">
+				<Box gapped full="width" justify="between" align="center">
+					<Box gapped>
 						<Switch checked={!!furniture.madePublicAt} onCheckedChange={togglePublic} />
 						{furniture.madePublicAt ? 'Public' : 'Private'}
 					</Box>
@@ -102,7 +102,7 @@ function NameEditor({ value, onChange, disabled }: { value: string; onChange: (v
 		setLocalValue(value);
 	}, [value]);
 	return (
-		<Box>
+		<Box full="width">
 			<Input value={localValue} onValueChange={setLocalValue} disabled={disabled} />
 			{localValue !== value && (
 				<Button color="suggested" onClick={() => onChange(localValue)} disabled={disabled}>

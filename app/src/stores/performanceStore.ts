@@ -10,8 +10,7 @@ export type PerformanceStore = {
 export const usePerformanceStore = create<PerformanceStore>((set) => {
 	// run in high-performance/low-quality mode if directLaunch is enabled, which
 	// is set by the PWA/TWA app
-	// TODO: set to true while we work on asset optimization
-	const perfMode = true; //new URLSearchParams(window.location.search).get('directLaunch') === 'true';
+	const perfMode = new URLSearchParams(window.location.search).get('directLaunch') === 'true';
 	return {
 		qualityLevel: perfMode ? 'low' : 'high',
 		setQualityLevel: (level) => {

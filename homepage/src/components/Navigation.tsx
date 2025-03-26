@@ -5,8 +5,12 @@ export const Navigation = () => {
 	return (
 		<NavBar background="paper">
 			<NavBar.Start>
-				<Logo />
-				<Text>alef.io</Text>
+				<Link to="/">
+					<Logo />
+				</Link>
+				<Link to="/">
+					<Text>alef.io</Text>
+				</Link>
 			</NavBar.Start>
 			<NavBar.End>
 				<Link text to="https://blog.alef.io">

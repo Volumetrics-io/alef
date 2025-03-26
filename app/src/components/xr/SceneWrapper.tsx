@@ -56,7 +56,7 @@ export function SceneWrapper({ children, disableEnterXR, ...rest }: SceneWrapper
 				>
 					<XR store={xrStore}>
 						<PointerEvents />
-						<QualityControl />
+						{/* <QualityControl /> */}
 						{import.meta.env.DEV && <Perf position="bottom-right" />}
 						<SplashScreen />
 						<ErrorBoundary fallback={<XRError />}>
@@ -102,17 +102,17 @@ function NonXRCameraControls() {
 	return <OrbitHandles enabled={!isInSession} />;
 }
 
-function QualityControl() {
-	const renderer = useThree((s) => s.gl);
-	useEffect(() => {
-		return usePerformanceStore.subscribe((state) => {
-			const qualityLevel = state.qualityLevel;
-			if (qualityLevel === 'low') {
-				renderer.shadowMap.enabled = false;
-			} else {
-				renderer.shadowMap.enabled = true;
-			}
-		});
-	}, [renderer]);
-	return null;
-}
+// function QualityControl() {
+// 	const renderer = useThree((s) => s.gl);
+// 	useEffect(() => {
+// 		return usePerformanceStore.subscribe((state) => {
+// 			const qualityLevel = state.qualityLevel;
+// 			if (qualityLevel === 'low') {
+// 				renderer.shadowMap.enabled = false;
+// 			} else {
+// 				renderer.shadowMap.enabled = true;
+// 			}
+// 		});
+// 	}, [renderer]);
+// 	return null;
+// }

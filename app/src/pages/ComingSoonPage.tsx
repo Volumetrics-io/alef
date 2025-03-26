@@ -12,7 +12,7 @@ const ComingSoonPage = () => {
 						alef
 					</Heading>
 				</Box>
-				<Text>Hello, {deviceType.toLowerCase()} user! A seamless Alef experience for your device is on its way, but in the meantime, open this app in an XR headset.</Text>
+				<Text>Hello, {deviceType.toLowerCase()} user! A seamless Alef experience for your device is on its way, but in the meantime, open this app in an Meta Quest.</Text>
 				<Button asChild color="suggested">
 					<Link to="https://alef.io">
 						Homepage

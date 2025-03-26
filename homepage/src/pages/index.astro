@@ -3,12 +3,19 @@ import { Box, Button, Heading, Hero, Link, Main, Text, Frame } from '@alef/sys';
 import { Footer } from '../components/Footer.tsx';
 import Layout from '../layouts/Layout.astro';
 import { Navigation } from '../components/Navigation.tsx';
+import { EmailCollector } from '../components/EmailCollector';
 ---
 
 <Layout>
 	<Navigation client:load />
 	<Hero client:load forceNav big padded>
 		<Hero.Title>One space, endless possibilities.</Hero.Title>
+		<Hero.Box align="center" stacked gapped>
+			<Text strong tall>Reimagine your space without lifting a finger.</Text>
+			<Link to="https://app.alef.io">
+				<Button color="suggested">get started</Button>
+			</Link>
+		</Hero.Box>
 		<Hero.Dimmer />
 		<Hero.Backdrop>
 			<!-- @ts-ignore -->
@@ -19,7 +26,7 @@ import { Navigation } from '../components/Navigation.tsx';
 	</Hero>
 	<Main gapped stacked padded>
 		<Box stacked gapped constrained="large" padded>
-			<Heading level={2}>Design your space without lifting a finger.</Heading>
+			<Heading level={2}>unlock the full potential of your space with alef.</Heading>
 			<Text tall>
 				With state-of-the-art immersive tools, Alef unlocks the full potential of your home. Our AI-powered platform lets you customize every detail, from furniture to
 				lighting, so you can envision the perfect space without all the heavy lifting.
@@ -28,11 +35,7 @@ import { Navigation } from '../components/Navigation.tsx';
 	</Main>
 	<Hero client:load big padded>
 		<Hero.Box align="center" stacked gapped>
-			<Heading level={1}>It's a web app.</Heading>
-			<Text>No need to download or install anything.</Text>
-			<Link to="https://app.alef.io">
-				<Button color="suggested">Try it now</Button>
-			</Link>
+			<EmailCollector />
 		</Hero.Box>
 		<Hero.Dimmer />
 		<Hero.Backdrop>

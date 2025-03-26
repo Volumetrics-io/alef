@@ -1,14 +1,14 @@
 import { useGeoStore } from '@/stores/geoStore';
-import { usePerformanceStore } from '@/stores/performanceStore';
+// import { usePerformanceStore } from '@/stores/performanceStore';
 import { xrStore } from '@/stores/xrStore';
 import { Box, BoxProps, Button, ErrorBoundary, Icon } from '@alef/sys';
 import { reversePainterSortStable } from '@pmndrs/uikit';
 import { PerformanceMonitor } from '@react-three/drei';
-import { Canvas, useThree } from '@react-three/fiber';
+import { Canvas } from '@react-three/fiber';
 import { OrbitHandles } from '@react-three/handle';
 import { noEvents, PointerEvents, useXR, XR } from '@react-three/xr';
 import { Perf } from 'r3f-perf';
-import { ReactNode, Suspense, useEffect } from 'react';
+import { ReactNode, Suspense } from 'react';
 import { PCFSoftShadowMap } from 'three';
 import { ActivePointer } from './controls/ActivePointer';
 import { SplashScreen } from './ui/SplashScreen';

@@ -1,14 +1,14 @@
 import { useGeoStore } from '@/stores/geoStore';
-// import { usePerformanceStore } from '@/stores/performanceStore';
+import { usePerformanceStore } from '@/stores/performanceStore';
 import { xrStore } from '@/stores/xrStore';
 import { Box, BoxProps, Button, ErrorBoundary, Icon } from '@alef/sys';
 import { reversePainterSortStable } from '@pmndrs/uikit';
 import { PerformanceMonitor } from '@react-three/drei';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitHandles } from '@react-three/handle';
 import { noEvents, PointerEvents, useXR, XR } from '@react-three/xr';
 import { Perf } from 'r3f-perf';
-import { ReactNode, Suspense } from 'react';
+import { ReactNode, Suspense, useEffect } from 'react';
 import { PCFSoftShadowMap } from 'three';
 import { ActivePointer } from './controls/ActivePointer';
 import { SplashScreen } from './ui/SplashScreen';
@@ -56,7 +56,7 @@ export function SceneWrapper({ children, disableEnterXR, ...rest }: SceneWrapper
 				>
 					<XR store={xrStore}>
 						<PointerEvents />
-						{/* <QualityControl /> */}
+						<QualityControl />
 						{import.meta.env.DEV && <Perf position="bottom-right" />}
 						<SplashScreen />
 						<ErrorBoundary fallback={<XRError />}>
@@ -102,17 +102,17 @@ function NonXRCameraControls() {
 	return <OrbitHandles enabled={!isInSession} />;
 }
 
-// function QualityControl() {
-// 	const renderer = useThree((s) => s.gl);
-// 	useEffect(() => {
-// 		return usePerformanceStore.subscribe((state) => {
-// 			const qualityLevel = state.qualityLevel;
-// 			if (qualityLevel === 'low') {
-// 				renderer.shadowMap.enabled = false;
-// 			} else {
-// 				renderer.shadowMap.enabled = true;
-// 			}
-// 		});
-// 	}, [renderer]);
-// 	return null;
-// }
+function QualityControl() {
+	const renderer = useThree((s) => s.gl);
+	useEffect(() => {
+		return usePerformanceStore.subscribe((state) => {
+			const qualityLevel = state.qualityLevel;
+			if (qualityLevel === 'low') {
+				renderer.shadowMap.enabled = false;
+			} else {
+				renderer.shadowMap.enabled = true;
+			}
+		});
+	}, [renderer]);
+	return null;
+}

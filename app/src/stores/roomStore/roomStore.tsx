@@ -46,6 +46,7 @@ export type RoomStoreState = RoomStateWithEditor & {
 	setViewingLayoutId: (id: PrefixedId<'rl'>) => void;
 	updateLayout: (data: Pick<RoomLayout, 'id' | 'name' | 'icon' | 'type'>) => void;
 	updatePlanes: (planes: UnknownRoomPlaneData[]) => void;
+	clearPlanes: () => void;
 	deleteLayout: (id: PrefixedId<'rl'>) => void;
 
 	// furniture APIs
@@ -270,11 +271,15 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 						},
 
 						updatePlanes: async (planes) => {
-							console.debug('Updating XR planes. There are:', planes.length, 'planes detected');
 							await localChange({
 								type: 'updatePlanes',
 								planes,
 								time: Date.now(),
+							});
+						},
+						clearPlanes: async () => {
+							await localChange({
+								type: 'clearPlanes',
 							});
 						},
 

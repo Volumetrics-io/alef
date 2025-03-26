@@ -14,6 +14,10 @@ export function updateRoom(state: RoomState, change: Operation) {
 			state.planes = mergePlanes(state.planes, change.planes);
 			state.planesUpdatedAt = change.time;
 			return state;
+		case 'clearPlanes':
+			state.planes = [];
+			state.planesUpdatedAt = null;
+			return state;
 		case 'addFurniture':
 			if (!state.layouts[change.roomLayoutId]) {
 				throw new AlefError(AlefError.Code.NotFound, `Room layout ${change.roomLayoutId} not found`);

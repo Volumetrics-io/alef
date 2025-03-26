@@ -59,6 +59,11 @@ const propertyRouter = new Hono<EnvWith<'session'>>()
 		const state = await property.getRoom(roomId);
 		return ctx.json(wrapRpcData(state));
 	})
+	.post('/rooms', async (ctx) => {
+		const property = ctx.get('property');
+		const room = await property.createRoom();
+		return ctx.json(wrapRpcData(room));
+	})
 	.get('/socketToken', async (ctx) => {
 		const session = ctx.get('session');
 		if (!session) {

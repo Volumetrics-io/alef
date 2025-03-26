@@ -8,6 +8,7 @@ import { publicApiClient } from './client';
  */
 
 export type PropertySocket = {
+	readonly id: PrefixedId<'p'>;
 	send: <T extends ClientMessageWithoutId>(message: T) => void;
 	request: <T extends ClientMessageWithoutId, Response extends ServerMessageType = ServerMessageType>(
 		message: T,
@@ -109,6 +110,9 @@ export async function connectToSocket(propertyId: PrefixedId<'p'>): Promise<Prop
 	});
 
 	const socket = {
+		get id() {
+			return propertyId;
+		},
 		send,
 		request,
 		onMessage: subscribe,

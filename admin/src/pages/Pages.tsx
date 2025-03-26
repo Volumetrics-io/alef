@@ -18,6 +18,10 @@ const routes = makeRoutes([
 		component: lazy(() => import('./FurniturePage.js')),
 	},
 	{
+		path: '/debug-rooms',
+		component: lazy(() => import('./DebugRoomsPage.js')),
+	},
+	{
 		path: '*',
 		component: lazy(() => import('./NotFoundPage.js')),
 	},

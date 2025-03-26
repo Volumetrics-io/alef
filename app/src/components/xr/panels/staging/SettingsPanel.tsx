@@ -1,5 +1,6 @@
 import { Button } from '@/components/xr/ui/Button';
 import { useColorTheme } from '@/hooks/useColorTheme';
+import { pairDeviceXROnboarding } from '@/onboarding/pairDeviceXR';
 import { fetch } from '@/services/fetch';
 import { useMe } from '@/services/publicApi/userHooks';
 import { queryClient } from '@/services/queryClient';
@@ -8,6 +9,7 @@ import { ToggleGroup, ToggleGroupItem } from '@react-three/uikit-default';
 import { SettingsIcon } from '@react-three/uikit-lucide';
 import { useState } from 'react';
 import { HeadsetLogin } from '../../auth/HeadsetLogin';
+import { OnboardingDot } from '../../onboarding/OnboardingDot';
 import { Heading } from '../../ui/Heading';
 import { Surface } from '../../ui/Surface';
 
@@ -48,6 +50,7 @@ function SettingsItem({ label, children }: { label: string; children: React.Reac
 function Login({ onPair }: { onPair: () => void }) {
 	return (
 		<SettingsItem label="Log in">
+			<OnboardingDot onboarding={pairDeviceXROnboarding} step="logInButton" />
 			<Text>Login to access more features.</Text>
 			<Button onClick={onPair}>
 				<Text>Get started</Text>

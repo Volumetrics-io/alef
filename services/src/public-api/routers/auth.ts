@@ -2,6 +2,7 @@ import { AuthError } from '@a-type/auth';
 import { Context, Hono } from 'hono';
 import { removeDeviceId } from '../auth/devices.js';
 import { authHandlers } from '../auth/handlers.js';
+import { sessions } from '../auth/session.js';
 import { Env } from '../config/ctx.js';
 
 export const authRouter = new Hono<Env>()
@@ -37,7 +38,22 @@ export const authRouter = new Hono<Env>()
 	.post('/email-login', (ctx) => authHandlers.handleEmailLoginRequest(ctx).catch(routeAuthErrorsToUi('/login', ctx)))
 	.post('/begin-reset-password', (ctx) => authHandlers.handleResetPasswordRequest(ctx).catch(routeAuthErrorsToUi('/login', ctx)))
 	.post('/reset-password', (ctx) => authHandlers.handleVerifyPasswordResetRequest(ctx).catch(routeAuthErrorsToUi('/login', ctx)))
-	.post('/refresh', (ctx) => authHandlers.handleRefreshSessionRequest(ctx))
+	.post('/refresh', (ctx) =>
+		authHandlers.handleRefreshSessionRequest(ctx).catch((err) => {
+			// invalid errors during refresh are usually pretty much the end of the session. best to clear
+			// cookies and start over.
+			if (err instanceof AuthError) {
+				if (err.message === AuthError.Messages.InvalidRefreshToken || err.message === AuthError.Messages.InvalidSession) {
+					const { headers } = sessions.clearSession(ctx);
+					return new Response(null, {
+						status: 400,
+						headers,
+					});
+				}
+			}
+			throw err;
+		})
+	)
 	.get('/session', (ctx) => authHandlers.handleSessionRequest(ctx));
 
 function routeAuthErrorsToUi(path: string, ctx: Context<Env>) {

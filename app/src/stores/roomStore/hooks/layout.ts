@@ -42,6 +42,10 @@ export function useUpdatePlanes() {
 	return useRoomStore((s) => s.updatePlanes);
 }
 
+export function useClearPlanes() {
+	return useRoomStore((s) => s.clearPlanes);
+}
+
 export function usePlanes(filter?: (p: RoomPlaneData) => boolean) {
 	return useRoomStore(useShallow((s) => (filter ? s.planes.filter(filter) : s.planes)));
 }

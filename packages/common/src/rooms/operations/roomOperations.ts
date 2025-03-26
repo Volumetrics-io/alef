@@ -27,6 +27,11 @@ export const updatePlanesOperationShape = baseRoomOperationShape.extend({
 });
 export type UpdatePlanesOperation = z.infer<typeof updatePlanesOperationShape>;
 
+export const clearPlanesOperationShape = baseRoomOperationShape.extend({
+	type: z.literal('clearPlanes'),
+});
+export type ClearPlanesOperation = z.infer<typeof clearPlanesOperationShape>;
+
 export const addFurnitureOperationShape = baseRoomOperationShape.extend({
 	type: z.literal('addFurniture'),
 	roomLayoutId: z.custom<PrefixedId<'rl'>>((v) => isPrefixedId(v, 'rl')),
@@ -92,6 +97,7 @@ export const roomOperationShape = z.union([
 	createLayoutOperationShape,
 	deleteLayoutOperation,
 	updatePlanesOperationShape,
+	clearPlanesOperationShape,
 	addFurnitureOperationShape,
 	updateFurnitureOperationShape,
 	removeFurnitureOperationShape,

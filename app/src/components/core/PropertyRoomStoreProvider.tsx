@@ -1,3 +1,4 @@
+import { useViewingRoomId } from '@/hooks/useViewingRoomId';
 import { useCurrentDevice } from '@/services/publicApi/deviceHooks';
 import { useAllProperties, useProperty } from '@/services/publicApi/propertyHooks';
 import { PropertySocketProvider } from '@/services/publicApi/PropertySocketProvider';
@@ -39,6 +40,8 @@ export function PropertyRoomStoreProvider({ children }: PropertyRoomStoreProvide
 // state to the main app experience. it has to be separated to this component because
 // the logged-out experience cannot fetch this data.
 function WrappedWithPropertyAndRoom({ children }: { children: ReactNode }) {
+	const [storedRoomId] = useViewingRoomId();
+
 	// determine which Property + Room to show
 	const { data: properties } = useAllProperties();
 	const defaultProperty = properties[0];
@@ -54,14 +57,15 @@ function WrappedWithPropertyAndRoom({ children }: { children: ReactNode }) {
 		data: { rooms },
 	} = useProperty(defaultProperty.id);
 	const defaultRoomId = Object.keys(rooms)[0] as PrefixedId<'r'>;
-
 	if (!defaultRoomId) {
 		throw new Error(`Expected the server to provision a default room`);
 	}
 
+	const room = rooms[storedRoomId ?? defaultRoomId] ?? rooms[defaultRoomId];
+
 	return (
 		<PropertySocketProvider propertyId={defaultProperty.id}>
-			<RoomStoreProvider roomId={defaultRoomId}>{children}</RoomStoreProvider>
+			<RoomStoreProvider roomId={room.id}>{children}</RoomStoreProvider>
 		</PropertySocketProvider>
 	);
 }

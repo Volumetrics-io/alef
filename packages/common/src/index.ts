@@ -1,6 +1,7 @@
 export * from './attributes.js';
 export * from './devices.js';
 export * from './error.js';
+export * from './geometry.js';
 export * from './ids.js';
 export * from './planes.js';
 export * from './rooms/index.js';

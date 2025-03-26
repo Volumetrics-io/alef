@@ -1,21 +1,13 @@
 ---
-import { Box, Heading, Hero, Logo, Main, NavBar, Text } from '@alef/sys';
+import { Box, Heading, Hero, Main, Text } from '@alef/sys';
 import { EmailCollector } from '../components/EmailCollector.tsx';
 import { Footer } from '../components/Footer.tsx';
-import { LoginButton } from '../components/LoginButton.tsx';
 import Layout from '../layouts/Layout.astro';
+import { Navigation } from '../components/Navigation.tsx';
 ---
 
 <Layout>
-	<NavBar client:load>
-		<NavBar.Start>
-			<Logo />
-			<Text>alef.io</Text>
-		</NavBar.Start>
-		<NavBar.End>
-			<LoginButton />
-		</NavBar.End>
-	</NavBar>
+	<Navigation client:load />
 	<Hero client:load forceNav big padded>
 		<Hero.Title>One space, endless possibilities.</Hero.Title>
 		<Hero.Dimmer />

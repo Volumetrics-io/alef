@@ -1,21 +1,12 @@
 ---
-import { Logo, NavBar, Text } from '@alef/sys';
-import { LoginButton } from '../components/LoginButton.tsx';
 import { TermsOfService } from '../components/TermsOfService.tsx';
 import { Footer } from '../components/Footer.tsx';
 import Layout from '../layouts/Layout.astro';
+import { Navigation } from '../components/Navigation.tsx';
 ---
 
 <Layout>
-	<NavBar client:load>
-		<NavBar.Start>
-			<Logo />
-			<Text>alef.io</Text>
-		</NavBar.Start>
-		<NavBar.End>
-			<LoginButton />
-		</NavBar.End>
-	</NavBar>
+	<Navigation client:load />
 	<TermsOfService />
 	<Footer />
 </Layout>

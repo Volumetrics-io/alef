@@ -49,6 +49,7 @@ export function SceneWrapper({ children, disableEnterXR, ...rest }: SceneWrapper
 						}
 					}}
 					shadows={{
+						enabled: true,
 						autoUpdate: false,
 						type: PCFSoftShadowMap,
 					}}

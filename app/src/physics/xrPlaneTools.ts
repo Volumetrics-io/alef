@@ -73,12 +73,17 @@ export function xrPlanesToRoomPlaneData(
 
 	const floorInverseMatrix = new Matrix4().fromArray(floorPose.transform.matrix).invert();
 	let tmpMatrix = new Matrix4();
-	return planes
+
+	// temporary for debug
+	const poses: [XRPlane, XRPose][] = [];
+
+	const data = planes
 		.map((plane) => {
 			const pose = frame.getPose(plane.planeSpace, rootSpace);
 			if (!pose) {
 				return null;
 			}
+			poses.push([plane, pose]);
 
 			tmpMatrix.fromArray(pose.transform.matrix);
 			tmpMatrix.premultiply(floorInverseMatrix);
@@ -105,4 +110,8 @@ export function xrPlanesToRoomPlaneData(
 			return data;
 		})
 		.filter((p) => p !== null);
+
+	console.log(poses);
+
+	return data;
 }

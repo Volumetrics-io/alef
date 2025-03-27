@@ -1,7 +1,8 @@
 import { useAABB } from '@/hooks/useAABB';
 import { useShadowControls } from '@/hooks/useShadowMapUpdate';
-import { useIsEditorStageMode, useIsSelected, useSelect, useSetPanelState } from '@/stores/editorStore';
+import { useSetPanelState } from '@/stores/editorStore';
 import { useFurniturePlacement, useFurniturePlacementFurnitureId, useSubscribeToPlacementPosition, useUpdateFurniturePlacementTransform } from '@/stores/roomStore';
+import { useIsEditorMode, useIsSelected, useSelect } from '@/stores/roomStore/hooks/editing';
 import { PrefixedId } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
 import { Bvh } from '@react-three/drei';
@@ -20,7 +21,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	const placement = useFurniturePlacement(furniturePlacementId);
 	const select = useSelect();
 	const selected = useIsSelected(furniturePlacementId);
-	const isFurnitureMode = useIsEditorStageMode('furniture');
+	const isFurnitureMode = useIsEditorMode('furniture');
 	const setPanelState = useSetPanelState();
 	const shadowControls = useShadowControls();
 

@@ -1,5 +1,5 @@
-import { useEditorSelectionReset, useUpdateClosestFloorCenter } from '@/stores/editorStore';
 import { useFurniturePlacementIds } from '@/stores/roomStore';
+import { useResetSelectionOnClickAway } from '@/stores/roomStore/hooks/editing';
 import { Environment } from '@react-three/drei';
 import { Suspense } from 'react';
 import { GlobalSpace } from '../anchors/GlobalSpace';
@@ -14,8 +14,7 @@ import { PlaneSync } from './PlaneSync';
 import { Walls } from './Walls';
 export function RoomRenderer() {
 	const furniturePlacementIds = useFurniturePlacementIds();
-	useEditorSelectionReset();
-	useUpdateClosestFloorCenter();
+	useResetSelectionOnClickAway();
 
 	return (
 		<>

@@ -48,7 +48,7 @@ export class AuthedStore extends RpcTarget {
 		await this.#db.deleteFrom('Device').where('id', '=', deviceId).execute();
 	}
 
-	updateDevice(deviceId: PrefixedId<'d'>, updates: Pick<DeviceUpdate, 'displayMode'>) {
+	updateDevice(deviceId: PrefixedId<'d'>, updates: Pick<DeviceUpdate, 'displayMode' | 'name' | 'type'>) {
 		return this.#db.updateTable('Device').set(updates).where('id', '=', deviceId).returningAll().executeTakeFirst();
 	}
 

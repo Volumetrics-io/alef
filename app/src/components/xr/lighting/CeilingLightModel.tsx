@@ -1,18 +1,17 @@
 import { useGlobalLighting } from '@/stores/roomStore';
-import { useIsEditorStageMode } from '@/stores/editorStore';
+import { useIsEditorMode } from '@/stores/roomStore/hooks/editing';
 import { MeshProps } from '@react-three/fiber';
 import { useXR } from '@react-three/xr';
 import { getLightColor } from './getLightColor';
-import { useMemo } from 'react';
 
 export interface CeilingLightModelProps extends MeshProps {}
 
 export function CeilingLightModel(props: CeilingLightModelProps) {
 	const [{ intensity: globalIntensity, color: globalColor }] = useGlobalLighting();
-	const enabled = useIsEditorStageMode('lighting');
+	const enabled = useIsEditorMode('lighting');
 	const { session } = useXR();
 
-	const visible = useMemo(() => session == null || enabled, [session, enabled]);
+	const visible = session === null || enabled;
 
 	return (
 		<group>

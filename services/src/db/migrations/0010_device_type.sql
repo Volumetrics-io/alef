@@ -1,0 +1,3 @@
+-- Migration number: 0010 	 2025-03-27T20:28:42.435Z
+ALTER TABLE Device
+	ADD COLUMN type TEXT DEFAULT 'other' NOT NULL;

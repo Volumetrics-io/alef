@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { isPrefixedId, PrefixedId } from '../../ids.js';
+import { editorModeShape } from '../state/editor.js';
 import { baseRoomOperationShape } from './common.js';
 
 export const selectLayoutOperationShape = baseRoomOperationShape.extend({
@@ -8,30 +9,25 @@ export const selectLayoutOperationShape = baseRoomOperationShape.extend({
 });
 export type SelectLayoutOperation = z.infer<typeof selectLayoutOperationShape>;
 
-export const selectFurniturePlacementOperationShape = baseRoomOperationShape.extend({
-	type: z.literal('selectFurniturePlacement'),
-	furniturePlacementId: z.custom<PrefixedId<'fp'>>((v) => isPrefixedId(v, 'fp')),
+export const selectObjectShape = baseRoomOperationShape.extend({
+	type: z.literal('selectObject'),
+	objectId: z.custom<PrefixedId<'fp'> | PrefixedId<'lp'> | null>((v) => v === null || isPrefixedId(v, 'fp') || isPrefixedId(v, 'lp')),
 });
-export type SelectFurniturePlacementOperation = z.infer<typeof selectFurniturePlacementOperationShape>;
+export type SelectFurniturePlacementOperation = z.infer<typeof selectObjectShape>;
 
-export const selectLightPlacementOperationShape = baseRoomOperationShape.extend({
-	type: z.literal('selectLightPlacement'),
-	lightPlacementId: z.custom<PrefixedId<'lp'>>((v) => isPrefixedId(v, 'lp')),
+export const setPlacingFurnitureOperationShape = baseRoomOperationShape.extend({
+	type: z.literal('setPlacingFurniture'),
+	furnitureId: z.custom<PrefixedId<'f'> | null>((v) => v === null || isPrefixedId(v, 'f')),
 });
-export type SelectLightPlacementOperation = z.infer<typeof selectLightPlacementOperationShape>;
+export type SetPlacingFurnitureOperation = z.infer<typeof setPlacingFurnitureOperationShape>;
 
-export const beginPlaceFurnitureOperationShape = baseRoomOperationShape.extend({
-	type: z.literal('beginPlaceFurniture'),
-	furnitureId: z.custom<PrefixedId<'f'>>((v) => isPrefixedId(v, 'f')),
+export const setEditorModeOperationShape = baseRoomOperationShape.extend({
+	type: z.literal('setEditorMode'),
+	mode: editorModeShape,
 });
-export type BeginPlaceFurnitureOperation = z.infer<typeof beginPlaceFurnitureOperationShape>;
+export type SetEditorModeOperation = z.infer<typeof setEditorModeOperationShape>;
 
-export const editorOperationShape = z.union([
-	selectLayoutOperationShape,
-	selectFurniturePlacementOperationShape,
-	selectLightPlacementOperationShape,
-	beginPlaceFurnitureOperationShape,
-]);
+export const editorOperationShape = z.union([selectLayoutOperationShape, selectObjectShape, setPlacingFurnitureOperationShape, setEditorModeOperationShape]);
 export type EditorOperation = z.infer<typeof editorOperationShape>;
 export type EditorOperationType = EditorOperation['type'];
 export type EditorOperationByType<T extends EditorOperationType> = Extract<EditorOperation, { type: T }>;

@@ -51,3 +51,13 @@ export async function removeDeviceId(ctx: Context): Promise<PrefixedId<'d'> | nu
 	}
 	return existingId;
 }
+
+export async function getDeviceId(ctx: Context): Promise<PrefixedId<'d'> | null> {
+	const existingId = await getSignedCookie(ctx, ctx.env.DEVICE_ID_SIGNING_SECRET, DEVICE_ID_COOKIE_NAME);
+	if (!existingId) return null;
+
+	if (!isPrefixedId(existingId, 'd')) {
+		return null;
+	}
+	return existingId;
+}

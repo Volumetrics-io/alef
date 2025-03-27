@@ -2,6 +2,7 @@ import { PropertySocket } from '@/services/publicApi/socket';
 import {
 	createOp,
 	DistributiveOmit,
+	EditorMode,
 	getDemoRoomState,
 	getUndo,
 	id,
@@ -32,6 +33,11 @@ export type RoomStoreState = RoomStateWithEditor & {
 	redoStack: Operation[];
 	undo(): void;
 	redo(): void;
+
+	// Editor actions
+	select: (id: PrefixedId<'fp'> | PrefixedId<'lp'> | null) => void;
+	setPlacingFurniture: (furnitureId: PrefixedId<'f'> | null) => void;
+	setEditorMode: (mode: EditorMode) => void;
 
 	/**
 	 * Creates an empty new room layout and sets it as the current layout
@@ -133,7 +139,8 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 							disableClearRedo,
 							localOnly,
 							disableHistory = localOnly,
-						}: { historyStack?: 'undoStack' | 'redoStack'; disableClearRedo?: boolean; localOnly?: boolean; disableHistory?: boolean } = {}
+							personal,
+						}: { historyStack?: 'undoStack' | 'redoStack'; disableClearRedo?: boolean; localOnly?: boolean; disableHistory?: boolean; personal?: boolean } = {}
 					): Promise<void> {
 						const op = createOp({ roomId, ...opInit });
 						seenOps.add(op.opId);
@@ -159,7 +166,9 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 
 						if (socket?.isClosed) {
 							set((state) => {
-								state.operationBacklog.push(op);
+								if (!personal) {
+									state.operationBacklog.push(op);
+								}
 								if (!disableClearRedo) {
 									state.redoStack = [];
 								}
@@ -169,6 +178,7 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 								await socket.request({
 									type: 'applyOperations',
 									operations: [op],
+									personal,
 								});
 								if (!disableClearRedo) {
 									set((state) => {
@@ -178,7 +188,9 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 							} catch (e) {
 								if (e instanceof Error && e.message === 'Request timed out') {
 									set((state) => {
-										state.operationBacklog.push(op);
+										if (!personal) {
+											state.operationBacklog.push(op);
+										}
 										if (!disableClearRedo) {
 											state.redoStack = [];
 										}
@@ -198,28 +210,63 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 						redoStack: [],
 
 						editor: {
+							mode: 'layouts',
 							placingFurnitureId: null,
 							selectedObjectId: null,
 							selectedLayoutId: firstLayoutId,
 						},
 
-						undo: () => {
+						undo: async () => {
 							const undo = get().undoStack[get().undoStack.length - 1];
 							if (undo) {
-								localChange(undo, { historyStack: 'redoStack', disableClearRedo: true });
+								await localChange(undo, { historyStack: 'redoStack', disableClearRedo: true });
 								set((state) => {
 									state.undoStack.pop();
 								});
 							}
 						},
-						redo: () => {
+						redo: async () => {
 							const redo = get().redoStack[get().redoStack.length - 1];
 							if (redo) {
-								localChange(redo, { historyStack: 'undoStack', disableClearRedo: true });
+								await localChange(redo, { historyStack: 'undoStack', disableClearRedo: true });
 								set((state) => {
 									state.redoStack.pop();
 								});
 							}
+						},
+
+						select: (id) => {
+							return localChange(
+								{
+									type: 'selectObject',
+									objectId: id,
+								},
+								{
+									personal: true,
+								}
+							);
+						},
+						setPlacingFurniture: (furnitureId) => {
+							return localChange(
+								{
+									type: 'setPlacingFurniture',
+									furnitureId,
+								},
+								{
+									personal: true,
+								}
+							);
+						},
+						setEditorMode: (mode) => {
+							return localChange(
+								{
+									type: 'setEditorMode',
+									mode,
+								},
+								{
+									personal: true,
+								}
+							);
 						},
 
 						updatePlanes: async (planes) => {

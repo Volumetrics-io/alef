@@ -1,4 +1,4 @@
-import { AlefError, isPrefixedId, PrefixedId } from '@alef/common';
+import { AlefError, DeviceType, isPrefixedId, PrefixedId } from '@alef/common';
 import { zValidator } from '@hono/zod-validator';
 import { Context, Hono } from 'hono';
 import { getConnInfo } from 'hono/cloudflare-workers';
@@ -23,12 +23,14 @@ const upsertDeviceMiddleware = createMiddleware<{
 }>(async (ctx, next) => {
 	// upsert the device upon connection. if an authenticated user is present, associates the device with them
 	// implicitly.
-	const description = ctx.req.query('description');
+	const name = ctx.req.query('name');
+	const type = ctx.req.query('type') as DeviceType | undefined;
 	const userId = ctx.get('session')?.userId;
 	const ownId = await assignOrRefreshDeviceId(ctx);
 	const device = {
-		name: description,
 		id: ownId,
+		name,
+		type,
 	};
 	const upserted = await ctx.env.PUBLIC_STORE.ensureDeviceExists(device, userId);
 	ctx.set('device', upserted);
@@ -51,7 +53,8 @@ export const devicesRouter = new Hono<Env>()
 		zValidator(
 			'query',
 			z.object({
-				description: z.string().optional(),
+				name: z.string().optional(),
+				type: z.enum(['mobile', 'tablet', 'headset', 'desktop', 'other']).optional(),
 			})
 		),
 		sessionMiddleware,
@@ -113,7 +116,8 @@ export const devicesRouter = new Hono<Env>()
 		zValidator(
 			'query',
 			z.object({
-				description: z.string().optional(),
+				name: z.string().optional(),
+				type: z.enum(['mobile', 'tablet', 'headset', 'desktop', 'other']).optional(),
 			})
 		),
 		upsertDeviceMiddleware,
@@ -122,7 +126,6 @@ export const devicesRouter = new Hono<Env>()
 			const device = ctx.get('device');
 			const ownId = device.id;
 
-			await ctx.env.PUBLIC_STORE.ensureDeviceExists(device, userId);
 			const discoveryState = await getDiscoveryState(ctx);
 			discoveryState.register(device);
 			const list = await discoveryState.listAll(device.id);
@@ -214,6 +217,7 @@ export const devicesRouter = new Hono<Env>()
 			z.object({
 				displayMode: z.enum(['staging', 'viewing']).optional(),
 				name: z.string().optional(),
+				type: z.enum(['mobile', 'headset', 'desktop', 'other']).optional(),
 			})
 		),
 		async (ctx) => {

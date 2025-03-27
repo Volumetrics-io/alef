@@ -1,4 +1,14 @@
-import { AlefError, assertAttributeKey, assertPrefixedId, Attribute, FurnitureModelQuality, getFurnitureModelPath, getFurniturePreviewImagePath, PrefixedId } from '@alef/common';
+import {
+	AlefError,
+	assertAttributeKey,
+	assertPrefixedId,
+	Attribute,
+	DeviceType,
+	FurnitureModelQuality,
+	getFurnitureModelPath,
+	getFurniturePreviewImagePath,
+	PrefixedId,
+} from '@alef/common';
 import { WorkerEntrypoint } from 'cloudflare:workers';
 import { ExpressionBuilder } from 'kysely';
 import { jsonArrayFrom } from 'kysely/helpers/sqlite';
@@ -164,18 +174,24 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 	 *
 	 * TODO: once discovered and claimed, devices can only be modified by their owners
 	 */
-	async ensureDeviceExists(info: Omit<NewDevice, 'displayMode' | 'name'> & { name?: string }, owner?: PrefixedId<'u'>) {
+	async ensureDeviceExists(info: Omit<NewDevice, 'displayMode' | 'name' | 'type'> & { type?: DeviceType; name?: string }, owner?: PrefixedId<'u'>) {
 		await this.#db
 			.insertInto('Device')
 			.values({
 				// provide a default name if none was provided
-				name: 'Unnamed Device',
-				id: info.id,
 				// devices always start in staging mode
 				displayMode: 'staging',
+				...info,
+				name: info.name ?? 'Unnamed Device',
+				type: info.type ?? 'other',
 			})
 			// if device already exists, keep existing values.
-			.onConflict((cb) => cb.column('id').doNothing())
+			.onConflict((cb) =>
+				cb.column('id').doUpdateSet((eb) => ({
+					name: eb.ref('excluded.name'),
+					type: eb.ref('excluded.type'),
+				}))
+			)
 			.execute();
 
 		if (owner) {

@@ -1,4 +1,7 @@
-import { StageMode, useDetailsOpen, useEditorStageMode } from '@/stores/editorStore';
+import { useMedia } from '@/hooks/useMedia';
+import { useDetailsOpen } from '@/stores/editorStore';
+import { useEditorMode } from '@/stores/roomStore/hooks/editing';
+import { EditorMode } from '@alef/common';
 import { Box, Frame, Icon, Tabs } from '@alef/sys';
 import clsx from 'clsx';
 import { ReactNode, Suspense } from 'react';
@@ -11,19 +14,22 @@ import { DesktopLayoutEditor } from './layouts/DesktopLayoutEditor';
 import { DesktopLayoutsPicker } from './layouts/DesktopLayoutsPicker';
 import { DesktopLightEditor } from './lighting/DesktopLightEditor';
 import { DesktopLightsMainEditor } from './lighting/DesktopLightsMainEditor';
+import { HeadsetConnectedIndicator } from './presence/HeadsetConnectedIndicator';
 
 export interface DesktopUIProps {
 	children?: ReactNode;
 }
 
 export function DesktopUI({ children }: DesktopUIProps) {
-	const [mode, setMode] = useEditorStageMode();
+	const [mode, setMode] = useEditorMode();
+	// don't bother rendering content, it won't be visible.
+	const isMobile = useMedia('(max-width: 768px)');
 
 	return (
 		<Box asChild className={cls.root}>
-			<Tabs value={mode || 'layouts'} onValueChange={(m) => setMode(m as StageMode)}>
+			<Tabs value={mode || 'layouts'} onValueChange={(m) => setMode(m as EditorMode)}>
 				<DesktopUIMain />
-				<Box className={cls.content}>{children}</Box>
+				{!isMobile && <Box className={cls.content}>{children}</Box>}
 				<DesktopUISecondary />
 			</Tabs>
 		</Box>
@@ -33,6 +39,9 @@ export function DesktopUI({ children }: DesktopUIProps) {
 function DesktopUIMain() {
 	return (
 		<Box className={cls.main} stacked>
+			<Box p="small" layout="center center">
+				<HeadsetConnectedIndicator />
+			</Box>
 			<Tabs.List className={cls.tabs}>
 				<Tabs.Trigger value="layouts">
 					<Icon name="house" />

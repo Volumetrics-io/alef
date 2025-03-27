@@ -5,6 +5,7 @@ import { useSearchParams } from '@verdant-web/react-router';
 const LoginPage = () => {
 	const [searchParams] = useSearchParams();
 	const returnTo = searchParams.get('returnTo') ?? undefined;
+	const error = searchParams.get('error') ?? undefined;
 
 	return (
 		<Box full align="center" justify="center" p>
@@ -17,6 +18,11 @@ const LoginPage = () => {
 				</Box>
 
 				<Heading level={1}>Login</Heading>
+				{error && (
+					<Box p style={{ backgroundColor: 'var(--error-paper)', color: 'var(--error-ink)' }}>
+						{error}
+					</Box>
+				)}
 				<EmailSigninForm returnTo={returnTo} />
 			</Frame>
 		</Box>

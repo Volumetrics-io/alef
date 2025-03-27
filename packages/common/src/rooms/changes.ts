@@ -80,18 +80,18 @@ export function updateRoom(state: RoomState, change: Operation) {
 			state.editor.selectedLayoutId = change.layoutId;
 			state.editor.selectedObjectId = null;
 			return state;
-		case 'selectFurniturePlacement':
+		case 'selectObject':
 			if (!state.editor) return state;
-			state.editor.selectedObjectId = change.furniturePlacementId;
+			state.editor.selectedObjectId = change.objectId;
 			return state;
-		case 'selectLightPlacement':
-			if (!state.editor) return state;
-			state.editor.selectedObjectId = change.lightPlacementId;
-			return state;
-		case 'beginPlaceFurniture':
+		case 'setPlacingFurniture':
 			if (!state.editor) return state;
 			state.editor.selectedObjectId = null;
 			state.editor.placingFurnitureId = change.furnitureId;
+			return state;
+		case 'setEditorMode':
+			if (!state.editor) return state;
+			state.editor.mode = change.mode;
 			return state;
 
 		default:

@@ -49,13 +49,38 @@ export class Property extends DurableObject<Bindings> {
 		console.info(`[${this.ctx.id.toString()}] Saved state`);
 	}
 
-	applyOperations(operations: Operation[]) {
+	async applyOperations(operations: Operation[]) {
 		for (const op of operations) {
 			updateRoom(this.#rooms[op.roomId], op);
+			this.#enqueueRoomUpdate(op.roomId);
 		}
-		this.#saveState();
-		// rebroadcast operations to all clients
-		this.#socketHandler.send({ type: 'syncOperations', operations });
+		await this.#saveState();
+	}
+
+	/**
+	 * To avoid potential state drift bugs, every so often after rooms are modified
+	 * we resync the server state to all connected clients.
+	 */
+	#roomUpdateTimeouts = new Map<PrefixedId<'r'>, number>();
+	#enqueueRoomUpdate(roomId: PrefixedId<'r'>) {
+		if (this.#roomUpdateTimeouts.has(roomId)) {
+			// already enqueued
+			return;
+		}
+		this.#roomUpdateTimeouts.set(
+			roomId,
+			setTimeout(async () => {
+				this.#roomUpdateTimeouts.delete(roomId);
+				const room = this.#rooms[roomId];
+				if (!room) {
+					return;
+				}
+				await this.#socketHandler.send({
+					type: 'roomUpdate',
+					data: room,
+				});
+			}, 10000)
+		);
 	}
 
 	async getAllRooms() {

@@ -1,4 +1,5 @@
 export * from './attributes.js';
+export * from './devices.js';
 export * from './error.js';
 export * from './ids.js';
 export * from './planes.js';

@@ -11,6 +11,8 @@ export function getSocketToken(session: Session, roomLayoutId: PrefixedId<'p'>, 
 	const builder = new SignJWT({
 		sub: session.userId,
 		aud: roomLayoutId,
+		dev: session.deviceId,
+		name: session.name,
 		exp: Math.floor(Date.now() / 1000) + 60 * 60,
 	})
 		.setProtectedHeader({
@@ -25,5 +27,5 @@ export function getSocketToken(session: Session, roomLayoutId: PrefixedId<'p'>, 
 
 export async function verifySocketToken(token: string, secret: string) {
 	const result = await jwtVerify(token, encoder.encode(secret));
-	return result.payload as { sub: string; aud: string };
+	return result.payload as { sub: PrefixedId<'u'>; aud: string; dev?: PrefixedId<'d'>; name?: string };
 }

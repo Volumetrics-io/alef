@@ -5,8 +5,8 @@ import { Selector, SelectorItem } from '@/components/xr/ui/Selector';
 import { Surface } from '@/components/xr/ui/Surface';
 import { colors } from '@/components/xr/ui/theme';
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
-import { useEditorStageMode } from '@/stores/editorStore';
 import { useAllFilters, useCategoryFilter, useSetFilters } from '@/stores/FilterStore';
+import { useEditorMode } from '@/stores/roomStore/hooks/editing';
 import { Attribute, AttributeKey } from '@alef/common';
 import { animated, useSpring } from '@react-spring/three';
 import { useFrame } from '@react-three/fiber';
@@ -174,11 +174,11 @@ export function CategoryFilter() {
 }
 
 export function FurniturePanelNavigation() {
-	const [, setMode] = useEditorStageMode();
+	const [, setMode] = useEditorMode();
 
 	return (
 		<Container flexShrink={0} flexDirection="row" gap={4} width="100%" paddingRight={6} justifyContent="space-between">
-			<Button onClick={() => setMode('layout')}>
+			<Button onClick={() => setMode('layouts')}>
 				<ArrowLeftIcon />
 			</Button>
 			<Button onClick={() => setMode('lighting')}>

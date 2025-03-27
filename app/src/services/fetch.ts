@@ -4,6 +4,7 @@ import { AlefError } from '@alef/common';
 
 export const fetch = createFetch({
 	refreshSessionEndpoint: `${publicApiOrigin}/auth/refresh`,
+	logoutEndpoint: `${publicApiOrigin}/auth/logout`,
 	isSessionExpired: (res) => {
 		const asAlefError = AlefError.fromResponse(res);
 		if (asAlefError) {

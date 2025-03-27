@@ -51,12 +51,31 @@ export const serverLayoutCreatedMessageShape = baseServerMessageShape.extend({
 });
 export type ServerLayoutCreatedMessage = z.infer<typeof serverLayoutCreatedMessageShape>;
 
+export const serverDeviceConnectedMessageShape = baseServerMessageShape.extend({
+	type: z.literal('deviceConnected'),
+	userId: z.custom<PrefixedId<'u'>>((v) => isPrefixedId(v, 'u')),
+	device: z.object({
+		id: z.custom<PrefixedId<'d'>>((v) => isPrefixedId(v, 'd')),
+		name: z.string(),
+		type: z.enum(['mobile', 'desktop', 'tablet', 'headset', 'other']),
+	}),
+});
+export type ServerDeviceConnectedMessage = z.infer<typeof serverDeviceConnectedMessageShape>;
+
+export const serverDeviceDisconnectedMessageShape = baseServerMessageShape.extend({
+	type: z.literal('deviceDisconnected'),
+	deviceId: z.custom<PrefixedId<'d'>>((v) => isPrefixedId(v, 'd')),
+});
+export type ServerDeviceDisconnectedMessage = z.infer<typeof serverDeviceDisconnectedMessageShape>;
+
 export const serverMessageShape = z.union([
 	serverAckMessageShape,
 	serverErrorMessageShape,
 	serverRoomUpdateMessageShape,
 	serverLayoutCreatedMessageShape,
 	serverSyncOperationsMessageShape,
+	serverDeviceConnectedMessageShape,
+	serverDeviceDisconnectedMessageShape,
 ]);
 export type ServerMessage = z.infer<typeof serverMessageShape>;
 
@@ -97,6 +116,8 @@ export type ClientRequestRoomMessage = z.infer<typeof clientRequestRoomMessageSh
 export const clientApplyOperationsMessageShape = baseClientMessageShape.extend({
 	type: z.literal('applyOperations'),
 	operations: operationShape.array(),
+	/** Means: only send these to other devices owned by me */
+	personal: z.boolean().optional(),
 });
 export type ClientApplyOperationsMessage = z.infer<typeof clientApplyOperationsMessageShape>;
 

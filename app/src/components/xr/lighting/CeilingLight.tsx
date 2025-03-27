@@ -1,6 +1,6 @@
 import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
-import { useIsEditorStageMode, useSelect, useSelectedLightPlacementId } from '@/stores/editorStore';
 import { useLightPlacement, useMoveLight, useSubscribeToPlacementPosition } from '@/stores/roomStore';
+import { useIsEditorMode, useIsSelected, useSelect } from '@/stores/roomStore/hooks/editing';
 import { PrefixedId } from '@alef/common';
 import { defaultApply, Handle, HandleState } from '@react-three/handle';
 import { useHover } from '@react-three/xr';
@@ -9,9 +9,8 @@ import { Group, Object3D, Vector3 } from 'three';
 import { CeilingLightModel } from './CeilingLightModel';
 
 export const CeilingLight = ({ id }: { id: PrefixedId<'lp'> }) => {
-	const editable = useIsEditorStageMode('lighting');
-	const selectedLightId = useSelectedLightPlacementId();
-	const selected = selectedLightId === id && editable;
+	const editable = useIsEditorMode('lighting');
+	const selected = useIsSelected(id) && editable;
 	const select = useSelect();
 	const updateShadowMap = useShadowMapUpdate();
 

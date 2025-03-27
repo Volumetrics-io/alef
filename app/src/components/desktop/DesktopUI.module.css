@@ -84,3 +84,15 @@
 		top: 0;
 	}
 }
+
+@media (max-width: 768px) {
+	.root {
+		grid-template-areas: 'main' 'secondary';
+		grid-template-columns: 1fr;
+		grid-template-rows: 1fr 1fr;
+	}
+
+	.content {
+		display: none;
+	}
+}

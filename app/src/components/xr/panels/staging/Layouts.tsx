@@ -1,5 +1,5 @@
-import { useEditorStageMode } from '@/stores/editorStore';
 import { useActiveRoomLayoutId, useCreateRoomLayout, useDeleteRoomLayout, useRoomLayout, useRoomLayoutIds, useUpdateRoomLayout } from '@/stores/roomStore';
+import { useEditorMode } from '@/stores/roomStore/hooks/editing';
 import { PrefixedId, RoomType } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { ArrowRightIcon, CheckIcon, HouseIcon, PencilIcon } from '@react-three/uikit-lucide';
@@ -12,7 +12,7 @@ import { Surface } from '../../ui/Surface';
 
 export function Layouts({ readonly }: { readonly?: boolean }) {
 	const layoutIds = useRoomLayoutIds();
-	const [_mode, setMode] = useEditorStageMode();
+	const [_mode, setMode] = useEditorMode();
 
 	const [editingId, setEditingId] = useState<PrefixedId<'rl'> | null>(null);
 

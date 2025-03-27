@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { AlefErrorCode } from './error.js';
 import { isPrefixedId, PrefixedId } from './ids.js';
+import { roomLayoutShape, roomStateShape } from './rooms/index.js';
 import { operationShape } from './rooms/operations.js';
-import { roomLayoutShape, roomStateShape } from './rooms/state.js';
 
 /**
  *
@@ -39,13 +39,25 @@ export const serverRoomUpdateMessageShape = baseServerMessageShape.extend({
 });
 export type ServerRoomUpdateMessage = z.infer<typeof serverRoomUpdateMessageShape>;
 
+export const serverSyncOperationsMessageShape = baseServerMessageShape.extend({
+	type: z.literal('syncOperations'),
+	operations: operationShape.array(),
+});
+export type ServerSyncOperationsMessage = z.infer<typeof serverSyncOperationsMessageShape>;
+
 export const serverLayoutCreatedMessageShape = baseServerMessageShape.extend({
 	type: z.literal('layoutCreated'),
 	data: roomLayoutShape,
 });
 export type ServerLayoutCreatedMessage = z.infer<typeof serverLayoutCreatedMessageShape>;
 
-export const serverMessageShape = z.union([serverAckMessageShape, serverErrorMessageShape, serverRoomUpdateMessageShape, serverLayoutCreatedMessageShape]);
+export const serverMessageShape = z.union([
+	serverAckMessageShape,
+	serverErrorMessageShape,
+	serverRoomUpdateMessageShape,
+	serverLayoutCreatedMessageShape,
+	serverSyncOperationsMessageShape,
+]);
 export type ServerMessage = z.infer<typeof serverMessageShape>;
 
 export type ServerMessageType = ServerMessage['type'];

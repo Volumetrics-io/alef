@@ -15,11 +15,11 @@ export function useCreateRoomLayout() {
 }
 
 export function useActiveRoomLayoutId() {
-	return useRoomStore(useShallow((s) => [s.viewingLayoutId || (Object.keys(s.layouts)[0] as PrefixedId<'rl'>), s.setViewingLayoutId] as const));
+	return useRoomStore(useShallow((s) => [s.selectedLayoutId || (Object.keys(s.layouts)[0] as PrefixedId<'rl'>), s.setViewingLayoutId] as const));
 }
 
 export function useActiveRoomLayout() {
-	return useRoomStore((s) => (s.viewingLayoutId ? (s.layouts[s.viewingLayoutId] ?? null) : null));
+	return useRoomStore((s) => (s.selectedLayoutId ? (s.layouts[s.selectedLayoutId] ?? null) : null));
 }
 
 export function useUpdateRoomLayout() {

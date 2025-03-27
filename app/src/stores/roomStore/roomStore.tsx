@@ -1,5 +1,7 @@
 import { PropertySocket } from '@/services/publicApi/socket';
 import {
+	createOp,
+	DistributiveOmit,
 	getDemoRoomState,
 	getUndo,
 	id,
@@ -11,7 +13,7 @@ import {
 	RoomGlobalLighting,
 	RoomLayout,
 	RoomLightPlacement,
-	RoomState,
+	RoomStateWithEditor,
 	RoomType,
 	UnknownRoomPlaneData,
 	updateRoom,
@@ -23,13 +25,11 @@ import { persist, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { useRoomStoreContext } from './Provider';
 
-export type RoomStoreState = RoomState & {
-	// client state
-	viewingLayoutId?: PrefixedId<'rl'>;
+export type RoomStoreState = RoomStateWithEditor & {
+	// undo/redo and buffer of unsent operations (only used for logged in clients)
 	operationBacklog: Operation[];
 	undoStack: Operation[];
 	redoStack: Operation[];
-
 	undo(): void;
 	redo(): void;
 
@@ -83,8 +83,6 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 							);
 							set({
 								...response.data,
-								// pick an arbitrary layout to view
-								viewingLayoutId: Object.keys(response.data.layouts)[0] as PrefixedId<'rl'> | undefined,
 							});
 						})();
 						socket.onMessage('roomUpdate', (msg) => {
@@ -92,6 +90,15 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 							console.log('Applying room update', msg);
 							set((state) => {
 								Object.assign(state, msg.data);
+							});
+						});
+						socket.onMessage('syncOperations', (msg) => {
+							// check we haven't seen each op already
+							set((state) => {
+								for (const op of msg.operations) {
+									if (seenOps.has(op.opId)) continue;
+									updateRoom(state, op);
+								}
 							});
 						});
 						// apply backlog on connect
@@ -111,15 +118,16 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 					}
 
 					function getLayoutId() {
-						const id = get().viewingLayoutId;
+						const id = get().editor.selectedLayoutId;
 						if (!id) {
 							throw new Error('No layout selected');
 						}
 						return id;
 					}
 
-					async function applyChange(
-						op: Operation,
+					const seenOps = new Set<string>();
+					async function localChange(
+						opInit: DistributiveOmit<Operation, 'roomId' | 'opId'>,
 						{
 							historyStack = 'undoStack',
 							disableClearRedo,
@@ -127,6 +135,9 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 							disableHistory = localOnly,
 						}: { historyStack?: 'undoStack' | 'redoStack'; disableClearRedo?: boolean; localOnly?: boolean; disableHistory?: boolean } = {}
 					): Promise<void> {
+						const op = createOp({ roomId, ...opInit });
+						seenOps.add(op.opId);
+
 						try {
 							// apply change and add to undo stack
 							set((state) => {
@@ -178,19 +189,24 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 					}
 
 					const defaultState = getDemoRoomState(roomId);
-					const firstLayoutId = Object.keys(defaultState.layouts)[0] as PrefixedId<'rl'> | undefined;
+					const firstLayoutId = Object.keys(defaultState.layouts)[0] as PrefixedId<'rl'> | null;
 					return {
 						...defaultState,
 						id: roomId,
 						operationBacklog: [],
 						undoStack: [],
 						redoStack: [],
-						viewingLayoutId: firstLayoutId,
+
+						editor: {
+							placingFurnitureId: null,
+							selectedObjectId: null,
+							selectedLayoutId: firstLayoutId,
+						},
 
 						undo: () => {
 							const undo = get().undoStack[get().undoStack.length - 1];
 							if (undo) {
-								applyChange(undo, { historyStack: 'redoStack', disableClearRedo: true });
+								localChange(undo, { historyStack: 'redoStack', disableClearRedo: true });
 								set((state) => {
 									state.undoStack.pop();
 								});
@@ -199,7 +215,7 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 						redo: () => {
 							const redo = get().redoStack[get().redoStack.length - 1];
 							if (redo) {
-								applyChange(redo, { historyStack: 'undoStack', disableClearRedo: true });
+								localChange(redo, { historyStack: 'undoStack', disableClearRedo: true });
 								set((state) => {
 									state.redoStack.pop();
 								});
@@ -208,9 +224,8 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 
 						updatePlanes: async (planes) => {
 							console.debug('Updating XR planes. There are:', planes.length, 'planes detected');
-							await applyChange({
+							await localChange({
 								type: 'updatePlanes',
-								roomId,
 								planes,
 								time: Date.now(),
 							});
@@ -226,38 +241,41 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 								name = `${nameFromType}${othersWithName > 0 ? ' ' + (othersWithName + 1) : ''}`;
 							}
 							const layoutId = id('rl');
-							await applyChange({
+							await localChange({
 								type: 'createLayout',
-								roomId,
 								data: { id: layoutId, name, type },
 							});
-							set({ viewingLayoutId: layoutId });
+							await localChange({
+								type: 'selectLayout',
+								layoutId,
+							});
 
 							return layoutId;
 						},
-						setViewingLayoutId(id) {
-							set({ viewingLayoutId: id });
+						async setViewingLayoutId(id) {
+							await localChange({
+								type: 'selectLayout',
+								layoutId: id,
+							});
 						},
 						updateLayout: async (data) => {
-							await applyChange({
+							await localChange({
 								type: 'updateLayout',
-								roomId,
 								data,
 							});
 						},
 
 						deleteLayout: async (id) => {
-							await applyChange({
+							await localChange({
 								type: 'deleteLayout',
-								roomId,
-								roomLayoutId: id,
+								layoutId: id,
 							});
-							set((state) => {
-								if (state.viewingLayoutId === id) {
-									const newLayoutId = Object.keys(state.layouts)[0] as PrefixedId<'rl'> | undefined;
-									state.viewingLayoutId = newLayoutId;
+							if (get().editor.selectedLayoutId === id) {
+								const newLayoutId = Object.keys(get().layouts)[0] as PrefixedId<'rl'> | null;
+								if (newLayoutId) {
+									await localChange({ type: 'selectLayout', layoutId: newLayoutId });
 								}
-							});
+							}
 						},
 
 						addFurniture: async (init) => {
@@ -268,9 +286,8 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 								...init,
 							};
 
-							await applyChange({
+							await localChange({
 								type: 'addFurniture',
-								roomId,
 								roomLayoutId: layoutId,
 								data: placement,
 							});
@@ -278,10 +295,9 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 							return placementId;
 						},
 						moveFurniture: async (id, { position, rotation }) => {
-							await applyChange({
+							await localChange({
 								type: 'updateFurniture',
-								roomId,
-								roomLayoutId: getLayoutId(),
+								layoutId: getLayoutId(),
 								data: {
 									id,
 									// transform to pojos
@@ -291,10 +307,9 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 							});
 						},
 						updateFurnitureId: async (id, furnitureId) => {
-							await applyChange({
+							await localChange({
 								type: 'updateFurniture',
-								roomId,
-								roomLayoutId: getLayoutId(),
+								layoutId: getLayoutId(),
 								data: {
 									id,
 									furnitureId,
@@ -302,10 +317,9 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 							});
 						},
 						deleteFurniture: async (id) => {
-							await applyChange({
+							await localChange({
 								type: 'removeFurniture',
-								roomId,
-								roomLayoutId: getLayoutId(),
+								layoutId: getLayoutId(),
 								id,
 							});
 						},
@@ -316,17 +330,15 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 								id: placementId,
 								...init,
 							};
-							await applyChange({
+							await localChange({
 								type: 'addLight',
-								roomId,
 								data: placement,
 							});
 							return placementId;
 						},
 						moveLight: async (id, { position }) => {
-							await applyChange({
+							await localChange({
 								type: 'updateLight',
-								roomId,
 								data: {
 									id,
 									position,
@@ -334,17 +346,15 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 							});
 						},
 						deleteLight: async (id) => {
-							await applyChange({
+							await localChange({
 								type: 'removeLight',
-								roomId,
 								id,
 							});
 						},
 						updateGlobalLighting: async (update, options) => {
-							await applyChange(
+							await localChange(
 								{
 									type: 'updateGlobalLighting',
-									roomId,
 									data: update,
 								},
 								options
@@ -357,7 +367,7 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 				name: `room-${roomId}`,
 				version: ROOM_STATE_VERSION,
 				partialize(state) {
-					const { id, version, layouts, lights, globalLighting, operationBacklog: messageBacklog, planes, viewingLayoutId } = state;
+					const { id, version, layouts, lights, globalLighting, operationBacklog: messageBacklog, planes, editor } = state;
 					return {
 						id,
 						version,
@@ -366,11 +376,17 @@ export const makeRoomStore = (roomId: PrefixedId<'r'>, socket: PropertySocket | 
 						globalLighting,
 						messageBacklog,
 						planes,
-						viewingLayoutId,
+						editor: {
+							// only preserve selected layout
+							placingFurnitureId: null,
+							selectedObjectId: null,
+							selectedLayoutId: editor.selectedLayoutId,
+						},
 					};
 				},
 				migrate(persistedState: any) {
 					return {
+						editor: persistedState?.editor ?? { selectedLayoutId: null, selectedObjectId: null, placingFurnitureId: null },
 						messageBacklog: [],
 						viewingLayoutId: persistedState?.viewingLayoutId,
 						...migrateRoomState(persistedState),

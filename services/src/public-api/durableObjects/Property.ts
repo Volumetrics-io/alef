@@ -49,28 +49,13 @@ export class Property extends DurableObject<Bindings> {
 		console.info(`[${this.ctx.id.toString()}] Saved state`);
 	}
 
-	// note: layout ID not currently used, updates are not very granular with
-	// the current protocol, we just send the whole room.
-	#broadcastChange(roomId: PrefixedId<'r'>, _roomLayoutId?: PrefixedId<'rl'>) {
-		const room = this.getRoom(roomId);
-		if (!room) return;
-		// Notify clients of layout change
-		this.#socketHandler.send({
-			type: 'roomUpdate',
-			data: room,
-		});
-	}
-
 	applyOperations(operations: Operation[]) {
-		const affectedRooms = new Set<PrefixedId<'r'>>();
 		for (const op of operations) {
 			updateRoom(this.#rooms[op.roomId], op);
-			affectedRooms.add(op.roomId);
 		}
 		this.#saveState();
-		for (const roomId of affectedRooms) {
-			this.#broadcastChange(roomId);
-		}
+		// rebroadcast operations to all clients
+		this.#socketHandler.send({ type: 'syncOperations', operations });
 	}
 
 	async getAllRooms() {

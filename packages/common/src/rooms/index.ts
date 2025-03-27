@@ -2,4 +2,7 @@ export * from './changes.js';
 export * from './defaults.js';
 export * from './operations.js';
 export * from './state.js';
+export * from './state/editor.js';
+export * from './state/roomData.js';
+export * from './undo.js';
 export * from './version.js';

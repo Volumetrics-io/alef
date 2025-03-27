@@ -5,3 +5,4 @@ export * from './planes.js';
 export * from './rooms/index.js';
 export * from './socket.js';
 export * from './storage.js';
+export type * from './utilTypes.js';

@@ -6,11 +6,11 @@ import { useShallow } from 'zustand/react/shallow';
 import { useRoomStore, useRoomStoreSubscribe } from '../roomStore';
 
 export function useFurniturePlacementIds() {
-	return useRoomStore(useShallow((s) => Object.keys(s.viewingLayoutId ? (s.layouts[s.viewingLayoutId]?.furniture ?? {}) : {}) as PrefixedId<'fp'>[]));
+	return useRoomStore(useShallow((s) => Object.keys(s.selectedLayoutId ? (s.layouts[s.selectedLayoutId]?.furniture ?? {}) : {}) as PrefixedId<'fp'>[]));
 }
 
 export function useFurniturePlacement(id: PrefixedId<'fp'>) {
-	return useRoomStore((s) => (s.viewingLayoutId ? (s.layouts[s.viewingLayoutId]?.furniture[id] ?? null) : null));
+	return useRoomStore((s) => (s.selectedLayoutId ? (s.layouts[s.selectedLayoutId]?.furniture[id] ?? null) : null));
 }
 
 export function useDeleteFurniturePlacement(id: PrefixedId<'fp'> | undefined) {
@@ -22,7 +22,7 @@ export function useDeleteFurniturePlacement(id: PrefixedId<'fp'> | undefined) {
 }
 
 export function useFurniturePlacementFurnitureId(id: PrefixedId<'fp'>) {
-	return useRoomStore((s) => (s.viewingLayoutId ? (s.layouts[s.viewingLayoutId]?.furniture[id]?.furnitureId ?? null) : null));
+	return useRoomStore((s) => (s.selectedLayoutId ? (s.layouts[s.selectedLayoutId]?.furniture[id]?.furnitureId ?? null) : null));
 }
 
 export function useSetFurniturePlacementFurnitureId() {
@@ -43,7 +43,7 @@ export function useAddFurniture() {
 
 export function useSubscribeToPlacementPosition(id: PrefixedId<'fp'> | PrefixedId<'lp'>, callback: (position: { x: number; y: number; z: number }) => void) {
 	useRoomStoreSubscribe(
-		(s) => (s.viewingLayoutId ? (isPrefixedId(id, 'fp') ? (s.layouts[s.viewingLayoutId]?.furniture[id] ?? null) : (s.lights[id] ?? null)) : null),
+		(s) => (s.selectedLayoutId ? (isPrefixedId(id, 'fp') ? (s.layouts[s.selectedLayoutId]?.furniture[id] ?? null) : (s.lights[id] ?? null)) : null),
 		(placement) => {
 			if (placement) {
 				callback(placement.position);

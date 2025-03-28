@@ -1,10 +1,10 @@
-import { SimpleVector3, type SimpleQuaternion } from './rooms/state.js';
+import { SimpleQuaternion, SimpleVector3 } from './rooms/index.js';
 
-export function vec3(x: number, y: number, z: number): SimpleVector3 {
+export function vec3(x: number = 0, y: number = 0, z: number = 0): SimpleVector3 {
 	return { x, y, z };
 }
 
-export function quat(x: number, y: number, z: number, w: number): SimpleQuaternion {
+export function quat(x: number = 0, y: number = 0, z: number = 0, w: number = 1): SimpleQuaternion {
 	return { x, y, z, w };
 }
 

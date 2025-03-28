@@ -1,4 +1,4 @@
-import { dotProduct, normalize, quaternionToNormal } from './geometry.js';
+import { addVectors, dotProduct, normalize, quaternionToNormal, scaleVector, vec3 } from './geometry.js';
 import { id, PrefixedId } from './ids.js';
 import { RoomPlaneData } from './rooms/index.js';
 import type { UnknownRoomPlaneData } from './rooms/state.js';
@@ -149,7 +149,20 @@ export function groupPlanesByRoom<Plane extends UnknownRoomPlaneData>(planes: Pl
 		const ceilingZ = ceiling.origin.z;
 		const candidateGroups = floorGroups.filter(({ floor }) => {
 			// in WebXR, ceilings are below (!?) floors... everything is reversed basically?
-			if (ceiling.origin.y >= floor.origin.y) {
+			// we can make things less confusing by avoiding global cardinal directions and using
+			// the plane orientation.
+			const floorNormal = quaternionToNormal(floor.orientation, tempVec1);
+			// using normals, 'above' means the vector from the floor to the ceiling
+			// has a positive dot product with the floor's normal
+			const floorToCeiling = normalize(
+				{
+					x: ceiling.origin.x - floor.origin.x,
+					y: ceiling.origin.y - floor.origin.y,
+					z: ceiling.origin.z - floor.origin.z,
+				},
+				tempVec2
+			);
+			if (dotProduct(floorNormal, floorToCeiling) > 0) {
 				return false;
 			}
 			const halfWidth = floor.extents[0] / 2;
@@ -172,25 +185,26 @@ export function groupPlanesByRoom<Plane extends UnknownRoomPlaneData>(planes: Pl
 				const floor = group.floor;
 
 				if (plane.label === 'wall') {
-					// we check that the wall is between the floor and any provided ceiling on the Y axis
-					if (group.ceiling) {
-						const minY = Math.min(floor.origin.y, group.ceiling.origin.y);
-						const maxY = Math.max(floor.origin.y, group.ceiling.origin.y);
-						if (plane.origin.y - plane.extents[1] / 2 < minY || plane.origin.y + plane.extents[1] / 2 > maxY) {
-							return false;
-						}
-					}
+					// TODO: it would also be good to check this wall is between the floor and ceiling
+					// vertically, but this is challenging without using global axes.
 
-					// project a point up from the origin of the floor to the height of the origin of the wall/door/window.
+					// plane points inward towards center of room:
+					// project a point up from the origin of the floor to half a meter
 					// the plane should roughly point _away_ from that point (because normals point outward in XR).
-					const planeLocalHeight = plane.origin.y - floor.origin.y;
-					const testPoint = { x: floor.origin.x, y: floor.origin.y + planeLocalHeight, z: floor.origin.z };
-					const directionToTestPoint = normalize({
-						x: testPoint.x - plane.origin.x,
-						y: testPoint.y - plane.origin.y,
-						z: testPoint.z - plane.origin.z,
-					});
-					const planeNormal = quaternionToNormal(plane.orientation);
+					// to avoid global directions, we use the floor's orientation to determine the local height direction.
+					const floorNormal = tempVec1;
+					quaternionToNormal(floor.orientation, tempVec1);
+					const testPoint = addVectors(floor.origin, scaleVector(floorNormal, 0.5, tempVec1), tempVec1);
+					const directionToTestPoint = normalize(
+						{
+							x: testPoint.x - plane.origin.x,
+							y: testPoint.y - plane.origin.y,
+							z: testPoint.z - plane.origin.z,
+						},
+						tempVec1
+					);
+					const planeNormal = tempVec2;
+					quaternionToNormal(plane.orientation, tempVec2);
 					const dot = dotProduct(planeNormal, directionToTestPoint);
 					if (dot > 0) {
 						return false;
@@ -211,3 +225,6 @@ export function groupPlanesByRoom<Plane extends UnknownRoomPlaneData>(planes: Pl
 
 	return { floorGroups, unassignedPlanes };
 }
+
+const tempVec1 = vec3();
+const tempVec2 = vec3();

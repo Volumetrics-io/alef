@@ -82,7 +82,7 @@
 	}
 
 	.main {
-		padding-bottom: 46px;
+		padding-bottom: calc(46px + env(safe-area-inset-bottom, 0px));
 	}
 
 	.secondary {
@@ -101,7 +101,8 @@
 	.secondaryToggle {
 		left: 0;
 		right: 0;
-		top: -34px;
+		top: calc(-34px - env(safe-area-inset-bottom, 0px));
+		z-index: 1;
 		display: flex;
 		align-items: center;
 		justify-content: center;

@@ -10,8 +10,8 @@ catalogs:
       specifier: 1.3.12
       version: 1.3.12
     '@a-type/auth-fetch':
-      specifier: ^1.0.2
-      version: 1.0.2
+      specifier: 2.0.1
+      version: 2.0.1
     '@a-type/utils':
       specifier: 1.1.4
       version: 1.1.4
@@ -91,7 +91,7 @@ importers:
     dependencies:
       '@a-type/auth-fetch':
         specifier: 'catalog:'
-        version: 1.0.2
+        version: 2.0.1
       '@alef/common':
         specifier: workspace:*
         version: link:../packages/common
@@ -188,7 +188,7 @@ importers:
     dependencies:
       '@a-type/auth-fetch':
         specifier: 'catalog:'
-        version: 1.0.2
+        version: 2.0.1
       '@a-type/onboarding':
         specifier: 1.0.3
         version: 1.0.3(@types/react@18.3.18)(react@18.3.1)
@@ -565,8 +565,8 @@ packages:
     peerDependencies:
       '@a-type/auth': 1.3.4
 
-  '@a-type/auth-fetch@1.0.2':
-    resolution: { integrity: sha512-yuHDhDAcz8eWS9VogW2J6BQVJCEd+4KmSjPV7aLkl69zVWVJhujCqddO7Rr9bHLrBMi11K0Mgw8XqLW1efgJsw== }
+  '@a-type/auth-fetch@2.0.1':
+    resolution: { integrity: sha512-ciR8ZxJo+LwDo8EHoCcj1Yxkm8tBnzB61+dn3FM8IsG5w8EZvz7H/U0eO3QiGAdpMchv1R/3o/htM7cjjdV0gg== }
 
   '@a-type/auth@1.3.12':
     resolution: { integrity: sha512-FXJEtHIMhSXoCRYQdC0u8FX6BzUrq4d8pYWGszfbDSvUZosG16shhznXpE2Xl9RbTQv9tEkA61Tsx11Qg9rTaA== }
@@ -7323,7 +7323,7 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@a-type/auth-fetch@1.0.2': {}
+  '@a-type/auth-fetch@2.0.1': {}
 
   '@a-type/auth@1.3.12':
     dependencies:

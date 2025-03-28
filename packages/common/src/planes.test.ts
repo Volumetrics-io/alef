@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { mergePlanes } from './planes.js';
-import { RoomPlaneData, UnknownRoomPlaneData } from './rooms/state.js';
+import { RoomPlaneData } from './rooms/index.js';
+import { UnknownRoomPlaneData } from './rooms/state.js';
 
 describe('plane merging', () => {
 	it('merges similar planes to existing ones, adds unique ones, and removes unmatched ones', () => {

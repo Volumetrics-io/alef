@@ -1,63 +1,18 @@
 import { z } from 'zod';
 import { isPrefixedId, PrefixedId } from '../ids.js';
 import { getEmptyRoomState } from './defaults.js';
+import { editorStateShape } from './state/editor.js';
+import {
+	RoomGlobalLighting,
+	roomGlobalLightingShape,
+	RoomLayout,
+	roomLayoutShape,
+	RoomLightPlacement,
+	roomLightPlacementShape,
+	RoomPlaneData,
+	roomPlaneDataShape,
+} from './state/roomData.js';
 import { ROOM_STATE_VERSION } from './version.js';
-
-export const simpleVector3Shape = z.object({
-	x: z.number().safe(),
-	y: z.number().safe(),
-	z: z.number().safe(),
-});
-export type SimpleVector3 = z.infer<typeof simpleVector3Shape>;
-
-export const simpleQuaternionShape = z.object({
-	x: z.number().safe(),
-	y: z.number().safe(),
-	z: z.number().safe(),
-	w: z.number().safe(),
-});
-export type SimpleQuaternion = z.infer<typeof simpleQuaternionShape>;
-
-export const roomPlaneDataShape = z.object({
-	id: z.custom<PrefixedId<'rp'>>((v) => isPrefixedId(v, 'rp')),
-	label: z.string(),
-	origin: simpleVector3Shape,
-	orientation: simpleQuaternionShape,
-	extents: z.tuple([z.number(), z.number()]),
-});
-export type RoomPlaneData = z.infer<typeof roomPlaneDataShape>;
-
-export const roomFurniturePlacementShape = z.object({
-	id: z.custom<PrefixedId<'fp'>>((v) => isPrefixedId(v, 'fp')),
-	position: simpleVector3Shape,
-	rotation: simpleQuaternionShape,
-	furnitureId: z.custom<PrefixedId<'f'>>((v) => isPrefixedId(v, 'f')),
-});
-export type RoomFurniturePlacement = z.infer<typeof roomFurniturePlacementShape>;
-
-export const roomLightPlacementShape = z.object({
-	id: z.custom<PrefixedId<'lp'>>((v) => isPrefixedId(v, 'lp')),
-	position: simpleVector3Shape,
-});
-export type RoomLightPlacement = z.infer<typeof roomLightPlacementShape>;
-
-export const roomGlobalLightingShape = z.object({
-	color: z.number(),
-	intensity: z.number(),
-});
-export type RoomGlobalLighting = z.infer<typeof roomGlobalLightingShape>;
-
-export const roomLayoutShape = z.object({
-	id: z.custom<PrefixedId<'rl'>>((v) => isPrefixedId(v, 'rl')),
-	furniture: z.record(
-		z.custom<PrefixedId<'fp'>>((v) => isPrefixedId(v, 'fp')),
-		roomFurniturePlacementShape
-	),
-	icon: z.string().optional(),
-	name: z.string().optional(),
-	type: z.string().optional(),
-});
-export type RoomLayout = z.infer<typeof roomLayoutShape>;
 
 export const roomStateShape = z.object({
 	id: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')),
@@ -73,8 +28,13 @@ export const roomStateShape = z.object({
 		roomLightPlacementShape
 	),
 	globalLighting: roomGlobalLightingShape,
+
+	// some clients may not have an editor state -- the server, for example.
+	editor: editorStateShape.optional(),
 });
 export type RoomState = z.infer<typeof roomStateShape>;
+// a version of RoomState where editor is required.
+export type RoomStateWithEditor = RoomState & { editor: z.infer<typeof editorStateShape> };
 
 export type UnknownRoomPlaneData = Omit<RoomPlaneData, 'id'>;
 

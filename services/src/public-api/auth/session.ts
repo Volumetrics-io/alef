@@ -1,7 +1,8 @@
 import { honoAdapter, SessionManager } from '@a-type/auth';
-import { AlefError, assertPrefixedId } from '@alef/common';
+import { AlefError, assertPrefixedId, PrefixedId } from '@alef/common';
 import { Context } from 'hono';
 import { Env } from '../config/ctx.js';
+import { getDeviceId } from './devices.js';
 import { getRootDomain } from './domains.js';
 
 declare module '@a-type/auth' {
@@ -9,6 +10,7 @@ declare module '@a-type/auth' {
 		userId: string;
 		name: string | null;
 		isProductAdmin: boolean;
+		deviceId?: PrefixedId<'d'>;
 	}
 }
 
@@ -32,10 +34,13 @@ export const sessions = new SessionManager<Context<Env>>({
 					throw new AlefError(AlefError.Code.BadRequest, `Invalid session. User with ID ${userId} not found.`);
 				}
 
+				const deviceId = (await getDeviceId(ctx)) || undefined;
+
 				return {
 					userId,
 					name: user.name,
 					isProductAdmin: user.isProductAdmin,
+					deviceId,
 				};
 			},
 			secret: ctx.env.SESSION_SECRET,
@@ -50,6 +55,7 @@ export const sessions = new SessionManager<Context<Env>>({
 		userId: 'sub',
 		name: 'name',
 		isProductAdmin: 'pad',
+		deviceId: 'dev',
 	},
 	adapter: honoAdapter,
 });

@@ -1,16 +1,16 @@
 import { AnimatedSurface, usePullAnimation } from '@/components/xr/ui/Animations';
 import { colors, getColorForAnimation } from '@/components/xr/ui/theme';
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
-import { useIsSelectedModelId, useSetSelectedModelId } from '@/stores/editorStore';
 import { usePerformanceStore } from '@/stores/performanceStore';
+import { usePlacingFurnitureId, useSetPlacingFurniture } from '@/stores/roomStore/hooks/editing';
 import { config, useSpring, useSpringRef } from '@react-spring/three';
 import { Image } from '@react-three/uikit';
 import { Suspense } from 'react';
 
 export function FurnitureSelectItem({ furnitureItem }: { furnitureItem: FurnitureItem }) {
 	const qualityLevel = usePerformanceStore((state) => state.qualityLevel);
-	const setSelectedModelId = useSetSelectedModelId();
-	const isSelected = useIsSelectedModelId(furnitureItem.id);
+	const setSelectedModelId = useSetPlacingFurniture();
+	const isSelected = usePlacingFurnitureId() === furnitureItem.id;
 
 	const api = useSpringRef();
 	const { value } = useSpring({

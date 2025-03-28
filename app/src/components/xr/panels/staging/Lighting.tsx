@@ -1,6 +1,6 @@
 import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
-import { useEditorStageMode, useLightIsSelected, useSelect } from '@/stores/editorStore';
 import { useDeleteLightPlacement, useGlobalLighting, useLightPlacementIds } from '@/stores/roomStore';
+import { useEditorMode, useIsSelected, useSelect } from '@/stores/roomStore/hooks/editing';
 import { PrefixedId } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { ArrowLeftIcon, LightbulbIcon, SunIcon, Trash } from '@react-three/uikit-lucide';
@@ -21,7 +21,7 @@ export const Lighting = () => {
 };
 
 const LightPane = () => {
-	const [, setMode] = useEditorStageMode();
+	const [, setMode] = useEditorMode();
 	const [{ intensity: globalIntensity, color: globalColor }, updateGlobal] = useGlobalLighting();
 	const lightColorRef = useRef(globalColor);
 	const lightIntensityRef = useRef(globalIntensity);
@@ -90,7 +90,7 @@ const LightPane = () => {
 };
 
 function LightItem({ id }: { id: PrefixedId<'lp'> }) {
-	const isSelected = useLightIsSelected(id);
+	const isSelected = useIsSelected(id);
 	const select = useSelect();
 
 	return (

@@ -1,5 +1,6 @@
 import { id, PrefixedId } from '../ids.js';
-import { RoomLightPlacement, RoomState, UnknownRoomPlaneData } from './state.js';
+import { RoomState, UnknownRoomPlaneData } from './state.js';
+import { RoomLightPlacement } from './state/roomData.js';
 import { ROOM_STATE_VERSION } from './version.js';
 
 export const DEMO_ROOM_PLANES: UnknownRoomPlaneData[] = [

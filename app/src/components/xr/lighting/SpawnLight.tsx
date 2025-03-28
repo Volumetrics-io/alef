@@ -1,12 +1,13 @@
-import { useIsEditorStageMode } from '@/stores/editorStore';
 import { useAddLight, useGlobalLighting } from '@/stores/roomStore';
+import { useIsEditorMode } from '@/stores/roomStore/hooks/editing';
 import { Matrix4, Vector3 } from 'three';
 import { usePrimaryCeilingPlane } from '../../../stores/roomStore/hooks/layout';
 import { PlanePlacement } from '../controls/PlanePlacement';
 import { CeilingLightModel } from './CeilingLightModel';
 import { getLightColor } from './getLightColor';
+
 export const SpawnLight = () => {
-	const enabled = useIsEditorStageMode('lighting');
+	const enabled = useIsEditorMode('lighting');
 	const [{ color: globalColor }] = useGlobalLighting();
 
 	const primaryCeiling = usePrimaryCeilingPlane() ?? {

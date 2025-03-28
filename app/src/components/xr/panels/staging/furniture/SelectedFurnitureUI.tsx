@@ -1,15 +1,14 @@
-import { useFurniturePlacement, useFurnitureQuickSwap } from '@/stores/roomStore';
+import { BodyAnchor } from '@/components/xr/anchors/BodyAnchor';
+import { useDeleteFurniturePlacement, useFurniturePlacement, useFurnitureQuickSwap } from '@/stores/roomStore';
+import { useSelectedFurniturePlacementId } from '@/stores/roomStore/hooks/editing';
+import { RoomFurniturePlacement } from '@alef/common';
 import { Container, ContainerProperties, Root } from '@react-three/uikit';
 import { ArrowLeft, ArrowRight, Trash } from '@react-three/uikit-lucide';
 import { Button } from '../../../ui/Button';
-import { useDeleteFurniturePlacement } from '@/stores/roomStore';
-import { RoomFurniturePlacement } from '@alef/common';
-import { useEditorStore } from '@/stores/editorStore';
-import { BodyAnchor } from '@/components/xr/anchors/BodyAnchor';
 
 export function SelectedFurnitureWidget({ ...props }: ContainerProperties) {
-	const selected = useEditorStore((s) => s.selectedId);
-	const placement = useFurniturePlacement(selected as `fp-${string}`);
+	const selected = useSelectedFurniturePlacementId();
+	const placement = useFurniturePlacement(selected || 'fp-none');
 
 	if (!placement) return null;
 

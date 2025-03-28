@@ -1,6 +1,6 @@
 import { useFurnitureDetails } from '@/services/publicApi/furnitureHooks';
-import { useIsSelected, useSelect } from '@/stores/editorStore';
 import { useFurniturePlacement, useFurniturePlacementIds } from '@/stores/roomStore';
+import { useIsSelected, useSelect } from '@/stores/roomStore/hooks/editing';
 import { PrefixedId } from '@alef/common';
 import { Box, BoxProps, Button, Icon, ScrollArea } from '@alef/sys';
 import { Suspense } from 'react';

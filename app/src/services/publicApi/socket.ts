@@ -1,4 +1,4 @@
-import { AlefError, ClientMessage, ClientMessageWithoutId, createClientMessage, PrefixedId, ServerMessage, ServerMessageByType, ServerMessageType } from '@alef/common';
+import { AlefError, ClientMessage, ClientMessageWithoutId, createClientMessage, DeviceType, PrefixedId, ServerMessage, ServerMessageByType, ServerMessageType } from '@alef/common';
 import toast from 'react-hot-toast';
 import { publicApiClient } from './client';
 
@@ -19,6 +19,7 @@ export type PropertySocket = {
 	close: () => void;
 	reconnect: () => Promise<void>;
 	isClosed: boolean;
+	peers: DevicePeers; // an object that tracks connected devices and their info
 };
 
 // cache connections to avoid duplicate sockets
@@ -99,6 +100,14 @@ export async function connectToSocket(propertyId: PrefixedId<'p'>): Promise<Prop
 		websocket.close();
 	}
 
+	const peers = new DevicePeers();
+	subscribe('deviceConnected', (message) => {
+		peers.onConnected(message.userId, message.device);
+	});
+	subscribe('deviceDisconnected', (message) => {
+		peers.onDisconnected(message.deviceId);
+	});
+
 	const socket = {
 		send,
 		request,
@@ -110,6 +119,7 @@ export async function connectToSocket(propertyId: PrefixedId<'p'>): Promise<Prop
 		},
 		reconnect: () => websocket.reconnect(),
 		onConnect: websocket.onConnect,
+		peers,
 	};
 	socketCache.set(propertyId, socket);
 	return socket;
@@ -221,5 +231,54 @@ class ReconnectingWebsocket {
 				})
 			);
 		});
+	}
+}
+
+export interface DevicePeerInfo {
+	id: PrefixedId<'d'>;
+	name: string;
+	type: DeviceType;
+}
+
+class DevicePeers extends EventTarget {
+	private presence: Map<PrefixedId<'u'>, DevicePeerInfo[]> = new Map();
+
+	onConnected = (userId: PrefixedId<'u'>, device: DevicePeerInfo) => {
+		const existing = this.presence.get(userId) || [];
+		this.presence.set(userId, [...existing, device]);
+		this.dispatchEvent(new CustomEvent('connected', { detail: { userId, device } }));
+	};
+	onDisconnected = (deviceId: PrefixedId<'d'>) => {
+		const matchingUserId = [...this.presence.entries()].find(([_, devices]) => devices.some((device) => device.id === deviceId))?.[0];
+		if (matchingUserId) {
+			const devices = this.presence.get(matchingUserId)!.filter((device) => device.id !== deviceId);
+			if (devices.length === 0) {
+				this.presence.delete(matchingUserId);
+			} else {
+				this.presence.set(matchingUserId, devices);
+			}
+			this.dispatchEvent(new CustomEvent('disconnected', { detail: { userId: matchingUserId, deviceId } }));
+		}
+	};
+
+	get allDevices(): DevicePeerInfo[] {
+		// Return a flat array of all connected devices across all users
+		const allDevices: DevicePeerInfo[] = [];
+		this.presence.forEach((devices) => {
+			allDevices.push(...devices);
+		});
+		return allDevices;
+	}
+
+	get allUsers() {
+		// Return a flat array of all unique user IDs
+		// This will return an array of user IDs that have at least one device connected
+		return Array.from(this.presence.keys());
+	}
+
+	devicesByUser(userId: PrefixedId<'u'>): DevicePeerInfo[] | undefined {
+		// Return an array of devices for a specific user ID
+		// If the user ID does not exist, it will return undefined
+		return this.presence.get(userId);
 	}
 }

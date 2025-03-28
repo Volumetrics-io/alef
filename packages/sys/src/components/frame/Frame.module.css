@@ -6,3 +6,15 @@
 		background-color: var(--track);
 	}
 }
+
+@layer components {
+	.colorPrimary {
+		background-color: var(--happy-paper);
+		color: var(--happy-ink);
+	}
+
+	.colorError {
+		background-color: var(--error-paper);
+		color: var(--error-ink);
+	}
+}

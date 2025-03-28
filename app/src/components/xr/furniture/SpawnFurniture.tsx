@@ -1,6 +1,7 @@
 import { useFurnitureModel } from '@/services/publicApi/furnitureHooks';
-import { useIsEditorStageMode, useSelectedModelId, useSetPanelState, useSetSelectedModelId } from '@/stores/editorStore';
+import { useSetPanelState } from '@/stores/editorStore';
 import { useAddFurniture, usePrimaryFloorPlane } from '@/stores/roomStore';
+import { useIsEditorMode, usePlacingFurnitureId, useSetPlacingFurniture } from '@/stores/roomStore/hooks/editing';
 import { PrefixedId } from '@alef/common';
 import { useMergedRef } from '@alef/sys';
 import { useFrame, useThree } from '@react-three/fiber';
@@ -11,9 +12,9 @@ import { getGlobalTransform } from '../userData/globalRoot';
 import { CollisionModel } from './FurnitureModel';
 
 export const SpawnFurniture = () => {
-	const enabled = useIsEditorStageMode('furniture');
-	const selectedModelId = useSelectedModelId();
-	const setSelectedModelId = useSetSelectedModelId();
+	const enabled = useIsEditorMode('furniture');
+	const selectedModelId = usePlacingFurnitureId();
+	const setSelectedModelId = useSetPlacingFurniture();
 	const setPanelState = useSetPanelState();
 	// detect primary floor, its origin length should be very small
 	const primaryFloor = usePrimaryFloorPlane() ?? {

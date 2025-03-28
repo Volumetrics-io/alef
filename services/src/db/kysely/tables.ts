@@ -1,4 +1,4 @@
-import { AttributeKey, PrefixedId } from '@alef/common';
+import { AttributeKey, DeviceType, PrefixedId } from '@alef/common';
 import { ColumnType, Insertable, Selectable, Updateable } from 'kysely';
 
 export interface Database {
@@ -128,6 +128,7 @@ export interface DeviceTable {
 
 	name: string;
 	displayMode: 'staging' | 'viewing';
+	type: DeviceType;
 }
 export type Device = Selectable<DeviceTable>;
 export type NewDevice = Insertable<DeviceTable>;

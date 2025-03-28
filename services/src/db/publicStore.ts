@@ -1,11 +1,21 @@
-import { AlefError, assertAttributeKey, assertPrefixedId, Attribute, FurnitureModelQuality, getFurnitureModelPath, getFurniturePreviewImagePath, PrefixedId } from '@alef/common';
+import {
+	AlefError,
+	assertAttributeKey,
+	assertPrefixedId,
+	Attribute,
+	DeviceType,
+	FurnitureModelQuality,
+	getFurnitureModelPath,
+	getFurniturePreviewImagePath,
+	PrefixedId,
+} from '@alef/common';
 import { WorkerEntrypoint } from 'cloudflare:workers';
 import { ExpressionBuilder } from 'kysely';
 import { jsonArrayFrom } from 'kysely/helpers/sqlite';
 import { AuthedStore } from './authedStore.js';
 import { Env } from './env.js';
 import { DB, getDatabase } from './kysely/index.js';
-import { Database, NewDevice } from './kysely/tables.js';
+import { Database, DeviceUpdate, NewDevice } from './kysely/tables.js';
 
 export class PublicStore extends WorkerEntrypoint<Env> {
 	#db: DB;
@@ -164,22 +174,34 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 	 *
 	 * TODO: once discovered and claimed, devices can only be modified by their owners
 	 */
-	async ensureDeviceExists(info: Omit<NewDevice, 'displayMode' | 'name'> & { name?: string }, owner?: PrefixedId<'u'>) {
+	async ensureDeviceExists(info: Omit<NewDevice, 'displayMode' | 'name' | 'type'> & { type?: DeviceType; name?: string }, owner?: PrefixedId<'u'>) {
+		const conflictUpdates: DeviceUpdate = {};
+		if (info.name) {
+			// if a name is provided, we should update the name in case of conflicts.
+			// this allows for devices to be renamed. otherwise we should not
+			// include it.
+			conflictUpdates.name = info.name;
+		}
+		if (info.type) {
+			// if a type is provided, we should update the type in case of conflicts.
+			// this allows for devices to change types if needed.
+			conflictUpdates.type = info.type;
+		}
 		await this.#db
 			.insertInto('Device')
 			.values({
 				// provide a default name if none was provided
-				name: 'Unnamed Device',
-				id: info.id,
 				// devices always start in staging mode
 				displayMode: 'staging',
+				...info,
+				name: info.name ?? 'Unnamed Device',
+				type: info.type ?? 'other',
 			})
 			// if device already exists, keep existing values.
-			.onConflict((cb) => cb.column('id').doNothing())
+			.onConflict((cb) => cb.column('id').doUpdateSet(conflictUpdates))
 			.execute();
 
 		if (owner) {
-			console.log('claiming device', info.id, 'for user', owner);
 			await this.#db
 				.insertInto('DeviceAccess')
 				.values({ userId: owner, deviceId: info.id })

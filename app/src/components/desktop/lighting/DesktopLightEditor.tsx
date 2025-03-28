@@ -1,10 +1,10 @@
-import { useEditorStore } from '@/stores/editorStore';
 import { useDeleteLightPlacement, useLightPlacement } from '@/stores/roomStore';
-import { isPrefixedId, RoomLightPlacement } from '@alef/common';
+import { useSelectedLightPlacementId } from '@/stores/roomStore/hooks/editing';
+import { RoomLightPlacement } from '@alef/common';
 import { Box, Button, Heading, Icon } from '@alef/sys';
 
 export function DesktopLightEditor() {
-	const selectedId = useEditorStore((s) => (s.selectedId && isPrefixedId(s.selectedId, 'lp') ? s.selectedId : null));
+	const selectedId = useSelectedLightPlacementId();
 	const placement = useLightPlacement(selectedId || 'lp-none');
 
 	if (!placement) {

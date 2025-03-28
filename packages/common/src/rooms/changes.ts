@@ -24,13 +24,13 @@ export function updateRoom(state: RoomState, change: Operation) {
 			state.lights[change.data.id] = change.data;
 			return state;
 		case 'updateFurniture':
-			if (!state.layouts[change.roomLayoutId]) {
-				throw new AlefError(AlefError.Code.NotFound, `Room layout ${change.roomLayoutId} not found`);
+			if (!state.layouts[change.layoutId]) {
+				throw new AlefError(AlefError.Code.NotFound, `Room layout ${change.layoutId} not found`);
 			}
-			if (!state.layouts[change.roomLayoutId]!.furniture[change.data.id]) {
-				throw new AlefError(AlefError.Code.NotFound, `Furniture ${change.data.id} not found in room layout ${change.roomLayoutId}`);
+			if (!state.layouts[change.layoutId]!.furniture[change.data.id]) {
+				throw new AlefError(AlefError.Code.NotFound, `Furniture ${change.data.id} not found in room layout ${change.layoutId}`);
 			}
-			state.layouts[change.roomLayoutId]!.furniture[change.data.id] = { ...state.layouts[change.roomLayoutId]!.furniture[change.data.id]!, ...change.data };
+			state.layouts[change.layoutId]!.furniture[change.data.id] = { ...state.layouts[change.layoutId]!.furniture[change.data.id]!, ...change.data };
 			return state;
 		case 'updateLight':
 			if (!state.lights[change.data.id]) {
@@ -39,10 +39,10 @@ export function updateRoom(state: RoomState, change: Operation) {
 			state.lights[change.data.id] = { ...state.lights[change.data.id]!, ...change.data };
 			return state;
 		case 'removeFurniture':
-			if (!state.layouts[change.roomLayoutId]) {
-				throw new AlefError(AlefError.Code.NotFound, `Room layout ${change.roomLayoutId} not found`);
+			if (!state.layouts[change.layoutId]) {
+				throw new AlefError(AlefError.Code.NotFound, `Room layout ${change.layoutId} not found`);
 			}
-			delete state.layouts[change.roomLayoutId]!.furniture[change.id];
+			delete state.layouts[change.layoutId]!.furniture[change.id];
 			return state;
 		case 'removeLight':
 			delete state.lights[change.id];
@@ -51,7 +51,7 @@ export function updateRoom(state: RoomState, change: Operation) {
 			state.globalLighting = { ...state.globalLighting, ...change.data };
 			return state;
 		case 'deleteLayout':
-			delete state.layouts[change.roomLayoutId];
+			delete state.layouts[change.layoutId];
 			return state;
 		case 'createLayout':
 			if (state.layouts[change.data.id]) {
@@ -69,51 +69,32 @@ export function updateRoom(state: RoomState, change: Operation) {
 			}
 			state.layouts[change.data.id] = { ...state.layouts[change.data.id]!, ...change.data };
 			return state;
+
+		// editor operations -- will no-op without an editor state key
+		case 'selectLayout':
+			if (!state.editor) return state;
+			if (!state.layouts[change.layoutId]) {
+				// don't fail, just noop
+				return state;
+			}
+			state.editor.selectedLayoutId = change.layoutId;
+			state.editor.selectedObjectId = null;
+			return state;
+		case 'selectObject':
+			if (!state.editor) return state;
+			state.editor.selectedObjectId = change.objectId;
+			return state;
+		case 'setPlacingFurniture':
+			if (!state.editor) return state;
+			state.editor.selectedObjectId = null;
+			state.editor.placingFurnitureId = change.furnitureId;
+			return state;
+		case 'setEditorMode':
+			if (!state.editor) return state;
+			state.editor.mode = change.mode;
+			return state;
+
 		default:
 			return state;
-	}
-}
-
-export function getUndo(baseState: RoomState, change: Operation): Operation | null {
-	switch (change.type) {
-		case 'addFurniture':
-			return { type: 'removeFurniture', roomId: baseState.id, roomLayoutId: change.roomLayoutId, id: change.data.id };
-		case 'addLight':
-			return { type: 'removeLight', roomId: baseState.id, id: change.data.id };
-		case 'updateFurniture':
-			if (!baseState.layouts[change.roomLayoutId]) {
-				return null;
-			}
-			if (!baseState.layouts[change.roomLayoutId]!.furniture[change.data.id]) {
-				return null;
-			}
-			return { type: 'updateFurniture', roomId: baseState.id, roomLayoutId: change.roomLayoutId, data: baseState.layouts[change.roomLayoutId]!.furniture[change.data.id]! };
-		case 'updateLight':
-			if (!baseState.lights[change.data.id]) {
-				return null;
-			}
-			return { type: 'updateLight', roomId: baseState.id, data: baseState.lights[change.data.id]! };
-		case 'removeFurniture':
-			if (!baseState.layouts[change.roomLayoutId]) {
-				return null;
-			}
-			if (!baseState.layouts[change.roomLayoutId]!.furniture[change.id]) {
-				return null;
-			}
-			return { type: 'addFurniture', roomId: baseState.id, roomLayoutId: change.roomLayoutId, data: baseState.layouts[change.roomLayoutId]!.furniture[change.id]! };
-		case 'removeLight':
-			if (!baseState.lights[change.id]) {
-				return null;
-			}
-			return { type: 'addLight', roomId: baseState.id, data: baseState.lights[change.id]! };
-		case 'updateGlobalLighting':
-			return { type: 'updateGlobalLighting', roomId: baseState.id, data: { ...baseState.globalLighting } };
-		case 'deleteLayout':
-			if (!baseState.layouts[change.roomLayoutId]) {
-				return null;
-			}
-			return { type: 'createLayout', roomId: baseState.id, data: baseState.layouts[change.roomLayoutId]! };
-		default:
-			return null;
 	}
 }

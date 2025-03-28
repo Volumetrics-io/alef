@@ -1,12 +1,12 @@
-import { useEditorStore } from '@/stores/editorStore';
 import { useDeleteFurniturePlacement, useFurniturePlacement, useFurnitureQuickSwap } from '@/stores/roomStore';
-import { isPrefixedId, RoomFurniturePlacement } from '@alef/common';
+import { useSelectedFurniturePlacementId } from '@/stores/roomStore/hooks/editing';
+import { RoomFurniturePlacement } from '@alef/common';
 import { Box, Button, Heading, Icon, Text } from '@alef/sys';
 import { Suspense } from 'react';
 import { FurnitureName } from './FurnitureName';
 
 export function DesktopFurnitureEditor() {
-	const selectedId = useEditorStore((s) => (s.selectedId && isPrefixedId(s.selectedId, 'fp') ? s.selectedId : null));
+	const selectedId = useSelectedFurniturePlacementId();
 	const placement = useFurniturePlacement(selectedId || 'fp-none');
 
 	if (!placement) {

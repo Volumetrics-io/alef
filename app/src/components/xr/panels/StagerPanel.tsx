@@ -1,5 +1,6 @@
 import { firstTimeUserXROnboarding } from '@/onboarding/firstTimeUserXR';
-import { useEditorStageMode, usePanelState } from '@/stores/editorStore';
+import { usePanelState } from '@/stores/editorStore';
+import { useEditorMode } from '@/stores/roomStore/hooks/editing';
 import { Container, Root, Text } from '@react-three/uikit';
 import { HouseIcon, MinimizeIcon, SofaIcon, SunIcon } from '@react-three/uikit-lucide';
 import { useXR } from '@react-three/xr';
@@ -22,7 +23,7 @@ import { UpdatePrompt } from './UpdatePrompt';
 
 export function StagerPanel() {
 	const [panelState] = usePanelState();
-	const [mode] = useEditorStageMode();
+	const [mode] = useEditorMode();
 	const isInXR = useXR((s) => !!s.session);
 
 	const position = useMemo(() => {
@@ -62,7 +63,7 @@ export function StagerPanel() {
 									<FurniturePanel />
 								</Suspense>
 							)}
-							{mode === 'layout' && <Layouts />}
+							{mode === 'layouts' && <Layouts />}
 							{mode === 'settings' && <SettingsPanel />}
 							{mode !== null && (
 								<DragController>

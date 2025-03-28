@@ -1,10 +1,12 @@
 import { useMedia } from '@/hooks/useMedia';
 import { useDetailsOpen } from '@/stores/editorStore';
+import { useUndo } from '@/stores/roomStore';
 import { useEditorMode, useOnSelectionChanged } from '@/stores/roomStore/hooks/editing';
 import { EditorMode } from '@alef/common';
 import { Box, Frame, Icon, Tabs } from '@alef/sys';
 import clsx from 'clsx';
 import { ReactNode, Suspense } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import cls from './DesktopUI.module.css';
 import { DesktopAddFurniture } from './furniture/DesktopAddFurniture';
 import { DesktopFurnitureEditor } from './furniture/DesktopFurnitureEditor';
@@ -25,6 +27,11 @@ export function DesktopUI({ children }: DesktopUIProps) {
 	const [mode, setMode] = useEditorMode();
 	// don't bother rendering content, it won't be visible.
 	const isMobile = useMedia('(max-width: 768px)');
+
+	// bind ctrl+z to undo, ctrl+shift+z to redo
+	const { undo, redo } = useUndo();
+	useHotkeys('mod+z', undo);
+	useHotkeys('mod+shift+z, mod+y', redo);
 
 	return (
 		<Box asChild className={cls.root}>

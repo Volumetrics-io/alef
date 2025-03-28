@@ -1,4 +1,4 @@
-import { NavBar } from '@/components/NavBar';
+import { NavBar } from '@/components/navBar/NavBar';
 import { PropertySelect } from '@/components/properties/PropertySelect';
 import { Box, Heading, Main } from '@alef/sys';
 import { useNavigate } from '@verdant-web/react-router';

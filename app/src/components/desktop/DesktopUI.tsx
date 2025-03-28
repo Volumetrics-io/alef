@@ -18,6 +18,7 @@ import { DesktopLayoutsPicker } from './layouts/DesktopLayoutsPicker';
 import { DesktopLightEditor } from './lighting/DesktopLightEditor';
 import { DesktopLightsMainEditor } from './lighting/DesktopLightsMainEditor';
 import { HeadsetConnectedIndicator } from './presence/HeadsetConnectedIndicator';
+import { NavBar } from '@/components/navBar/NavBar';
 
 export interface DesktopUIProps {
 	children?: ReactNode;
@@ -47,6 +48,7 @@ export function DesktopUI({ children }: DesktopUIProps) {
 function DesktopUIMain() {
 	return (
 		<Box className={cls.main} stacked>
+			<NavBar />
 			<Box p="small" layout="center center">
 				<HeadsetConnectedIndicator />
 			</Box>

@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 export interface HeadsetConnectedIndicatorProps {}
 
-const FAKE_IT = true;
+const FAKE_IT = false;
 
 export function HeadsetConnectedIndicator({}: HeadsetConnectedIndicatorProps) {
 	const { data: self } = useMe();

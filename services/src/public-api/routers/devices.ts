@@ -34,7 +34,7 @@ const upsertDeviceMiddleware = createMiddleware<{
 	};
 	const upserted = await ctx.env.PUBLIC_STORE.ensureDeviceExists(device, userId);
 	ctx.set('device', upserted);
-	return next();
+	await next();
 });
 
 export const devicesRouter = new Hono<Env>()
@@ -147,6 +147,7 @@ export const devicesRouter = new Hono<Env>()
 							isProductAdmin: user.isProductAdmin,
 							name: user.name,
 							userId: assignedUserId,
+							deviceId: ownId,
 							// TODO: don't ditch types here... while this is all the same ctx value,
 							// the types applied to SessionManager are particular.
 						},

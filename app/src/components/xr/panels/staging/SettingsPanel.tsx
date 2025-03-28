@@ -66,7 +66,7 @@ function Logout() {
 						method: 'POST',
 						credentials: 'include',
 					});
-					queryClient.clear();
+					queryClient.resetQueries(); // clear all queries to reset the state
 				}}
 			>
 				<Text>Log out</Text>

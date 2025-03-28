@@ -4,7 +4,7 @@ import { useThree } from '@react-three/fiber';
 import { useEffect } from 'react';
 import { Object3D, Object3DEventMap } from 'three';
 import { useShallow } from 'zustand/react/shallow';
-import { useRoomStore } from '../roomStore';
+import { useRoomStore, useRoomStoreSubscribe } from '../roomStore';
 
 export function useEditorMode() {
 	return useRoomStore(useShallow((s) => [s.editor.mode, s.setEditorMode] as const));
@@ -51,4 +51,9 @@ export function useSetPlacingFurniture() {
 
 export function usePlacingFurnitureId() {
 	return useRoomStore((s) => s.editor.placingFurnitureId);
+}
+
+export function useOnSelectionChanged(cb: (selectedId: PrefixedId<'fp'> | PrefixedId<'lp'> | null) => void, options?: { fireImmediately?: boolean }) {
+	// subscribe to changes in the selected object id
+	useRoomStoreSubscribe((s) => s.editor.selectedObjectId, cb, options);
 }

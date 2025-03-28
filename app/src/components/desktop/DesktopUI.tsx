@@ -1,6 +1,6 @@
 import { useMedia } from '@/hooks/useMedia';
 import { useDetailsOpen } from '@/stores/editorStore';
-import { useEditorMode } from '@/stores/roomStore/hooks/editing';
+import { useEditorMode, useOnSelectionChanged } from '@/stores/roomStore/hooks/editing';
 import { EditorMode } from '@alef/common';
 import { Box, Frame, Icon, Tabs } from '@alef/sys';
 import clsx from 'clsx';
@@ -78,10 +78,13 @@ function DesktopUIMain() {
 
 function DesktopUISecondary() {
 	const [open, setOpen] = useDetailsOpen();
+	// open details panel when selection changes
+	useOnSelectionChanged(() => setOpen(true));
 	return (
 		<Box className={cls.secondary}>
-			<Frame float="top-left" style={{ left: open ? undefined : -38, padding: '0.25rem' }} className={cls.secondaryToggle}>
-				<Icon name={open ? 'panel-right-close' : 'panel-right-open'} onClick={() => setOpen(!open)} />
+			<Frame float="top-left" className={cls.secondaryToggle} onClick={() => setOpen(!open)} aria-label="Toggle details panel" tabIndex={0} role="button">
+				<Icon name={open ? 'panel-right-close' : 'panel-right-open'} className={cls.secondaryContentToggleIcon} />
+				<span className={cls.secondaryContentToggleLabel}>Details</span>
 			</Frame>
 			<Box className={clsx(cls.secondaryContent, open && cls.secondaryContentOpen)}>
 				<Box className={cls.secondaryContentInner}>

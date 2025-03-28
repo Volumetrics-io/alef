@@ -66,10 +66,13 @@ export const Navigation = () => {
 };
 
 const ModeIcon = () => {
+	const [panelState] = usePanelState();
 	const [mode] = useEditorMode();
-	if (mode === 'layouts') return <House />;
-	if (mode === 'furniture') return <Sofa />;
-	if (mode === 'lighting') return <Sun />;
-	if (mode === 'settings') return <Settings />;
+	if (panelState !== 'closed') {
+		if (mode === 'layouts') return <House />;
+		if (mode === 'furniture') return <Sofa />;
+		if (mode === 'lighting') return <Sun />;
+		if (mode === 'settings') return <Settings />;
+	}
 	return <Menu />;
 };

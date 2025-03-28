@@ -1,5 +1,7 @@
 @layer components {
 	.root {
+		container-type: inline-size;
+		container-name: nav-bar;
 		font-family: var(--font-head);
 		justify-content: space-between;
 		position: sticky;

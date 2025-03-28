@@ -67,7 +67,7 @@
 }
 
 /* Dark theme */
-/* @media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
 	:root {
 		--paper: hsl(0, 0%, 8%);
 		--hover: hsl(0, 0%, 12%);
@@ -100,7 +100,7 @@
 		--error-paper: hsl(345, 21%, 25%);
 		--error-ink: hsl(345, 70%, 91%);
 	}
-} */
+}
 
 body {
 	font-family: var(--font-body);

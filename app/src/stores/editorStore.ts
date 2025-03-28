@@ -14,7 +14,7 @@ export type EditorStore = {
 	setDetailsOpen: (open: boolean) => void;
 };
 
-export const useEditorStore = create<EditorStore>((set, get) => {
+export const useEditorStore = create<EditorStore>((set) => {
 	// enable the splash screen by default when rendering in the PWA
 	const splashScreen = new URLSearchParams(window.location.search).get('directLaunch') === 'true';
 	if (splashScreen) {

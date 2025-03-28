@@ -2,10 +2,10 @@ import { pairDeviceXROnboarding } from '@/onboarding/pairDeviceXR';
 import { useCreateRoom } from '@/services/publicApi/propertyHooks';
 import { usePropertySocket } from '@/services/publicApi/PropertySocketProvider';
 import { useIsLoggedIn } from '@/services/publicApi/userHooks';
-import { useEditorStageMode } from '@/stores/editorStore';
 import { useClearPlanes } from '@/stores/roomStore';
 import { AlefError } from '@alef/common';
 import { Container, Root, Text } from '@react-three/uikit';
+import { useEditorMode } from '../../../stores/roomStore/hooks/editing';
 import { BodyAnchor } from '../anchors';
 import { Button } from '../ui/Button';
 import { Defaults } from '../ui/Defaults';
@@ -65,7 +65,7 @@ function NewRoomButton() {
 }
 
 function SignUpButton() {
-	const [_, setMode] = useEditorStageMode();
+	const [_, setMode] = useEditorMode();
 	const startLogin = () => {
 		setMode('settings');
 		pairDeviceXROnboarding.restart();

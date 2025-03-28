@@ -1,4 +1,4 @@
-import { addVectors, dotProduct, normalize, quaternionToNormal, scaleVector, vec3 } from './geometry.js';
+import { addVectors, distance, dotProduct, normalize, quaternionToNormal, scaleVector, vec3 } from './geometry.js';
 import { id, PrefixedId } from './ids.js';
 import { RoomPlaneData } from './rooms/index.js';
 import type { UnknownRoomPlaneData } from './rooms/state.js';
@@ -153,29 +153,25 @@ export function groupPlanesByRoom<Plane extends UnknownRoomPlaneData>(planes: Pl
 			// the plane orientation.
 			const floorNormal = quaternionToNormal(floor.orientation, tempVec1);
 			// using normals, 'above' means the vector from the floor to the ceiling
-			// has a positive dot product with the floor's normal
-			const floorToCeiling = normalize(
-				{
-					x: ceiling.origin.x - floor.origin.x,
-					y: ceiling.origin.y - floor.origin.y,
-					z: ceiling.origin.z - floor.origin.z,
-				},
-				tempVec2
-			);
-			if (dotProduct(floorNormal, floorToCeiling) > 0) {
+			// has a negative dot product with the floor's normal
+			const floorToCeiling = normalize(addVectors(ceiling.origin, scaleVector(floor.origin, -1, tempVec2), tempVec2), tempVec2);
+			if (dotProduct(floorNormal, floorToCeiling) >= 0) {
+				console.log('dot', floorNormal, floorToCeiling, 'not above floor', floor.origin, ceiling.origin);
 				return false;
 			}
 			const halfWidth = floor.extents[0] / 2;
 			const halfDepth = floor.extents[1] / 2;
+			// TODO: can this part be made orientation-agnostic?
 			return ceilingX < floor.origin.x + halfWidth && ceilingX > floor.origin.x - halfWidth && ceilingZ < floor.origin.z + halfDepth && ceilingZ > floor.origin.z - halfDepth;
 		});
 		const closestGroup = candidateGroups.sort((a, b) => {
-			return Math.abs(a.floor.origin.y - ceiling.origin.y) - Math.abs(b.floor.origin.y - ceiling.origin.y);
+			return distance(a.floor.origin, ceiling.origin) - distance(b.floor.origin, ceiling.origin);
 		})[0];
 		if (closestGroup) {
 			closestGroup.ceiling = ceiling;
 			closestGroup.allPlanes.push(ceiling);
 		} else {
+			console.log('no match for ceiling', ceiling);
 			unassignedPlanes.push(ceiling);
 		}
 	}

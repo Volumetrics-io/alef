@@ -19,6 +19,7 @@ export type PropertySocket = {
 	close: () => void;
 	reconnect: () => Promise<void>;
 	isClosed: boolean;
+	peers: DevicePeers; // an object that tracks connected devices and their info
 };
 
 // cache connections to avoid duplicate sockets
@@ -259,4 +260,25 @@ class DevicePeers extends EventTarget {
 			this.dispatchEvent(new CustomEvent('disconnected', { detail: { userId: matchingUserId, deviceId } }));
 		}
 	};
+
+	get allDevices(): DevicePeerInfo[] {
+		// Return a flat array of all connected devices across all users
+		const allDevices: DevicePeerInfo[] = [];
+		this.presence.forEach((devices) => {
+			allDevices.push(...devices);
+		});
+		return allDevices;
+	}
+
+	get allUsers() {
+		// Return a flat array of all unique user IDs
+		// This will return an array of user IDs that have at least one device connected
+		return Array.from(this.presence.keys());
+	}
+
+	devicesByUser(userId: PrefixedId<'u'>): DevicePeerInfo[] | undefined {
+		// Return an array of devices for a specific user ID
+		// If the user ID does not exist, it will return undefined
+		return this.presence.get(userId);
+	}
 }

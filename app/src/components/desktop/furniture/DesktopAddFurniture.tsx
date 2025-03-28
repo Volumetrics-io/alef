@@ -1,9 +1,15 @@
+import { useSetPlacingFurniture } from '@/stores/roomStore/hooks/editing';
 import { Button, Dialog, Icon } from '@alef/sys';
 import { useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import { DesktopOnlineFurniturePicker } from './DesktopOnlineFurniturePicker';
 
 export function DesktopAddFurniture() {
 	const [open, setOpen] = useState(false);
+	const setSelectedModelId = useSetPlacingFurniture();
+	useHotkeys('esc', () => {
+		setSelectedModelId(null);
+	});
 
 	return (
 		<>

@@ -8,6 +8,7 @@ import { ReactNode, Suspense } from 'react';
 import cls from './DesktopUI.module.css';
 import { DesktopAddFurniture } from './furniture/DesktopAddFurniture';
 import { DesktopFurnitureEditor } from './furniture/DesktopFurnitureEditor';
+import { DesktopFurnitureMobileInstructions } from './furniture/DesktopFurnitureMobileInstructions';
 import { DesktopPlacedFurnitureList } from './furniture/DesktopPlacedFurnitureList';
 import { DesktopAddLayout } from './layouts/DesktopAddLayout';
 import { DesktopLayoutEditor } from './layouts/DesktopLayoutEditor';
@@ -64,7 +65,10 @@ function DesktopUIMain() {
 			<Tabs.Content value="furniture">
 				<Suspense>
 					<Box p="small" full stacked justify="between">
-						<DesktopPlacedFurnitureList />
+						<Box stacked gapped>
+							<DesktopFurnitureMobileInstructions />
+							<DesktopPlacedFurnitureList />
+						</Box>
 						<DesktopAddFurniture />
 					</Box>
 				</Suspense>

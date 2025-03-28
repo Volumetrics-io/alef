@@ -2,7 +2,6 @@ import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
 import { useSetPlacingFurniture } from '@/stores/roomStore/hooks/editing';
 import { PrefixedId } from '@alef/common';
 import { Button, Card, CardGrid, Icon, ScrollArea } from '@alef/sys';
-import { useHotkeys } from 'react-hotkeys-hook';
 import cls from './DesktopFurnitureCollection.module.css';
 
 export interface DesktopFurnitureCollectionProps {
@@ -13,11 +12,6 @@ export interface DesktopFurnitureCollectionProps {
 }
 
 export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore, onSelect }: DesktopFurnitureCollectionProps) {
-	const setSelectedModelId = useSetPlacingFurniture();
-	useHotkeys('esc', () => {
-		setSelectedModelId(null);
-	});
-
 	return (
 		<ScrollArea>
 			<CardGrid p="small">

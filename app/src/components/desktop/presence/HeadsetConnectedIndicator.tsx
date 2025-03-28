@@ -1,39 +1,10 @@
-import { usePropertySocket } from '@/services/publicApi/PropertySocketProvider';
-import { useMe } from '@/services/publicApi/userHooks';
-import { PrefixedId } from '@alef/common';
 import { Frame } from '@alef/sys';
-import { useEffect, useState } from 'react';
+import { useIsHeadsetConnected } from './hooks';
 
 export interface HeadsetConnectedIndicatorProps {}
 
-const FAKE_IT = false;
-
 export function HeadsetConnectedIndicator({}: HeadsetConnectedIndicatorProps) {
-	const { data: self } = useMe();
-	const myId = self?.id;
-	const [headsetDeviceId, setHeadsetDeviceId] = useState<PrefixedId<'d'> | null>(null);
-
-	const socket = usePropertySocket();
-	useEffect(() => {
-		if (!socket) return;
-		const unsubConnect = socket.onMessage('deviceConnected', ({ userId, device }) => {
-			if (userId === myId && device.type === 'headset') {
-				setHeadsetDeviceId(device.id);
-			}
-		});
-		const unsubDisconnect = socket.onMessage('deviceDisconnected', ({ deviceId }) => {
-			if (deviceId === headsetDeviceId) {
-				setHeadsetDeviceId(null);
-			}
-		});
-
-		return () => {
-			unsubConnect();
-			unsubDisconnect();
-		};
-	}, [socket, myId, headsetDeviceId]);
-
-	const isHeadsetConnected = FAKE_IT || headsetDeviceId !== null;
+	const isHeadsetConnected = useIsHeadsetConnected();
 
 	return (
 		<Frame rounded p="squeeze" layout="center center" gapped>

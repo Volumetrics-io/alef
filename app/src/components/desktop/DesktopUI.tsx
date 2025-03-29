@@ -47,7 +47,7 @@ export function DesktopUI({ children }: DesktopUIProps) {
 
 function DesktopUIMain() {
 	return (
-		<Box className={cls.main} stacked>
+		<Box className={cls.main} stacked p="small">
 			<NavBar />
 			<Box p="small" layout="center center">
 				<HeadsetConnectedIndicator />
@@ -68,7 +68,7 @@ function DesktopUIMain() {
 			</Tabs.List>
 			<Tabs.Content value="layouts">
 				<Suspense>
-					<Box p="small" full stacked justify="between">
+					<Box full stacked justify="between">
 						<DesktopLayoutsPicker />
 						<DesktopAddLayout />
 					</Box>
@@ -76,7 +76,7 @@ function DesktopUIMain() {
 			</Tabs.Content>
 			<Tabs.Content value="furniture">
 				<Suspense>
-					<Box p="small" full stacked justify="between">
+					<Box full stacked justify="between">
 						<Box stacked gapped>
 							<DesktopFurnitureMobileInstructions />
 							<DesktopPlacedFurnitureList />

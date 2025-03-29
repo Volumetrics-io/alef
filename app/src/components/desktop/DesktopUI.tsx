@@ -3,7 +3,7 @@ import { useDetailsOpen } from '@/stores/editorStore';
 import { useUndo } from '@/stores/roomStore';
 import { useEditorMode, useOnSelectionChanged } from '@/stores/roomStore/hooks/editing';
 import { EditorMode } from '@alef/common';
-import { Box, Frame, Icon, Tabs } from '@alef/sys';
+import { Box, Frame, Icon, Tabs, Text } from '@alef/sys';
 import clsx from 'clsx';
 import { ReactNode, Suspense } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -52,15 +52,18 @@ function DesktopUIMain() {
 			<Box p="small" layout="center center">
 				<HeadsetConnectedIndicator />
 			</Box>
-			<Tabs.List className={cls.tabs}>
+			<Tabs.List>
 				<Tabs.Trigger value="layouts">
 					<Icon name="house" />
+					<Text>Layouts</Text>
 				</Tabs.Trigger>
 				<Tabs.Trigger value="furniture">
 					<Icon name="sofa" />
+					<Text>Furniture</Text>
 				</Tabs.Trigger>
 				<Tabs.Trigger value="lighting">
 					<Icon name="lightbulb" />
+					<Text>Lighting</Text>
 				</Tabs.Trigger>
 			</Tabs.List>
 			<Tabs.Content value="layouts">

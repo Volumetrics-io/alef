@@ -19,23 +19,15 @@ export function DesktopGlobalLightEditor() {
 				onValueCommit={([v]) => updateGlobalLighting({ intensity: v })}
 			/>
 			<Label>Color</Label>
-			<Slider.Root
+			<Slider
 				min={0}
 				max={10}
 				step={0.1}
 				value={[globalLighting.color]}
 				onValueChange={([v]) => updateGlobalLighting({ color: v }, { localOnly: true })}
 				onValueCommit={([v]) => updateGlobalLighting({ color: v })}
-			>
-				<Slider.Track>
-					<Slider.Range
-						style={{
-							backgroundColor: getLightColor(globalLighting.color),
-						}}
-					/>
-				</Slider.Track>
-				<Slider.Thumb />
-			</Slider.Root>
+				rangeColor={getLightColor(globalLighting.color)}
+			/>
 		</Box>
 	);
 }

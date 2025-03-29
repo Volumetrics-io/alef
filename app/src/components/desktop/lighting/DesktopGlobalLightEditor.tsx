@@ -7,8 +7,6 @@ export function DesktopGlobalLightEditor() {
 
 	return (
 		<Box stacked gapped>
-			<Heading level={3}>Global light</Heading>
-			<Text>Adjust the global light settings.</Text>
 			<Label>Intensity</Label>
 			<Slider
 				min={0}

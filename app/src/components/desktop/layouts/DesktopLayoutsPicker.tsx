@@ -11,9 +11,6 @@ export interface DesktopLayoutsPickerProps {
 export function DesktopLayoutsPicker({ className }: DesktopLayoutsPickerProps) {
 	return (
 		<Box stacked gapped className={className}>
-			<Box>
-				<Heading level={3}>Layouts</Heading>
-			</Box>
 			<ScrollArea>
 				<LayoutSelector />
 			</ScrollArea>

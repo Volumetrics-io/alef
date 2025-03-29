@@ -7,7 +7,6 @@ export function DesktopLightsMainEditor() {
 			<DesktopGlobalLightEditor />
 			<Box stacked gapped>
 				<Heading level={3}>Room lights</Heading>
-				<Text>Tap or click the ceiling to place a new light.</Text>
 			</Box>
 		</Box>
 	);

@@ -1,5 +1,5 @@
 import { useActiveRoomLayoutId, useRoomLayout, useUpdateRoomLayout } from '@/stores/roomStore';
-import { Box, Form } from '@alef/sys';
+import { Box, Dialog, Form, Icon, Button } from '@alef/sys';
 import { DesktopLayoutTypeField } from './DesktopLayoutTypeField';
 
 export interface DesktopLayoutEditorProps {
@@ -12,30 +12,39 @@ export function DesktopLayoutEditor({ className }: DesktopLayoutEditorProps) {
 	const updateLayout = useUpdateRoomLayout();
 
 	if (!layoutData) {
-		return <Box>Missing layout</Box>;
+		return null;
 	}
 
 	return (
-		<Box p="small" className={className} stacked gapped>
-			<Form
-				initialValues={{
-					name: layoutData.name ?? '',
-					type: layoutData.type ?? 'living-room',
-				}}
-				enableReinitialize
-				onSubmit={(values) => {
-					updateLayout({
-						id: layoutData.id,
-						...values,
-					});
-				}}
-			>
-				<Form.TextField name="name" label="Name" required />
-				<DesktopLayoutTypeField name="type" />
-				<Form.Actions>
-					<Form.Submit>Save</Form.Submit>
-				</Form.Actions>
-			</Form>
-		</Box>
+		<Dialog>
+			<Dialog.Trigger asChild>
+				<Button>
+					<Icon name="pencil" />
+				</Button>
+			</Dialog.Trigger>
+			<Dialog.Content title="Edit Layout">
+				<Box p="small" className={className} stacked gapped>
+					<Form
+						initialValues={{
+							name: layoutData.name ?? '',
+							type: layoutData.type ?? 'living-room',
+						}}
+						enableReinitialize
+						onSubmit={(values) => {
+							updateLayout({
+								id: layoutData.id,
+								...values,
+							});
+						}}
+					>
+						<Form.TextField name="name" label="Name" required />
+						<DesktopLayoutTypeField name="type" />
+						<Form.Actions>
+							<Form.Submit>Save</Form.Submit>
+						</Form.Actions>
+					</Form>
+				</Box>
+			</Dialog.Content>
+		</Dialog>
 	);
 }

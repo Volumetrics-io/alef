@@ -12,14 +12,13 @@ import { DesktopAddFurniture } from './furniture/DesktopAddFurniture';
 import { DesktopFurnitureEditor } from './furniture/DesktopFurnitureEditor';
 import { DesktopFurnitureMobileInstructions } from './furniture/DesktopFurnitureMobileInstructions';
 import { DesktopPlacedFurnitureList } from './furniture/DesktopPlacedFurnitureList';
-import { DesktopAddLayout } from './layouts/DesktopAddLayout';
 import { DesktopLayoutEditor } from './layouts/DesktopLayoutEditor';
 import { DesktopLayoutsPicker } from './layouts/DesktopLayoutsPicker';
 import { DesktopLightEditor } from './lighting/DesktopLightEditor';
 import { DesktopLightsMainEditor } from './lighting/DesktopLightsMainEditor';
 import { HeadsetConnectedIndicator } from './presence/HeadsetConnectedIndicator';
 import { NavBar } from '@/components/navBar/NavBar';
-
+import { DesktopLayoutTools } from './layouts/DesktopLayoutTools';
 export interface DesktopUIProps {
 	children?: ReactNode;
 }
@@ -39,7 +38,7 @@ export function DesktopUI({ children }: DesktopUIProps) {
 			<Tabs value={mode || 'layouts'} onValueChange={(m) => setMode(m as EditorMode)}>
 				<DesktopUIMain />
 				{!isMobile && <Box className={cls.content}>{children}</Box>}
-				<DesktopUISecondary />
+				{/* <DesktopUISecondary /> */}
 			</Tabs>
 		</Box>
 	);
@@ -70,7 +69,7 @@ function DesktopUIMain() {
 				<Suspense>
 					<Box full stacked justify="between">
 						<DesktopLayoutsPicker />
-						<DesktopAddLayout />
+						<DesktopLayoutTools />
 					</Box>
 				</Suspense>
 			</Tabs.Content>

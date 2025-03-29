@@ -31,11 +31,11 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(func
 					<Box spread>
 						<DialogTitle>{title}</DialogTitle>
 					</Box>
-					<DialogClose asChild>
+					<Dialog.Close asChild>
 						<Button variant="action" float="top-right">
 							<XIcon />
 						</Button>
-					</DialogClose>
+					</Dialog.Close>
 					{props.children}
 				</DialogPrimitive.Content>
 			</Frame>
@@ -47,9 +47,21 @@ export const DialogActions = withProps(Box, {
 	spread: true,
 });
 
+export interface DialogTriggerProps extends DialogPrimitive.DialogTriggerProps {
+	asChild?: boolean;
+}
+
+export const DialogTrigger = forwardRef<HTMLButtonElement, DialogTriggerProps>(function DialogTrigger({ asChild, ...props }, ref) {
+	return (
+		<DialogPrimitive.Trigger className={cls.trigger} asChild={asChild} ref={ref} {...props}>
+			{props.children}
+		</DialogPrimitive.Trigger>
+	);
+});
+
 export const Dialog = Object.assign(DialogRoot, {
 	Content: DialogContent,
-	Trigger: DialogPrimitive.Trigger,
+	Trigger: DialogTrigger,
 	Actions: DialogActions,
 	Close: DialogClose,
 	Title: DialogTitle,

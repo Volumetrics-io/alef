@@ -8,7 +8,7 @@
 	overflow: hidden;
 	height: auto;
 	width: 100%;
-	background-color: var(--track);
+	background-color: var(--paper);
 
 	--main-size: 400px;
 	--secondary-size: 300px;

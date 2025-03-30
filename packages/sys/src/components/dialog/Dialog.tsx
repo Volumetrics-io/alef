@@ -20,25 +20,34 @@ export const DialogDescription = withClassName(DialogPrimitive.Description, cls.
 export interface DialogContentProps extends DialogPrimitive.DialogContentProps {
 	title: string;
 	width?: 'medium' | 'large';
+	container?: HTMLElement | null;
 }
 
-export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(function DialogContent({ width, title, ...props }, ref) {
+export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(function DialogContent({ width, title, container, ...props }, ref) {
+	const handleOutsidePointerDown = (e: Event) => {
+		if (container && !container.contains(e.target as Node)) {
+			e.preventDefault();
+		}
+	};
+
 	return (
-		<DialogPrimitive.Portal>
+		<DialogPrimitive.Portal container={container}>
 			<DialogPrimitive.Overlay className={cls.overlay} />
-			<Frame asChild padded stacked gapped elevated ref={ref}>
-				<DialogPrimitive.Content className={clsx(cls.content, width === 'large' && cls.contentLarge)} {...props}>
-					<Box spread>
-						<DialogTitle>{title}</DialogTitle>
-					</Box>
-					<DialogClose asChild>
-						<Button variant="action" float="top-right">
-							<XIcon />
-						</Button>
-					</DialogClose>
-					{props.children}
-				</DialogPrimitive.Content>
-			</Frame>
+			<Box className={cls.contentContainer}>
+				<Frame asChild padded stacked gapped elevated ref={ref}>
+					<DialogPrimitive.Content className={clsx(cls.content, width === 'large' && cls.contentLarge)} onPointerDownOutside={handleOutsidePointerDown} {...props}>
+						<Box>
+							<DialogTitle>{title}</DialogTitle>
+						</Box>
+						<Dialog.Close asChild>
+							<Button variant="action" color="ghost" float="top-right">
+								<XIcon />
+							</Button>
+						</Dialog.Close>
+						{props.children}
+					</DialogPrimitive.Content>
+				</Frame>
+			</Box>
 		</DialogPrimitive.Portal>
 	);
 });
@@ -47,9 +56,21 @@ export const DialogActions = withProps(Box, {
 	spread: true,
 });
 
+export interface DialogTriggerProps extends DialogPrimitive.DialogTriggerProps {
+	asChild?: boolean;
+}
+
+export const DialogTrigger = forwardRef<HTMLButtonElement, DialogTriggerProps>(function DialogTrigger({ asChild, ...props }, ref) {
+	return (
+		<DialogPrimitive.Trigger className={cls.trigger} asChild={asChild} ref={ref} {...props}>
+			{props.children}
+		</DialogPrimitive.Trigger>
+	);
+});
+
 export const Dialog = Object.assign(DialogRoot, {
 	Content: DialogContent,
-	Trigger: DialogPrimitive.Trigger,
+	Trigger: DialogTrigger,
 	Actions: DialogActions,
 	Close: DialogClose,
 	Title: DialogTitle,

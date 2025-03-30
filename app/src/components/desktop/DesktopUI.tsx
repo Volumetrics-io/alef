@@ -1,23 +1,20 @@
 import { useMedia } from '@/hooks/useMedia';
-import { useDetailsOpen } from '@/stores/editorStore';
 import { useUndo } from '@/stores/roomStore';
-import { useEditorMode, useOnSelectionChanged } from '@/stores/roomStore/hooks/editing';
+import { useEditorMode } from '@/stores/roomStore/hooks/editing';
 import { EditorMode } from '@alef/common';
-import { Box, Frame, Icon, Tabs } from '@alef/sys';
-import clsx from 'clsx';
-import { ReactNode, Suspense } from 'react';
+import { Box, Icon, Tabs, Text } from '@alef/sys';
+import { ReactNode, Suspense, useEffect, useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import cls from './DesktopUI.module.css';
 import { DesktopAddFurniture } from './furniture/DesktopAddFurniture';
-import { DesktopFurnitureEditor } from './furniture/DesktopFurnitureEditor';
 import { DesktopFurnitureMobileInstructions } from './furniture/DesktopFurnitureMobileInstructions';
 import { DesktopPlacedFurnitureList } from './furniture/DesktopPlacedFurnitureList';
-import { DesktopAddLayout } from './layouts/DesktopAddLayout';
-import { DesktopLayoutEditor } from './layouts/DesktopLayoutEditor';
 import { DesktopLayoutsPicker } from './layouts/DesktopLayoutsPicker';
-import { DesktopLightEditor } from './lighting/DesktopLightEditor';
 import { DesktopLightsMainEditor } from './lighting/DesktopLightsMainEditor';
 import { HeadsetConnectedIndicator } from './presence/HeadsetConnectedIndicator';
+import { NavBar } from '@/components/navBar/NavBar';
+import { DesktopLayoutTools } from './layouts/DesktopLayoutTools';
+import { useContainerStore } from './stores/useContainer';
 
 export interface DesktopUIProps {
 	children?: ReactNode;
@@ -38,40 +35,52 @@ export function DesktopUI({ children }: DesktopUIProps) {
 			<Tabs value={mode || 'layouts'} onValueChange={(m) => setMode(m as EditorMode)}>
 				<DesktopUIMain />
 				{!isMobile && <Box className={cls.content}>{children}</Box>}
-				<DesktopUISecondary />
+				{/* <DesktopUISecondary /> */}
 			</Tabs>
 		</Box>
 	);
 }
 
 function DesktopUIMain() {
+	const container = useRef<HTMLDivElement>(null);
+
+	const setContainer = useContainerStore((state) => state.setContainer);
+
+	useEffect(() => {
+		setContainer(container.current);
+	}, [container.current]);
+
 	return (
-		<Box className={cls.main} stacked>
+		<Box ref={container} className={cls.main} stacked p="small">
+			<NavBar />
 			<Box p="small" layout="center center">
 				<HeadsetConnectedIndicator />
 			</Box>
-			<Tabs.List className={cls.tabs}>
+			<Tabs.List>
 				<Tabs.Trigger value="layouts">
 					<Icon name="house" />
+					<Text>Layouts</Text>
 				</Tabs.Trigger>
 				<Tabs.Trigger value="furniture">
 					<Icon name="sofa" />
+					<Text>Furniture</Text>
 				</Tabs.Trigger>
 				<Tabs.Trigger value="lighting">
 					<Icon name="lightbulb" />
+					<Text>Lighting</Text>
 				</Tabs.Trigger>
 			</Tabs.List>
 			<Tabs.Content value="layouts">
 				<Suspense>
-					<Box p="small" full stacked justify="between">
+					<Box full stacked justify="between">
 						<DesktopLayoutsPicker />
-						<DesktopAddLayout />
+						<DesktopLayoutTools />
 					</Box>
 				</Suspense>
 			</Tabs.Content>
 			<Tabs.Content value="furniture">
 				<Suspense>
-					<Box p="small" full stacked justify="between">
+					<Box full stacked justify="between">
 						<Box stacked gapped>
 							<DesktopFurnitureMobileInstructions />
 							<DesktopPlacedFurnitureList />
@@ -83,39 +92,6 @@ function DesktopUIMain() {
 			<Tabs.Content value="lighting">
 				<DesktopLightsMainEditor />
 			</Tabs.Content>
-		</Box>
-	);
-}
-
-function DesktopUISecondary() {
-	const [open, setOpen] = useDetailsOpen();
-	// open details panel when selection changes
-	useOnSelectionChanged(() => setOpen(true));
-	return (
-		<Box className={cls.secondary}>
-			<Frame float="top-left" className={cls.secondaryToggle} onClick={() => setOpen(!open)} aria-label="Toggle details panel" tabIndex={0} role="button">
-				<Icon name={open ? 'panel-right-close' : 'panel-right-open'} className={cls.secondaryContentToggleIcon} />
-				<span className={cls.secondaryContentToggleLabel}>Details</span>
-			</Frame>
-			<Box className={clsx(cls.secondaryContent, open && cls.secondaryContentOpen)}>
-				<Box className={cls.secondaryContentInner}>
-					<Tabs.Content value="layouts">
-						<Suspense>
-							<DesktopLayoutEditor />
-						</Suspense>
-					</Tabs.Content>
-					<Tabs.Content value="furniture">
-						<Suspense>
-							<DesktopFurnitureEditor />
-						</Suspense>
-					</Tabs.Content>
-					<Tabs.Content value="lighting">
-						<Suspense>
-							<DesktopLightEditor />
-						</Suspense>
-					</Tabs.Content>
-				</Box>
-			</Box>
 		</Box>
 	);
 }

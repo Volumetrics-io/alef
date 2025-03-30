@@ -1,4 +1,4 @@
-import { NavBar } from '@/components/NavBar';
+import { NavBar } from '@/components/navBar/NavBar';
 import { useProperty } from '@/services/publicApi/propertyHooks';
 import { PrefixedId } from '@alef/common';
 import { Box, Breadcrumbs, Button, Heading, Main } from '@alef/sys';

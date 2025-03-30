@@ -1,5 +1,7 @@
 @layer components {
 	.root {
+		container-type: inline-size;
+		container-name: nav-bar;
 		font-family: var(--font-head);
 		justify-content: space-between;
 		position: sticky;
@@ -9,8 +11,13 @@
 		/* border-bottom: var(--border); */
 		transition:
 			background-color 0.3s ease,
-			border 0.3s ease;
+			border 0.3s ease,
+			transform 0.3s ease;
 		flex-grow: 0;
+	}
+
+	.hidden {
+		transform: translateY(-100%);
 	}
 }
 

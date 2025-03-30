@@ -1,45 +1,67 @@
-import { useFurnitureDetails } from '@/services/publicApi/furnitureHooks';
+import { FurnitureItem, useFurnitureDetails } from '@/services/publicApi/furnitureHooks';
 import { useFurniturePlacement, useFurniturePlacementIds } from '@/stores/roomStore';
-import { useIsSelected, useSelect } from '@/stores/roomStore/hooks/editing';
+import { useIsSelected, useSelect, useSelectedFurniturePlacementId } from '@/stores/roomStore/hooks/editing';
 import { PrefixedId } from '@alef/common';
-import { Box, BoxProps, Button, Icon, ScrollArea } from '@alef/sys';
-import { Suspense } from 'react';
+import { CardGrid, Dialog, ScrollArea } from '@alef/sys';
+import { DesktopFurnitureCard } from './DesktopFurnitureCard';
+import { DesktopSelectedFurnitureTools } from './DesktopFurnitureTools';
+import { useContainerStore } from '../stores/useContainer';
 
-export interface DesktopPlacedFurnitureListProps extends BoxProps {}
-
-export function DesktopPlacedFurnitureList(props: DesktopPlacedFurnitureListProps) {
+export function DesktopPlacedFurnitureList() {
 	const ids = useFurniturePlacementIds();
 
 	return (
 		<ScrollArea>
-			<Box p="small" stacked gapped {...props}>
+			<CardGrid small p="small">
 				{ids.map((id) => (
-					<DesktopPlacedFurnitureListItem key={id} id={id} />
+					<DesktopPlacedFurnitureCard key={id} id={id} />
 				))}
-			</Box>
+			</CardGrid>
 		</ScrollArea>
 	);
 }
 
-function DesktopPlacedFurnitureListItem({ id }: { id: PrefixedId<'fp'> }) {
+function DesktopPlacedFurnitureCard({ id }: { id: PrefixedId<'fp'> }) {
 	const placement = useFurniturePlacement(id);
 	const select = useSelect();
 	const isSelected = useIsSelected(id);
 
 	if (!placement) return null;
 
+	const { data: furnitureData } = useFurnitureDetails(placement.furnitureId);
+
+	if (!furnitureData) return null;
+
+	const handleOpenChange = (open: boolean) => {
+		if (!open) {
+			select(null);
+		}
+	};
+
 	return (
-		<Button justify="start" onClick={() => select(id)}>
-			<Suspense fallback={<span>Furniture</span>}>
-				<DesktopPlacedFurnitureListItemName furnitureId={placement.furnitureId} />
-			</Suspense>
-			{isSelected && <Icon name="check" style={{ marginLeft: 'auto' }} />}
-		</Button>
+		<Dialog onOpenChange={handleOpenChange}>
+			<Dialog.Trigger
+				asChild
+				onClick={() => {
+					select(id);
+				}}
+			>
+				<DesktopFurnitureCard item={furnitureData} isSelected={isSelected} />
+			</Dialog.Trigger>
+			<FurnitureDetailsDialogContent item={furnitureData} />
+		</Dialog>
 	);
 }
 
-function DesktopPlacedFurnitureListItemName({ furnitureId }: { furnitureId: PrefixedId<'f'> }) {
-	const { data: furnitureData } = useFurnitureDetails(furnitureId);
+function FurnitureDetailsDialogContent({ item }: { item: FurnitureItem }) {
+	const container = useContainerStore((state) => state.container);
 
-	return <span>{furnitureData?.name ?? 'Furniture'}</span>;
+	const selectedPlacementId = useSelectedFurniturePlacementId();
+
+	return (
+		<Dialog.Content title={item.name} container={container}>
+			<img src={`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${item.id}/image.jpg`} />
+			{selectedPlacementId && <DesktopSelectedFurnitureTools id={selectedPlacementId} />}
+		</Dialog.Content>
+	);
 }

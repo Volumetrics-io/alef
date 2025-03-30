@@ -1,6 +1,6 @@
 import { useMe } from '@/services/publicApi/userHooks';
 import { Button, Text, NavMenu, Icon, Logo, NavBarProps, NavBar as SysNavBar } from '@alef/sys';
-import { Link, useMatchingRoutes } from '@verdant-web/react-router';
+import { Link } from '@verdant-web/react-router';
 import { forwardRef } from 'react';
 import { LogoutButton } from '../auth/LogoutButton';
 import { UpdatePrompt } from '../updates/UpdatePrompt';
@@ -8,9 +8,6 @@ import cls from './NavBar.module.css';
 
 export const NavBar = forwardRef<HTMLDivElement, NavBarProps>(function NavBar(props, ref) {
 	const { data: session } = useMe();
-	const routes = useMatchingRoutes();
-	const isProperties = routes.some((r) => r.path === '/properties');
-	const isDevices = routes.some((r) => r.path === '/devices');
 
 	return (
 		<SysNavBar {...props} ref={ref}>

@@ -107,7 +107,7 @@ body {
 	color: var(--ink);
 	line-height: 1.6;
 	background: var(--paper);
-	min-height: 100vh;
+	min-height: 100dvh;
 }
 
 img {
@@ -131,7 +131,7 @@ hr {
 
 .full-layout {
 	width: 100vw;
-	height: 100vh;
+	height: 100dvh;
 }
 
 header {

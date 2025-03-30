@@ -1,6 +1,6 @@
 @layer components {
 	.overlay {
-		position: fixed;
+		position: absolute;
 		inset: 0;
 		background-color: var(--dimmed);
 		animation: overlayShow 0.5s var(--bounce);
@@ -14,7 +14,7 @@
 	}
 
 	.contentContainer {
-		position: fixed;
+		position: absolute;
 		bottom: 0%;
 		left: 50%;
 		transform: translate(-50%, 0%);

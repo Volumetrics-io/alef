@@ -51,7 +51,7 @@ export interface NavMenuItemProps extends BoxProps {
 
 export const NavMenuItem = forwardRef<HTMLDivElement, NavMenuItemProps>(function NavMenuItem({ className, children, asChild, ...rest }, ref) {
 	return (
-		<Control asChild={asChild} className={clsx(cls.item, className)} {...rest}>
+		<Control ref={ref} asChild={asChild} className={clsx(cls.item, className)} {...rest}>
 			{children}
 		</Control>
 	);
@@ -61,7 +61,7 @@ export interface NavMenuItemLinkProps extends LinkProps {}
 
 export const NavMenuItemLink = forwardRef<HTMLAnchorElement, NavMenuItemLinkProps>(function NavMenuItemLink({ className, children, ...rest }, ref) {
 	return (
-		<Link className={clsx(cls.item, className)} {...rest}>
+		<Link ref={ref} className={clsx(cls.item, className)} {...rest}>
 			{children}
 		</Link>
 	);

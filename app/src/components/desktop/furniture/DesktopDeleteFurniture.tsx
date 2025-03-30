@@ -1,4 +1,4 @@
-import { Icon, Button, Dialog, Box, Text } from '@alef/sys';
+import { Icon, Button, Dialog } from '@alef/sys';
 import { useCallback } from 'react';
 import { useContainerStore } from '../stores/useContainer';
 import { useSelect, useSelectedFurniturePlacementId } from '@/stores/roomStore/hooks/editing';

@@ -1,6 +1,6 @@
 import { getLightColor } from '@/components/xr/lighting/getLightColor';
 import { useGlobalLighting } from '@/stores/roomStore';
-import { Box, Heading, Label, Slider, Text } from '@alef/sys';
+import { Box, Label, Slider } from '@alef/sys';
 
 export function DesktopGlobalLightEditor() {
 	const [globalLighting, updateGlobalLighting] = useGlobalLighting();

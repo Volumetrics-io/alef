@@ -6,7 +6,7 @@ import { Box } from '@alef/sys';
 
 const DesktopModePage = () => {
 	return (
-		<Box stacked stretched layout="stretch start" style={{ maxHeight: '100vh', overflow: 'hidden' }}>
+		<Box stacked stretched layout="stretch start" style={{ maxHeight: '100dvh', overflow: 'hidden' }}>
 			<PropertyRoomStoreProvider>
 				<DesktopUI>
 					<SceneWrapper full disableEnterXR>

@@ -13,4 +13,9 @@
 		*/
 		/* flex-basis: calc(100dvh - var(--hero-height, var(--nav-height, 0)) - 1rem); */
 	}
+
+	.forceNav {
+		--nav-height: 82px;
+		margin-top: calc(var(--nav-height, 0) * -1);
+	}
 }

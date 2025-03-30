@@ -24,17 +24,10 @@ export const NavMenuContent = forwardRef<HTMLDivElement, NavMenuContentProps>(fu
 				<RadixDialog.Content data-side="left" ref={ref} className={clsx(cls.content, className)}>
 					<Box className={cls.header} full="width" align="center" justify="between">
 						<RadixDialog.Title>
-							{' '}
 							<Link to="/">
-								{' '}
-								<Logo style={{ width: 40, height: 'auto' }} />{' '}
-							</Link>{' '}
+								<Logo style={{ width: 40, height: 'auto' }} />
+							</Link>
 						</RadixDialog.Title>
-						<RadixDialog.Close asChild>
-							<Button variant="action" color="ghost" float="top-right">
-								<XIcon />
-							</Button>
-						</RadixDialog.Close>
 					</Box>
 					{children}
 				</RadixDialog.Content>

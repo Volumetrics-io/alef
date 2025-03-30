@@ -14,7 +14,7 @@ export const NavBar = forwardRef<HTMLDivElement, NavBarProps>(function NavBar(pr
 
 	return (
 		<SysNavBar {...props} ref={ref}>
-			<SysNavBar.Start>
+			<SysNavBar.Start className={cls.navbar}>
 				{session && (
 					<NavMenu>
 						<NavMenu.Trigger>

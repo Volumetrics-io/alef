@@ -69,5 +69,9 @@
 @layer variants {
 	.contentLarge {
 		max-width: 90vw;
+
+		@media (max-width: 768px) {
+			max-width: 100%;
+		}
 	}
 }

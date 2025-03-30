@@ -1,8 +1,7 @@
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
 import { usePlacingFurnitureId, useSetPlacingFurniture } from '@/stores/roomStore/hooks/editing';
-import { Button, Card, CardGrid, Icon, ScrollArea } from '@alef/sys';
-import cls from './DesktopFurnitureCollection.module.css';
-import clsx from 'clsx';
+import { Button, CardGrid, Icon, ScrollArea } from '@alef/sys';
+import { DesktopFurnitureCard } from './DesktopFurnitureCard';
 
 export interface DesktopFurnitureCollectionProps {
 	furniture: FurnitureItem[];
@@ -15,7 +14,7 @@ export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore }: D
 		<ScrollArea>
 			<CardGrid small p="small">
 				{furniture.map((item) => (
-					<DesktopFurnitureCard key={item.id} item={item} />
+					<FurnitureCard key={item.id} item={item} />
 				))}
 			</CardGrid>
 			{hasMore && (
@@ -28,7 +27,7 @@ export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore }: D
 	);
 }
 
-function DesktopFurnitureCard({ item }: { item: FurnitureItem }) {
+function FurnitureCard({ item }: { item: FurnitureItem }) {
 	const selectedModelId = usePlacingFurnitureId();
 	const setSelectedModelId = useSetPlacingFurniture();
 
@@ -42,14 +41,5 @@ function DesktopFurnitureCard({ item }: { item: FurnitureItem }) {
 		}
 	};
 
-	return (
-		<Card onClick={handleClick} className={clsx(cls.card, isSelected && cls.cardSelected)}>
-			<Card.Main>
-				<Card.Image src={`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${item.id}/image.jpg`} />
-			</Card.Main>
-			<Card.Details>
-				<Card.Title>{item.name}</Card.Title>
-			</Card.Details>
-		</Card>
-	);
+	return <DesktopFurnitureCard item={item} isSelected={isSelected} onClick={handleClick} />;
 }

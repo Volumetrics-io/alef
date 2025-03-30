@@ -1,20 +1,15 @@
 import { useMedia } from '@/hooks/useMedia';
-import { useDetailsOpen } from '@/stores/editorStore';
 import { useUndo } from '@/stores/roomStore';
-import { useEditorMode, useOnSelectionChanged } from '@/stores/roomStore/hooks/editing';
+import { useEditorMode } from '@/stores/roomStore/hooks/editing';
 import { EditorMode } from '@alef/common';
-import { Box, Frame, Icon, Tabs, Text } from '@alef/sys';
-import clsx from 'clsx';
+import { Box, Icon, Tabs, Text } from '@alef/sys';
 import { ReactNode, Suspense, useEffect, useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import cls from './DesktopUI.module.css';
 import { DesktopAddFurniture } from './furniture/DesktopAddFurniture';
-import { DesktopFurnitureEditor } from './furniture/DesktopFurnitureEditor';
 import { DesktopFurnitureMobileInstructions } from './furniture/DesktopFurnitureMobileInstructions';
 import { DesktopPlacedFurnitureList } from './furniture/DesktopPlacedFurnitureList';
-import { DesktopLayoutEditor } from './layouts/DesktopLayoutEditor';
 import { DesktopLayoutsPicker } from './layouts/DesktopLayoutsPicker';
-import { DesktopLightEditor } from './lighting/DesktopLightEditor';
 import { DesktopLightsMainEditor } from './lighting/DesktopLightsMainEditor';
 import { HeadsetConnectedIndicator } from './presence/HeadsetConnectedIndicator';
 import { NavBar } from '@/components/navBar/NavBar';
@@ -97,39 +92,6 @@ function DesktopUIMain() {
 			<Tabs.Content value="lighting">
 				<DesktopLightsMainEditor />
 			</Tabs.Content>
-		</Box>
-	);
-}
-
-function DesktopUISecondary() {
-	const [open, setOpen] = useDetailsOpen();
-	// open details panel when selection changes
-	useOnSelectionChanged(() => setOpen(true));
-	return (
-		<Box className={cls.secondary}>
-			<Frame float="top-left" className={cls.secondaryToggle} onClick={() => setOpen(!open)} aria-label="Toggle details panel" tabIndex={0} role="button">
-				<Icon name={open ? 'panel-right-close' : 'panel-right-open'} className={cls.secondaryContentToggleIcon} />
-				<span className={cls.secondaryContentToggleLabel}>Details</span>
-			</Frame>
-			<Box className={clsx(cls.secondaryContent, open && cls.secondaryContentOpen)}>
-				<Box className={cls.secondaryContentInner}>
-					<Tabs.Content value="layouts">
-						<Suspense>
-							<DesktopLayoutEditor />
-						</Suspense>
-					</Tabs.Content>
-					<Tabs.Content value="furniture">
-						<Suspense>
-							<DesktopFurnitureEditor />
-						</Suspense>
-					</Tabs.Content>
-					<Tabs.Content value="lighting">
-						<Suspense>
-							<DesktopLightEditor />
-						</Suspense>
-					</Tabs.Content>
-				</Box>
-			</Box>
 		</Box>
 	);
 }

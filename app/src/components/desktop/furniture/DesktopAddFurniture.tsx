@@ -17,7 +17,7 @@ export function DesktopAddFurniture() {
 				<Dialog.Trigger asChild>
 					<Button color="suggested">
 						<Icon name="plus" />
-						Asset furniture
+						Add furniture
 					</Button>
 				</Dialog.Trigger>
 				<Dialog.Content title="Asset Library" width="large" container={container}>

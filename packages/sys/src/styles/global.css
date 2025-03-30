@@ -106,7 +106,7 @@ body {
 	font-family: var(--font-body);
 	color: var(--ink);
 	line-height: 1.6;
-	background: var(--track);
+	background: var(--paper);
 	min-height: 100vh;
 }
 

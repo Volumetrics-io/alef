@@ -7,7 +7,7 @@ import { Control } from '../control/Control.js';
 import cls from './NavMenu.module.css';
 import { Box, BoxProps } from '../box/Box.js';
 import { Logo } from '../logo/Logo.js';
-import { Button, ButtonProps } from '../button/Button.js';
+import { Button } from '../button/Button.js';
 import { Link, LinkProps } from '@verdant-web/react-router';
 import { XIcon } from 'lucide-react';
 

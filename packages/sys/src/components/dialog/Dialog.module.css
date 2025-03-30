@@ -24,6 +24,10 @@
 		padding: 1rem;
 		animation: contentShow 0.3s;
 		padding-bottom: env(safe-area-inset-bottom);
+
+		@media (max-width: 768px) {
+			padding: 0;
+		}
 	}
 
 	.content {
@@ -31,6 +35,10 @@
 		border-radius: 1rem;
 		max-width: min(42rem, 90vw);
 		max-height: 100dvh;
+
+		@media (max-width: 768px) {
+			width: 100%;
+		}
 	}
 
 	.title {

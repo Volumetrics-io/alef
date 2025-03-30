@@ -7,21 +7,21 @@ import { Control } from '../control/Control.js';
 import cls from './NavMenu.module.css';
 import { Box, BoxProps } from '../box/Box.js';
 import { Logo } from '../logo/Logo.js';
-import { Icon } from '../icon/Icon.js';
 import { Button, ButtonProps } from '../button/Button.js';
 import { Link, LinkProps } from '@verdant-web/react-router';
+import { XIcon } from 'lucide-react';
 
 export const NavMenuRoot = withClassName(RadixDialog.Root, cls.root);
 export const NavMenuTrigger = withClassName(withProps(RadixDialog.Trigger, { asChild: true }), cls.trigger);
 
 export interface NavMenuContentProps extends RadixDialog.DialogContentProps {}
 
-export const NavMenuContent = forwardRef<HTMLDivElement, NavMenuContentProps>(function NavMenuContent({ className, children, ...rest }, ref) {
+export const NavMenuContent = forwardRef<HTMLDivElement, NavMenuContentProps>(function NavMenuContent({ className, children }, ref) {
 	return (
 		<RadixDialog.Portal>
 			<RadixDialog.Overlay />
 			<Box className={cls.overlay}>
-				<RadixDialog.Content data-side="left" ref={ref} className={clsx(cls.content, className)} {...rest}>
+				<RadixDialog.Content data-side="left" ref={ref} className={clsx(cls.content, className)}>
 					<Box className={cls.header} full="width" align="center" justify="between">
 						<RadixDialog.Title>
 							{' '}
@@ -30,11 +30,11 @@ export const NavMenuContent = forwardRef<HTMLDivElement, NavMenuContentProps>(fu
 								<Logo style={{ width: 40, height: 'auto' }} />{' '}
 							</Link>{' '}
 						</RadixDialog.Title>
-						<NavMenuClose>
-							<NavMenu.ItemIcon>
-								<Icon name="x" />
-							</NavMenu.ItemIcon>
-						</NavMenuClose>
+						<RadixDialog.Close asChild>
+							<Button variant="action" color="ghost" float="top-right">
+								<XIcon />
+							</Button>
+						</RadixDialog.Close>
 					</Box>
 					{children}
 				</RadixDialog.Content>
@@ -64,18 +64,6 @@ export const NavMenuItemLink = forwardRef<HTMLAnchorElement, NavMenuItemLinkProp
 		<Link ref={ref} className={clsx(cls.item, className)} {...rest}>
 			{children}
 		</Link>
-	);
-});
-
-export interface NavMenuCloseProps extends ButtonProps {}
-
-export const NavMenuClose = forwardRef<HTMLButtonElement, NavMenuCloseProps>(function NavMenuClose({ className, children, ...rest }, ref) {
-	return (
-		<RadixDialog.Close asChild>
-			<Button ref={ref} color="ghost" {...rest}>
-				{children}
-			</Button>
-		</RadixDialog.Close>
 	);
 });
 

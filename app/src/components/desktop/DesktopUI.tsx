@@ -5,7 +5,7 @@ import { useEditorMode, useOnSelectionChanged } from '@/stores/roomStore/hooks/e
 import { EditorMode } from '@alef/common';
 import { Box, Frame, Icon, Tabs, Text } from '@alef/sys';
 import clsx from 'clsx';
-import { ReactNode, Suspense } from 'react';
+import { ReactNode, Suspense, useEffect, useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import cls from './DesktopUI.module.css';
 import { DesktopAddFurniture } from './furniture/DesktopAddFurniture';
@@ -19,6 +19,8 @@ import { DesktopLightsMainEditor } from './lighting/DesktopLightsMainEditor';
 import { HeadsetConnectedIndicator } from './presence/HeadsetConnectedIndicator';
 import { NavBar } from '@/components/navBar/NavBar';
 import { DesktopLayoutTools } from './layouts/DesktopLayoutTools';
+import { useContainerStore } from './stores/useContainer';
+
 export interface DesktopUIProps {
 	children?: ReactNode;
 }
@@ -45,8 +47,16 @@ export function DesktopUI({ children }: DesktopUIProps) {
 }
 
 function DesktopUIMain() {
+	const container = useRef<HTMLDivElement>(null);
+
+	const setContainer = useContainerStore((state) => state.setContainer);
+
+	useEffect(() => {
+		setContainer(container.current);
+	}, [container.current]);
+
 	return (
-		<Box className={cls.main} stacked p="small">
+		<Box ref={container} className={cls.main} stacked p="small">
 			<NavBar />
 			<Box p="small" layout="center center">
 				<HeadsetConnectedIndicator />

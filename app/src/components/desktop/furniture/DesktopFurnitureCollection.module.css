@@ -6,3 +6,7 @@
 		transition: transform var(--animation-duration) ease;
 	}
 }
+
+.cardSelected {
+	border-color: var(--focus);
+}

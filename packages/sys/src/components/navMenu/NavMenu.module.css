@@ -35,6 +35,14 @@
 		margin: 0.5rem;
 		max-width: calc(100% - 1rem);
 
+		/* Specific adjustments for PWA mode */
+		@media (display-mode: standalone), (display-mode: fullscreen) {
+			margin-left: max(0.5rem, env(safe-area-inset-left));
+			margin-right: max(0.5rem, env(safe-area-inset-right));
+			margin-top: max(0.5rem, env(safe-area-inset-top));
+			margin-bottom: max(0.5rem, env(safe-area-inset-bottom));
+		}
+
 		&[data-side='top'] {
 			animation-name: slideDownAndFade;
 		}

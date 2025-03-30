@@ -12,7 +12,7 @@
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
-		border-radius: 2rem;
+		border-radius: 1rem;
 		width: 100%;
 		max-width: min(42rem, 90vw);
 		animation: contentShow 0.5s var(--bounce);

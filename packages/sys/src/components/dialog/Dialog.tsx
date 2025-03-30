@@ -28,11 +28,11 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(func
 			<DialogPrimitive.Overlay className={cls.overlay} />
 			<Frame asChild padded stacked gapped elevated ref={ref}>
 				<DialogPrimitive.Content className={clsx(cls.content, width === 'large' && cls.contentLarge)} {...props}>
-					<Box spread>
+					<Box>
 						<DialogTitle>{title}</DialogTitle>
 					</Box>
 					<Dialog.Close asChild>
-						<Button variant="action" float="top-right">
+						<Button variant="action" color="ghost" float="top-right">
 							<XIcon />
 						</Button>
 					</Dialog.Close>

@@ -15,8 +15,12 @@
 		top: 0;
 		left: 0;
 		z-index: 9999;
-		height: 100vh;
-		width: 100vw;
+		height: 100%;
+		width: 100%;
+		max-width: 100%;
+		max-height: 100%;
+		overflow: hidden;
+		padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 	}
 
 	.content {
@@ -30,6 +34,7 @@
 		overflow: auto;
 
 		margin: 0.5rem;
+		max-width: calc(100% - 1rem);
 
 		&[data-side='top'] {
 			animation-name: slideDownAndFade;
@@ -53,7 +58,7 @@
 
 		@media (max-width: 768px) {
 			width: 70vw;
-			max-width: 220px;
+			max-width: min(220px, calc(100% - 1rem));
 		}
 	}
 

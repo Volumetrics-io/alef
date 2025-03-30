@@ -10,7 +10,7 @@ export const NavBar = forwardRef<HTMLDivElement, NavBarProps>(function NavBar(pr
 	const { data: session } = useMe();
 
 	return (
-		<SysNavBar {...props} ref={ref}>
+		<SysNavBar {...props} background="paper" ref={ref}>
 			<SysNavBar.Start className={cls.navbar}>
 				{session && (
 					<NavMenu>

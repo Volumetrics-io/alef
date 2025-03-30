@@ -19,29 +19,27 @@
 		width: 100%;
 		max-width: 100%;
 		max-height: 100%;
+		background-color: var(--dimmed);
+
 		overflow: hidden;
+		/* Specific adjustments for PWA mode */
+		@media (display-mode: standalone), (display-mode: fullscreen) {
+			padding-left: env(safe-area-inset-left);
+			padding-right: env(safe-area-inset-right);
+			padding-top: env(safe-area-inset-top);
+			padding-bottom: env(safe-area-inset-bottom);
+		}
 	}
 
 	.content {
-		min-width: 220px;
+		min-width: 250px;
 		background-color: var(--paper);
 		display: flex;
 		flex-flow: column nowrap;
-		border-radius: 1rem;
-		border: var(--border);
-		box-shadow: var(--shadow);
+		border-right: var(--border);
 		overflow: auto;
 
-		margin: 0.5rem;
 		max-width: calc(100% - 1rem);
-
-		/* Specific adjustments for PWA mode */
-		@media (display-mode: standalone), (display-mode: fullscreen) {
-			margin-left: max(0.5rem, env(safe-area-inset-left));
-			margin-right: max(0.5rem, env(safe-area-inset-right));
-			margin-top: max(0.5rem, env(safe-area-inset-top));
-			margin-bottom: max(0.5rem, env(safe-area-inset-bottom));
-		}
 
 		&[data-side='top'] {
 			animation-name: slideDownAndFade;
@@ -65,7 +63,7 @@
 
 		@media (max-width: 768px) {
 			width: 70vw;
-			max-width: min(220px, calc(100% - 1rem));
+			max-width: max(220px, calc(100% - 1rem));
 		}
 	}
 

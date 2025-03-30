@@ -7,9 +7,7 @@ import { Control } from '../control/Control.js';
 import cls from './NavMenu.module.css';
 import { Box, BoxProps } from '../box/Box.js';
 import { Logo } from '../logo/Logo.js';
-import { Button } from '../button/Button.js';
 import { Link, LinkProps } from '@verdant-web/react-router';
-import { XIcon } from 'lucide-react';
 
 export const NavMenuRoot = withClassName(RadixDialog.Root, cls.root);
 export const NavMenuTrigger = withClassName(withProps(RadixDialog.Trigger, { asChild: true }), cls.trigger);
@@ -24,17 +22,10 @@ export const NavMenuContent = forwardRef<HTMLDivElement, NavMenuContentProps>(fu
 				<RadixDialog.Content data-side="left" ref={ref} className={clsx(cls.content, className)}>
 					<Box className={cls.header} full="width" align="center" justify="between">
 						<RadixDialog.Title>
-							{' '}
 							<Link to="/">
-								{' '}
-								<Logo style={{ width: 40, height: 'auto' }} />{' '}
-							</Link>{' '}
+								<Logo style={{ width: 40, height: 'auto' }} />
+							</Link>
 						</RadixDialog.Title>
-						<RadixDialog.Close asChild>
-							<Button variant="action" color="ghost" float="top-right">
-								<XIcon />
-							</Button>
-						</RadixDialog.Close>
 					</Box>
 					{children}
 				</RadixDialog.Content>

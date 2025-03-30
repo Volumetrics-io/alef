@@ -25,7 +25,7 @@ const HomePage = () => {
 
 		// devices page is default 2D UI homepage while properties isn't very useful
 		// on 2D UI yets
-		return <Redirect to="/devices" />;
+		return <Redirect to="/desktop" />;
 	}
 
 	return <LazyMainScene />;

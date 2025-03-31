@@ -1,6 +1,6 @@
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
 import { usePlacingFurnitureId, useSetPlacingFurniture } from '@/stores/roomStore/hooks/editing';
-import { Button, CardGrid, Icon, ScrollArea } from '@alef/sys';
+import { Box, Button, CardGrid, Icon, ScrollArea } from '@alef/sys';
 import { DesktopFurnitureCard } from './DesktopFurnitureCard';
 
 export interface DesktopFurnitureCollectionProps {
@@ -11,7 +11,7 @@ export interface DesktopFurnitureCollectionProps {
 
 export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore }: DesktopFurnitureCollectionProps) {
 	return (
-		<ScrollArea>
+		<Box full stacked>
 			<CardGrid small>
 				{furniture.map((item) => (
 					<FurnitureCard key={item.id} item={item} />
@@ -23,7 +23,7 @@ export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore }: D
 					Load More
 				</Button>
 			)}
-		</ScrollArea>
+		</Box>
 	);
 }
 

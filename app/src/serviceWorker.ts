@@ -120,16 +120,21 @@ self.addEventListener('install', (event) => {
 				throw new Error('Failed to fetch core furniture metadata');
 			}
 			const coreFurnitureJson = (await coreFurniture.json()) as {
-				id: string;
-				name: string;
-				attributes: Attribute[];
-				modelUpdatedAt: string;
-			}[];
+				items: {
+					id: string;
+					name: string;
+					attributes: Attribute[];
+					modelUpdatedAt: string;
+				}[];
+				pageInfo: {
+					page: number;
+				};
+			};
 
 			// avoid re-fetching the same furniture
 			const cachedFurniture = await cache.keys();
 			const cachedFurnitureIds = cachedFurniture.map((r) => r.url.split('/')[4]);
-			const coreFurnitureJsonFiltered = coreFurnitureJson.filter((f) => !cachedFurnitureIds.includes(f.id));
+			const coreFurnitureJsonFiltered = coreFurnitureJson.items.filter((f) => !cachedFurnitureIds.includes(f.id));
 
 			// Cache all original quality models and preview thumbnails
 			const coreFurnitureModels = coreFurnitureJsonFiltered

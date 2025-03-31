@@ -1,4 +1,4 @@
-import { Frame, Heading, Box, Text, Dialog, Button } from '@alef/sys';
+import { Frame, Heading, Box, Text, Dialog, Button, Icon } from '@alef/sys';
 import { useClaimDevice, useDeviceDiscovery } from '@/services/publicApi/deviceHooks';
 import { PrefixedId } from '@alef/common';
 import toast from 'react-hot-toast';
@@ -28,8 +28,9 @@ export function DeviceDiscovery() {
 				{!suggested.length && (
 					<Box stacked gapped align="center">
 						<Text>Waiting for a pairing request.</Text>
-						<Frame color="secondary" p="small">
-							Be sure to disable VPN / Private Relay on this device and your headset.
+						<Frame color="secondary" p="small" align="center" gapped>
+							<Icon name="triangle-alert" />
+							<Text>Be sure to disable VPN / Private Relay on this device and your headset.</Text>
 						</Frame>
 					</Box>
 				)}

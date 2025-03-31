@@ -44,33 +44,3 @@ function PairedDeviceItem({ device }: { device: DeviceResponseData }) {
 		</Frame>
 	);
 }
-
-function OldPairedDeviceItem({ device }: { device: DeviceResponseData }) {
-	const { mutate: deleteDevice, isPending: isDeletePending } = useDeleteDevice();
-	const { mutate: updateDevice, isPending: isUpdatePending } = useUpdateDevice();
-	const isPending = isDeletePending || isUpdatePending;
-
-	return (
-		<Card key={device.id}>
-			<Card.Main layout="center center">
-				<Label>
-					Buyer Mode
-					<Switch
-						checked={device.displayMode === 'viewing'}
-						disabled={isPending}
-						onCheckedChange={(checked) => updateDevice({ deviceId: device.id, updates: { displayMode: checked ? 'viewing' : 'staging' } })}
-					/>
-				</Label>
-			</Card.Main>
-			<Card.Details justify="between">
-				<Box gapped>
-					<Card.Title>{device.name}</Card.Title>
-					{device.isSelf && <Text>(this device)</Text>}
-				</Box>
-				<Button disabled={device.isSelf} color="destructive" loading={isPending} onClick={() => deleteDevice(device.id)}>
-					<Icon name="trash" />
-				</Button>
-			</Card.Details>
-		</Card>
-	);
-}

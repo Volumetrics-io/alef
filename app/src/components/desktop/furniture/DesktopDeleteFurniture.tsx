@@ -1,12 +1,12 @@
-import { Icon, Button, Dialog } from '@alef/sys';
+import { useDeleteFurniturePlacement } from '@/stores/roomStore';
+import { useSelect } from '@/stores/roomStore/hooks/editing';
+import { PrefixedId } from '@alef/common';
+import { Button, Dialog, Icon } from '@alef/sys';
 import { useCallback } from 'react';
 import { useContainerStore } from '../stores/useContainer';
-import { useSelect, useSelectedFurniturePlacementId } from '@/stores/roomStore/hooks/editing';
-import { useDeleteFurniturePlacement } from '@/stores/roomStore';
-export function DesktopDeleteFurniture() {
-	const selectedPlacementId = useSelectedFurniturePlacementId();
-	if (!selectedPlacementId) return null;
-	const deleteFurniturePlacement = useDeleteFurniturePlacement(selectedPlacementId);
+
+export function DesktopDeleteFurniture({ placementId }: { placementId: PrefixedId<'fp'> }) {
+	const deleteFurniturePlacement = useDeleteFurniturePlacement(placementId);
 	const select = useSelect();
 
 	const container = useContainerStore((state) => state.container);

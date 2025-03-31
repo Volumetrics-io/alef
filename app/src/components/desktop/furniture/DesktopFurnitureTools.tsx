@@ -1,7 +1,7 @@
-import { Icon, Button, Box } from '@alef/sys';
-import { DesktopDeleteFurniture } from './DesktopDeleteFurniture';
-import { useFurnitureQuickSwap, useFurniturePlacement } from '@/stores/roomStore';
+import { useFurniturePlacement, useFurnitureQuickSwap } from '@/stores/roomStore';
 import { PrefixedId, RoomFurniturePlacement } from '@alef/common';
+import { Box, Button, Icon } from '@alef/sys';
+import { DesktopDeleteFurniture } from './DesktopDeleteFurniture';
 export function DesktopSelectedFurnitureTools({ id }: { id: PrefixedId<'fp'> }) {
 	const placement = useFurniturePlacement(id);
 	if (!placement) return null;
@@ -9,7 +9,7 @@ export function DesktopSelectedFurnitureTools({ id }: { id: PrefixedId<'fp'> }) 
 	return (
 		<Box gapped grow>
 			<SwapButton placement={placement} direction="left" />
-			<DesktopDeleteFurniture />
+			<DesktopDeleteFurniture placementId={id} />
 			<SwapButton placement={placement} direction="right" />
 		</Box>
 	);

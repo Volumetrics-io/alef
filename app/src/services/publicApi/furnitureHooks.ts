@@ -4,6 +4,7 @@ import { useGLTF } from '@react-three/drei';
 import { useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import type { InferResponseType } from 'hono/client';
 import { publicApiClient } from './client';
+import { handleErrors } from './utils';
 
 export function useAllFurniture(
 	options: {
@@ -51,12 +52,12 @@ export function useFurnitureAttributes(key: AttributeKey) {
 	});
 }
 
-export function useFurnitureDetails(furnitureId: PrefixedId<'f'>) {
+export function useFurnitureDetails(furnitureId: PrefixedId<'f'> | null) {
 	return useSuspenseQuery({
 		queryKey: ['id', furnitureId],
 		queryFn: async () => {
-			const response = await publicApiClient.furniture[':id'].$get({ param: { id: furnitureId } });
-			return response.json();
+			if (!furnitureId) return null;
+			return handleErrors(publicApiClient.furniture[':id'].$get({ param: { id: furnitureId } }));
 		},
 	});
 }

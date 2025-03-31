@@ -13,6 +13,11 @@
 		color: var(--happy-ink);
 	}
 
+	.colorSecondary {
+		background-color: var(--sunny-paper);
+		color: var(--sunny-ink);
+	}
+
 	.colorError {
 		background-color: var(--error-paper);
 		color: var(--error-ink);

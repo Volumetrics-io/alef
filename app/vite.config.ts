@@ -15,7 +15,7 @@ export default defineConfig({
 				id: 'io.alef.app',
 				name: 'alef',
 				short_name: 'alef',
-				description: 'One room, endless possibilities.',
+				description: 'a multi-platform, immersive home decorating tool.',
 				background_color: '#141414',
 				scope: 'https://app.alef.io/',
 				icons: [
@@ -30,6 +30,44 @@ export default defineConfig({
 						sizes: '512x512',
 						type: 'image/png',
 						purpose: 'maskable',
+					},
+				],
+				screenshots: [
+					{
+						src: '/screenshots/desktop/layouts-tab.png',
+						sizes: '3456x2160',
+						type: 'image/png',
+						form_factor: 'wide',
+					},
+					{
+						src: '/screenshots/desktop/furniture-tab.png',
+						sizes: '3456x2160',
+						type: 'image/png',
+						form_factor: 'wide',
+					},
+					{
+						src: '/screenshots/desktop/lighting-tab.png',
+						sizes: '3456x2160',
+						type: 'image/png',
+						form_factor: 'wide',
+					},
+					{
+						src: '/screenshots/mobile/layouts-tab.png',
+						sizes: '860x1864',
+						type: 'image/png',
+						form_factor: 'narrow',
+					},
+					{
+						src: '/screenshots/mobile/furniture-tab.png',
+						sizes: '860x1864',
+						type: 'image/png',
+						form_factor: 'narrow',
+					},
+					{
+						src: '/screenshots/mobile/lighting-tab.png',
+						sizes: '860x1864',
+						type: 'image/png',
+						form_factor: 'narrow',
 					},
 				],
 				categories: ['productivity', 'lifestyle', 'creativity', 'home', 'utilities'],

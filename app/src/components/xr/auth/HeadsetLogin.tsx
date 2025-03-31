@@ -54,6 +54,7 @@ function DeviceList({ devices, onSelect }: { devices: { id: PrefixedId<'d'>; nam
 	return (
 		<Container flexDirection="column" flexGrow={1} flexShrink={0} gap={4}>
 			<Text>Log into Alef on a phone or computer using the same Wifi network as this device, then select it here.</Text>
+			<Text color={colors.focus}>Make sure your device is on the same network as this headset and VPN / Private Relay is disabled.</Text>
 			<Container
 				flexDirection="column"
 				gap={4}

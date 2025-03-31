@@ -4,7 +4,7 @@ import { Box, BoxProps } from '../box/Box.js';
 import cls from './Frame.module.css';
 
 export interface FrameProps extends BoxProps {
-	color?: 'primary' | 'error' | 'default';
+	color?: 'primary' | 'secondary' | 'error' | 'default';
 }
 
 export const Frame = forwardRef<HTMLDivElement, FrameProps>(function Frame({ className, ...props }, ref) {
@@ -18,6 +18,7 @@ export const Frame = forwardRef<HTMLDivElement, FrameProps>(function Frame({ cla
 				{
 					[cls.colorPrimary]: props.color === 'primary',
 					[cls.colorError]: props.color === 'error',
+					[cls.colorSecondary]: props.color === 'secondary',
 				},
 				className
 			)}

@@ -25,7 +25,7 @@ function PairedDeviceItem({ device }: { device: DeviceResponseData }) {
 		<Card key={device.id}>
 			<Card.Main layout="center center">
 				<Label>
-					Buyer Mode
+					Read only
 					<Switch
 						checked={device.displayMode === 'viewing'}
 						disabled={isPending}

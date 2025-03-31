@@ -10,7 +10,7 @@ import { Button } from '../button/Button.js';
 import { Frame } from '../frame/Frame.js';
 import cls from './Dialog.module.css';
 
-export const DialogRoot = withClassName(DialogPrimitive.Root, cls.root);
+export const DialogRoot = DialogPrimitive.Root;
 
 export const DialogClose = DialogPrimitive.Close;
 
@@ -46,21 +46,19 @@ export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(func
 	return (
 		<DialogPrimitive.Portal container={container}>
 			<DialogPrimitive.Overlay className={cls.overlay} />
-			<Box className={cls.contentContainer}>
-				<Frame asChild padded stacked gapped elevated ref={ref}>
-					<DialogPrimitive.Content className={clsx(cls.content, width === 'large' && cls.contentLarge)} onPointerDownOutside={handleOutsidePointerDown} {...props}>
-						<Box>
-							<DialogTitle>{title}</DialogTitle>
-						</Box>
-						<Dialog.Close asChild>
-							<Button variant="action" color="ghost" float="top-right">
-								<XIcon />
-							</Button>
-						</Dialog.Close>
-						{props.children}
-					</DialogPrimitive.Content>
-				</Frame>
-			</Box>
+			<Frame asChild padded stacked gapped elevated ref={ref}>
+				<DialogPrimitive.Content className={clsx(cls.content, width === 'large' && cls.contentLarge)} onPointerDownOutside={handleOutsidePointerDown} {...props}>
+					<Box>
+						<DialogTitle>{title}</DialogTitle>
+					</Box>
+					<Dialog.Close asChild>
+						<Button variant="action" color="ghost" float="top-right">
+							<XIcon />
+						</Button>
+					</Dialog.Close>
+					{props.children}
+				</DialogPrimitive.Content>
+			</Frame>
 		</DialogPrimitive.Portal>
 	);
 });

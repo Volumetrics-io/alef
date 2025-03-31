@@ -1,4 +1,4 @@
-import { AlefError, getDefaultRoomState, id, migrateRoomState, Operation, PrefixedId, RoomState, updateRoom } from '@alef/common';
+import { AlefError, getDemoRoomState, id, migrateRoomState, Operation, PrefixedId, RoomState, updateRoom } from '@alef/common';
 import { DurableObject } from 'cloudflare:workers';
 import { Bindings } from '../config/ctx';
 import { PropertySocketHandler } from './sockets/PropertySocketHandler';
@@ -36,7 +36,7 @@ export class Property extends DurableObject<Bindings> {
 			if (!Object.keys(this.#rooms).length) {
 				// if no rooms exist, insert a default room.
 				const roomId = id('r');
-				this.#rooms[roomId] = getDefaultRoomState(roomId);
+				this.#rooms[roomId] = getDemoRoomState(roomId);
 				await this.#saveState();
 			}
 		});
@@ -49,28 +49,38 @@ export class Property extends DurableObject<Bindings> {
 		console.info(`[${this.ctx.id.toString()}] Saved state`);
 	}
 
-	// note: layout ID not currently used, updates are not very granular with
-	// the current protocol, we just send the whole room.
-	#broadcastChange(roomId: PrefixedId<'r'>, _roomLayoutId?: PrefixedId<'rl'>) {
-		const room = this.getRoom(roomId);
-		if (!room) return;
-		// Notify clients of layout change
-		this.#socketHandler.send({
-			type: 'roomUpdate',
-			data: room,
-		});
-	}
-
-	applyOperations(operations: Operation[]) {
-		const affectedRooms = new Set<PrefixedId<'r'>>();
+	async applyOperations(operations: Operation[]) {
 		for (const op of operations) {
 			updateRoom(this.#rooms[op.roomId], op);
-			affectedRooms.add(op.roomId);
+			this.#enqueueRoomUpdate(op.roomId);
 		}
-		this.#saveState();
-		for (const roomId of affectedRooms) {
-			this.#broadcastChange(roomId);
+		await this.#saveState();
+	}
+
+	/**
+	 * To avoid potential state drift bugs, every so often after rooms are modified
+	 * we resync the server state to all connected clients.
+	 */
+	#roomUpdateTimeouts = new Map<PrefixedId<'r'>, number>();
+	#enqueueRoomUpdate(roomId: PrefixedId<'r'>) {
+		if (this.#roomUpdateTimeouts.has(roomId)) {
+			// already enqueued
+			return;
 		}
+		this.#roomUpdateTimeouts.set(
+			roomId,
+			setTimeout(async () => {
+				this.#roomUpdateTimeouts.delete(roomId);
+				const room = this.#rooms[roomId];
+				if (!room) {
+					return;
+				}
+				await this.#socketHandler.send({
+					type: 'roomUpdate',
+					data: room,
+				});
+			}, 10000)
+		);
 	}
 
 	async getAllRooms() {
@@ -91,7 +101,7 @@ export class Property extends DurableObject<Bindings> {
 
 	createRoom() {
 		const roomId = id('r');
-		this.#rooms[roomId] = getDefaultRoomState(roomId);
+		this.#rooms[roomId] = getDemoRoomState(roomId);
 		this.#saveState();
 		return this.#rooms[roomId];
 	}

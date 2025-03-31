@@ -9,8 +9,8 @@ export function EmailCollector({}: EmailCollectorProps) {
 
 	return (
 		<Frame p stacked gapped>
-			<Heading level={2}>Request a demo</Heading>
-			<Text>Ready to see Alef in action? Fill out the form below to request a demo.</Text>
+			<Heading level={2}>Keep up to date</Heading>
+			<Text>sign up for our newsletter to stay in the loop.</Text>
 			{submitted ? (
 				<Box p>
 					<Text>Thanks for your interest! We'll be in touch soon.</Text>

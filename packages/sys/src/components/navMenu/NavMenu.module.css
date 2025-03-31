@@ -1,0 +1,167 @@
+@layer components {
+	.root {
+	}
+
+	.trigger {
+	}
+
+	.header {
+		padding: 1rem;
+		padding-bottom: 1.5rem;
+	}
+
+	.overlay {
+		position: fixed;
+		inset: 0;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 9999;
+		height: 100dvh;
+		width: 100%;
+		background-color: var(--dimmed);
+		overflow: hidden;
+	}
+
+	.content {
+		position: fixed;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		min-width: 250px;
+		height: 100dvh;
+		background-color: var(--paper);
+		display: flex;
+		flex-flow: column nowrap;
+		border-right: var(--border);
+		overflow: auto;
+		padding-left: env(safe-area-inset-left);
+		padding-top: env(safe-area-inset-top);
+		padding-bottom: 3dvh;
+
+		max-width: calc(100% - 1rem);
+
+		&[data-side='top'] {
+			animation-name: slideDownAndFade;
+		}
+		&[data-side='bottom'] {
+			animation-name: slideUpAndFade;
+		}
+		&[data-side='left'] {
+			animation-name: slideRightAndFade;
+		}
+		&[data-side='right'] {
+			animation-name: slideLeftAndFade;
+		}
+
+		&[data-state='open'] {
+			animation-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+			animation-duration: var(--animation-duration);
+			animation-direction: normal;
+			animation-play-state: running;
+		}
+
+		@media (max-width: 768px) {
+			width: 70vw;
+			max-width: max(220px, calc(100% - 1rem));
+		}
+	}
+
+	.contentEnd {
+		margin-top: auto;
+	}
+
+	.item {
+		display: flex;
+		flex-direction: row;
+		gap: 0.5rem;
+
+		padding: 0.5rem 1rem;
+		justify-content: flex-start;
+		border-radius: 0;
+		border: 0;
+		cursor: pointer;
+		text-decoration: none;
+
+		/* --color-border: transparent; */
+		--color-text: var(--ink);
+		--color-background: var(--paper);
+
+		&[data-highlighted] {
+			background-color: var(--track);
+			--color-border: var(--focus);
+			z-index: 1;
+			outline-offset: -2px;
+			/* outline: none; */
+		}
+
+		&:first-child {
+			border-top-left-radius: 1rem;
+			border-top-right-radius: 1rem;
+		}
+		&:last-child {
+			margin-top: auto;
+			border-bottom-left-radius: 1rem;
+			border-bottom-right-radius: 1rem;
+		}
+
+		&:hover {
+			background-color: var(--track);
+			transform: none;
+		}
+	}
+
+	.itemIcon {
+	}
+
+	.separator {
+		height: var(--thickness);
+		border-top: var(--border);
+		width: 100%;
+	}
+}
+
+@keyframes slideUpAndFade {
+	from {
+		opacity: 0;
+		transform: translateY(2px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes slideRightAndFade {
+	from {
+		opacity: 0;
+		transform: translateX(-100px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+@keyframes slideDownAndFade {
+	from {
+		opacity: 0;
+		transform: translateY(-2px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes slideLeftAndFade {
+	from {
+		opacity: 0;
+		transform: translateX(2px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}

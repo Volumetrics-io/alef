@@ -1,8 +1,7 @@
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
-import { useSetSelectedModelId } from '@/stores/editorStore';
-import { Button, Card, CardGrid, Icon, ScrollArea } from '@alef/sys';
-import { useHotkeys } from 'react-hotkeys-hook';
-import cls from './DesktopFurnitureCollection.module.css';
+import { usePlacingFurnitureId, useSetPlacingFurniture } from '@/stores/roomStore/hooks/editing';
+import { Box, Button, CardGrid, Icon } from '@alef/sys';
+import { DesktopFurnitureCard } from './DesktopFurnitureCard';
 
 export interface DesktopFurnitureCollectionProps {
 	furniture: FurnitureItem[];
@@ -11,16 +10,11 @@ export interface DesktopFurnitureCollectionProps {
 }
 
 export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore }: DesktopFurnitureCollectionProps) {
-	const setSelectedModelId = useSetSelectedModelId();
-	useHotkeys('esc', () => {
-		setSelectedModelId(null);
-	});
-
 	return (
-		<ScrollArea>
-			<CardGrid small p="small">
+		<Box full stacked>
+			<CardGrid small>
 				{furniture.map((item) => (
-					<DesktopFurnitureCard key={item.id} item={item} />
+					<FurnitureCard key={item.id} item={item} />
 				))}
 			</CardGrid>
 			{hasMore && (
@@ -29,25 +23,23 @@ export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore }: D
 					Load More
 				</Button>
 			)}
-		</ScrollArea>
+		</Box>
 	);
 }
 
-function DesktopFurnitureCard({ item }: { item: FurnitureItem }) {
-	const setSelectedModelId = useSetSelectedModelId();
+function FurnitureCard({ item }: { item: FurnitureItem }) {
+	const selectedModelId = usePlacingFurnitureId();
+	const setSelectedModelId = useSetPlacingFurniture();
 
-	const add = () => {
-		setSelectedModelId(item.id);
+	const isSelected = selectedModelId === item.id;
+
+	const handleClick = () => {
+		if (isSelected) {
+			setSelectedModelId(null);
+		} else {
+			setSelectedModelId(item.id);
+		}
 	};
 
-	return (
-		<Card onClick={add} className={cls.card}>
-			<Card.Main>
-				<Card.Image src={`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${item.id}/image.jpg`} />
-			</Card.Main>
-			<Card.Details>
-				<Card.Title>{item.name}</Card.Title>
-			</Card.Details>
-		</Card>
-	);
+	return <DesktopFurnitureCard item={item} isSelected={isSelected} onClick={handleClick} />;
 }

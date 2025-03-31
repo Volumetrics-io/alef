@@ -17,9 +17,12 @@ export function DesktopRoomTypePicker({ multiple, value, onValueChange }: Deskto
 				value: value?.[0],
 				onValueChange: (v: RoomType) => onValueChange?.([v]),
 			};
+
+	const sortedRoomTypes = [...ROOM_TYPES].sort((a, b) => a.length - b.length);
+
 	return (
-		<ToggleGroup wrap {...groupProps}>
-			{ROOM_TYPES.map((type) => (
+		<ToggleGroup wrap full="width" stacked={false} {...groupProps}>
+			{sortedRoomTypes.map((type) => (
 				<ToggleGroup.Item key={type} value={type}>
 					<DesktopLayoutIcon type={type} />
 					<Box>{sentenceCase(type)}</Box>

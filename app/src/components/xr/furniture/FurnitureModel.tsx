@@ -3,7 +3,7 @@ import { useFurnitureDetails, useFurnitureModel } from '@/services/publicApi/fur
 import { usePerformanceStore } from '@/stores/performanceStore';
 import { FurnitureModelQuality, PrefixedId, RANKED_FURNITURE_MODEL_QUALITIES } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
-import { Bvh, Clone, Detailed, Outlines, Preload } from '@react-three/drei';
+import { Bvh, Clone, Outlines, Preload } from '@react-three/drei';
 import { ThreeEvent } from '@react-three/fiber';
 import { forwardRef, ReactNode, Suspense, useCallback } from 'react';
 import { DoubleSide, Group, Mesh } from 'three';
@@ -15,7 +15,7 @@ export interface FurnitureModelProps {
 	pointerEvents?: 'none' | 'auto';
 	receiveShadow?: boolean;
 	castShadow?: boolean;
-	maxQuality?: FurnitureModelQuality;
+	quality?: FurnitureModelQuality;
 	debugLod?: boolean;
 }
 
@@ -164,7 +164,7 @@ export const CollisionModel = forwardRef<Group, FurnitureModelProps & { errorFal
 );
 
 export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFallback?: ReactNode }>(
-	({ errorFallback, maxQuality: preferredMaxQuality = FurnitureModelQuality.Original, debugLod, ...props }, ref) => {
+	({ errorFallback, quality: preferredMaxQuality = FurnitureModelQuality.Original, debugLod, ...props }, ref) => {
 		const renderQuality = usePerformanceStore((state) => state.qualityLevel);
 		const globalMaxQuality = renderQuality == 'high' ? FurnitureModelQuality.Original : FurnitureModelQuality.Low;
 		// to cap the model quality, we use the smallest of the two: [preferredMaxQuality, globalMaxQuality].
@@ -173,13 +173,6 @@ export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFal
 		const maxQualityRank = Math.min(RANKED_FURNITURE_MODEL_QUALITIES.indexOf(preferredMaxQuality), RANKED_FURNITURE_MODEL_QUALITIES.indexOf(globalMaxQuality));
 		const maxQuality = RANKED_FURNITURE_MODEL_QUALITIES[maxQualityRank];
 
-		const isLowQuality = maxQuality === FurnitureModelQuality.Low || maxQuality === FurnitureModelQuality.Collision;
-
-		const baseLodIndex = lods.findIndex((lod) => lod.quality === maxQuality);
-		const usedLods = lods.slice(baseLodIndex);
-
-		// FIXME: this JSX structure is kind of a mess of multiple kinds of fallbacks...
-		// perhaps there's a more intuitive way to structure this behavior.
 		return (
 			// a last line of defense against missing models and network errors, this fallback
 			// attempts to render the original model, using a placeholder as a loader, and if
@@ -199,49 +192,14 @@ export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFal
 					)
 				}
 			>
-				{/* While loading, if we're not already loading a low quality model, show the lowest available. */}
-				<Suspense
-					fallback={
-						isLowQuality ? (
-							// if this component is rendering the lowest quality model already, just show a placeholder as it fetches.
-							<PlaceholderModel furnitureId={props.furnitureId} ref={ref} />
-						) : (
-							/*
-								When attempting to render the low quality fallback model, we might also not have that... show a
-								generic placeholder instead to avoid fallback to the error box above and at least present
-								something to the user while loading the main model.
-							*/
-							<ErrorBoundary fallback={<PlaceholderModel furnitureId={props.furnitureId} ref={ref} />}>
-								{/*
-									The loading state for the loading state, lol. While we load the low quality model to display
-									until the higher quality one is available, we show a placeholder to let the user know something
-									is coming. Even the low quality model may have a noticeable delay!
-								*/}
-								<Suspense fallback={<PlaceholderModel furnitureId={props.furnitureId} ref={ref} />}>
-									<Preload all />
-									<FurnitureModelRenderer {...props} quality={FurnitureModelQuality.Low} ref={ref} />
-								</Suspense>
-							</ErrorBoundary>
-						)
-					}
-				>
+				<Suspense fallback={<PlaceholderModel furnitureId={props.furnitureId} ref={ref} pointerEvents={props.pointerEvents} />}>
 					<Preload all />
-					<Detailed distances={usedLods.map((lod) => lod.distance)}>
-						{usedLods.map((lod) => (
-							<FurnitureModelRenderer {...props} quality={lod.quality} outline={debugLod} ref={ref} key={lod.quality} />
-						))}
-					</Detailed>
+					<FurnitureModelRenderer {...props} quality={maxQuality} ref={ref} />
 				</Suspense>
 			</ErrorBoundary>
 		);
 	}
 );
-
-const lods = [
-	{ quality: FurnitureModelQuality.Original, distance: 1.5 },
-	{ quality: FurnitureModelQuality.Medium, distance: 2 },
-	{ quality: FurnitureModelQuality.Low, distance: 4 },
-];
 
 const qualityColor = {
 	[FurnitureModelQuality.Original]: 'blue',

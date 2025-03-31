@@ -39,3 +39,7 @@ export * from './components/tooltip/Tooltip.js';
 export * from './hocs/withClassName.js';
 export * from './hocs/withProps.js';
 export * from './hooks/useMergedRef.js';
+
+export * from './components/navMenu/NavMenu.js';
+
+export * from './components/collapsible/Collapsible.js';

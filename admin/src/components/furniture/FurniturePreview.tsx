@@ -8,6 +8,7 @@ import { Canvas, useThree } from '@react-three/fiber';
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { Vector3 } from 'three';
 import { FurnitureSnapshot } from './FurnitureSnapshot';
+import { Perf } from 'r3f-perf';
 
 export interface FurniturePreviewProps {
 	furnitureId: PrefixedId<'f'>;
@@ -50,6 +51,7 @@ export function FurniturePreview({ furnitureId, nonce = 'none', onMetadataUpdate
 						preserveDrawingBuffer: true,
 					}}
 				>
+					<Perf />
 					<Environment preset="city" />
 					<ambientLight intensity={1} />
 					<OrbitControls makeDefault target={[0, 0.6, 0]} />

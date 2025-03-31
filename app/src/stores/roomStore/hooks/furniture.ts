@@ -1,16 +1,16 @@
 import { useAllFurniture, useFurnitureDetails } from '@/services/publicApi/furnitureHooks';
-import { useSelect } from '@/stores/editorStore';
 import { isPrefixedId, PrefixedId, RoomFurniturePlacement } from '@alef/common';
 import { useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useRoomStore, useRoomStoreSubscribe } from '../roomStore';
+import { useSelect } from './editing';
 
 export function useFurniturePlacementIds() {
-	return useRoomStore(useShallow((s) => Object.keys(s.viewingLayoutId ? (s.layouts[s.viewingLayoutId]?.furniture ?? {}) : {}) as PrefixedId<'fp'>[]));
+	return useRoomStore(useShallow((s) => Object.keys(s.editor.selectedLayoutId ? (s.layouts[s.editor.selectedLayoutId]?.furniture ?? {}) : {}) as PrefixedId<'fp'>[]));
 }
 
 export function useFurniturePlacement(id: PrefixedId<'fp'>) {
-	return useRoomStore((s) => (s.viewingLayoutId ? (s.layouts[s.viewingLayoutId]?.furniture[id] ?? null) : null));
+	return useRoomStore((s) => (s.editor.selectedLayoutId ? (s.layouts[s.editor.selectedLayoutId]?.furniture[id] ?? null) : null));
 }
 
 export function useDeleteFurniturePlacement(id: PrefixedId<'fp'> | undefined) {
@@ -22,7 +22,7 @@ export function useDeleteFurniturePlacement(id: PrefixedId<'fp'> | undefined) {
 }
 
 export function useFurniturePlacementFurnitureId(id: PrefixedId<'fp'>) {
-	return useRoomStore((s) => (s.viewingLayoutId ? (s.layouts[s.viewingLayoutId]?.furniture[id]?.furnitureId ?? null) : null));
+	return useRoomStore((s) => (s.editor.selectedLayoutId ? (s.layouts[s.editor.selectedLayoutId]?.furniture[id]?.furnitureId ?? null) : null));
 }
 
 export function useSetFurniturePlacementFurnitureId() {
@@ -43,7 +43,7 @@ export function useAddFurniture() {
 
 export function useSubscribeToPlacementPosition(id: PrefixedId<'fp'> | PrefixedId<'lp'>, callback: (position: { x: number; y: number; z: number }) => void) {
 	useRoomStoreSubscribe(
-		(s) => (s.viewingLayoutId ? (isPrefixedId(id, 'fp') ? (s.layouts[s.viewingLayoutId]?.furniture[id] ?? null) : (s.lights[id] ?? null)) : null),
+		(s) => (s.editor.selectedLayoutId ? (isPrefixedId(id, 'fp') ? (s.layouts[s.editor.selectedLayoutId]?.furniture[id] ?? null) : (s.lights[id] ?? null)) : null),
 		(placement) => {
 			if (placement) {
 				callback(placement.position);

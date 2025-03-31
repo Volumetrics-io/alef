@@ -31,8 +31,11 @@ export function NonHeadsetDeviceDiscovery() {
 			</Form>
 			{firstSuggested && <SuggestedDevice device={firstSuggested} />}
 			{!suggested.length && (
-				<Box>
+				<Box stacked gapped>
 					<Text>Waiting for a pairing request. Keep this page open and launch the app on your headset to get started.</Text>
+					<Frame color="secondary" p>
+						Be sure to disable VPN / Private Relay on this device and your headset.
+					</Frame>
 				</Box>
 			)}
 		</Frame>

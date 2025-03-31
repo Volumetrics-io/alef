@@ -1,7 +1,8 @@
-import { AlefError, assertPrefixedId, ClientMessage, PrefixedId, ServerMessage, ServerRoomUpdateMessage } from '@alef/common';
+import { AlefError, assertPrefixedId, ClientApplyOperationsMessage, ClientMessage, PrefixedId, ServerAckMessage, ServerMessage, ServerRoomUpdateMessage } from '@alef/common';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { z } from 'zod';
+import { Device } from '../../../db/kysely/tables';
 import { verifySocketToken } from '../../auth/socketTokens';
 import { Bindings, Env } from '../../config/ctx';
 import { type Property } from '../Property';
@@ -9,6 +10,7 @@ import { type Property } from '../Property';
 export interface SocketSessionInfo {
 	userId: PrefixedId<'u'>;
 	socketId: string;
+	deviceInfo?: Pick<Device, 'id' | 'name' | 'type'>;
 	/**
 	 * Keeps track of whether the socket is ready to receive messages.
 	 * If the socket is not ready, messages will be queued until it is.
@@ -46,8 +48,7 @@ export class PropertySocketHandler {
 
 				// validate token and read game session id and user to connect to
 				const token = ctx.req.valid('query').token;
-				const { sub: userId } = await verifySocketToken(token, this.#env.SOCKET_TOKEN_SECRET);
-
+				const { sub: userId, dev: deviceId } = await verifySocketToken(token, this.#env.SOCKET_TOKEN_SECRET);
 				assertPrefixedId(userId, 'u');
 
 				const webSocketPair = new WebSocketPair();
@@ -56,13 +57,39 @@ export class PropertySocketHandler {
 				this.#ctx.acceptWebSocket(server);
 
 				// map the socket to the token info for later reference.
+				const deviceInfo = deviceId ? await this.#env.PUBLIC_STORE.getStoreForUser(userId).getDevice(deviceId) : undefined;
+				if (deviceId && !deviceInfo) {
+					console.warn('Device not found for socket', deviceId, userId);
+				}
+				const socketId = crypto.randomUUID();
 				this.#updateSocketInfo(server, {
 					userId,
-					socketId: crypto.randomUUID(),
+					socketId,
 					status: 'pending',
+					deviceInfo,
 				});
 
 				console.debug('Socket connected', userId, server.deserializeAttachment());
+				if (deviceInfo) {
+					// broadcast presence update
+					this.send({
+						type: 'deviceConnected',
+						userId,
+						device: deviceInfo,
+					});
+				}
+				// send other device presence (will be backlogged for now)
+				const messageBacklog = new Array<ServerMessage>();
+				this.#messageBacklogs.set(socketId, messageBacklog);
+				for (const info of this.#socketInfo.values()) {
+					if (info.deviceInfo) {
+						messageBacklog.push({
+							type: 'deviceConnected',
+							userId: info.userId,
+							device: info.deviceInfo,
+						});
+					}
+				}
 
 				return new Response(null, {
 					status: 101,
@@ -77,7 +104,12 @@ export class PropertySocketHandler {
 	};
 
 	handleMessage = async (ws: WebSocket, event: string | ArrayBuffer) => {
-		const info = this.#socketInfo.get(ws);
+		const info: SocketSessionInfo = this.#socketInfo.get(ws) || ws.deserializeAttachment();
+		if (!info) {
+			console.error('Socket info not found when handling event', event, 'serialized attachment:', ws.deserializeAttachment());
+			return;
+		}
+
 		if (info?.status === 'pending') {
 			this.#updateSocketInfo(ws, { ...info, status: 'ready' });
 			console.log('Socket ready', info.socketId, info.userId, 'sending backlog');
@@ -100,14 +132,15 @@ export class PropertySocketHandler {
 				case 'ping':
 					break;
 				case 'applyOperations':
-					this.#property.applyOperations(message.operations);
+					await this.#property.applyOperations(message.operations);
+					this.#rebroadcastOperations(message, info);
 					break;
 				default:
 					break;
 			}
 
 			// ack the message
-			ws.send(JSON.stringify({ responseTo: message.messageId, type: 'ack' }));
+			ws.send(JSON.stringify({ responseTo: message.messageId, type: 'ack' } satisfies ServerAckMessage));
 		} catch (err) {
 			// respond with error
 			const asAlefError = AlefError.wrap(err);
@@ -136,6 +169,11 @@ export class PropertySocketHandler {
 		// TODO: collaboration: signal to peers that this client has disconnected
 		this.#socketInfo.delete(ws);
 		console.log('Socket closed', ws.deserializeAttachment());
+		const info = ws.deserializeAttachment();
+		if (info) {
+			this.#messageBacklogs.delete(info.socketId);
+			this.send({ type: 'deviceDisconnected', deviceId: info.deviceInfo?.id });
+		}
 	};
 
 	send = async (
@@ -167,6 +205,14 @@ export class PropertySocketHandler {
 				ws.send(JSON.stringify(msg));
 				console.debug('Sent message to socket', socketId, userId, msg.type);
 			}
+		}
+	};
+
+	#rebroadcastOperations = async (message: ClientApplyOperationsMessage, sender: SocketSessionInfo) => {
+		if (message.personal) {
+			await this.send({ type: 'syncOperations', operations: message.operations }, { to: [sender.userId] });
+		} else {
+			await this.send({ type: 'syncOperations', operations: message.operations });
 		}
 	};
 }

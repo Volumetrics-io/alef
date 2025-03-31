@@ -1,7 +1,8 @@
 import { useAABB } from '@/hooks/useAABB';
 import { useShadowControls } from '@/hooks/useShadowMapUpdate';
-import { useIsEditorStageMode, useIsSelected, useSelect, useSetPanelState } from '@/stores/editorStore';
+import { useSetPanelState } from '@/stores/editorStore';
 import { useFurniturePlacement, useFurniturePlacementFurnitureId, useSubscribeToPlacementPosition, useUpdateFurniturePlacementTransform } from '@/stores/roomStore';
+import { useIsEditorMode, useIsSelected, useSelect } from '@/stores/roomStore/hooks/editing';
 import { PrefixedId } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
 import { Bvh } from '@react-three/drei';
@@ -20,7 +21,7 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 	const placement = useFurniturePlacement(furniturePlacementId);
 	const select = useSelect();
 	const selected = useIsSelected(furniturePlacementId);
-	const isFurnitureMode = useIsEditorStageMode('furniture');
+	const isFurnitureMode = useIsEditorMode('furniture');
 	const setPanelState = useSetPanelState();
 	const shadowControls = useShadowControls();
 
@@ -103,7 +104,16 @@ function RotationHandle({
 	const [hovered, setHovered] = useState(false);
 	return (
 		<Handle rotate={{ x: false, y: true, z: false }} translate="as-rotate" {...props}>
-			<Bvh onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} position={position} rotation={[Math.PI / 2, 0, 0]} renderOrder={-2} enabled={visible}>
+			<Bvh
+				// @ts-ignore - pointerEvents not included in typings
+				pointerEvents={visible ? 'auto' : 'none'}
+				onPointerEnter={() => setHovered(true)}
+				onPointerLeave={() => setHovered(false)}
+				position={position}
+				rotation={[Math.PI / 2, 0, 0]}
+				renderOrder={-2}
+				enabled={visible}
+			>
 				<mesh visible={visible}>
 					<torusGeometry args={[radius, 0.025, 32]} />
 					<meshPhongMaterial color={colors.focus.value} emissive={colors.focus.value} emissiveIntensity={0.5} />

@@ -8,6 +8,7 @@ const LoginPage = () => {
 	const [searchParams, updateSearch] = useSearchParams();
 	const returnTo = searchParams.get('returnTo') ?? undefined;
 	const tab = searchParams.get('tab') ?? 'login';
+	const error = searchParams.get('error') ?? undefined;
 
 	return (
 		<Box full align="center" justify="center" p>
@@ -18,6 +19,11 @@ const LoginPage = () => {
 						alef
 					</Heading>
 				</Box>
+        {error && (
+					<Box p style={{ backgroundColor: 'var(--error-paper)', color: 'var(--error-ink)' }}>
+						{error}
+					</Box>
+				)}
 
 				<Tabs
 					value={tab}

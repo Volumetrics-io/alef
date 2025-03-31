@@ -1,25 +1,24 @@
 ---
-import { Box, Heading, Hero, Logo, Main, NavBar, Text } from '@alef/sys';
-import { EmailCollector } from '../components/EmailCollector.tsx';
+import { Box, Button, Heading, Hero, Link, Main, Text } from '@alef/sys';
 import { Footer } from '../components/Footer.tsx';
-import { LoginButton } from '../components/LoginButton.tsx';
 import Layout from '../layouts/Layout.astro';
+import { Navigation } from '../components/Navigation.tsx';
+import { EmailCollector } from '../components/EmailCollector';
 ---
 
 <Layout>
-	<NavBar client:load>
-		<NavBar.Start>
-			<Logo />
-			<Text>alef.io</Text>
-		</NavBar.Start>
-		<NavBar.End>
-			<LoginButton />
-		</NavBar.End>
-	</NavBar>
+	<Navigation client:load />
 	<Hero client:load forceNav big padded>
 		<Hero.Title>One space, endless possibilities.</Hero.Title>
+		<Hero.Box align="center" stacked gapped>
+			<Text strong tall>Reimagine your space without lifting a finger.</Text>
+			<Link to="https://app.alef.io">
+				<Button color="suggested">get started</Button>
+			</Link>
+		</Hero.Box>
 		<Hero.Dimmer />
 		<Hero.Backdrop>
+			<!-- @ts-ignore -->
 			<video autoPlay loop muted playsInline>
 				<source src="https://public-assets.alef.io/alef-tour.mp4" type="video/mp4" />
 			</video>
@@ -27,7 +26,7 @@ import Layout from '../layouts/Layout.astro';
 	</Hero>
 	<Main gapped stacked padded>
 		<Box stacked gapped constrained="large" padded>
-			<Heading level={2}>Design your space without lifting a finger.</Heading>
+			<Heading level={2}>unlock the full potential of your space with alef.</Heading>
 			<Text tall>
 				With state-of-the-art immersive tools, Alef unlocks the full potential of your home. Our AI-powered platform lets you customize every detail, from furniture to
 				lighting, so you can envision the perfect space without all the heavy lifting.
@@ -35,11 +34,12 @@ import Layout from '../layouts/Layout.astro';
 		</Box>
 	</Main>
 	<Hero client:load big padded>
-		<Hero.Box>
-			<EmailCollector client:load />
+		<Hero.Box align="center" stacked gapped>
+			<EmailCollector />
 		</Hero.Box>
 		<Hero.Dimmer />
 		<Hero.Backdrop>
+			<!-- @ts-ignore -->
 			<video autoPlay loop muted playsInline>
 				<source src="https://public-assets.alef.io/alef-demo-1-compressed.mp4" type="video/mp4" />
 			</video>

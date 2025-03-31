@@ -19,13 +19,13 @@ const HomePage = () => {
 
 	if (!isHeadset) {
 		if (!session) {
-			// not logged in -- redirect to login
-			return <Redirect to="/login" />;
+			// not logged in -- redirect to coming soon page until 2d is officially launched
+			return <Redirect to="/coming-soon" />;
 		}
 
 		// devices page is default 2D UI homepage while properties isn't very useful
 		// on 2D UI yets
-		return <Redirect to="/devices" />;
+		return <Redirect to="/desktop" />;
 	}
 
 	return <LazyMainScene />;

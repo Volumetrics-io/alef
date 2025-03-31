@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import { isPrefixedId, PrefixedId } from './ids.js';
-import { roomFurniturePlacementShape, roomGlobalLightingShape, roomLayoutShape, roomLightPlacementShape, roomPlaneDataShape } from './state.js';
+import { isPrefixedId, PrefixedId } from '../../ids.js';
+import { roomFurniturePlacementShape, roomGlobalLightingShape, roomLayoutShape, roomLightPlacementShape, roomPlaneDataShape } from '../state/roomData.js';
+import { baseRoomOperationShape } from './common.js';
 
-export const createLayoutOperationShape = z.object({
+export const createLayoutOperationShape = baseRoomOperationShape.extend({
 	type: z.literal('createLayout'),
-	roomId: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')),
 	data: roomLayoutShape.pick({
 		id: true,
 		name: true,
@@ -14,33 +14,29 @@ export const createLayoutOperationShape = z.object({
 });
 export type CreateLayoutOperation = z.infer<typeof createLayoutOperationShape>;
 
-export const deleteLayoutOperation = z.object({
+export const deleteLayoutOperation = baseRoomOperationShape.extend({
 	type: z.literal('deleteLayout'),
-	roomId: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')),
-	roomLayoutId: z.custom<PrefixedId<'rl'>>((v) => isPrefixedId(v, 'rl')),
+	layoutId: z.custom<PrefixedId<'rl'>>((v) => isPrefixedId(v, 'rl')),
 });
 export type DeleteLayoutOperation = z.infer<typeof deleteLayoutOperation>;
 
-export const updatePlanesOperationShape = z.object({
+export const updatePlanesOperationShape = baseRoomOperationShape.extend({
 	type: z.literal('updatePlanes'),
-	roomId: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')),
 	planes: roomPlaneDataShape.omit({ id: true }).array(),
 	time: z.number(),
 });
 export type UpdatePlanesOperation = z.infer<typeof updatePlanesOperationShape>;
 
-export const addFurnitureOperationShape = z.object({
+export const addFurnitureOperationShape = baseRoomOperationShape.extend({
 	type: z.literal('addFurniture'),
-	roomId: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')),
 	roomLayoutId: z.custom<PrefixedId<'rl'>>((v) => isPrefixedId(v, 'rl')),
 	data: roomFurniturePlacementShape,
 });
 export type AddFurnitureOperation = z.infer<typeof addFurnitureOperationShape>;
 
-export const updateFurnitureOperationShape = z.object({
+export const updateFurnitureOperationShape = baseRoomOperationShape.extend({
 	type: z.literal('updateFurniture'),
-	roomId: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')),
-	roomLayoutId: z.custom<PrefixedId<'rl'>>((v) => isPrefixedId(v, 'rl')),
+	layoutId: z.custom<PrefixedId<'rl'>>((v) => isPrefixedId(v, 'rl')),
 	// updates require id, but all other fields are optional.
 	data: roomFurniturePlacementShape.partial().extend({
 		id: z.custom<PrefixedId<'fp'>>((v) => isPrefixedId(v, 'fp')),
@@ -48,47 +44,41 @@ export const updateFurnitureOperationShape = z.object({
 });
 export type UpdateFurnitureOperation = z.infer<typeof updateFurnitureOperationShape>;
 
-export const removeFurnitureOperationShape = z.object({
+export const removeFurnitureOperationShape = baseRoomOperationShape.extend({
 	type: z.literal('removeFurniture'),
-	roomId: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')),
-	roomLayoutId: z.custom<PrefixedId<'rl'>>((v) => isPrefixedId(v, 'rl')),
+	layoutId: z.custom<PrefixedId<'rl'>>((v) => isPrefixedId(v, 'rl')),
 	id: z.custom<PrefixedId<'fp'>>((v) => isPrefixedId(v, 'fp')),
 });
 export type RemoveFurnitureOperation = z.infer<typeof removeFurnitureOperationShape>;
 
-export const addLightOperationShape = z.object({
+export const addLightOperationShape = baseRoomOperationShape.extend({
 	type: z.literal('addLight'),
-	roomId: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')),
 	data: roomLightPlacementShape,
 });
 export type AddLightOperation = z.infer<typeof addLightOperationShape>;
 
-export const updateLightOperationShape = z.object({
+export const updateLightOperationShape = baseRoomOperationShape.extend({
 	type: z.literal('updateLight'),
-	roomId: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')),
 	data: roomLightPlacementShape.partial().extend({
 		id: z.custom<PrefixedId<'lp'>>((v) => isPrefixedId(v, 'lp')),
 	}),
 });
 export type UpdateLightOperation = z.infer<typeof updateLightOperationShape>;
 
-export const removeLightOperationShape = z.object({
+export const removeLightOperationShape = baseRoomOperationShape.extend({
 	type: z.literal('removeLight'),
-	roomId: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')),
 	id: z.custom<PrefixedId<'lp'>>((v) => isPrefixedId(v, 'lp')),
 });
 export type RemoveLightOperation = z.infer<typeof removeLightOperationShape>;
 
-export const updateGlobalLightingOperationShape = z.object({
+export const updateGlobalLightingOperationShape = baseRoomOperationShape.extend({
 	type: z.literal('updateGlobalLighting'),
-	roomId: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')),
 	data: roomGlobalLightingShape.partial(),
 });
 export type UpdateGlobalLightingOperation = z.infer<typeof updateGlobalLightingOperationShape>;
 
-export const updateRoomLayoutOperationShape = z.object({
+export const updateRoomLayoutOperationShape = baseRoomOperationShape.extend({
 	type: z.literal('updateLayout'),
-	roomId: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')),
 	data: roomLayoutShape.pick({
 		id: true,
 		name: true,
@@ -98,7 +88,7 @@ export const updateRoomLayoutOperationShape = z.object({
 });
 export type UpdateRoomLayoutOperation = z.infer<typeof updateRoomLayoutOperationShape>;
 
-export const operationShape = z.union([
+export const roomOperationShape = z.union([
 	createLayoutOperationShape,
 	deleteLayoutOperation,
 	updatePlanesOperationShape,
@@ -111,10 +101,7 @@ export const operationShape = z.union([
 	updateGlobalLightingOperationShape,
 	updateRoomLayoutOperationShape,
 ]);
-export type Operation = z.infer<typeof operationShape>;
-export type OperationType = Operation['type'];
-export type OperationByType<T extends OperationType> = Extract<Operation, { type: T }>;
 
-export function createOperation(op: Operation) {
-	return operationShape.parse(op);
-}
+export type RoomOperation = z.infer<typeof roomOperationShape>;
+export type RoomOperationType = RoomOperation['type'];
+export type RoomOperationByType<T extends RoomOperationType> = Extract<RoomOperation, { type: T }>;

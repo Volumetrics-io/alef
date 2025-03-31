@@ -13,6 +13,7 @@ export const resourceIdTypes = {
 	d: 'Device',
 	p: 'Property',
 	rp: 'RoomPlane',
+	op: 'Operation',
 } as const;
 export type ResourceIdPrefix = keyof typeof resourceIdTypes;
 export type ResourceTypeName = (typeof resourceIdTypes)[ResourceIdPrefix];

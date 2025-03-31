@@ -1,8 +1,8 @@
-import { useSelect } from '@/stores/editorStore';
 import { PrefixedId, RoomLightPlacement } from '@alef/common';
 import { useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useRoomStore } from '../roomStore';
+import { useSelect } from './editing';
 
 export function useLightPlacementIds() {
 	return useRoomStore(useShallow((s) => Object.keys(s.lights ?? {}) as PrefixedId<'lp'>[]));

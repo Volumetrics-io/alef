@@ -2,11 +2,12 @@ import { PrefixedId } from '@alef/common';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { InferResponseType } from 'hono';
 import toast from 'react-hot-toast';
+import { deviceType } from '../os';
 import { queryClient } from '../queryClient';
 import { publicApiClient } from './client';
 import { fallbackWhenOfflineOrError, handleErrors } from './utils';
 
-export function useDeviceDiscovery(description?: string) {
+export function useDeviceDiscovery(name?: string) {
 	return useSuspenseQuery({
 		queryKey: ['deviceDiscovery'],
 		networkMode: 'always',
@@ -15,7 +16,8 @@ export function useDeviceDiscovery(description?: string) {
 			const result = await handleErrors(
 				publicApiClient.devices.discover.$get({
 					query: {
-						description,
+						name,
+						type: deviceType,
 					},
 				})
 			);
@@ -135,7 +137,8 @@ export function useCurrentDevice(name?: string) {
 			return fallbackWhenOfflineOrError(
 				publicApiClient.devices.self.$get({
 					query: {
-						description: name,
+						name,
+						type: deviceType,
 					},
 				}),
 				null

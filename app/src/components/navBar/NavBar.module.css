@@ -1,0 +1,15 @@
+.navbar {
+	display: flex;
+	position: relative;
+	@container (max-width: 700px) {
+		width: 100%;
+	}
+}
+
+.logo {
+	@container (max-width: 700px) {
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+}

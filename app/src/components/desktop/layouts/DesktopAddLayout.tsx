@@ -6,6 +6,7 @@ export function DesktopAddLayout() {
 
 	return (
 		<Button
+			grow
 			color="suggested"
 			onClick={() => {
 				create();

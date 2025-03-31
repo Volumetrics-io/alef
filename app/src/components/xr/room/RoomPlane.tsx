@@ -1,8 +1,10 @@
+import { useCameraForward } from '@/hooks/useCameraOrigin';
 import { DEBUG } from '@/services/debug';
 import { RoomPlaneData } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
-import { GroupProps } from '@react-three/fiber';
-import { ColorRepresentation, Quaternion, Vector3 } from 'three';
+import { GroupProps, useFrame } from '@react-three/fiber';
+import { useRef } from 'react';
+import { ColorRepresentation, Mesh, Quaternion, Vector3 } from 'three';
 
 export interface DemoPlaneProps extends GroupProps {
 	plane: RoomPlaneData;
@@ -39,9 +41,25 @@ function RoomPlaneFlat({ extents, color }: { extents: [number, number]; color: C
 }
 
 function RoomPlaneBox({ extents, color, depth }: { extents: [number, number]; color: ColorRepresentation; depth: number }) {
+	const meshRef = useRef<Mesh>(null);
+	// hide mesh when its normal aligns with camera; i.e. camera is looking at the back of it
+	const tempVec = new Vector3();
+	const getCameraForward = useCameraForward();
+	useFrame(() => {
+		if (meshRef.current) {
+			meshRef.current.visible = true;
+			meshRef.current.getWorldDirection(tempVec);
+			const camDir = getCameraForward();
+			// using a threshold makes pop-out less noticeable
+			if (tempVec.dot(camDir) < -0.9) {
+				meshRef.current.visible = false;
+			}
+		}
+	});
+
 	return (
-		<mesh receiveShadow>
-			<boxGeometry args={[extents[0], depth, extents[1]]} />
+		<mesh receiveShadow ref={meshRef} rotation={[Math.PI / 2, 0, 0]}>
+			<boxGeometry args={[extents[0], extents[1], depth]} />
 			<meshPhysicalMaterial color={color} />
 		</mesh>
 	);

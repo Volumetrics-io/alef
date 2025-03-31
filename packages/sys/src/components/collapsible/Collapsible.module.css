@@ -1,0 +1,44 @@
+@layer components {
+	.root {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		color: var(--text);
+		background-color: var(--track);
+		border-radius: 0.5rem;
+		border: var(--border);
+		z-index: 1000;
+
+		[data-state='open'] {
+			position: static;
+		}
+	}
+
+	.trigger {
+		width: 100%;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0.5rem 1rem;
+		color: var(--text);
+		background-color: var(--track);
+		border: none;
+	}
+
+	.overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	.content {
+		padding: 1rem;
+		color: var(--text);
+		background-color: var(--track);
+		border: none;
+	}
+}

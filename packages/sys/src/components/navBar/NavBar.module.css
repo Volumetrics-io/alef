@@ -1,16 +1,23 @@
 @layer components {
 	.root {
+		container-type: inline-size;
+		container-name: nav-bar;
 		font-family: var(--font-head);
 		justify-content: space-between;
 		position: sticky;
 		top: 0;
 		z-index: 999;
 		background-color: transparent;
-		border-bottom: var(--border);
+		/* border-bottom: var(--border); */
 		transition:
 			background-color 0.3s ease,
-			border 0.3s ease;
+			border 0.3s ease,
+			transform 0.3s ease;
 		flex-grow: 0;
+	}
+
+	.hidden {
+		transform: translateY(-100%);
 	}
 }
 

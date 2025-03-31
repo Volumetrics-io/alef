@@ -1,5 +1,5 @@
 import { DeviceResponseData, useDeleteDevice, useDevices, useUpdateDevice } from '@/services/publicApi/deviceHooks';
-import { Box, Button, Card, Frame, Heading, Icon, Label, Switch, Text } from '@alef/sys';
+import { Box, Button, Frame, Heading, Icon, Label, Switch, Text } from '@alef/sys';
 
 export function PairedDeviceList() {
 	const { data: devices } = useDevices();

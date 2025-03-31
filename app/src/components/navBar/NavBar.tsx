@@ -22,17 +22,17 @@ export const NavBar = forwardRef<HTMLDivElement, NavBarProps>(function NavBar(pr
 							</Button>
 						</NavMenu.Trigger>
 						<NavMenu.Content>
-							<NavMenu.ItemLink to="/properties">
+							<NavMenu.ItemLink to="/">
 								<NavMenu.ItemIcon>
-									<Icon name="house" />
+									<Icon name="pencil-ruler" />
 								</NavMenu.ItemIcon>
-								<Text>Properties</Text>
+								<Text>Editor</Text>
 							</NavMenu.ItemLink>
 							<NavMenu.ItemLink to="/devices">
 								<NavMenu.ItemIcon>
 									<Icon name="glasses" />
 								</NavMenu.ItemIcon>
-								<Text>Headsets</Text>
+								<Text>Device management</Text>
 							</NavMenu.ItemLink>
 
 							<NavMenu.ContentEnd>

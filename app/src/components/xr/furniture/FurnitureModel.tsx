@@ -192,7 +192,7 @@ export const FurnitureModel = forwardRef<Group, FurnitureModelProps & { errorFal
 					)
 				}
 			>
-				<Suspense fallback={<PlaceholderModel furnitureId={props.furnitureId} ref={ref} />}>
+				<Suspense fallback={<PlaceholderModel furnitureId={props.furnitureId} ref={ref} pointerEvents={props.pointerEvents} />}>
 					<Preload all />
 					<FurnitureModelRenderer {...props} quality={maxQuality} ref={ref} />
 				</Suspense>

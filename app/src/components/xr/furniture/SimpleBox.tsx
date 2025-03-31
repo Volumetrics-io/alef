@@ -1,6 +1,8 @@
+import { RoundedBox } from '@react-three/drei';
 import { GroupProps } from '@react-three/fiber';
-import { forwardRef, useMemo } from 'react';
-import { Box3, Group } from 'three';
+import { forwardRef } from 'react';
+import { Group } from 'three';
+import { VoluShaderMaterial } from '../shaders/VoluShader';
 
 export interface SimpleBoxProps extends GroupProps {
 	size: [number, number, number];
@@ -9,17 +11,12 @@ export interface SimpleBoxProps extends GroupProps {
 }
 
 export const SimpleBox = forwardRef<Group, SimpleBoxProps>(function SimpleBox({ size, transparent, ...rest }, ref) {
-	const box = useMemo(() => new Box3().setFromArray([-size[0] / 2, -size[1] / 2, -size[2] / 2, size[0] / 2, size[1] / 2, size[2] / 2]), [size[0], size[1], size[2]]);
+	console.log(size, rest);
 	return (
 		<group {...rest} ref={ref}>
-			<box3Helper
-				args={[box, 0x6b6bff]}
-				onUpdate={(self) => {
-					self.computeLineDistances();
-				}}
-			>
-				<lineDashedMaterial color={0x6b6bff} dashSize={0.05} gapSize={0.05} transparent={transparent} />
-			</box3Helper>
+			<RoundedBox args={size} radius={0.1}>
+				<VoluShaderMaterial />
+			</RoundedBox>
 		</group>
 	);
 });

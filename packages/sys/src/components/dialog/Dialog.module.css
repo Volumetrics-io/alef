@@ -1,4 +1,7 @@
 @layer components {
+	.root {
+		flex-shrink: 0;
+	}
 	.overlay {
 		position: absolute;
 		inset: 0;

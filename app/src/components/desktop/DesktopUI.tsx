@@ -74,10 +74,8 @@ function DesktopUIMain() {
 				<DesktopLayoutTools />
 			</DesktopUITabContent>
 			<DesktopUITabContent value="furniture">
-				<Box stacked gapped>
-					<DesktopFurnitureMobileInstructions />
-					<DesktopPlacedFurnitureList />
-				</Box>
+				<DesktopFurnitureMobileInstructions />
+				<DesktopPlacedFurnitureList />
 				<DesktopAddFurniture />
 			</DesktopUITabContent>
 			<DesktopUITabContent value="lighting">
@@ -91,7 +89,7 @@ function DesktopUITabContent({ children, value }: { children: ReactNode; value: 
 	return (
 		<Tabs.Content value={value}>
 			<Suspense>
-				<Box full stacked justify="between">
+				<Box full stacked gapped justify="between">
 					{children}
 				</Box>
 			</Suspense>

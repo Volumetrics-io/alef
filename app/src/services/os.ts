@@ -3,23 +3,23 @@ function getOS() {
 	if (ua.includes('windows')) {
 		return 'Windows';
 	}
-	if (ua.includes('mac')) {
-		return 'Mac';
-	}
-	if (ua.includes('linux')) {
-		return 'Linux';
-	}
-	if (ua.includes('android')) {
-		return 'Android';
-	}
 	if (ua.includes('iphone')) {
 		return 'iOS';
 	}
 	if (ua.includes('ipad')) {
-		return 'iOS';
+		return 'iPadOS';
 	}
 	if (ua.includes('ipod')) {
 		return 'iOS';
+	}
+	if (ua.includes('android')) {
+		return 'Android';
+	}
+	if (ua.includes('mac')) {
+		return 'macOS';
+	}
+	if (ua.includes('linux')) {
+		return 'Linux';
 	}
 	return 'Unknown';
 }
@@ -82,6 +82,8 @@ function getDeviceType() {
 }
 
 export const deviceType = getDeviceType();
+
+console.log('ua', ua);
 
 console.log(`DEVICE INFO`, {
 	os,

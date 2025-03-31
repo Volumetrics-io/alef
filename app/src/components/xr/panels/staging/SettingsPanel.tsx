@@ -47,10 +47,10 @@ function SettingsItem({ label, children }: { label: string; children: React.Reac
 
 function Login({ onPair }: { onPair: () => void }) {
 	return (
-		<SettingsItem label="Log in">
-			<Text>Login to access more features.</Text>
+		<SettingsItem label="Connect to account">
+			<Text>Connect to your account to access more features.</Text>
 			<Button onClick={onPair}>
-				<Text>Get started</Text>
+				<Text>Connect</Text>
 			</Button>
 		</SettingsItem>
 	);

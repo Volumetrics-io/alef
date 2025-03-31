@@ -25,11 +25,13 @@ const upsertDeviceMiddleware = createMiddleware<{
 	// implicitly.
 	const name = ctx.req.query('name');
 	const type = ctx.req.query('type') as DeviceType | undefined;
+	const description = ctx.req.query('description');
 	const userId = ctx.get('session')?.userId;
 	const ownId = await assignOrRefreshDeviceId(ctx);
 	const device = {
 		id: ownId,
 		name,
+		defaultName: description,
 		type,
 	};
 	const upserted = await ctx.env.PUBLIC_STORE.ensureDeviceExists(device, userId);
@@ -54,6 +56,8 @@ export const devicesRouter = new Hono<Env>()
 			'query',
 			z.object({
 				name: z.string().optional(),
+				// required: some baseline description of what this device is, absent any other naming.
+				description: z.string(),
 				type: z.enum(['mobile', 'tablet', 'headset', 'desktop', 'other']).optional(),
 			})
 		),
@@ -117,6 +121,8 @@ export const devicesRouter = new Hono<Env>()
 			'query',
 			z.object({
 				name: z.string().optional(),
+				// required: some baseline description of what this device is, absent any other naming.
+				description: z.string(),
 				type: z.enum(['mobile', 'tablet', 'headset', 'desktop', 'other']).optional(),
 			})
 		),

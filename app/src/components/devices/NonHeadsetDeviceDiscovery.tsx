@@ -1,15 +1,12 @@
-import { os } from '@/services/os';
 import { useClaimDevice, useCurrentDevice, useDeviceDiscovery, useUpdateDevice } from '@/services/publicApi/deviceHooks';
-import { useMe } from '@/services/publicApi/userHooks';
 import { PrefixedId } from '@alef/common';
 import { Box, Button, Dialog, Form, Frame, Heading, Text } from '@alef/sys';
 import toast from 'react-hot-toast';
 
 export function NonHeadsetDeviceDiscovery() {
-	const { data: me } = useMe();
 	const {
 		data: { suggested },
-	} = useDeviceDiscovery(`${me?.friendlyName}'s ${os} device`);
+	} = useDeviceDiscovery();
 	const { data: selfDevice } = useCurrentDevice();
 	const updateDevice = useUpdateDevice();
 

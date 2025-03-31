@@ -2,12 +2,19 @@ import { PrefixedId } from '@alef/common';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { InferResponseType } from 'hono';
 import toast from 'react-hot-toast';
-import { deviceType } from '../os';
+import { deviceName, deviceType } from '../os';
 import { queryClient } from '../queryClient';
 import { publicApiClient } from './client';
+import { useMe } from './userHooks';
 import { fallbackWhenOfflineOrError, handleErrors } from './utils';
 
-export function useDeviceDiscovery(name?: string) {
+export function useDefaultDeviceName() {
+	const { data: me } = useMe();
+	return me ? `${me?.friendlyName}'s ${deviceName}` : deviceName;
+}
+
+export function useDeviceDiscovery() {
+	const defaultName = useDefaultDeviceName();
 	return useSuspenseQuery({
 		queryKey: ['deviceDiscovery'],
 		networkMode: 'always',
@@ -16,7 +23,7 @@ export function useDeviceDiscovery(name?: string) {
 			const result = await handleErrors(
 				publicApiClient.devices.discover.$get({
 					query: {
-						name,
+						description: defaultName,
 						type: deviceType,
 					},
 				})
@@ -130,14 +137,15 @@ export function useUpdateDevice() {
 	});
 }
 
-export function useCurrentDevice(name?: string) {
+export function useCurrentDevice() {
+	const defaultName = useDefaultDeviceName();
 	return useSuspenseQuery({
-		queryKey: ['currentDevice'],
+		queryKey: ['devices', 'current'],
 		queryFn: async () => {
 			return fallbackWhenOfflineOrError(
 				publicApiClient.devices.self.$get({
 					query: {
-						name,
+						description: defaultName,
 						type: deviceType,
 					},
 				}),

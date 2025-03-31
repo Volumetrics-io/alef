@@ -66,7 +66,7 @@ export const isQuest = userAgent.includes('OculusBrowser') || userAgent.includes
 export const isHeadset = supportsXR && (emulateHeadset || isQuest || os === 'iOS' || (ua.includes('mobile') && !isTall));
 
 /** Best guess as to what to call this device */
-export const deviceName = isHeadset ? (isQuest ? 'Quest' : os === 'iOS' ? 'Vision Pro' : 'Headset') : browser === 'Unknown' ? 'Browser' : browser;
+export const deviceName = isHeadset ? (isQuest ? 'Quest' : os === 'iOS' ? 'Vision Pro' : 'Headset') : `${os} device`;
 
 function getDeviceType() {
 	if (isHeadset) {

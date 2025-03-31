@@ -3,7 +3,6 @@ import { useFurniturePlacement, useFurniturePlacementIds } from '@/stores/roomSt
 import { useIsSelected, useSelect } from '@/stores/roomStore/hooks/editing';
 import { PrefixedId } from '@alef/common';
 import { CardGrid, Dialog, ScrollArea } from '@alef/sys';
-import { useContainerStore } from '../stores/useContainer';
 import { DesktopFurnitureCard } from './DesktopFurnitureCard';
 import { DesktopSelectedFurnitureTools } from './DesktopFurnitureTools';
 
@@ -54,10 +53,8 @@ function DesktopPlacedFurnitureCard({ id }: { id: PrefixedId<'fp'> }) {
 }
 
 function FurnitureDetailsDialogContent({ item, placementId }: { item: FurnitureItem; placementId: PrefixedId<'fp'> }) {
-	const container = useContainerStore((state) => state.container);
-
 	return (
-		<Dialog.Content title={item.name} container={container}>
+		<Dialog.Content title={item.name}>
 			<img src={`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${item.id}/image.jpg`} />
 			<DesktopSelectedFurnitureTools id={placementId} />
 		</Dialog.Content>

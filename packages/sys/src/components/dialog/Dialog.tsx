@@ -1,7 +1,8 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { Slot } from '@radix-ui/react-slot';
 import clsx from 'clsx';
 import { XIcon } from 'lucide-react';
-import { forwardRef } from 'react';
+import { createContext, forwardRef, ReactNode, useContext, useState } from 'react';
 import { withClassName } from '../../hocs/withClassName.js';
 import { withProps } from '../../hocs/withProps.js';
 import { Box } from '../box/Box.js';
@@ -11,11 +12,21 @@ import cls from './Dialog.module.css';
 
 export const DialogRoot = withClassName(DialogPrimitive.Root, cls.root);
 
-export const DialogClose = withClassName(DialogPrimitive.Close, cls.close);
+export const DialogClose = DialogPrimitive.Close;
 
 export const DialogTitle = withClassName(DialogPrimitive.Title, cls.title);
 
-export const DialogDescription = withClassName(DialogPrimitive.Description, cls.description);
+export const DialogDescription = DialogPrimitive.Description;
+
+const DialogContainerContext = createContext<HTMLElement | null>(null);
+export function DialogContainerProvider({ children }: { children: ReactNode }) {
+	const [element, setElement] = useState<HTMLElement | null>(null);
+	return (
+		<DialogContainerContext.Provider value={element}>
+			<Slot ref={setElement}>{children}</Slot>
+		</DialogContainerContext.Provider>
+	);
+}
 
 export interface DialogContentProps extends DialogPrimitive.DialogContentProps {
 	title: string;
@@ -23,7 +34,9 @@ export interface DialogContentProps extends DialogPrimitive.DialogContentProps {
 	container?: HTMLElement | null;
 }
 
-export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(function DialogContent({ width, title, container, ...props }, ref) {
+export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(function DialogContent({ width, title, container: containerFromProps, ...props }, ref) {
+	const containerFromContext = useContext(DialogContainerContext);
+	const container = containerFromProps || containerFromContext;
 	const handleOutsidePointerDown = (e: Event) => {
 		if (container && !container.contains(e.target as Node)) {
 			e.preventDefault();
@@ -62,7 +75,7 @@ export interface DialogTriggerProps extends DialogPrimitive.DialogTriggerProps {
 
 export const DialogTrigger = forwardRef<HTMLButtonElement, DialogTriggerProps>(function DialogTrigger({ asChild, ...props }, ref) {
 	return (
-		<DialogPrimitive.Trigger className={cls.trigger} asChild={asChild} ref={ref} {...props}>
+		<DialogPrimitive.Trigger asChild={asChild} ref={ref} {...props}>
 			{props.children}
 		</DialogPrimitive.Trigger>
 	);
@@ -75,4 +88,5 @@ export const Dialog = Object.assign(DialogRoot, {
 	Close: DialogClose,
 	Title: DialogTitle,
 	Description: DialogDescription,
+	ContainerProvider: DialogContainerProvider,
 });

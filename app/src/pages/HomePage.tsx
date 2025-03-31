@@ -18,14 +18,8 @@ const HomePage = () => {
 	}, [incompleteProfile, navigate]);
 
 	if (!isHeadset) {
-		if (!session) {
-			// not logged in -- redirect to coming soon page until 2d is officially launched
-			return <Redirect to="/coming-soon" />;
-		}
-
-		// devices page is default 2D UI homepage while properties isn't very useful
-		// on 2D UI yets
-		return <Redirect to="/desktop" />;
+		// on desktop/mobile, editor is the default page.
+		return <Redirect to="/editor" />;
 	}
 
 	return <LazyMainScene />;

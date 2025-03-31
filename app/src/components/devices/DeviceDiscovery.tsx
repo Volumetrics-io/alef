@@ -2,14 +2,11 @@ import { Frame, Heading, Box, Text, Dialog, Button, Icon } from '@alef/sys';
 import { useClaimDevice, useDeviceDiscovery } from '@/services/publicApi/deviceHooks';
 import { PrefixedId } from '@alef/common';
 import toast from 'react-hot-toast';
-import { os } from '@/services/os';
-import { useMe } from '@/services/publicApi/userHooks';
 
 export function DeviceDiscovery() {
-	const { data: me } = useMe();
 	const {
 		data: { suggested },
-	} = useDeviceDiscovery(`${me?.friendlyName}'s ${os} device`);
+	} = useDeviceDiscovery();
 
 	const firstSuggested = suggested[0];
 	return (

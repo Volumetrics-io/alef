@@ -15,7 +15,7 @@ void main() {
  * colors: #ccffff, #ffe5ec, #fcfccf, using 3D coordinates for consistency across the object.
  */
 const fragment = `
-precision mediump float;
+
 uniform float time;
 uniform vec3 resolution;
 uniform vec3 color1;

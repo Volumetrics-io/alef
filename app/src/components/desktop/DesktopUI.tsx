@@ -35,7 +35,6 @@ export function DesktopUI({ children }: DesktopUIProps) {
 			<Tabs value={mode || 'layouts'} onValueChange={(m) => setMode(m as EditorMode)}>
 				<DesktopUIMain />
 				{!isMobile && <Box className={cls.content}>{children}</Box>}
-				{/* <DesktopUISecondary /> */}
 			</Tabs>
 		</Box>
 	);
@@ -70,28 +69,34 @@ function DesktopUIMain() {
 					<Text>Lighting</Text>
 				</Tabs.Trigger>
 			</Tabs.List>
-			<Tabs.Content value="layouts">
-				<Suspense>
-					<Box full stacked justify="between">
-						<DesktopLayoutsPicker />
-						<DesktopLayoutTools />
-					</Box>
-				</Suspense>
-			</Tabs.Content>
-			<Tabs.Content value="furniture">
-				<Suspense>
-					<Box full stacked justify="between">
-						<Box stacked gapped>
-							<DesktopFurnitureMobileInstructions />
-							<DesktopPlacedFurnitureList />
-						</Box>
-						<DesktopAddFurniture />
-					</Box>
-				</Suspense>
-			</Tabs.Content>
-			<Tabs.Content value="lighting">
+			<DesktopUITabContent value="layouts">
+				<DesktopLayoutsPicker />
+				<DesktopLayoutTools />
+			</DesktopUITabContent>
+			<DesktopUITabContent value="furniture">
+				<Box stacked gapped>
+					<DesktopFurnitureMobileInstructions />
+					<DesktopPlacedFurnitureList />
+				</Box>
+				<DesktopAddFurniture />
+			</DesktopUITabContent>
+			<DesktopUITabContent value="lighting">
 				<DesktopLightsMainEditor />
-			</Tabs.Content>
+			</DesktopUITabContent>
 		</Box>
+	);
+}
+
+function DesktopUITabContent({ children, value }: { children: ReactNode; value: string }) {
+	const isPWA = new URLSearchParams(window.location.search).get('directLaunch') === 'true';
+
+	return (
+		<Tabs.Content value={value}>
+			<Suspense>
+				<Box full stacked justify="between" style={{ paddingBottom: isPWA ? '5dvh' : '0' }}>
+					{children}
+				</Box>
+			</Suspense>
+		</Tabs.Content>
 	);
 }

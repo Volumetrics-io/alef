@@ -24,18 +24,17 @@
 		padding: 1rem;
 		animation: contentShow 0.3s;
 
+		align-items: center;
+
 		@media (max-width: 768px) {
-			padding: 0;
+			padding: 0.5rem;
 		}
 	}
 
 	.content {
-		margin: auto;
 		border-radius: 1rem;
 		width: 100%;
-		max-height: 100dvh;
-
-		padding-bottom: env(safe-area-inset-bottom);
+		max-height: 90dvh;
 
 		@media (max-width: 768px) {
 			width: 100%;

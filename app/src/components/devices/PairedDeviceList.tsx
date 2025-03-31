@@ -30,7 +30,7 @@ function PairedDeviceItem({ device }: { device: DeviceResponseData }) {
 			</Box>
 			<Box gapped justify="between" full="width">
 				<Label>
-					Buyer Mode
+					Read only
 					<Switch
 						checked={device.displayMode === 'viewing'}
 						disabled={isPending}

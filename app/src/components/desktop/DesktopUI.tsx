@@ -88,12 +88,10 @@ function DesktopUIMain() {
 }
 
 function DesktopUITabContent({ children, value }: { children: ReactNode; value: string }) {
-	const isPWA = new URLSearchParams(window.location.search).get('directLaunch') === 'true';
-
 	return (
 		<Tabs.Content value={value}>
 			<Suspense>
-				<Box full stacked justify="between" style={{ paddingBottom: isPWA ? '5dvh' : '0' }}>
+				<Box full stacked justify="between">
 					{children}
 				</Box>
 			</Suspense>

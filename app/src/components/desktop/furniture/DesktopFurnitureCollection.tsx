@@ -12,7 +12,7 @@ export interface DesktopFurnitureCollectionProps {
 export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore }: DesktopFurnitureCollectionProps) {
 	return (
 		<ScrollArea>
-			<CardGrid small p="small">
+			<CardGrid small>
 				{furniture.map((item) => (
 					<FurnitureCard key={item.id} item={item} />
 				))}

@@ -1,6 +1,6 @@
 @layer components {
 	.overlay {
-		position: fixed;
+		position: absolute;
 		inset: 0;
 		background-color: var(--dimmed);
 		animation: overlayShow 0.5s var(--bounce);
@@ -14,23 +14,33 @@
 	}
 
 	.contentContainer {
-		position: fixed;
+		position: absolute;
 		bottom: 0%;
 		left: 50%;
 		transform: translate(-50%, 0%);
 		z-index: 10000;
-		height: 100dvh;
+		height: 100%;
 		width: 100%;
 		padding: 1rem;
 		animation: contentShow 0.3s;
 		padding-bottom: env(safe-area-inset-bottom);
+
+		@media (max-width: 768px) {
+			padding: 0;
+		}
 	}
 
 	.content {
 		margin: auto;
 		border-radius: 1rem;
-		max-width: min(42rem, 90vw);
-		max-height: 100dvh;
+		width: 100%;
+		max-height: 100%;
+
+		margin-bottom: env(safe-area-inset-bottom);
+
+		@media (max-width: 768px) {
+			width: 100%;
+		}
 	}
 
 	.title {
@@ -61,5 +71,9 @@
 @layer variants {
 	.contentLarge {
 		max-width: 90vw;
+
+		@media (max-width: 768px) {
+			max-width: 100%;
+		}
 	}
 }

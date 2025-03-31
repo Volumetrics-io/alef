@@ -1,6 +1,6 @@
 import { useAllFurniture, useFurnitureAttributes } from '@/services/publicApi/furnitureHooks';
 import { useAllFilters } from '@/stores/FilterStore';
-import { Box, BoxProps, Heading, ScrollArea } from '@alef/sys';
+import { Box, BoxProps, Collapsible, Heading, ScrollArea } from '@alef/sys';
 import { Suspense } from 'react';
 import { DesktopFurnitureAttributePicker } from './DesktopFurnitureAttributePicker';
 import { DesktopFurnitureCategoryFilter } from './DesktopFurnitureCategoryFilter';
@@ -10,7 +10,7 @@ export interface DesktopOnlineFurniturePickerProps extends Omit<BoxProps, 'onSel
 
 export function DesktopOnlineFurniturePicker({ ...props }: DesktopOnlineFurniturePickerProps) {
 	return (
-		<Box full stacked gapped p="small" {...props}>
+		<Box full stacked gapped {...props}>
 			<DesktopFurnitureFilters />
 			<ScrollArea>
 				<Suspense>
@@ -24,11 +24,18 @@ export function DesktopOnlineFurniturePicker({ ...props }: DesktopOnlineFurnitur
 function DesktopFurnitureFilters() {
 	const { data: typeOptions } = useFurnitureAttributes('type');
 	return (
-		<Box gapped stacked>
-			<DesktopFurnitureCategoryFilter />
-			<Heading level={3}>Types</Heading>
-			<DesktopFurnitureAttributePicker attributeKey="type" options={typeOptions.map((v) => ({ key: 'type', value: v }))} />
-		</Box>
+		<Collapsible>
+			<Collapsible.Trigger>
+				<Heading level={3}>Filters</Heading>
+			</Collapsible.Trigger>
+			<Collapsible.Content>
+				<Box gapped stacked>
+					<DesktopFurnitureCategoryFilter />
+					<Heading level={3}>Types</Heading>
+					<DesktopFurnitureAttributePicker attributeKey="type" options={typeOptions.map((v) => ({ key: 'type', value: v }))} />
+				</Box>
+			</Collapsible.Content>
+		</Collapsible>
 	);
 }
 

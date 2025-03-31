@@ -16,19 +16,20 @@ export default defineConfig({
 				name: 'alef',
 				short_name: 'alef',
 				description: 'One room, endless possibilities.',
-				background_color: '#ffffff',
+				background_color: '#141414',
 				scope: 'https://app.alef.io/',
 				icons: [
 					{
 						src: '/icons/192.png',
 						sizes: '192x192',
 						type: 'image/png',
+						purpose: 'maskable',
 					},
 					{
 						src: '/icons/512.png',
 						sizes: '512x512',
 						type: 'image/png',
-						purpose: 'any maskable',
+						purpose: 'maskable',
 					},
 				],
 				categories: ['productivity', 'lifestyle', 'creativity', 'home', 'utilities'],

@@ -1,20 +1,19 @@
+import { NavBar } from '@/components/navBar/NavBar';
 import { useMedia } from '@/hooks/useMedia';
 import { useUndo } from '@/stores/roomStore';
 import { useEditorMode } from '@/stores/roomStore/hooks/editing';
 import { EditorMode } from '@alef/common';
-import { Box, Icon, Tabs, Text } from '@alef/sys';
-import { ReactNode, Suspense, useEffect, useRef } from 'react';
+import { Box, Dialog, Icon, Tabs, Text } from '@alef/sys';
+import { ReactNode, Suspense } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import cls from './DesktopUI.module.css';
 import { DesktopAddFurniture } from './furniture/DesktopAddFurniture';
 import { DesktopFurnitureMobileInstructions } from './furniture/DesktopFurnitureMobileInstructions';
 import { DesktopPlacedFurnitureList } from './furniture/DesktopPlacedFurnitureList';
 import { DesktopLayoutsPicker } from './layouts/DesktopLayoutsPicker';
+import { DesktopLayoutTools } from './layouts/DesktopLayoutTools';
 import { DesktopLightsMainEditor } from './lighting/DesktopLightsMainEditor';
 import { HeadsetConnectedIndicator } from './presence/HeadsetConnectedIndicator';
-import { NavBar } from '@/components/navBar/NavBar';
-import { DesktopLayoutTools } from './layouts/DesktopLayoutTools';
-import { useContainerStore } from './stores/useContainer';
 
 export interface DesktopUIProps {
 	children?: ReactNode;
@@ -41,47 +40,41 @@ export function DesktopUI({ children }: DesktopUIProps) {
 }
 
 function DesktopUIMain() {
-	const container = useRef<HTMLDivElement>(null);
-
-	const setContainer = useContainerStore((state) => state.setContainer);
-
-	useEffect(() => {
-		setContainer(container.current);
-	}, [container.current]);
-
 	return (
-		<Box ref={container} className={cls.main} stacked p="small">
-			<NavBar />
-			<Box p="small" layout="center center">
-				<HeadsetConnectedIndicator />
+		<Dialog.ContainerProvider>
+			<Box className={cls.main} stacked p="small">
+				<NavBar />
+				<Box p="small" layout="center center">
+					<HeadsetConnectedIndicator />
+				</Box>
+				<Tabs.List>
+					<Tabs.Trigger value="layouts">
+						<Icon name="house" />
+						<Text>Layouts</Text>
+					</Tabs.Trigger>
+					<Tabs.Trigger value="furniture">
+						<Icon name="sofa" />
+						<Text>Furniture</Text>
+					</Tabs.Trigger>
+					<Tabs.Trigger value="lighting">
+						<Icon name="lightbulb" />
+						<Text>Lighting</Text>
+					</Tabs.Trigger>
+				</Tabs.List>
+				<DesktopUITabContent value="layouts">
+					<DesktopLayoutsPicker />
+					<DesktopLayoutTools />
+				</DesktopUITabContent>
+				<DesktopUITabContent value="furniture">
+					<DesktopFurnitureMobileInstructions />
+					<DesktopPlacedFurnitureList />
+					<DesktopAddFurniture />
+				</DesktopUITabContent>
+				<DesktopUITabContent value="lighting">
+					<DesktopLightsMainEditor />
+				</DesktopUITabContent>
 			</Box>
-			<Tabs.List>
-				<Tabs.Trigger value="layouts">
-					<Icon name="house" />
-					<Text>Layouts</Text>
-				</Tabs.Trigger>
-				<Tabs.Trigger value="furniture">
-					<Icon name="sofa" />
-					<Text>Furniture</Text>
-				</Tabs.Trigger>
-				<Tabs.Trigger value="lighting">
-					<Icon name="lightbulb" />
-					<Text>Lighting</Text>
-				</Tabs.Trigger>
-			</Tabs.List>
-			<DesktopUITabContent value="layouts">
-				<DesktopLayoutsPicker />
-				<DesktopLayoutTools />
-			</DesktopUITabContent>
-			<DesktopUITabContent value="furniture">
-				<DesktopFurnitureMobileInstructions />
-				<DesktopPlacedFurnitureList />
-				<DesktopAddFurniture />
-			</DesktopUITabContent>
-			<DesktopUITabContent value="lighting">
-				<DesktopLightsMainEditor />
-			</DesktopUITabContent>
-		</Box>
+		</Dialog.ContainerProvider>
 	);
 }
 

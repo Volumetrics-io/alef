@@ -1,15 +1,12 @@
-import { Icon, Button, Dialog } from '@alef/sys';
-import { useCallback } from 'react';
-import { useContainerStore } from '../stores/useContainer';
-import { useSelect, useSelectedFurniturePlacementId } from '@/stores/roomStore/hooks/editing';
 import { useDeleteFurniturePlacement } from '@/stores/roomStore';
-export function DesktopDeleteFurniture() {
-	const selectedPlacementId = useSelectedFurniturePlacementId();
-	if (!selectedPlacementId) return null;
-	const deleteFurniturePlacement = useDeleteFurniturePlacement(selectedPlacementId);
-	const select = useSelect();
+import { useSelect } from '@/stores/roomStore/hooks/editing';
+import { PrefixedId } from '@alef/common';
+import { Button, Dialog, Icon } from '@alef/sys';
+import { useCallback } from 'react';
 
-	const container = useContainerStore((state) => state.container);
+export function DesktopDeleteFurniture({ placementId }: { placementId: PrefixedId<'fp'> }) {
+	const deleteFurniturePlacement = useDeleteFurniturePlacement(placementId);
+	const select = useSelect();
 
 	const handleDelete = useCallback(() => {
 		select(null);
@@ -23,7 +20,7 @@ export function DesktopDeleteFurniture() {
 					<Icon name="trash" />
 				</Button>
 			</Dialog.Trigger>
-			<Dialog.Content title="Delete asset" container={container}>
+			<Dialog.Content title="Delete asset">
 				<Dialog.Description>Are you sure you want to delete this object?</Dialog.Description>
 				<Dialog.Actions>
 					<Dialog.Close asChild>

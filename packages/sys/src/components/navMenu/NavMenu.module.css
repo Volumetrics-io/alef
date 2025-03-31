@@ -68,6 +68,10 @@
 		}
 	}
 
+	.contentEnd {
+		margin-top: auto;
+	}
+
 	.item {
 		display: flex;
 		flex-direction: row;
@@ -78,6 +82,7 @@
 		border-radius: 0;
 		border: 0;
 		cursor: pointer;
+		text-decoration: none;
 
 		/* --color-border: transparent; */
 		--color-text: var(--ink);
@@ -103,6 +108,7 @@
 
 		&:hover {
 			background-color: var(--track);
+			transform: none;
 		}
 	}
 

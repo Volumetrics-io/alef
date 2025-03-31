@@ -37,7 +37,7 @@ function LayoutItem({ layoutId }: { layoutId: PrefixedId<'rl'> }) {
 
 	return (
 		<Box full gapped>
-			<Button grow onClick={() => set(layoutId)}>
+			<Button grow justify="start" onClick={() => set(layoutId)}>
 				<DesktopLayoutIcon type={(layoutData?.type as RoomType) ?? 'living-room'} />
 				{layoutData?.name ?? '(deleted)'}
 				{active === layoutId && <Icon name="check" style={{ marginLeft: 'auto' }} />}

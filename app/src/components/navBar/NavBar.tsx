@@ -1,5 +1,5 @@
 import { useMe } from '@/services/publicApi/userHooks';
-import { Button, Text, NavMenu, Icon, Logo, NavBarProps, NavBar as SysNavBar } from '@alef/sys';
+import { Button, Icon, Logo, NavBarProps, NavMenu, NavBar as SysNavBar, Text } from '@alef/sys';
 import { Link } from '@verdant-web/react-router';
 import { forwardRef } from 'react';
 import { LogoutButton } from '../auth/LogoutButton';
@@ -14,8 +14,8 @@ export const NavBar = forwardRef<HTMLDivElement, NavBarProps>(function NavBar(pr
 			<SysNavBar.Start className={cls.navbar}>
 				{session && (
 					<NavMenu>
-						<NavMenu.Trigger>
-							<Button asChild color="ghost">
+						<NavMenu.Trigger asChild>
+							<Button color="ghost">
 								<NavMenu.ItemIcon>
 									<Icon name="menu" />
 								</NavMenu.ItemIcon>
@@ -34,9 +34,12 @@ export const NavBar = forwardRef<HTMLDivElement, NavBarProps>(function NavBar(pr
 								</NavMenu.ItemIcon>
 								<Text>Headsets</Text>
 							</NavMenu.ItemLink>
-							<NavMenu.Item>
+
+							<NavMenu.ContentEnd>
 								<LogoutButton />
-							</NavMenu.Item>
+								<Link to="https://alef.io/tos">Terms of Service</Link>
+								<Link to="https://alef.io/privacy">Privacy Policy</Link>
+							</NavMenu.ContentEnd>
 						</NavMenu.Content>
 					</NavMenu>
 				)}
@@ -45,13 +48,13 @@ export const NavBar = forwardRef<HTMLDivElement, NavBarProps>(function NavBar(pr
 				</Link>
 				<UpdatePrompt />
 			</SysNavBar.Start>
-			{!session && (
-				<SysNavBar.End gapped align="center" wrap>
+			<SysNavBar.End gapped align="center" wrap>
+				{!session && (
 					<Button asChild color="suggested">
 						<Link to="/login">Login</Link>
 					</Button>
-				</SysNavBar.End>
-			)}
+				)}
+			</SysNavBar.End>
 		</SysNavBar>
 	);
 });

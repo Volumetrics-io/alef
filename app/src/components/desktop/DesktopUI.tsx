@@ -17,7 +17,8 @@ import { DesktopLayoutTools } from './layouts/DesktopLayoutTools';
 import { DesktopLightEditor } from './lighting/DesktopLightEditor';
 import { DesktopLightsMainEditor } from './lighting/DesktopLightsMainEditor';
 import { HeadsetConnectedIndicator } from './presence/HeadsetConnectedIndicator';
-
+import { useMatchingRoutes } from '@verdant-web/react-router';
+import { DevicesPage } from '@/pages/devices/DevicesPage';
 export interface DesktopUIProps {
 	children?: ReactNode;
 }
@@ -46,9 +47,19 @@ export function DesktopUI({ children }: DesktopUIProps) {
 }
 
 function DesktopUIMain() {
+	const routes = useMatchingRoutes();
+	const isDevicesPage = routes.some((r) => r.path === '/devices');
 	return (
 		<Box className={cls.main} stacked p="small">
 			<NavBar />
+			{isDevicesPage ? <DevicesPage /> : <DesktopEditor />}
+		</Box>
+	);
+}
+
+function DesktopEditor() {
+	return (
+		<>
 			<Box p="small" layout="center center">
 				<HeadsetConnectedIndicator />
 			</Box>
@@ -78,7 +89,7 @@ function DesktopUIMain() {
 			<DesktopUITabContent value="lighting">
 				<DesktopLightsMainEditor />
 			</DesktopUITabContent>
-		</Box>
+		</>
 	);
 }
 

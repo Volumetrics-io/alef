@@ -1,17 +1,18 @@
-import { NonHeadsetDeviceDiscovery } from '@/components/devices/NonHeadsetDeviceDiscovery';
+import { DeviceIDCard } from '@/components/devices/DeviceIDCard';
 import { PairedDeviceList } from '@/components/devices/PairedDeviceList';
-import { NavBar } from '@/components/navBar/NavBar';
-import { Box, Main } from '@alef/sys';
+import { DeviceDiscovery } from '@/components/devices/DeviceDiscovery';
+import { Box, Heading, ScrollArea } from '@alef/sys';
 
 export function DevicesPage() {
 	return (
-		<Main>
-			<NavBar />
+		<ScrollArea>
 			<Box stacked gapped align="center">
-				<NonHeadsetDeviceDiscovery />
+				<Heading level={3}>Device Management</Heading>
+				<DeviceIDCard />
+				<DeviceDiscovery />
 				<PairedDeviceList />
 			</Box>
-		</Main>
+		</ScrollArea>
 	);
 }
 

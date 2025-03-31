@@ -12,7 +12,7 @@ export const NavBar = forwardRef<HTMLDivElement, NavBarProps>(function NavBar(pr
 	return (
 		<SysNavBar {...props} background="paper" ref={ref}>
 			<SysNavBar.Start className={cls.navbar}>
-				{session && (
+				{session ? (
 					<NavMenu>
 						<NavMenu.Trigger asChild>
 							<Button color="ghost">
@@ -22,17 +22,17 @@ export const NavBar = forwardRef<HTMLDivElement, NavBarProps>(function NavBar(pr
 							</Button>
 						</NavMenu.Trigger>
 						<NavMenu.Content>
-							<NavMenu.ItemLink to="/properties">
+							<NavMenu.ItemLink to="/">
 								<NavMenu.ItemIcon>
-									<Icon name="house" />
+									<Icon name="pencil-ruler" />
 								</NavMenu.ItemIcon>
-								<Text>Properties</Text>
+								<Text>Editor</Text>
 							</NavMenu.ItemLink>
 							<NavMenu.ItemLink to="/devices">
 								<NavMenu.ItemIcon>
 									<Icon name="glasses" />
 								</NavMenu.ItemIcon>
-								<Text>Headsets</Text>
+								<Text>Device management</Text>
 							</NavMenu.ItemLink>
 
 							<NavMenu.ContentEnd>
@@ -42,19 +42,16 @@ export const NavBar = forwardRef<HTMLDivElement, NavBarProps>(function NavBar(pr
 							</NavMenu.ContentEnd>
 						</NavMenu.Content>
 					</NavMenu>
+				) : (
+					<Button asChild color="suggested">
+						<Link to="/login">Login</Link>
+					</Button>
 				)}
 				<Link className={cls.logo} to="/">
 					<Logo style={{ width: 40, height: 'auto' }} />
 				</Link>
 				<UpdatePrompt />
 			</SysNavBar.Start>
-			<SysNavBar.End gapped align="center" wrap>
-				{!session && (
-					<Button asChild color="suggested">
-						<Link to="/login">Login</Link>
-					</Button>
-				)}
-			</SysNavBar.End>
 		</SysNavBar>
 	);
 });

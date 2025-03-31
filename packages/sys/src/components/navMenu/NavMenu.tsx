@@ -29,7 +29,7 @@ export const NavMenuContent = forwardRef<HTMLDivElement, NavMenuContentProps>(fu
 							</Link>
 						</RadixDialog.Title>
 						<RadixDialog.Close asChild>
-							<Button aria-label="Close menu">
+							<Button variant="action" color="ghost" aria-label="Close menu">
 								<Icon name="x" />
 							</Button>
 						</RadixDialog.Close>

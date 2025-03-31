@@ -1,6 +1,6 @@
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
 import { usePlacingFurnitureId, useSetPlacingFurniture } from '@/stores/roomStore/hooks/editing';
-import { Box, Button, CardGrid, Icon, ScrollArea } from '@alef/sys';
+import { Box, Button, CardGrid, Icon } from '@alef/sys';
 import { DesktopFurnitureCard } from './DesktopFurnitureCard';
 
 export interface DesktopFurnitureCollectionProps {

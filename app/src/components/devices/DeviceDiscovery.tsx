@@ -1,6 +1,7 @@
-import { Frame, Heading, Box, Text, Dialog, Button, Icon } from '@alef/sys';
 import { useClaimDevice, useDeviceDiscovery } from '@/services/publicApi/deviceHooks';
 import { PrefixedId } from '@alef/common';
+import { Box, Button, Dialog, Frame, Heading, Icon, Text } from '@alef/sys';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 
 export function DeviceDiscovery() {
@@ -49,9 +50,10 @@ function SuggestedDevice({
 			toast.success(`Paired with ${device.name}`);
 		},
 	});
+	const [open, setOpen] = useState(true);
 
 	return (
-		<Dialog open>
+		<Dialog open={open} onOpenChange={setOpen}>
 			<Dialog.Content title={`Pair with ${device.name}`}>
 				<Text tall>Tap "Pair" to associate this device with your account.</Text>
 				<Button

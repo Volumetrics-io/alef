@@ -3,9 +3,13 @@ import { useMedia } from '@/hooks/useMedia';
 import { useUndo } from '@/stores/roomStore';
 import { useEditorMode, useSelect, useSelectedObjectId } from '@/stores/roomStore/hooks/editing';
 import { EditorMode, isPrefixedId } from '@alef/common';
-import { Box, Icon, Tabs, Text } from '@alef/sys';
+import { Box, Heading, Icon, ScrollArea, Tabs, Text } from '@alef/sys';
 import { ReactNode, Suspense } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { DeviceDiscovery } from '../devices/DeviceDiscovery';
+import { DeviceIDCard } from '../devices/DeviceIDCard';
+import { DevicePaircodeClaim } from '../devices/DevicePaircodeClaim';
+import { PairedDeviceList } from '../devices/PairedDeviceList';
 import { DesktopSecondaryContent } from './common/DesktopSecondaryContent';
 import cls from './DesktopUI.module.css';
 import { DesktopAddFurniture } from './furniture/DesktopAddFurniture';
@@ -17,8 +21,6 @@ import { DesktopLayoutTools } from './layouts/DesktopLayoutTools';
 import { DesktopLightEditor } from './lighting/DesktopLightEditor';
 import { DesktopLightsMainEditor } from './lighting/DesktopLightsMainEditor';
 import { HeadsetConnectedIndicator } from './presence/HeadsetConnectedIndicator';
-import { useMatchingRoutes } from '@verdant-web/react-router';
-import { DevicesPage } from '@/pages/devices/DevicesPage';
 export interface DesktopUIProps {
 	children?: ReactNode;
 }
@@ -47,12 +49,10 @@ export function DesktopUI({ children }: DesktopUIProps) {
 }
 
 function DesktopUIMain() {
-	const routes = useMatchingRoutes();
-	const isDevicesPage = routes.some((r) => r.path === '/devices');
 	return (
 		<Box className={cls.main} stacked p="small">
 			<NavBar />
-			{isDevicesPage ? <DevicesPage /> : <DesktopEditor />}
+			<DesktopEditor />
 		</Box>
 	);
 }
@@ -76,6 +76,10 @@ function DesktopEditor() {
 					<Icon name="lightbulb" />
 					<Text>Lighting</Text>
 				</Tabs.Trigger>
+				<Tabs.Trigger value="settings">
+					<Icon name="settings" />
+					<Text>Settings</Text>
+				</Tabs.Trigger>
 			</Tabs.List>
 			<DesktopUITabContent value="layouts">
 				<DesktopLayoutsPicker />
@@ -88,6 +92,17 @@ function DesktopEditor() {
 			</DesktopUITabContent>
 			<DesktopUITabContent value="lighting">
 				<DesktopLightsMainEditor />
+			</DesktopUITabContent>
+			<DesktopUITabContent value="settings">
+				<ScrollArea>
+					<Box stacked gapped align="center">
+						<Heading level={4}>Devices</Heading>
+						<DeviceIDCard />
+						<DeviceDiscovery />
+						<DevicePaircodeClaim />
+						<PairedDeviceList />
+					</Box>
+				</ScrollArea>
 			</DesktopUITabContent>
 		</>
 	);

@@ -19,7 +19,7 @@ export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(function S
 		[stableOnScroll]
 	);
 	return (
-		<Box stacked className={clsx(cls.root, className, 'scrollable')} onScroll={internalOnScroll} {...rest} ref={ref}>
+		<Box stacked full className={clsx(cls.root, className)} onScroll={internalOnScroll} {...rest} ref={ref}>
 			{children}
 		</Box>
 	);

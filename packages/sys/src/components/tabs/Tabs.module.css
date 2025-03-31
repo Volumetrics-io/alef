@@ -10,7 +10,6 @@
 		flex-direction: row;
 		border: var(--border);
 		border-radius: var(--radius-md);
-		margin-bottom: 0.5rem;
 	}
 
 	.trigger {
@@ -57,6 +56,5 @@
 		flex-grow: 1;
 		outline: none;
 		min-height: 0;
-		max-height: 100%;
 	}
 }

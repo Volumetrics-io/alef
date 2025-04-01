@@ -1,10 +1,13 @@
 import { EmailSigninForm } from '@/components/auth/EmailSigninForm';
-import { Box, Frame, Heading, Link, Logo } from '@alef/sys';
+import { EmailSignupForm } from '@/components/auth/EmailSignupForm';
+import { OAuthSigninButton } from '@/components/auth/OAuthSigninButton';
+import { Box, Frame, Heading, Icon, Link, Logo, Tabs } from '@alef/sys';
 import { useSearchParams } from '@verdant-web/react-router';
 
 const LoginPage = () => {
-	const [searchParams] = useSearchParams();
+	const [searchParams, updateSearch] = useSearchParams();
 	const returnTo = searchParams.get('returnTo') ?? undefined;
+	const tab = searchParams.get('tab') ?? 'login';
 	const error = searchParams.get('error') ?? undefined;
 
 	return (
@@ -16,14 +19,60 @@ const LoginPage = () => {
 						alef
 					</Heading>
 				</Box>
-
-				<Heading level={1}>Login</Heading>
-				{error && (
+        {error && (
 					<Box p style={{ backgroundColor: 'var(--error-paper)', color: 'var(--error-ink)' }}>
 						{error}
 					</Box>
 				)}
-				<EmailSigninForm returnTo={returnTo} />
+
+				<Tabs
+					value={tab}
+					onValueChange={(value) =>
+						updateSearch((s) => {
+							s.set('tab', value);
+							return s;
+						})
+					}
+				>
+					<Box align="stretch" stacked gapped>
+						<Box justify="center">
+							<Tabs.List>
+								<Tabs.Trigger value="login">
+									<Box gapped>
+										<Icon name="hand" />
+										Log&nbsp;in
+									</Box>
+								</Tabs.Trigger>
+								<Tabs.Trigger value="signup">
+									<Box gapped>
+										<Icon name="square-check-big" />
+										Sign&nbsp;up
+									</Box>
+								</Tabs.Trigger>
+							</Tabs.List>
+						</Box>
+						<Tabs.Content value="login">
+							<Box stacked gapped>
+								<Heading level={1}>Log in</Heading>
+								<OAuthSigninButton provider="google" returnTo={returnTo} style={{ margin: '0 auto' }}>
+									Log in with Google
+								</OAuthSigninButton>
+								<Or />
+								<EmailSigninForm returnTo={returnTo} />
+							</Box>
+						</Tabs.Content>
+						<Tabs.Content value="signup">
+							<Box stacked gapped>
+								<Heading level={1}>Sign up</Heading>
+								<OAuthSigninButton provider="google" returnTo={returnTo} style={{ margin: '0 auto' }}>
+									Sign up with Google
+								</OAuthSigninButton>
+								<Or />
+								<EmailSignupForm returnTo={returnTo} />
+							</Box>
+						</Tabs.Content>
+					</Box>
+				</Tabs>
 			</Frame>
 			<Box gapped p="small" style={{ fontSize: '0.8rem', color: 'var(--faded)' }}>
 				<Link to="https://alef.io/tos">Terms of Service</Link>
@@ -32,5 +81,13 @@ const LoginPage = () => {
 		</Box>
 	);
 };
+
+const Or = () => (
+	<Box justify="between" align="center" gapped>
+		<Box full style={{ borderBottom: 'var(--border)' }} />
+		<Box>or</Box>
+		<Box full style={{ borderBottom: 'var(--border)' }} />
+	</Box>
+);
 
 export default LoginPage;

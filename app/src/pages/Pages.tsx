@@ -58,7 +58,7 @@ const routes = makeRoutes([
 		component: HeadsetPage,
 	},
 	{
-		path: '/desktop',
+		path: '/editor',
 		component: lazy(() => import('./DesktopModePage.js')),
 	},
 	{

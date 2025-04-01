@@ -1,4 +1,4 @@
-import { Button, ButtonProps } from '@alef/sys';
+import { Box, Button, ButtonProps } from '@alef/sys';
 import { ReactNode } from 'react';
 
 export function OAuthSigninButton({
@@ -28,10 +28,12 @@ export function OAuthSigninButton({
 	}
 
 	return (
-		<form action={url.toString()} className={className} method="post">
-			<Button type="submit" {...rest}>
-				{children}
-			</Button>
-		</form>
+		<Box asChild>
+			<form action={url.toString()} className={className} method="post">
+				<Button type="submit" {...rest}>
+					{children}
+				</Button>
+			</form>
+		</Box>
 	);
 }

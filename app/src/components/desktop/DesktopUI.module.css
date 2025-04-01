@@ -34,9 +34,14 @@
 	border-right: var(--border);
 }
 
+.trigger {
+	gap: 0;
+}
+
 .tabs {
 	align-self: center;
 	position: sticky;
+	width: 100%;
 	top: 0.5rem;
 	z-index: 1000;
 }
@@ -51,16 +56,29 @@
 }
 
 .tabLabel {
-	display: none;
+	max-width: 0;
+	opacity: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	transform-origin: left;
 }
-.trigger[data-state='active'] {
-	.tabLabel {
-		display: inline;
-	}
+.trigger[data-state='active'] .tabLabel {
+	padding-left: 0.5rem;
+	max-width: 200px;
+	opacity: 1;
+	transition:
+		max-width 0.3s ease-out,
+		opacity 0.2s ease-out;
 }
 @container main (min-width: 430px) {
+	.trigger {
+		gap: 0.25rem;
+	}
 	.tabLabel {
+		padding-left: 0 !important;
 		display: inline;
+		max-width: 200px;
+		opacity: 1;
 	}
 }
 

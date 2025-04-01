@@ -58,8 +58,13 @@
 /* iOS-specific styling for the controls */
 @supports (-webkit-touch-callout: none) {
 	.controls {
-		bottom: 3dvh;
+		bottom: 5dvh;
 	}
+}
+
+.settings {
+	flex-grow: 0;
+	flex-shrink: 1;
 }
 
 .tabLabel {
@@ -77,7 +82,7 @@
 		max-width 0.3s ease-out,
 		opacity 0.2s ease-out;
 }
-@container main (min-width: 430px) {
+@container main (min-width: 425px) {
 	.trigger {
 		gap: 0.25rem;
 	}

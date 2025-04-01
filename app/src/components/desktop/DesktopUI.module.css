@@ -46,7 +46,7 @@
 
 .controls {
 	position: sticky;
-	bottom: 0.5rem;
+	bottom: calc(0.5rem + env(safe-area-inset-bottom));
 	background-color: var(--paper);
 }
 

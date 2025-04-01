@@ -174,7 +174,7 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 	 *
 	 * TODO: once discovered and claimed, devices can only be modified by their owners
 	 */
-	async ensureDeviceExists(info: Omit<NewDevice, 'displayMode' | 'name' | 'type'> & { type?: DeviceType; name?: string }, owner?: PrefixedId<'u'>) {
+	async ensureDeviceExists(info: Omit<NewDevice, 'displayMode' | 'name' | 'type'> & { type?: DeviceType; name?: string; defaultName?: string }, owner?: PrefixedId<'u'>) {
 		const conflictUpdates: DeviceUpdate = {};
 		if (info.name) {
 			// if a name is provided, we should update the name in case of conflicts.
@@ -193,8 +193,8 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 				// provide a default name if none was provided
 				// devices always start in staging mode
 				displayMode: 'staging',
-				...info,
-				name: info.name ?? 'Unnamed Device',
+				id: info.id,
+				name: info.name ?? info.defaultName ?? `Unnamed ${info.type ?? 'device'}`,
 				type: info.type ?? 'other',
 			})
 			// if device already exists, keep existing values.

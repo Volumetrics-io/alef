@@ -25,11 +25,13 @@ const upsertDeviceMiddleware = createMiddleware<{
 	// implicitly.
 	const name = ctx.req.query('name');
 	const type = ctx.req.query('type') as DeviceType | undefined;
+	const description = ctx.req.query('description');
 	const userId = ctx.get('session')?.userId;
 	const ownId = await assignOrRefreshDeviceId(ctx);
 	const device = {
 		id: ownId,
 		name,
+		defaultName: description,
 		type,
 	};
 	const upserted = await ctx.env.PUBLIC_STORE.ensureDeviceExists(device, userId);
@@ -54,6 +56,8 @@ export const devicesRouter = new Hono<Env>()
 			'query',
 			z.object({
 				name: z.string().optional(),
+				// required: some baseline description of what this device is, absent any other naming.
+				description: z.string(),
 				type: z.enum(['mobile', 'tablet', 'headset', 'desktop', 'other']).optional(),
 			})
 		),
@@ -106,6 +110,28 @@ export const devicesRouter = new Hono<Env>()
 			});
 		}
 	)
+	.post(
+		'/paircode/:code/claim',
+		userStoreMiddleware,
+		zValidator(
+			'param',
+			z.object({
+				code: z.string(),
+			})
+		),
+		async (ctx) => {
+			const { code } = ctx.req.valid('param');
+			const paircodes = await getPaircodes(ctx);
+			const deviceId = await paircodes.claim(code);
+			if (!deviceId) {
+				throw new AlefError(AlefError.Code.NotFound, 'No match found for that code. Double-check it.');
+			}
+			await ctx.get('userStore').claimDevice(deviceId);
+			return ctx.json({
+				ok: true,
+			});
+		}
+	)
 	// device discovery uses a Durable Object per public IP to register devices which are simultaneously
 	// connected and allow them to claim one another.
 	// This is also a public endpoint! Devices which aren't discovered or assigned yet aren't authenticated
@@ -117,6 +143,8 @@ export const devicesRouter = new Hono<Env>()
 			'query',
 			z.object({
 				name: z.string().optional(),
+				// required: some baseline description of what this device is, absent any other naming.
+				description: z.string(),
 				type: z.enum(['mobile', 'tablet', 'headset', 'desktop', 'other']).optional(),
 			})
 		),
@@ -129,6 +157,13 @@ export const devicesRouter = new Hono<Env>()
 			const discoveryState = await getDiscoveryState(ctx);
 			discoveryState.register(device);
 			const list = await discoveryState.listAll(device.id);
+
+			let code: string | null = null;
+			// only enable paircodes for devices that are not yet registered
+			if (!userId) {
+				const paircodes = await getPaircodes(ctx);
+				code = await paircodes.register(device.id);
+			}
 
 			// if this device is already registered, it is assigned an authentication token
 			let wasAssigned = false;
@@ -166,6 +201,7 @@ export const devicesRouter = new Hono<Env>()
 				wrapRpcData({
 					...list,
 					wasAssigned,
+					paircode: code,
 				})
 			);
 		}
@@ -240,6 +276,11 @@ async function getDiscoveryState(ctx: Context<{ Bindings: Bindings; Variables: a
 
 	const durableObjectId = ctx.env.DEVICE_DISCOVERY.idFromName(ip);
 	const discoveryState = ctx.env.DEVICE_DISCOVERY.get(durableObjectId);
-	console.log(discoveryState);
 	return discoveryState;
+}
+
+async function getPaircodes(ctx: Context<{ Bindings: Bindings; Variables: any }>) {
+	const durableObjectId = ctx.env.PAIRCODES.idFromName('paircodes');
+	const paircodes = ctx.env.PAIRCODES.get(durableObjectId);
+	return paircodes;
 }

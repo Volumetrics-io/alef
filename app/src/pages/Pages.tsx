@@ -35,7 +35,7 @@ const routes = makeRoutes([
 		children: [
 			{
 				index: true,
-				component: lazy(() => import('./devices/DevicesPage.js')),
+				component: lazy(() => import('./DesktopModePage.js')),
 			},
 		],
 	},

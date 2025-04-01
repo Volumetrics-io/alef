@@ -36,6 +36,11 @@ class_name = "DeviceDiscovery"
 name = "PROPERTY"
 class_name = "Property"
 
+[[durable_objects.bindings]]
+name = "PAIRCODES"
+class_name = "Paircodes"
+
+
 [[migrations]]
 tag = "v1"
 new_classes = ["DeviceDiscovery"]
@@ -43,3 +48,7 @@ new_classes = ["DeviceDiscovery"]
 [[migrations]]
 tag = "v2"
 new_classes = ["Property"]
+
+[[migrations]]
+tag = "v3"
+new_classes = ["Paircodes"]

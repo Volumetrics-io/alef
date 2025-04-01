@@ -1,5 +1,4 @@
-import { isQuest } from '@/services/os';
-import { useDeviceDiscovery, useDiscoverySuggest } from '@/services/publicApi/deviceHooks';
+import { useCurrentDevice, useDeviceDiscovery, useDiscoverySuggest } from '@/services/publicApi/deviceHooks';
 import { PrefixedId } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { HourglassIcon } from '@react-three/uikit-lucide';
@@ -11,17 +10,10 @@ import { Surface } from '../ui/Surface';
 import { colors } from '../ui/theme';
 
 export function HeadsetLogin({ onCancel }: { onCancel?: () => void }) {
-	// TODO: modify name from here
-	const [name, _setName] = useState(() => {
-		if (isQuest) {
-			return 'Quest Headset';
-		}
-		return 'New Headset';
-	});
-
 	const {
-		data: { all: devices },
-	} = useDeviceDiscovery(name);
+		data: { all: devices, paircode },
+	} = useDeviceDiscovery();
+	const { data: thisDevice } = useCurrentDevice();
 	const [selectedDeviceId, setSelectedDevice] = useState<string | null>(null);
 	const selectedDevice = devices?.find((device) => device.id === selectedDeviceId);
 
@@ -38,9 +30,9 @@ export function HeadsetLogin({ onCancel }: { onCancel?: () => void }) {
 					Device Pairing
 				</Heading>
 				{selectedDevice ? (
-					<WaitingToPair name={name} selectedDevice={selectedDevice} onCancel={() => setSelectedDevice(null)} />
+					<WaitingToPair name={thisDevice?.name ?? undefined} selectedDevice={selectedDevice} onCancel={() => setSelectedDevice(null)} />
 				) : (
-					<DeviceList onSelect={pairWithDevice} devices={devices} />
+					<DeviceList onSelect={pairWithDevice} devices={devices} paircode={paircode} />
 				)}
 				<Button onClick={onCancel}>
 					<Text>Cancel</Text>
@@ -50,11 +42,19 @@ export function HeadsetLogin({ onCancel }: { onCancel?: () => void }) {
 	);
 }
 
-function DeviceList({ devices, onSelect }: { devices: { id: PrefixedId<'d'>; name?: string }[]; onSelect: (id: PrefixedId<'d'>) => void }) {
+function DeviceList({ devices, onSelect, paircode }: { devices: { id: PrefixedId<'d'>; name?: string }[]; onSelect: (id: PrefixedId<'d'>) => void; paircode: string | null }) {
 	return (
 		<Container flexDirection="column" flexGrow={1} flexShrink={0} gap={4}>
 			<Text>Log into Alef on a phone or computer using the same Wifi network as this device, then select it here.</Text>
 			<Text color={colors.focus}>Make sure your device is on the same network as this headset and VPN / Private Relay is disabled.</Text>
+			{paircode && (
+				<Container justifyContent="space-between" borderWidth={1} borderColor={colors.border} borderRadius={5} padding={5} flexGrow={0} flexShrink={0}>
+					<Text color={colors.faded}>Manual pair code:</Text>
+					<Text fontWeight="bold" color={colors.focus}>
+						{paircode}
+					</Text>
+				</Container>
+			)}
 			<Container
 				flexDirection="column"
 				gap={4}
@@ -81,14 +81,16 @@ function DeviceList({ devices, onSelect }: { devices: { id: PrefixedId<'d'>; nam
 	);
 }
 
-function WaitingToPair({ selectedDevice, onCancel, name }: { selectedDevice: { id: PrefixedId<'d'>; name?: string }; onCancel?: () => void; name: string }) {
+function WaitingToPair({ selectedDevice, onCancel, name }: { selectedDevice: { id: PrefixedId<'d'>; name?: string }; onCancel?: () => void; name?: string }) {
 	return (
 		<Container flexDirection={'column'} gap={4} flexGrow={1}>
 			<HourglassIcon />
 			<Text fontSize={10}>Waiting to pair with {selectedDevice.name ?? 'Unknown device'}</Text>
-			<Text>
-				This device's name is: <Text fontWeight="semi-bold">{name}</Text>
-			</Text>
+			{name && (
+				<Text>
+					This device's name is: <Text fontWeight="semi-bold">{name}</Text>
+				</Text>
+			)}
 			<Text>Press "Pair" on your device when prompted.</Text>
 			<Button onClick={onCancel}>
 				<Text>Choose another device</Text>

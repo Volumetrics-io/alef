@@ -3,23 +3,23 @@ function getOS() {
 	if (ua.includes('windows')) {
 		return 'Windows';
 	}
-	if (ua.includes('mac')) {
-		return 'Mac';
-	}
-	if (ua.includes('linux')) {
-		return 'Linux';
-	}
-	if (ua.includes('android')) {
-		return 'Android';
-	}
 	if (ua.includes('iphone')) {
 		return 'iOS';
 	}
 	if (ua.includes('ipad')) {
-		return 'iOS';
+		return 'iPadOS';
 	}
 	if (ua.includes('ipod')) {
 		return 'iOS';
+	}
+	if (ua.includes('android')) {
+		return 'Android';
+	}
+	if (ua.includes('mac')) {
+		return 'macOS';
+	}
+	if (ua.includes('linux')) {
+		return 'Linux';
 	}
 	return 'Unknown';
 }
@@ -66,7 +66,7 @@ export const isQuest = userAgent.includes('OculusBrowser') || userAgent.includes
 export const isHeadset = supportsXR && (emulateHeadset || isQuest || os === 'iOS' || (ua.includes('mobile') && !isTall));
 
 /** Best guess as to what to call this device */
-export const deviceName = isHeadset ? (isQuest ? 'Quest' : os === 'iOS' ? 'Vision Pro' : 'Headset') : browser === 'Unknown' ? 'Browser' : browser;
+export const deviceName = isHeadset ? (isQuest ? 'Quest' : os === 'iOS' ? 'Vision Pro' : 'Headset') : `${os} device`;
 
 function getDeviceType() {
 	if (isHeadset) {
@@ -82,6 +82,8 @@ function getDeviceType() {
 }
 
 export const deviceType = getDeviceType();
+
+console.log('ua', ua);
 
 console.log(`DEVICE INFO`, {
 	os,

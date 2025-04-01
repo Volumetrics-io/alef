@@ -1,7 +1,8 @@
 import type { AdminStore, PublicStore } from '../../db/index.js';
 import { SessionWithPrefixedIds } from '../../middleware/session.js';
-import { DeviceDiscovery } from '../durableObjects/DeviceDiscovery.js';
-import { Property } from '../durableObjects/Property.js';
+import type { DeviceDiscovery } from '../durableObjects/DeviceDiscovery.js';
+import type { Paircodes } from '../durableObjects/Paircodes.js';
+import type { Property } from '../durableObjects/Property.js';
 
 export interface Bindings {
 	// env
@@ -29,6 +30,7 @@ export interface Bindings {
 	ADMIN_STORE: Service<AdminStore>;
 	DEVICE_DISCOVERY: DurableObjectNamespace<DeviceDiscovery>;
 	PROPERTY: DurableObjectNamespace<Property>;
+	PAIRCODES: DurableObjectNamespace<Paircodes>;
 }
 
 export interface CtxVars {

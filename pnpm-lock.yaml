@@ -13,8 +13,8 @@ catalogs:
       specifier: 2.0.1
       version: 2.0.1
     '@a-type/utils':
-      specifier: 1.1.4
-      version: 1.1.4
+      specifier: 1.1.5
+      version: 1.1.5
     '@cloudflare/workers-types':
       specifier: ^4.20250124.3
       version: 4.20250129.0
@@ -252,6 +252,9 @@ importers:
       '@tanstack/react-query':
         specifier: 5.62.15
         version: 5.62.15(react@18.3.1)
+      '@use-gesture/react':
+        specifier: ^10.3.1
+        version: 10.3.1(react@18.3.1)
       '@verdant-web/react-router':
         specifier: ^0.7.1
         version: 0.7.1(react@18.3.1)
@@ -539,7 +542,7 @@ importers:
         version: 1.1.1(kysely@0.27.5)
       '@a-type/utils':
         specifier: 'catalog:'
-        version: 1.1.4
+        version: 1.1.5
       '@alef/common':
         specifier: workspace:*
         version: link:../packages/common
@@ -590,8 +593,8 @@ packages:
     peerDependencies:
       react: ^19
 
-  '@a-type/utils@1.1.4':
-    resolution: { integrity: sha512-RG82RwQs2or6iX1i/EcsnsXF8fq6G/2/r+I8x0gCFlDn6h+0P6EbZxMkTVBc8MTtN31m0mni3zhUd/1M4byAhg== }
+  '@a-type/utils@1.1.5':
+    resolution: { integrity: sha512-V3tQRLXWn4ko3fWx3H2euAp2HAutazW7BOFHtQy3gbObCQucCwX+I2b+Hb2Pwm18difEDjGiuLYi+MSHcURrdQ== }
 
   '@adobe/css-tools@4.3.3':
     resolution: { integrity: sha512-rE0Pygv0sEZ4vBWHlAgJLGDU7Pm8xoO6p3wsEceb7GYAjScrOHpEo8KK/eVkAcnSM+slAEtXjA2JpdjLp4fJQQ== }
@@ -7410,7 +7413,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/react'
 
-  '@a-type/utils@1.1.4': {}
+  '@a-type/utils@1.1.5': {}
 
   '@adobe/css-tools@4.3.3': {}
 

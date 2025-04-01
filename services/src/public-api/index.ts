@@ -49,4 +49,5 @@ app.route('/auth', authRouter);
 export default app;
 
 export { DeviceDiscovery } from './durableObjects/DeviceDiscovery.js';
+export { Paircodes } from './durableObjects/Paircodes.js';
 export { Property } from './durableObjects/Property.js';

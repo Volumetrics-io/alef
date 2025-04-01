@@ -1,13 +1,14 @@
+import { useActiveRoomLayoutId } from '@/stores/roomStore';
 import { Box } from '@alef/sys';
 import { DesktopAddLayout } from './DesktopAddLayout';
-import { useActiveRoomLayoutId } from '@/stores/roomStore';
-import { DesktopLayoutEditor } from './DesktopLayoutEditor';
 import { DesktopDeleteLayout } from './DesktopDeleteLayout';
-export function DesktopLayoutTools() {
+import { DesktopLayoutEditor } from './DesktopLayoutEditor';
+
+export function DesktopLayoutTools({ className }: { className?: string }) {
 	const [activeLayoutId] = useActiveRoomLayoutId();
 
 	return (
-		<Box full="width" gapped>
+		<Box full="width" gapped className={className}>
 			<DesktopAddLayout />
 			{activeLayoutId && <DesktopLayoutEditor />}
 			{activeLayoutId && <DesktopDeleteLayout />}

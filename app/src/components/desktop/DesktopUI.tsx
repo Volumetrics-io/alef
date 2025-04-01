@@ -1,10 +1,11 @@
 import { NavBar } from '@/components/navBar/NavBar';
+import { useDetectSticky } from '@/hooks/useDetectSticky';
 import { useMedia } from '@/hooks/useMedia';
 import { useIsLoggedIn } from '@/services/publicApi/userHooks';
 import { useUndo } from '@/stores/roomStore';
 import { useEditorMode, useSelect, useSelectedObjectId } from '@/stores/roomStore/hooks/editing';
 import { EditorMode, isPrefixedId } from '@alef/common';
-import { Box, Heading, Icon, ScrollArea, Tabs, Text } from '@alef/sys';
+import { Box, Heading, Icon, Tabs, Text } from '@alef/sys';
 import { ReactNode, Suspense } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { DeviceDiscovery } from '../devices/DeviceDiscovery';
@@ -54,7 +55,7 @@ function DesktopUIMain() {
 	return (
 		<Box className={cls.main}>
 			<Box stacked p="small" full>
-				<NavBar />
+				<NavBar className={cls.nav} />
 				<DesktopEditor />
 			</Box>
 			<MainPanelResizer />
@@ -65,12 +66,17 @@ function DesktopUIMain() {
 function DesktopEditor() {
 	const isLoggedIn = useIsLoggedIn();
 
+	const tabsRef = useDetectSticky<HTMLDivElement>({
+		containerSelector: `.${cls.main}`,
+		offset: 16,
+	});
+
 	return (
 		<>
 			<Box p="small" layout="center center">
 				<HeadsetConnectedIndicator />
 			</Box>
-			<Tabs.List>
+			<Tabs.List className={cls.tabs} ref={tabsRef}>
 				<Tabs.Trigger value="layouts">
 					<Icon name="house" />
 					<Text className={cls.tabLabel}>Layouts</Text>
@@ -92,28 +98,26 @@ function DesktopEditor() {
 			</Tabs.List>
 			<DesktopUITabContent value="layouts">
 				<DesktopLayoutsPicker />
-				<DesktopLayoutTools />
+				<DesktopLayoutTools className={cls.controls} />
 			</DesktopUITabContent>
 			<DesktopUITabContent value="furniture">
 				<DesktopFurnitureMobileInstructions />
 				<DesktopPlacedFurnitureList />
-				<DesktopAddFurniture />
+				<DesktopAddFurniture className={cls.controls} />
 			</DesktopUITabContent>
 			<DesktopUITabContent value="lighting">
 				<DesktopLightsMainEditor />
 			</DesktopUITabContent>
 			{isLoggedIn && (
 				<DesktopUITabContent value="settings">
-					<ScrollArea>
-						<Box stacked gapped p="small">
-							<Heading level={3}>Settings</Heading>
-							<DeviceIDCard />
-							<Heading level={4}>Pair devices</Heading>
-							<DeviceDiscovery />
-							<DevicePaircodeClaim />
-							<PairedDeviceList />
-						</Box>
-					</ScrollArea>
+					<Box stacked gapped p="small">
+						<Heading level={3}>Settings</Heading>
+						<DeviceIDCard />
+						<Heading level={4}>Pair devices</Heading>
+						<DeviceDiscovery />
+						<DevicePaircodeClaim />
+						<PairedDeviceList />
+					</Box>
 				</DesktopUITabContent>
 			)}
 		</>

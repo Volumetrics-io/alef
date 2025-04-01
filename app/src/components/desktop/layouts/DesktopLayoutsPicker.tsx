@@ -1,6 +1,6 @@
 import { useActiveRoomLayoutId, useRoomLayout, useRoomLayoutIds } from '@/stores/roomStore';
 import { PrefixedId, RoomType } from '@alef/common';
-import { Box, Button, Icon, ScrollArea } from '@alef/sys';
+import { Box, Button, Icon } from '@alef/sys';
 import { Suspense } from 'react';
 import { DesktopLayoutIcon } from '../common/DesktopLayoutIcon';
 
@@ -9,19 +9,9 @@ export interface DesktopLayoutsPickerProps {
 }
 
 export function DesktopLayoutsPicker({ className }: DesktopLayoutsPickerProps) {
-	return (
-		<Box stacked gapped className={className}>
-			<ScrollArea>
-				<LayoutSelector />
-			</ScrollArea>
-		</Box>
-	);
-}
-
-function LayoutSelector() {
 	const layoutIds = useRoomLayoutIds();
 	return (
-		<Box gapped stacked p="small">
+		<Box gapped stacked p="small" className={className}>
 			{layoutIds.map((layoutId) => (
 				<Suspense key={layoutId} fallback={<Button />}>
 					<LayoutItem layoutId={layoutId} />

@@ -77,22 +77,21 @@ function DesktopEditor() {
 				<HeadsetConnectedIndicator />
 			</Box>
 			<Tabs.List className={cls.tabs} ref={tabsRef}>
-				<Tabs.Trigger value="layouts">
+				<Tabs.Trigger className={cls.trigger} value="layouts">
 					<Icon name="house" />
 					<Text className={cls.tabLabel}>Layouts</Text>
 				</Tabs.Trigger>
-				<Tabs.Trigger value="furniture">
+				<Tabs.Trigger className={cls.trigger} value="furniture">
 					<Icon name="sofa" />
 					<Text className={cls.tabLabel}>Furniture</Text>
 				</Tabs.Trigger>
-				<Tabs.Trigger value="lighting">
+				<Tabs.Trigger className={cls.trigger} value="lighting">
 					<Icon name="lightbulb" />
-					<Text className={cls.tabLabel}>Lighting</Text>
+					<Text className={cls.tabLabel}>Lights</Text>
 				</Tabs.Trigger>
 				{isLoggedIn && (
-					<Tabs.Trigger value="settings">
+					<Tabs.Trigger className={cls.trigger} value="settings">
 						<Icon name="settings" />
-						<Text className={cls.tabLabel}>Settings</Text>
 					</Tabs.Trigger>
 				)}
 			</Tabs.List>

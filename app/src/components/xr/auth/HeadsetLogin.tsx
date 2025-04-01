@@ -11,7 +11,7 @@ import { colors } from '../ui/theme';
 
 export function HeadsetLogin({ onCancel }: { onCancel?: () => void }) {
 	const {
-		data: { all: devices },
+		data: { all: devices, paircode },
 	} = useDeviceDiscovery();
 	const { data: thisDevice } = useCurrentDevice();
 	const [selectedDeviceId, setSelectedDevice] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export function HeadsetLogin({ onCancel }: { onCancel?: () => void }) {
 				{selectedDevice ? (
 					<WaitingToPair name={thisDevice?.name ?? undefined} selectedDevice={selectedDevice} onCancel={() => setSelectedDevice(null)} />
 				) : (
-					<DeviceList onSelect={pairWithDevice} devices={devices} />
+					<DeviceList onSelect={pairWithDevice} devices={devices} paircode={paircode} />
 				)}
 				<Button onClick={onCancel}>
 					<Text>Cancel</Text>
@@ -42,11 +42,19 @@ export function HeadsetLogin({ onCancel }: { onCancel?: () => void }) {
 	);
 }
 
-function DeviceList({ devices, onSelect }: { devices: { id: PrefixedId<'d'>; name?: string }[]; onSelect: (id: PrefixedId<'d'>) => void }) {
+function DeviceList({ devices, onSelect, paircode }: { devices: { id: PrefixedId<'d'>; name?: string }[]; onSelect: (id: PrefixedId<'d'>) => void; paircode: string | null }) {
 	return (
 		<Container flexDirection="column" flexGrow={1} flexShrink={0} gap={4}>
 			<Text>Log into Alef on a phone or computer using the same Wifi network as this device, then select it here.</Text>
 			<Text color={colors.focus}>Make sure your device is on the same network as this headset and VPN / Private Relay is disabled.</Text>
+			{paircode && (
+				<Container justifyContent="space-between" borderWidth={1} borderColor={colors.border} borderRadius={5} padding={5} flexGrow={0} flexShrink={0}>
+					<Text color={colors.faded}>Manual pair code:</Text>
+					<Text fontWeight="bold" color={colors.focus}>
+						{paircode}
+					</Text>
+				</Container>
+			)}
 			<Container
 				flexDirection="column"
 				gap={4}

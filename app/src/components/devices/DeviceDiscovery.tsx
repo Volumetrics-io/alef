@@ -1,6 +1,7 @@
-import { Frame, Heading, Box, Text, Dialog, Button, Icon } from '@alef/sys';
 import { useClaimDevice, useDeviceDiscovery } from '@/services/publicApi/deviceHooks';
 import { PrefixedId } from '@alef/common';
+import { Box, Button, Dialog, Frame, Icon, Text } from '@alef/sys';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 
 export function DeviceDiscovery() {
@@ -10,9 +11,8 @@ export function DeviceDiscovery() {
 
 	const firstSuggested = suggested[0];
 	return (
-		<Box stacked gapped align="center" full="width">
-			<Heading level={3}>Connect a headset</Heading>
-			<Box stacked p="small">
+		<Box stacked gapped full="width">
+			<Box stacked p="squeeze">
 				<Text>To connect a headset to your account:</Text>
 				<Box stacked p="small">
 					<Text>1. Open alef in your headset</Text>
@@ -49,9 +49,10 @@ function SuggestedDevice({
 			toast.success(`Paired with ${device.name}`);
 		},
 	});
+	const [open, setOpen] = useState(true);
 
 	return (
-		<Dialog open>
+		<Dialog open={open} onOpenChange={setOpen}>
 			<Dialog.Content title={`Pair with ${device.name}`}>
 				<Text tall>Tap "Pair" to associate this device with your account.</Text>
 				<Button

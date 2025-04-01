@@ -1,6 +1,6 @@
 .root {
 	display: grid;
-	grid-template-areas: 'main content secondary';
+	grid-template-areas: 'main content';
 	grid-template-columns: auto 1fr auto;
 	grid-template-rows: minmax(0, 1fr);
 	flex: 1;
@@ -10,8 +10,7 @@
 	width: 100%;
 	background-color: var(--paper);
 
-	--main-size: 400px;
-	--secondary-size: 300px;
+	--main-size: 500px;
 }
 
 .main {
@@ -20,113 +19,42 @@
 	min-height: 0;
 	width: var(--main-size);
 	padding-top: 0.5rem;
+	container: main / inline-size;
 }
 
 .content {
 	grid-area: content;
-	min-width: var(--secondary-size);
 	border-left: var(--border);
 	border-right: var(--border);
-}
-
-.secondary {
-	grid-area: secondary;
-}
-
-.secondaryContent {
-	width: 0px;
-	transition:
-		width var(--animation-duration) var(--bounce),
-		height var(--animation-duration) var(--bounce);
-	overflow: hidden;
-	position: relative;
-}
-
-.secondaryContentInner {
-	width: var(--secondary-size);
-	position: absolute;
-	top: 3rem;
-	left: 0;
-	height: calc(100% - 3rem);
-}
-
-.secondaryContentOpen {
-	width: var(--secondary-size);
-}
-
-.secondaryToggle {
-	left: -38px;
-	padding: 0.25rem;
-	position: absolute;
-	top: 0.75rem;
-}
-.secondaryContentOpen > .secondaryToggle {
-	left: auto;
-}
-.secondaryContentToggleLabel {
-	display: none;
 }
 
 .tabs {
 	align-self: center;
 }
 
+.tabLabel {
+	display: none;
+}
+@container main (min-width: 720px) {
+	.tabLabel {
+		display: inline;
+	}
+}
+
 /** Smaller size shifts things */
 @media (max-width: 1024px) {
 	.root {
-		grid-template-areas: 'main content' 'secondary content';
+		grid-template-areas: 'main content';
 		grid-template-columns: auto 1fr;
 		grid-template-rows: 1fr auto;
 		align-items: stretch;
 		--main-size: 100%;
 	}
-
-	.main {
-		padding-bottom: calc(46px + env(safe-area-inset-bottom, 0px));
-	}
-
-	.secondary {
-		border-top: var(--border);
-	}
-
-	.secondaryContent {
-		height: 0;
-		width: 100%;
-	}
-
-	.secondaryContentOpen {
-		height: var(--secondary-size);
-	}
-
-	.secondaryToggle {
-		left: 0;
-		right: 0;
-		top: calc(-34px - env(safe-area-inset-bottom, 0px));
-		z-index: 1;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.5rem;
-		border-radius: 0;
-		background-color: var(--paper);
-	}
-	.secondaryContentToggleLabel {
-		display: block;
-	}
-	.secondaryContentToggleIcon {
-		transform: rotate(90deg);
-	}
-
-	.secondaryContentInner {
-		width: 100%;
-		height: var(--secondary-size);
-		top: 0;
-	}
 }
 
 @media (max-width: 768px) {
 	.root {
-		grid-template-areas: 'main' 'secondary';
+		grid-template-areas: 'main';
 		grid-template-columns: 1fr;
 		grid-template-rows: 1fr auto;
 	}

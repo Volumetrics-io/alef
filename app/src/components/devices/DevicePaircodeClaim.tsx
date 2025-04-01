@@ -35,7 +35,7 @@ export function DevicePaircodeClaim({}: DevicePaircodeClaimProps) {
 
 	return (
 		<Frame p stacked gapped>
-			<Heading level={3}>Use a code</Heading>
+			<Heading level={4}>Use a code</Heading>
 			<Text>If automatic discovery isn't working, you can manually enter the device's pair code.</Text>
 			<Input
 				value={code}
@@ -49,6 +49,7 @@ export function DevicePaircodeClaim({}: DevicePaircodeClaimProps) {
 				onFocus={(ev) => {
 					ev.target.select();
 				}}
+				placeholder="XXXXX"
 			/>
 		</Frame>
 	);

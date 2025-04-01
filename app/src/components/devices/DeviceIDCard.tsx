@@ -1,5 +1,5 @@
 import { useCurrentDevice, useUpdateDevice } from '@/services/publicApi/deviceHooks';
-import { Frame, Box, Form } from '@alef/sys';
+import { Box, Form, Frame } from '@alef/sys';
 
 export function DeviceIDCard() {
 	const { data: selfDevice } = useCurrentDevice();
@@ -16,7 +16,7 @@ export function DeviceIDCard() {
 						await updateDevice.mutateAsync({ deviceId: selfDevice.id, updates: { name } });
 					}}
 				>
-					<Form.TextField name="name" label="device ID" />
+					<Form.TextField name="name" label="This device" />
 					<Form.Submit disabled={!selfDevice}>Change name</Form.Submit>
 				</Form>
 			</Frame>

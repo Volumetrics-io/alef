@@ -5,8 +5,8 @@ export function PairedDeviceList() {
 	const { data: devices } = useDevices();
 
 	return (
-		<Box stacked gapped align="center" full="width">
-			<Heading level={2}>Paired devices</Heading>
+		<Box stacked gapped full="width">
+			<Heading level={4}>Paired devices</Heading>
 			<Box stacked gapped full="width">
 				{devices.map((device) => {
 					if (device.isSelf) return null;

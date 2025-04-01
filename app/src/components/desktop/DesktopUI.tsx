@@ -11,6 +11,7 @@ import { DeviceIDCard } from '../devices/DeviceIDCard';
 import { DevicePaircodeClaim } from '../devices/DevicePaircodeClaim';
 import { PairedDeviceList } from '../devices/PairedDeviceList';
 import { DesktopSecondaryContent } from './common/DesktopSecondaryContent';
+import { MainPanelResizer } from './common/MainPanelResizer';
 import cls from './DesktopUI.module.css';
 import { DesktopAddFurniture } from './furniture/DesktopAddFurniture';
 import { DesktopFurnitureMobileInstructions } from './furniture/DesktopFurnitureMobileInstructions';
@@ -50,9 +51,12 @@ export function DesktopUI({ children }: DesktopUIProps) {
 
 function DesktopUIMain() {
 	return (
-		<Box className={cls.main} stacked p="small">
-			<NavBar />
-			<DesktopEditor />
+		<Box className={cls.main}>
+			<Box stacked p="small" full>
+				<NavBar />
+				<DesktopEditor />
+			</Box>
+			<MainPanelResizer />
 		</Box>
 	);
 }
@@ -66,19 +70,19 @@ function DesktopEditor() {
 			<Tabs.List>
 				<Tabs.Trigger value="layouts">
 					<Icon name="house" />
-					<Text>Layouts</Text>
+					<Text className={cls.tabLabel}>Layouts</Text>
 				</Tabs.Trigger>
 				<Tabs.Trigger value="furniture">
 					<Icon name="sofa" />
-					<Text>Furniture</Text>
+					<Text className={cls.tabLabel}>Furniture</Text>
 				</Tabs.Trigger>
 				<Tabs.Trigger value="lighting">
 					<Icon name="lightbulb" />
-					<Text>Lighting</Text>
+					<Text className={cls.tabLabel}>Lighting</Text>
 				</Tabs.Trigger>
 				<Tabs.Trigger value="settings">
 					<Icon name="settings" />
-					<Text>Settings</Text>
+					<Text className={cls.tabLabel}>Settings</Text>
 				</Tabs.Trigger>
 			</Tabs.List>
 			<DesktopUITabContent value="layouts">
@@ -95,9 +99,10 @@ function DesktopEditor() {
 			</DesktopUITabContent>
 			<DesktopUITabContent value="settings">
 				<ScrollArea>
-					<Box stacked gapped align="center">
-						<Heading level={4}>Devices</Heading>
+					<Box stacked gapped p="small">
+						<Heading level={3}>Settings</Heading>
 						<DeviceIDCard />
+						<Heading level={4}>Pair devices</Heading>
 						<DeviceDiscovery />
 						<DevicePaircodeClaim />
 						<PairedDeviceList />

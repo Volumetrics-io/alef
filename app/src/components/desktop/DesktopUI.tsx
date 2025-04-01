@@ -1,5 +1,6 @@
 import { NavBar } from '@/components/navBar/NavBar';
 import { useMedia } from '@/hooks/useMedia';
+import { useIsLoggedIn } from '@/services/publicApi/userHooks';
 import { useUndo } from '@/stores/roomStore';
 import { useEditorMode, useSelect, useSelectedObjectId } from '@/stores/roomStore/hooks/editing';
 import { EditorMode, isPrefixedId } from '@alef/common';
@@ -62,6 +63,8 @@ function DesktopUIMain() {
 }
 
 function DesktopEditor() {
+	const isLoggedIn = useIsLoggedIn();
+
 	return (
 		<>
 			<Box p="small" layout="center center">
@@ -80,10 +83,12 @@ function DesktopEditor() {
 					<Icon name="lightbulb" />
 					<Text className={cls.tabLabel}>Lighting</Text>
 				</Tabs.Trigger>
-				<Tabs.Trigger value="settings">
-					<Icon name="settings" />
-					<Text className={cls.tabLabel}>Settings</Text>
-				</Tabs.Trigger>
+				{isLoggedIn && (
+					<Tabs.Trigger value="settings">
+						<Icon name="settings" />
+						<Text className={cls.tabLabel}>Settings</Text>
+					</Tabs.Trigger>
+				)}
 			</Tabs.List>
 			<DesktopUITabContent value="layouts">
 				<DesktopLayoutsPicker />
@@ -97,18 +102,20 @@ function DesktopEditor() {
 			<DesktopUITabContent value="lighting">
 				<DesktopLightsMainEditor />
 			</DesktopUITabContent>
-			<DesktopUITabContent value="settings">
-				<ScrollArea>
-					<Box stacked gapped p="small">
-						<Heading level={3}>Settings</Heading>
-						<DeviceIDCard />
-						<Heading level={4}>Pair devices</Heading>
-						<DeviceDiscovery />
-						<DevicePaircodeClaim />
-						<PairedDeviceList />
-					</Box>
-				</ScrollArea>
-			</DesktopUITabContent>
+			{isLoggedIn && (
+				<DesktopUITabContent value="settings">
+					<ScrollArea>
+						<Box stacked gapped p="small">
+							<Heading level={3}>Settings</Heading>
+							<DeviceIDCard />
+							<Heading level={4}>Pair devices</Heading>
+							<DeviceDiscovery />
+							<DevicePaircodeClaim />
+							<PairedDeviceList />
+						</Box>
+					</ScrollArea>
+				</DesktopUITabContent>
+			)}
 		</>
 	);
 }

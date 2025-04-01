@@ -9,7 +9,7 @@ export function useIsCompanionMode() {
 	const socket = usePropertySocket();
 	const [companionDeviceId, setCompanionDeviceId] = useState<PrefixedId<'d'> | null>(() => {
 		if (!myId) return null;
-		return socket?.peers.devicesByUser(myId)?.find((device) => device.type === 'mobile' || device.type === 'tablet')?.id ?? null;
+		return socket?.peers.devicesByUser(myId)?.find((device) => device.type !== 'headset')?.id ?? null;
 	});
 
 	useEffect(() => {

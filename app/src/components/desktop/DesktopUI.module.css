@@ -55,6 +55,13 @@
 	background-color: var(--paper);
 }
 
+/* iOS-specific styling for the controls */
+@supports (-webkit-touch-callout: none) {
+	.controls {
+		bottom: 3dvh;
+	}
+}
+
 .tabLabel {
 	max-width: 0;
 	opacity: 0;

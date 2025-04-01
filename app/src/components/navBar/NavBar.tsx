@@ -1,5 +1,5 @@
 import { useMe } from '@/services/publicApi/userHooks';
-import { Button, Icon, Logo, NavBarProps, NavMenu, NavBar as SysNavBar, Text } from '@alef/sys';
+import { Box, Button, Icon, Logo, NavBarProps, Popover, NavBar as SysNavBar } from '@alef/sys';
 import { Link } from '@verdant-web/react-router';
 import { forwardRef } from 'react';
 import { LogoutButton } from '../auth/LogoutButton';
@@ -13,35 +13,20 @@ export const NavBar = forwardRef<HTMLDivElement, NavBarProps>(function NavBar(pr
 		<SysNavBar {...props} background="paper" ref={ref}>
 			<SysNavBar.Start className={cls.navbar}>
 				{session ? (
-					<NavMenu>
-						<NavMenu.Trigger asChild>
+					<Popover>
+						<Popover.Trigger asChild>
 							<Button color="ghost">
-								<NavMenu.ItemIcon>
-									<Icon name="menu" />
-								</NavMenu.ItemIcon>
+								<Icon name="menu" />
 							</Button>
-						</NavMenu.Trigger>
-						<NavMenu.Content>
-							<NavMenu.ItemLink to="/">
-								<NavMenu.ItemIcon>
-									<Icon name="pencil-ruler" />
-								</NavMenu.ItemIcon>
-								<Text>Editor</Text>
-							</NavMenu.ItemLink>
-							<NavMenu.ItemLink to="/devices">
-								<NavMenu.ItemIcon>
-									<Icon name="glasses" />
-								</NavMenu.ItemIcon>
-								<Text>Device management</Text>
-							</NavMenu.ItemLink>
-
-							<NavMenu.ContentEnd>
+						</Popover.Trigger>
+						<Popover.Content>
+							<Box stacked gapped p>
 								<LogoutButton />
 								<Link to="https://alef.io/tos">Terms of Service</Link>
 								<Link to="https://alef.io/privacy">Privacy Policy</Link>
-							</NavMenu.ContentEnd>
-						</NavMenu.Content>
-					</NavMenu>
+							</Box>
+						</Popover.Content>
+					</Popover>
 				) : (
 					<Button asChild color="suggested">
 						<Link to="/login">Login</Link>

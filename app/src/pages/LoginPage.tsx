@@ -1,5 +1,5 @@
 import { EmailSigninForm } from '@/components/auth/EmailSigninForm';
-import { Box, Frame, Heading, Logo } from '@alef/sys';
+import { Box, Frame, Heading, Link, Logo } from '@alef/sys';
 import { useSearchParams } from '@verdant-web/react-router';
 
 const LoginPage = () => {
@@ -8,7 +8,7 @@ const LoginPage = () => {
 	const error = searchParams.get('error') ?? undefined;
 
 	return (
-		<Box full align="center" justify="center" p>
+		<Box full stacked align="center" justify="center" p>
 			<Frame gapped stacked p constrained>
 				<Box full align="center" gapped>
 					<Logo width={80} height={80} style={{ alignSelf: 'flex-start' }} />
@@ -25,6 +25,10 @@ const LoginPage = () => {
 				)}
 				<EmailSigninForm returnTo={returnTo} />
 			</Frame>
+			<Box gapped p="small" style={{ fontSize: '0.8rem', color: 'var(--faded)' }}>
+				<Link to="https://alef.io/tos">Terms of Service</Link>
+				<Link to="https://alef.io/privacy">Privacy Policy</Link>
+			</Box>
 		</Box>
 	);
 };

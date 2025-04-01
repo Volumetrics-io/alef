@@ -35,8 +35,8 @@ export function DevicePaircodeClaim({}: DevicePaircodeClaimProps) {
 
 	return (
 		<Frame p stacked gapped>
-			<Heading level={4}>Use a code</Heading>
-			<Text>If automatic discovery isn't working, you can manually enter the device's pair code.</Text>
+			<Heading level={4}>Not seeing your device?</Heading>
+			<Text>Connect using the headset pair code.</Text>
 			<Input
 				value={code}
 				onValueChange={(val) => {

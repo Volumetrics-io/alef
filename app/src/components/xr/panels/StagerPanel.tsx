@@ -20,11 +20,13 @@ import { Layouts } from './staging/Layouts';
 import { Lighting } from './staging/Lighting';
 import { SettingsPanel } from './staging/SettingsPanel';
 import { UpdatePrompt } from './UpdatePrompt';
+import { useIsCompanionMode } from '@/hooks/useIsCompanionMode';
 
 export function StagerPanel() {
 	const [panelState] = usePanelState();
 	const [mode] = useEditorMode();
 	const isInXR = useXR((s) => !!s.session);
+	const isCompanionMode = useIsCompanionMode();
 
 	const position = useMemo(() => {
 		if (!isInXR) {
@@ -33,7 +35,7 @@ export function StagerPanel() {
 		if (panelState === 'open') {
 			return new Vector3(0, -0.15, 0.75);
 		}
-		if (panelState === 'hidden') {
+		if (panelState === 'hidden' && !isCompanionMode) {
 			return new Vector3(0.5, -0.3, 0.6);
 		}
 		return new Vector3(0, 0.2, 0.75);
@@ -57,8 +59,8 @@ export function StagerPanel() {
 					<RescanPrompt />
 					{panelState === 'open' && (
 						<>
-							{mode === 'lighting' && <Lighting />}
-							{mode === 'furniture' && (
+							{mode === 'lighting' && !isCompanionMode && <Lighting />}
+							{mode === 'furniture' && !isCompanionMode && (
 								<Suspense>
 									<FurniturePanel />
 								</Suspense>

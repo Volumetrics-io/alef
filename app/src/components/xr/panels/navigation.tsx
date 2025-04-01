@@ -7,10 +7,11 @@ import { Box, House, Menu, Minimize, Settings, Sofa, Sun, X } from '@react-three
 import { OnboardingDot } from '../onboarding/OnboardingDot';
 import { Button } from '../ui/Button';
 import { Selector, SelectorItem } from '../ui/Selector';
-
+import { useIsCompanionMode } from '@/hooks/useIsCompanionMode';
 export const Navigation = () => {
 	const [mode, setMode] = useEditorMode();
 	const [panelState, setPanelState] = usePanelState();
+	const isCompanionMode = useIsCompanionMode();
 
 	const { canRescan, rescanRoom } = useRescanRoom();
 
@@ -27,9 +28,9 @@ export const Navigation = () => {
 					firstTimeUserXROnboarding.completeStep('welcome');
 				}}
 			>
-				{panelState === 'open' ? <X /> : <ModeIcon />}
+				{panelState === 'open' ? <X /> : <ModeIcon isCompanionMode={isCompanionMode} />}
 			</Button>
-			{panelState === 'open' && (
+			{panelState === 'open' && !isCompanionMode && (
 				<Button variant="secondary" size="icon" onClick={() => setPanelState('hidden')}>
 					<OnboardingDot onboarding={firstTimeUserXROnboarding} step="minimize" />
 					<Minimize />
@@ -42,14 +43,18 @@ export const Navigation = () => {
 							<OnboardingDot onboarding={firstTimeUserXROnboarding} step="layouts" />
 							<House />
 						</SelectorItem>
-						<SelectorItem selected={mode === 'furniture'} onClick={() => setMode('furniture')}>
-							<OnboardingDot onboarding={firstTimeUserXROnboarding} step="furniture" />
-							<Sofa />
-						</SelectorItem>
-						<SelectorItem selected={mode === 'lighting'} onClick={() => setMode('lighting')}>
-							<OnboardingDot onboarding={firstTimeUserXROnboarding} step="lighting" />
-							<Sun />
-						</SelectorItem>
+						{!isCompanionMode && (
+							<>
+								<SelectorItem selected={mode === 'furniture'} onClick={() => setMode('furniture')}>
+									<OnboardingDot onboarding={firstTimeUserXROnboarding} step="furniture" />
+									<Sofa />
+								</SelectorItem>
+								<SelectorItem selected={mode === 'lighting'} onClick={() => setMode('lighting')}>
+									<OnboardingDot onboarding={firstTimeUserXROnboarding} step="lighting" />
+									<Sun />
+								</SelectorItem>
+							</>
+						)}
 						<SelectorItem selected={mode === 'settings'} onClick={() => setMode('settings')}>
 							<Settings />
 						</SelectorItem>
@@ -65,10 +70,10 @@ export const Navigation = () => {
 	);
 };
 
-const ModeIcon = () => {
+const ModeIcon = ({ isCompanionMode }: { isCompanionMode: boolean }) => {
 	const [panelState] = usePanelState();
 	const [mode] = useEditorMode();
-	if (panelState !== 'closed') {
+	if (panelState !== 'closed' || isCompanionMode) {
 		if (mode === 'layouts') return <House />;
 		if (mode === 'furniture') return <Sofa />;
 		if (mode === 'lighting') return <Sun />;

@@ -24,6 +24,8 @@ import { DesktopLayoutTools } from './layouts/DesktopLayoutTools';
 import { DesktopLightEditor } from './lighting/DesktopLightEditor';
 import { DesktopLightsMainEditor } from './lighting/DesktopLightsMainEditor';
 import { HeadsetConnectedIndicator } from './presence/HeadsetConnectedIndicator';
+import clsx from 'clsx';
+
 export interface DesktopUIProps {
 	children?: ReactNode;
 }
@@ -90,7 +92,7 @@ function DesktopEditor() {
 					<Text className={cls.tabLabel}>Lights</Text>
 				</Tabs.Trigger>
 				{isLoggedIn && (
-					<Tabs.Trigger className={cls.trigger} value="settings">
+					<Tabs.Trigger className={clsx(cls.trigger, cls.settings)} value="settings">
 						<Icon name="settings" />
 					</Tabs.Trigger>
 				)}

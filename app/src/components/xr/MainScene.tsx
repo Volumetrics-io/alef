@@ -3,11 +3,11 @@ import { DepthShader } from '@/components/xr/shaders/DepthShader';
 
 import { PropertyRoomStoreProvider } from '@/components/core/PropertyRoomStoreProvider.js';
 import { useColorTheme } from '@/hooks/useColorTheme';
-import { useEditorStore } from '@/stores/editorStore';
+// import { useEditorStore } from '@/stores/editorStore';
 import { AdaptiveEvents } from '@react-three/drei';
-import { useMode } from './modes/ModeContext';
+// import { useMode } from './modes/ModeContext';
 import { StagerPanel } from './panels/StagerPanel';
-import { ViewerPanel } from './panels/ViewerPanel';
+// import { ViewerPanel } from './panels/ViewerPanel';
 import { RoomRenderer } from './room/RoomRenderer';
 import { SceneWrapper } from './SceneWrapper';
 
@@ -20,7 +20,8 @@ export function MainScene() {
 			<AdaptiveEvents />
 			<PropertyRoomStoreProvider>
 				<RoomRenderer />
-				<ModePanel />
+				{/* <ModePanel /> */}
+				<StagerPanel />
 			</PropertyRoomStoreProvider>
 		</SceneWrapper>
 	);
@@ -28,9 +29,9 @@ export function MainScene() {
 
 export default MainScene;
 
-function ModePanel() {
-	const mode = useMode();
-	const splashScreen = useEditorStore((s) => s.splashScreen);
-	if (splashScreen) return null;
-	return mode === 'staging' ? <StagerPanel /> : <ViewerPanel />;
-}
+// function ModePanel() {
+// 	const mode = useMode();
+// 	const splashScreen = useEditorStore((s) => s.splashScreen);
+// 	if (splashScreen) return null;
+// 	return mode === 'staging' ? <StagerPanel /> : <ViewerPanel />;
+// }

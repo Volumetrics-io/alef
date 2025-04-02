@@ -51,7 +51,8 @@ export function PlanePlacement({ plane, onPlace, children, enabled, bothSides, c
 
 	return (
 		<group rotation={[Math.PI, 0, 0]} visible={enabled}>
-			<group position={[plane.origin.x, plane.origin.y, plane.origin.z]} quaternion={[plane.orientation.x, plane.orientation.y, plane.orientation.z, plane.orientation.w]}>
+			{/* FIXME: this is a hack to eliminate depth fighting between this and the shadow plane */}
+			<group position={[plane.origin.x, plane.origin.y + 0.0001, plane.origin.z]} quaternion={[plane.orientation.x, plane.orientation.y, plane.orientation.z, plane.orientation.w]}>
 				<mesh
 					rotation={[Math.PI / 2, 0, 0]}
 					// @ts-ignore

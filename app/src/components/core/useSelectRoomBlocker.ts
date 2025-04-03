@@ -6,7 +6,6 @@ export function useSelectRoomBlocker({ closeOnSelect }: { closeOnSelect?: boolea
 	const hasSelectedRoom = useHasSelectedRoom();
 	const roomIds = useRoomIds();
 
-	console.log('roomIds', roomIds);
 	const startWithSelectorVisible = roomIds.length !== 1;
 
 	const [showSelector, setShowSelector] = useState(startWithSelectorVisible);
@@ -28,8 +27,6 @@ export function useSelectRoomBlocker({ closeOnSelect }: { closeOnSelect?: boolea
 	const finalShowSelector = showSelector && (!closeOnSelect || !hasSelectedRoom);
 	// TODO: auto-select room based on similarity to detected floor plane in XR if
 	// multiple rooms are available.
-
-	console.log(finalShowSelector, showSelector, hasSelectedRoom);
 
 	return { showContent, showSelector: finalShowSelector, close };
 }

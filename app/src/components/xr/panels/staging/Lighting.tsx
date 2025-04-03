@@ -1,6 +1,6 @@
 import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
-import { useDeleteLightPlacement, useGlobalLighting, useLightPlacementIds } from '@/stores/roomStore';
-import { useEditorMode, useIsSelected, useSelect } from '@/stores/roomStore/hooks/editing';
+import { useDeleteLightPlacement, useGlobalLighting, useLightPlacementIds } from '@/stores/propertyStore';
+import { useEditorMode, useIsSelected, useSelect } from '@/stores/propertyStore/hooks/editing';
 import { PrefixedId } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { ArrowLeftIcon, LightbulbIcon, SunIcon, Trash } from '@react-three/uikit-lucide';

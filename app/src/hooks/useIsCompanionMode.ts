@@ -1,5 +1,5 @@
-import { usePropertySocket } from '@/services/publicApi/PropertySocketProvider';
 import { useMe } from '@/services/publicApi/userHooks';
+import { usePropertySocket } from '@/stores/propertyStore/hooks/property';
 import { PrefixedId } from '@alef/common';
 import { useEffect, useState } from 'react';
 

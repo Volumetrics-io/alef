@@ -1,6 +1,6 @@
 import { Button } from '@/components/xr/ui/Button.js';
 import { Surface } from '@/components/xr/ui/Surface';
-import { useUndo } from '@/stores/roomStore';
+import { useUndo } from '@/stores/propertyStore';
 import { ContainerProperties } from '@react-three/uikit';
 import { RedoIcon, UndoIcon } from '@react-three/uikit-lucide';
 

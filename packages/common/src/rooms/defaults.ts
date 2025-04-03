@@ -284,6 +284,8 @@ export function getEmptyRoomState(idOverride?: PrefixedId<'r'>): RoomState {
 	const defaultLayoutId = id('rl');
 	return {
 		id: idOverride || id('r'),
+		createdAt: Date.now(),
+		updatedAt: null,
 		version: ROOM_STATE_VERSION,
 		planes: [],
 		planesUpdatedAt: null,

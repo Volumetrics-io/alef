@@ -1,13 +1,13 @@
+import { useIsCompanionMode } from '@/hooks/useIsCompanionMode';
 import { useRescanRoom } from '@/hooks/useRescanRoom';
 import { firstTimeUserXROnboarding } from '@/onboarding/firstTimeUserXR';
 import { usePanelState } from '@/stores/editorStore';
-import { useEditorMode } from '@/stores/roomStore/hooks/editing';
+import { useEditorMode } from '@/stores/propertyStore/hooks/editing';
 import { Container } from '@react-three/uikit';
 import { Box, House, Menu, Minimize, Settings, Sofa, Sun, X } from '@react-three/uikit-lucide';
 import { OnboardingDot } from '../onboarding/OnboardingDot';
 import { Button } from '../ui/Button';
 import { Selector, SelectorItem } from '../ui/Selector';
-import { useIsCompanionMode } from '@/hooks/useIsCompanionMode';
 export const Navigation = () => {
 	const [mode, setMode] = useEditorMode();
 	const [panelState, setPanelState] = usePanelState();

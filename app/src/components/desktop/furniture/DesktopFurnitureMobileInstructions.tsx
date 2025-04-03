@@ -1,4 +1,4 @@
-import { usePlacingFurnitureId } from '@/stores/roomStore/hooks/editing';
+import { usePlacingFurnitureId } from '@/stores/propertyStore/hooks/editing';
 import { Box, Frame, Heading, Icon, Text } from '@alef/sys';
 import { useIsHeadsetConnected } from '../presence/hooks';
 import cls from './DesktopFurnitureMobileInstructions.module.css';

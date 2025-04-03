@@ -9,6 +9,7 @@ export function updateRoom(state: RoomState, change: Operation) {
 	// validate the operation
 	// this will throw if the operation is invalid.
 	operationShape.parse(change);
+	state.updatedAt = Date.now();
 	switch (change.type) {
 		case 'updatePlanes':
 			state.planes = mergePlanes(state.planes, change.planes);

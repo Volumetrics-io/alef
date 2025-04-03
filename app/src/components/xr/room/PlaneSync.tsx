@@ -1,5 +1,5 @@
 import { xrPlanesToRoomPlaneData } from '@/physics/xrPlaneTools';
-import { useHasPlanes, usePlanesUpdatedAt, useUpdatePlanes } from '@/stores/roomStore';
+import { useHasPlanes, usePlanesUpdatedAt, useUpdatePlanes } from '@/stores/propertyStore';
 import { useFrame } from '@react-three/fiber';
 import { useXR, useXRPlanes } from '@react-three/xr';
 

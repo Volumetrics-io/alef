@@ -1,6 +1,7 @@
+import { useIsCompanionMode } from '@/hooks/useIsCompanionMode';
 import { firstTimeUserXROnboarding } from '@/onboarding/firstTimeUserXR';
 import { usePanelState } from '@/stores/editorStore';
-import { useEditorMode } from '@/stores/roomStore/hooks/editing';
+import { useEditorMode } from '@/stores/propertyStore/hooks/editing';
 import { Container, Root, Text } from '@react-three/uikit';
 import { HouseIcon, MinimizeIcon, SofaIcon, SunIcon } from '@react-three/uikit-lucide';
 import { useXR } from '@react-three/xr';
@@ -20,7 +21,6 @@ import { Layouts } from './staging/Layouts';
 import { Lighting } from './staging/Lighting';
 import { SettingsPanel } from './staging/SettingsPanel';
 import { UpdatePrompt } from './UpdatePrompt';
-import { useIsCompanionMode } from '@/hooks/useIsCompanionMode';
 
 export function StagerPanel() {
 	const [panelState] = usePanelState();

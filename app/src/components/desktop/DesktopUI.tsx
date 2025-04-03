@@ -2,10 +2,11 @@ import { NavBar } from '@/components/navBar/NavBar';
 import { useDetectSticky } from '@/hooks/useDetectSticky';
 import { useMedia } from '@/hooks/useMedia';
 import { useIsLoggedIn } from '@/services/publicApi/userHooks';
-import { useUndo } from '@/stores/roomStore';
-import { useEditorMode, useSelect, useSelectedObjectId } from '@/stores/roomStore/hooks/editing';
+import { useUndo } from '@/stores/propertyStore';
+import { useEditorMode, useSelect, useSelectedObjectId } from '@/stores/propertyStore/hooks/editing';
 import { EditorMode, isPrefixedId } from '@alef/common';
 import { Box, Heading, Icon, Tabs, Text } from '@alef/sys';
+import clsx from 'clsx';
 import { ReactNode, Suspense } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { DeviceDiscovery } from '../devices/DeviceDiscovery';
@@ -24,7 +25,6 @@ import { DesktopLayoutTools } from './layouts/DesktopLayoutTools';
 import { DesktopLightEditor } from './lighting/DesktopLightEditor';
 import { DesktopLightsMainEditor } from './lighting/DesktopLightsMainEditor';
 import { HeadsetConnectedIndicator } from './presence/HeadsetConnectedIndicator';
-import clsx from 'clsx';
 
 export interface DesktopUIProps {
 	children?: ReactNode;

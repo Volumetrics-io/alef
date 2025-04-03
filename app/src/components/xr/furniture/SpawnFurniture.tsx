@@ -1,7 +1,7 @@
 import { useFurnitureModel } from '@/services/publicApi/furnitureHooks';
 import { useSetPanelState } from '@/stores/editorStore';
-import { useAddFurniture, usePrimaryFloorPlane } from '@/stores/roomStore';
-import { useIsEditorMode, usePlacingFurnitureId, useSetPlacingFurniture } from '@/stores/roomStore/hooks/editing';
+import { useAddFurniture, usePrimaryFloorPlane } from '@/stores/propertyStore';
+import { useIsEditorMode, usePlacingFurnitureId, useSetPlacingFurniture } from '@/stores/propertyStore/hooks/editing';
 import { PrefixedId } from '@alef/common';
 import { useMergedRef } from '@alef/sys';
 import { useFrame, useThree } from '@react-three/fiber';

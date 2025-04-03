@@ -1,4 +1,4 @@
-import { useGlobalLighting, useLightPlacementIds } from '@/stores/roomStore';
+import { useGlobalLighting, useLightPlacementIds } from '@/stores/propertyStore';
 import { useThree } from '@react-three/fiber';
 import { useEffect, useRef } from 'react';
 import { Group } from 'three';

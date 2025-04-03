@@ -1,4 +1,4 @@
-import { useActiveRoomLayoutId, useRoomLayout, useUpdateRoomLayout } from '@/stores/roomStore';
+import { useActiveRoomLayoutId, useRoomLayout, useUpdateRoomLayout } from '@/stores/propertyStore';
 import { Box, Button, Dialog, Form, Icon } from '@alef/sys';
 import { DesktopLayoutTypeField } from './DesktopLayoutTypeField';
 export interface DesktopLayoutEditorProps {

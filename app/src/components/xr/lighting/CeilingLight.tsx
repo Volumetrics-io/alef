@@ -1,6 +1,6 @@
 import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
-import { useLightPlacement, useMoveLight, useSubscribeToPlacementPosition } from '@/stores/roomStore';
-import { useIsEditorMode, useIsSelected, useSelect } from '@/stores/roomStore/hooks/editing';
+import { useLightPlacement, useMoveLight, useSubscribeToPlacementPosition } from '@/stores/propertyStore';
+import { useIsEditorMode, useIsSelected, useSelect } from '@/stores/propertyStore/hooks/editing';
 import { PrefixedId } from '@alef/common';
 import { defaultApply, Handle, HandleState } from '@react-three/handle';
 import { useHover } from '@react-three/xr';

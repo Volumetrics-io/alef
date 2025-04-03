@@ -1,5 +1,5 @@
 import { usePrimaryXRFloorPlane } from '@/hooks/usePrimaryXRFloorPlane';
-import { usePrimaryFloorPlane } from '@/stores/roomStore';
+import { usePrimaryFloorPlane } from '@/stores/propertyStore';
 import { XRSpace } from '@react-three/xr';
 import { ReactNode } from 'react';
 import { makeGlobalRootUserData } from '../userData/globalRoot';

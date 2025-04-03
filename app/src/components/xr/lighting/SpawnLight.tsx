@@ -1,7 +1,7 @@
-import { useAddLight, useGlobalLighting } from '@/stores/roomStore';
-import { useIsEditorMode } from '@/stores/roomStore/hooks/editing';
+import { useAddLight, useGlobalLighting } from '@/stores/propertyStore';
+import { useIsEditorMode } from '@/stores/propertyStore/hooks/editing';
 import { Matrix4, Vector3 } from 'three';
-import { usePrimaryCeilingPlane } from '../../../stores/roomStore/hooks/layout';
+import { usePrimaryCeilingPlane } from '../../../stores/propertyStore/hooks/layout';
 import { PlanePlacement } from '../controls/PlanePlacement';
 import { CeilingLightModel } from './CeilingLightModel';
 import { getLightColor } from './getLightColor';

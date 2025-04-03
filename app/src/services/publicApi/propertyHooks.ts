@@ -1,5 +1,6 @@
 import { PrefixedId } from '@alef/common';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { InferResponseType } from 'hono';
 import { publicApiClient } from './client';
 import { fallbackWhenOfflineOrError, handleErrors } from './utils';
 
@@ -24,3 +25,5 @@ export function useProperty(propertyId: PrefixedId<'p'>) {
 		},
 	});
 }
+
+export type PropertyResponse = InferResponseType<(typeof publicApiClient.properties)[':id']['$get']>;

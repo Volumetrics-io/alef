@@ -1,4 +1,4 @@
-import { AlefError, isPrefixedId, PrefixedId } from '@alef/common';
+import { AlefError, isPrefixedId, PrefixedId, ROOM_STATE_VERSION, roomStateInitializationShape } from '@alef/common';
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { createMiddleware } from 'hono/factory';
@@ -57,6 +57,15 @@ const propertyRouter = new Hono<EnvWith<'session'>>()
 		const property = ctx.get('property');
 		const roomId = ctx.req.valid('param').roomId;
 		const state = await property.getRoom(roomId);
+		return ctx.json(wrapRpcData(state));
+	})
+	.post('/rooms', zValidator('json', roomStateInitializationShape), async (ctx) => {
+		const property = ctx.get('property');
+		const roomData = ctx.req.valid('json');
+		if (roomData.version !== ROOM_STATE_VERSION) {
+			throw new AlefError(AlefError.Code.BadRequest, 'Invalid room version');
+		}
+		const state = await property.createRoom(roomData);
 		return ctx.json(wrapRpcData(state));
 	})
 	.get('/socketToken', async (ctx) => {

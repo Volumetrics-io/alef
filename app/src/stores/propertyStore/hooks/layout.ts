@@ -15,7 +15,7 @@ export function useCreateRoomLayout() {
 }
 
 export function useActiveRoomLayoutId() {
-	const id = useRoomState((s) => s.editor.selectedLayoutId || Object.keys(s.layouts)[0] || null);
+	const id: PrefixedId<'rl'> = useRoomState((s) => s.editor.selectedLayoutId || (Object.keys(s.layouts)[0] as PrefixedId<'rl'>));
 	const setId = useRoomApi((s) => s.setViewingLayoutId);
 	return [id, setId] as const;
 }

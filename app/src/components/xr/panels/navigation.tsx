@@ -8,6 +8,7 @@ import { Box, House, Menu, Minimize, Settings, Sofa, Sun, X } from '@react-three
 import { OnboardingDot } from '../onboarding/OnboardingDot';
 import { Button } from '../ui/Button';
 import { Selector, SelectorItem } from '../ui/Selector';
+
 export const Navigation = () => {
 	const [mode, setMode] = useEditorMode();
 	const [panelState, setPanelState] = usePanelState();

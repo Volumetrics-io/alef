@@ -2,7 +2,7 @@ import { useSelectRoomBlocker } from '@/components/core/useSelectRoomBlocker';
 import { useHasSelectedRoom, useSelectRoom } from '@/stores/propertyStore/hooks/editing';
 import { useRoomCreatedAt, useRoomIds } from '@/stores/propertyStore/hooks/rooms';
 import { PrefixedId } from '@alef/common';
-import { Root, Text } from '@react-three/uikit';
+import { Container, Root, Text } from '@react-three/uikit';
 import { ReactNode } from 'react';
 import { Vector3 } from 'three';
 import { BodyAnchor } from '../anchors';
@@ -38,12 +38,14 @@ function RoomSelectorPanel({ onClose }: { onClose: () => void }) {
 		<BodyAnchor follow lockY distance={0.1} position={new Vector3(0, -0.1, 0.5)}>
 			<Root pixelSize={0.001} flexDirection="column" gap={10}>
 				<Defaults>
-					<Surface width={200} height={300} flexDirection="column" gap={5}>
+					<Surface width={300} height={300} flexDirection="column" flexWrap="no-wrap" gap={10} padding={10}>
 						<Heading level={1}>Select a room</Heading>
 						<Text>Select a room to start editing.</Text>
-						{roomIds.map((id, index) => (
-							<RoomItem key={id} roomId={id} onSelect={() => selectRoom(id)} index={index} />
-						))}
+						<Container overflow="scroll" flexGrow={1} flexShrink={1} gap={5} flexDirection="column">
+							{roomIds.map((id, index) => (
+								<RoomItem key={id} roomId={id} onSelect={() => selectRoom(id)} index={index} />
+							))}
+						</Container>
 						{hasSelectedRoom && (
 							<Button onClick={onClose}>
 								<Text>Done</Text>

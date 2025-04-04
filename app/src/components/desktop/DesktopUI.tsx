@@ -25,6 +25,7 @@ import { DesktopLayoutTools } from './layouts/DesktopLayoutTools';
 import { DesktopLightEditor } from './lighting/DesktopLightEditor';
 import { DesktopLightsMainEditor } from './lighting/DesktopLightsMainEditor';
 import { HeadsetConnectedIndicator } from './presence/HeadsetConnectedIndicator';
+import { RoomPicker } from './rooms/RoomPicker';
 
 export interface DesktopUIProps {
 	children?: ReactNode;
@@ -46,6 +47,7 @@ export function DesktopUI({ children }: DesktopUIProps) {
 				<DesktopUIMain />
 				<Box className={cls.content}>
 					<DesktopUISecondary />
+					<RoomPicker />
 					{!isMobile && children}
 				</Box>
 			</Tabs>

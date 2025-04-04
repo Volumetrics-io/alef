@@ -64,3 +64,11 @@ export function useCreateRoom() {
 export function useRoomCreatedAt(id: PrefixedId<'r'>) {
 	return usePropertyStore((state) => state.rooms[id].createdAt);
 }
+
+export function useSelectedRoomId() {
+	return usePropertyStore((state) => state.meta.selectedRoomId);
+}
+
+export function useDeleteRoom() {
+	return usePropertyStore((state) => state.api.deleteRoom);
+}

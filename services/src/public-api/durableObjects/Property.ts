@@ -110,4 +110,15 @@ export class Property extends DurableObject<Bindings> {
 		this.#saveState();
 		return this.#rooms[roomId];
 	}
+
+	deleteRoom(roomId: PrefixedId<'r'>) {
+		if (this.#rooms[roomId]) {
+			delete this.#rooms[roomId];
+			this.#saveState();
+		}
+		this.#socketHandler.send({
+			type: 'roomDeleted',
+			roomId,
+		});
+	}
 }

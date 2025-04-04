@@ -59,6 +59,12 @@ const propertyRouter = new Hono<EnvWith<'session'>>()
 		const state = await property.getRoom(roomId);
 		return ctx.json(wrapRpcData(state));
 	})
+	.delete('/rooms/:roomId', zValidator('param', z.object({ roomId: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')) })), async (ctx) => {
+		const property = ctx.get('property');
+		const roomId = ctx.req.valid('param').roomId;
+		const result = await property.deleteRoom(roomId);
+		return ctx.json(wrapRpcData(result));
+	})
 	.post('/rooms', zValidator('json', roomStateInitializationShape), async (ctx) => {
 		const property = ctx.get('property');
 		const roomData = ctx.req.valid('json');

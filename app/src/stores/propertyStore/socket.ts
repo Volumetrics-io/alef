@@ -27,6 +27,15 @@ export function listenToSocketEvents(
 			}
 		});
 	});
+	socket.onMessage('roomDeleted', (msg) => {
+		globalSet((state) => {
+			delete state.rooms[msg.roomId];
+			delete state.roomApis[msg.roomId];
+			if (state.meta.selectedRoomId === msg.roomId) {
+				state.meta.selectedRoomId = null;
+			}
+		});
+	});
 	socket.onMessage('syncOperations', (msg) => {
 		for (const op of msg.operations) {
 			const roomApi = globalGet().roomApis[op.roomId];

@@ -74,8 +74,11 @@ export const writeAccessMiddleware = createMiddleware<{
 	};
 	Bindings: Env['Bindings'];
 }>(async (ctx, next) => {
-	await userStoreMiddleware(ctx, next);
-	if (ctx.get('session').access && ctx.get('session').access !== 'write:all') {
+	const session = await getRequestSessionOrThrow(ctx);
+	ctx.set('session', session);
+	const userStore = await ctx.env.PUBLIC_STORE.getStoreForUser(session.userId);
+	ctx.set('userStore', userStore);
+	if (session.access && session.access !== 'write:all') {
 		throw new AlefError(AlefError.Code.Unauthorized, 'You do not have write access to this resource.');
 	}
 	return next();

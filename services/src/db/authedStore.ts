@@ -80,7 +80,7 @@ export class AuthedStore extends RpcTarget {
 
 	async upsertDefaultPublicAccessToken() {
 		const token = crypto.randomUUID();
-		const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24 * 30); // 30 days
+		const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 1 day
 
 		const existingToken = await this.#db
 			.selectFrom('PublicAccessToken')

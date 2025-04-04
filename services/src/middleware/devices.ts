@@ -16,7 +16,7 @@ export const upsertDeviceMiddleware = createMiddleware<{
 }>(async (ctx, next) => {
 	// upsert the device upon connection. if an authenticated user is present, associates the device with them
 	// implicitly.
-	const name = ctx.req.query('name');
+	const name = ctx.req.query('name') ?? 'Unknown device';
 	const type = ctx.req.query('type') as DeviceType | undefined;
 	const description = ctx.req.query('description');
 	const userId = ctx.get('session')?.userId;

@@ -12,6 +12,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { DeviceDiscovery } from '../devices/DeviceDiscovery';
 import { DeviceIDCard } from '../devices/DeviceIDCard';
 import { DevicePaircodeClaim } from '../devices/DevicePaircodeClaim';
+import { DeviceQRPair } from '../devices/DeviceQRPair';
 import { PairedDeviceList } from '../devices/PairedDeviceList';
 import { DesktopSecondaryContent } from './common/DesktopSecondaryContent';
 import { MainPanelResizer } from './common/MainPanelResizer';
@@ -119,6 +120,7 @@ function DesktopEditor() {
 						<Heading level={4}>Pair devices</Heading>
 						<DeviceDiscovery />
 						<DevicePaircodeClaim />
+						<DeviceQRPair />
 						<PairedDeviceList />
 					</Box>
 				</DesktopUITabContent>

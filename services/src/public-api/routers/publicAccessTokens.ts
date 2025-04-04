@@ -20,6 +20,7 @@ export const publicAccessTokensRouter = new Hono<Env>()
 		if (!tokenData) {
 			throw new AlefError(AlefError.Code.BadRequest, 'Invalid or expired token');
 		}
+		console.log(`Token data: ${JSON.stringify(tokenData)}`);
 		const userStore = await ctx.env.PUBLIC_STORE.getStoreForUser(tokenData.userId);
 		const user = await userStore.getMe();
 		if (!user) {
@@ -31,6 +32,7 @@ export const publicAccessTokensRouter = new Hono<Env>()
 				name: user.name,
 				userId: user.id,
 				deviceId: ctx.get('device').id,
+				access: 'read:all',
 			},
 			ctx as any
 		);

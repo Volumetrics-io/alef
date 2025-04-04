@@ -67,6 +67,20 @@ export const userStoreMiddleware = createMiddleware<{
 	return next();
 });
 
+export const writeAccessMiddleware = createMiddleware<{
+	Variables: {
+		userStore: RpcStub<AuthedStore>;
+		session: SessionWithPrefixedIds;
+	};
+	Bindings: Env['Bindings'];
+}>(async (ctx, next) => {
+	await userStoreMiddleware(ctx, next);
+	if (ctx.get('session').access && ctx.get('session').access !== 'write:all') {
+		throw new AlefError(AlefError.Code.Unauthorized, 'You do not have write access to this resource.');
+	}
+	return next();
+});
+
 /**
  * Only useful for endpoints that may be public or private.
  * Other middleware exported from this module is more convenient

@@ -11,6 +11,7 @@ declare module '@a-type/auth' {
 		name: string | null;
 		isProductAdmin: boolean;
 		deviceId?: PrefixedId<'d'>;
+		access?: 'write:all' | 'read:all';
 	}
 }
 
@@ -41,6 +42,8 @@ export const sessions = new SessionManager<Context<Env>>({
 					name: user.name,
 					isProductAdmin: user.isProductAdmin,
 					deviceId,
+					// users who log in via sign-in have write access.
+					access: 'write:all',
 				};
 			},
 			secret: ctx.env.SESSION_SECRET,
@@ -56,6 +59,7 @@ export const sessions = new SessionManager<Context<Env>>({
 		name: 'name',
 		isProductAdmin: 'pad',
 		deviceId: 'dev',
+		access: 'acc',
 	},
 	adapter: honoAdapter,
 });

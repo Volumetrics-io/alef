@@ -231,4 +231,18 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 			])
 			.executeTakeFirst();
 	}
+
+	async getPublicAccessToken(token: string) {
+		const publicAccessToken = await this.#db.selectFrom('PublicAccessToken').where('token', '=', token).selectAll().executeTakeFirst();
+
+		if (!publicAccessToken) {
+			return null;
+		}
+
+		if (new Date(publicAccessToken.expiresAt) < new Date()) {
+			return null;
+		}
+
+		return publicAccessToken;
+	}
 }

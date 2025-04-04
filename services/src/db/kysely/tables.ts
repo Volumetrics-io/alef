@@ -11,6 +11,7 @@ export interface Database {
 	Device: DeviceTable;
 	DeviceAccess: DeviceAccessTable;
 	Property: PropertyTable;
+	PublicAccessToken: PublicAccessTokenTable;
 }
 
 // date serialization: Dates go in, strings come out.
@@ -156,3 +157,18 @@ export interface PropertyTable {
 export type Property = Selectable<PropertyTable>;
 export type NewProperty = Insertable<PropertyTable>;
 export type PropertyUpdate = Updateable<PropertyTable>;
+
+// gives read-only public access to a device for a user's account.
+export interface PublicAccessTokenTable {
+	id: PrefixedId<'pat'>;
+	createdAt: CreatedAt;
+	updatedAt: UpdatedAt;
+
+	token: string;
+	name: string;
+	expiresAt: DateColumnRequired;
+	userId: PrefixedId<'u'>;
+}
+export type PublicAccessToken = Selectable<PublicAccessTokenTable>;
+export type NewPublicAccessToken = Insertable<PublicAccessTokenTable>;
+export type PublicAccessTokenUpdate = Updateable<PublicAccessTokenTable>;

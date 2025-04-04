@@ -1,43 +1,14 @@
-import { AlefError, DeviceType, isPrefixedId, PrefixedId } from '@alef/common';
+import { AlefError, isPrefixedId, PrefixedId } from '@alef/common';
 import { zValidator } from '@hono/zod-validator';
 import { Context, Hono } from 'hono';
 import { getConnInfo } from 'hono/cloudflare-workers';
-import { createMiddleware } from 'hono/factory';
 import { z } from 'zod';
 import { wrapRpcData } from '../../helpers/wrapRpcData';
-import { sessionMiddleware, userStoreMiddleware } from '../../middleware/session';
+import { upsertDeviceMiddleware } from '../../middleware/devices';
+import { sessionMiddleware, userStoreMiddleware, writeAccessMiddleware } from '../../middleware/session';
 import { assignOrRefreshDeviceId } from '../auth/devices';
 import { sessions } from '../auth/session';
 import { Bindings, Env } from '../config/ctx';
-
-/**
- * Middleware that ensures the connecting device is recorded in the database,
- * associated with the current user if logged in, and applying a ?description value
- * if provided.
- */
-const upsertDeviceMiddleware = createMiddleware<{
-	Variables: Env['Variables'] & {
-		device: { id: PrefixedId<'d'>; name: string };
-	};
-	Bindings: Env['Bindings'];
-}>(async (ctx, next) => {
-	// upsert the device upon connection. if an authenticated user is present, associates the device with them
-	// implicitly.
-	const name = ctx.req.query('name');
-	const type = ctx.req.query('type') as DeviceType | undefined;
-	const description = ctx.req.query('description');
-	const userId = ctx.get('session')?.userId;
-	const ownId = await assignOrRefreshDeviceId(ctx);
-	const device = {
-		id: ownId,
-		name,
-		defaultName: description,
-		type,
-	};
-	const upserted = await ctx.env.PUBLIC_STORE.ensureDeviceExists(device, userId);
-	ctx.set('device', upserted);
-	await next();
-});
 
 export const devicesRouter = new Hono<Env>()
 	.get('/', userStoreMiddleware, async (ctx) => {
@@ -91,7 +62,7 @@ export const devicesRouter = new Hono<Env>()
 	})
 	.post(
 		'/:deviceId/claim',
-		userStoreMiddleware,
+		writeAccessMiddleware,
 		zValidator(
 			'param',
 			z.object({
@@ -112,7 +83,7 @@ export const devicesRouter = new Hono<Env>()
 	)
 	.post(
 		'/paircode/:code/claim',
-		userStoreMiddleware,
+		writeAccessMiddleware,
 		zValidator(
 			'param',
 			z.object({
@@ -183,9 +154,10 @@ export const devicesRouter = new Hono<Env>()
 							name: user.name,
 							userId: assignedUserId,
 							deviceId: ownId,
-							// TODO: don't ditch types here... while this is all the same ctx value,
-							// the types applied to SessionManager are particular.
+							access: 'write:all',
 						},
+						// TODO: don't ditch types here... while this is all the same ctx value,
+						// the types applied to SessionManager are particular.
 						ctx as unknown as Context<Env>
 					);
 					for (const [key, value] of updates.headers) {
@@ -227,7 +199,7 @@ export const devicesRouter = new Hono<Env>()
 	)
 	.delete(
 		'/:deviceId',
-		userStoreMiddleware,
+		writeAccessMiddleware,
 		zValidator(
 			'param',
 			z.object({
@@ -242,7 +214,7 @@ export const devicesRouter = new Hono<Env>()
 	)
 	.put(
 		'/:deviceId',
-		userStoreMiddleware,
+		writeAccessMiddleware,
 		zValidator(
 			'param',
 			z.object({

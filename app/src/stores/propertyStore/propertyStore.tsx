@@ -19,6 +19,7 @@ export type PropertyStoreState = {
 		propertyId: PrefixedId<'p'>;
 		operationBacklog: Operation[];
 		selectedRoomId: PrefixedId<'r'> | null;
+		fromApi: boolean;
 	};
 
 	// ephemeral
@@ -37,7 +38,7 @@ export type PersistedPropertyStoreState = Pick<PropertyStoreState, 'rooms' | 'me
 
 export const makePropertyStore = async (propertyId: PrefixedId<'p'> | null) => {
 	console.debug('Loading property store', { propertyId });
-	const { rooms, propertySocket, id } = await loadProperty(propertyId);
+	const { rooms, propertySocket, id, fromApi } = await loadProperty(propertyId);
 	console.debug('Property store loaded', { id, rooms });
 
 	const store = createStore<PropertyStoreState>()(
@@ -80,6 +81,7 @@ export const makePropertyStore = async (propertyId: PrefixedId<'p'> | null) => {
 							propertyId: id,
 							operationBacklog: [],
 							selectedRoomId: firstRoomId || null,
+							fromApi,
 						},
 						api: createPropertyApi(set, get),
 						history: createHistoryApi(set, get),
@@ -108,10 +110,14 @@ export const makePropertyStore = async (propertyId: PrefixedId<'p'> | null) => {
 					// as it's more authoritative. For local only properties, we
 					// want to restore the persisted value, as otherwise persistence doesn't
 					// do anything.
-					const isApiBacked = !!propertyId;
-					const mergedRooms = isApiBacked
+					const mergedRooms = fromApi
 						? {
-								...persistedState.rooms,
+								// FIXME: if we restore persisted rooms when we have API data, it resurrects
+								// deleted rooms without putting them in the API again, leading to inconsistent state.
+								// this functionally means you just can't create rooms while offline (they get erased).
+								// we could either fix this somehow, or just disable making new rooms when the socket
+								// is not connected (in fact I think that already won't work!)
+								// ...persistedState.rooms,
 								...initialState.rooms,
 							}
 						: {
@@ -129,6 +135,14 @@ export const makePropertyStore = async (propertyId: PrefixedId<'p'> | null) => {
 							selectedRoomId: null,
 						},
 						rooms: mergedRooms,
+						roomApis: Object.keys(mergedRooms).reduce(
+							(acc, roomId) => {
+								const roomApi = createRoomApi(roomId as PrefixedId<'r'>)(store.setState, store.getState);
+								acc[roomId as PrefixedId<'r'>] = roomApi;
+								return acc;
+							},
+							{} as Record<PrefixedId<'r'>, RoomApi>
+						),
 					};
 				},
 			}

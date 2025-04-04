@@ -16,6 +16,7 @@ function createDefaultLocalProperty() {
 			'r-local': getDemoRoomState(),
 		},
 		propertySocket: null,
+		fromApi: false,
 	};
 }
 
@@ -45,6 +46,7 @@ export async function loadProperty(propertyId: PrefixedId<'p'> | null) {
 		id: propertyId,
 		rooms: data.rooms,
 		propertySocket: socket,
+		fromApi: true,
 	};
 }
 

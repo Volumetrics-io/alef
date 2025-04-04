@@ -26,7 +26,10 @@ export const sessions = new SessionManager<Context<Env>>({
 				sameSite: 'lax',
 				domain: getRootDomain(ctx.env.API_ORIGIN),
 			},
-			expiration: ctx.env.NODE_ENV === 'production' ? '1d' : '1m',
+			// Grant note: I like to set this super low in dev mode to test expiration and renewal,
+			// but for now let's leave it at 1 day.
+			// expiration: ctx.env.NODE_ENV === 'production' ? '1d' : '1m','
+			expiration: '1d',
 			async createSession(userId) {
 				assertPrefixedId(userId, 'u');
 				const user = await (await ctx.env.PUBLIC_STORE.getStoreForUser(userId)).getSession();

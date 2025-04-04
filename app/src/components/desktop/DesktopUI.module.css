@@ -104,7 +104,7 @@
 	}
 
 	.main {
-		width: auto;
+		width: var(--main-size);
 	}
 }
 
@@ -113,6 +113,10 @@
 		grid-template-areas: 'main';
 		grid-template-columns: 1fr;
 		grid-template-rows: 1fr auto;
+	}
+
+	.main {
+		width: auto;
 	}
 
 	.content {

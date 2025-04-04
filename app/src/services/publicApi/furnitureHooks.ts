@@ -65,10 +65,7 @@ export function useFurnitureModel(furnitureId: PrefixedId<'f'>, quality: Furnitu
 	const src = `${publicApiOrigin}/furniture/${furnitureId}/model?quality=${quality}`;
 	return useAuthenticatedGLTF(src);
 }
-useFurnitureModel.preload = (
-	furnitureId: PrefixedId<'f'>,
-	qualities: FurnitureModelQuality[] = [FurnitureModelQuality.Original, FurnitureModelQuality.Low, FurnitureModelQuality.Medium, FurnitureModelQuality.Collision]
-) => {
+useFurnitureModel.preload = (furnitureId: PrefixedId<'f'>, qualities: FurnitureModelQuality[] = [FurnitureModelQuality.Original, FurnitureModelQuality.Collision]) => {
 	for (const quality of qualities) {
 		const src = `${publicApiOrigin}/furniture/${furnitureId}/model?quality=${quality}`;
 		useAuthenticatedGLTF.preload(src);

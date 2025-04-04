@@ -1,5 +1,5 @@
 import { useEnvironmentStore } from '@/stores/environmentStore';
-import { useGlobalLighting } from '@/stores/roomStore';
+import { useGlobalLighting } from '@/stores/propertyStore';
 import { ErrorBoundary } from '@alef/sys';
 // import type { RigidBody as RRigidBody } from '@dimforge/rapier3d-compat';
 import { useFrame } from '@react-three/fiber';

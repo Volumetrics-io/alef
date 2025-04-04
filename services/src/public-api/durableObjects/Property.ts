@@ -99,10 +99,26 @@ export class Property extends DurableObject<Bindings> {
 		return room.layouts[roomLayoutId];
 	}
 
-	createRoom() {
+	createRoom(initialState?: Omit<RoomState, 'id' | 'updatedAt'>) {
 		const roomId = id('r');
-		this.#rooms[roomId] = getDemoRoomState(roomId);
+		this.#rooms[roomId] = initialState ? { ...initialState, id: roomId, updatedAt: null } : getDemoRoomState(roomId);
+		// inform socket clients about the new room
+		this.#socketHandler.send({
+			type: 'roomUpdate',
+			data: this.#rooms[roomId],
+		});
 		this.#saveState();
 		return this.#rooms[roomId];
+	}
+
+	deleteRoom(roomId: PrefixedId<'r'>) {
+		if (this.#rooms[roomId]) {
+			delete this.#rooms[roomId];
+			this.#saveState();
+		}
+		this.#socketHandler.send({
+			type: 'roomDeleted',
+			roomId,
+		});
 	}
 }

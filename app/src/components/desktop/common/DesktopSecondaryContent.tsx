@@ -23,7 +23,7 @@ export function DesktopSecondaryContent({ children, title, open, onOpenChange }:
 	if (!open) return null;
 
 	return (
-		<Frame float="top-left" p stacked gapped style={{ minWidth: 300 }}>
+		<Frame float="top-left" p stacked gapped style={{ minWidth: 300, maxWidth: '25vw' }}>
 			<Box justify="between">
 				<Heading level={2}>{title}</Heading>
 			</Box>

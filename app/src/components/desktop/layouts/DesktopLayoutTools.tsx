@@ -1,4 +1,4 @@
-import { useActiveRoomLayoutId } from '@/stores/roomStore';
+import { useActiveRoomLayoutId } from '@/stores/propertyStore';
 import { Box } from '@alef/sys';
 import { DesktopAddLayout } from './DesktopAddLayout';
 import { DesktopDeleteLayout } from './DesktopDeleteLayout';

@@ -1,49 +1,51 @@
 import { PrefixedId, RoomPlaneData } from '@alef/common';
 import { useShallow } from 'zustand/react/shallow';
-import { useRoomStore } from '../roomStore';
+import { useRoomApi, useRoomState } from './rooms.js';
 
 export function useRoomLayoutIds() {
-	return useRoomStore(useShallow((s) => Object.keys(s.layouts) as PrefixedId<'rl'>[]));
+	return useRoomState(useShallow((s) => Object.keys(s.layouts) as PrefixedId<'rl'>[]));
 }
 
 export function useRoomLayout(id: PrefixedId<'rl'>) {
-	return useRoomStore((s) => s.layouts[id] ?? null);
+	return useRoomState((s) => s.layouts[id] ?? null);
 }
 
 export function useCreateRoomLayout() {
-	return useRoomStore((s) => s.createLayout);
+	return useRoomApi((s) => s.createLayout);
 }
 
 export function useActiveRoomLayoutId() {
-	return useRoomStore(useShallow((s) => [s.editor.selectedLayoutId || (Object.keys(s.layouts)[0] as PrefixedId<'rl'>), s.setViewingLayoutId] as const));
+	const id: PrefixedId<'rl'> = useRoomState((s) => s.editor.selectedLayoutId || (Object.keys(s.layouts)[0] as PrefixedId<'rl'>));
+	const setId = useRoomApi((s) => s.setViewingLayoutId);
+	return [id, setId] as const;
 }
 
 export function useActiveRoomLayout() {
-	return useRoomStore((s) => (s.editor.selectedLayoutId ? (s.layouts[s.editor.selectedLayoutId] ?? null) : null));
+	return useRoomState((s) => (s.editor.selectedLayoutId ? (s.layouts[s.editor.selectedLayoutId] ?? null) : null));
 }
 
 export function useUpdateRoomLayout() {
-	return useRoomStore((s) => s.updateLayout);
+	return useRoomApi((s) => s.updateLayout);
 }
 
 export function useDeleteRoomLayout() {
-	return useRoomStore((s) => s.deleteLayout);
+	return useRoomApi((s) => s.deleteLayout);
 }
 
 export function useHasPlanes() {
-	return useRoomStore((s) => s.planes.length > 0);
+	return useRoomState((s) => s.planes.length > 0);
 }
 
 export function usePlanesUpdatedAt() {
-	return useRoomStore((s) => s.planesUpdatedAt);
+	return useRoomState((s) => s.planesUpdatedAt);
 }
 
 export function useUpdatePlanes() {
-	return useRoomStore((s) => s.updatePlanes);
+	return useRoomApi((s) => s.updatePlanes);
 }
 
 export function usePlanes(filter?: (p: RoomPlaneData) => boolean) {
-	return useRoomStore(useShallow((s) => (filter ? s.planes.filter(filter) : s.planes)));
+	return useRoomState(useShallow((s) => (filter ? s.planes.filter(filter) : s.planes)));
 }
 
 export function usePrimaryFloorPlane() {

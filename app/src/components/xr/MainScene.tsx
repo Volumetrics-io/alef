@@ -9,6 +9,7 @@ import { AdaptiveEvents } from '@react-three/drei';
 import { StagerPanel } from './panels/StagerPanel';
 // import { ViewerPanel } from './panels/ViewerPanel';
 import { RoomRenderer } from './room/RoomRenderer';
+import { SelectRoomBlocker } from './room/SelectRoomBlocker';
 import { SceneWrapper } from './SceneWrapper';
 
 export function MainScene() {
@@ -19,9 +20,11 @@ export function MainScene() {
 			<DepthShader />
 			<AdaptiveEvents />
 			<PropertyRoomStoreProvider>
-				<RoomRenderer />
-				{/* <ModePanel /> */}
-				<StagerPanel />
+				<SelectRoomBlocker>
+					<RoomRenderer />
+					{/* <ModePanel /> */}
+					<StagerPanel />
+				</SelectRoomBlocker>
 			</PropertyRoomStoreProvider>
 		</SceneWrapper>
 	);

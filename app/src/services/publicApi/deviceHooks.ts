@@ -32,7 +32,7 @@ export function useDeviceDiscovery() {
 			// the check for logged in status.
 			if (result.wasAssigned) {
 				queryClient.invalidateQueries({ queryKey: ['me'] });
-				queryClient.invalidateQueries({ queryKey: ['currentDevice'] });
+				queryClient.invalidateQueries({ queryKey: ['devices', 'current'] });
 				toast.success('Success! Your device is logged in.');
 			}
 			return result;

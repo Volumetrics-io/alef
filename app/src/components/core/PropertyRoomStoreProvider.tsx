@@ -1,10 +1,8 @@
 import { useCurrentDevice } from '@/services/publicApi/deviceHooks';
-import { useAllProperties, useProperty } from '@/services/publicApi/propertyHooks';
-import { PropertySocketProvider } from '@/services/publicApi/PropertySocketProvider';
+import { useAllProperties } from '@/services/publicApi/propertyHooks';
 import { useMe } from '@/services/publicApi/userHooks';
-import { RoomStoreProvider } from '@/stores/roomStore';
-import { PrefixedId } from '@alef/common';
-import { ReactNode } from 'react';
+import { PropertyStoreProvider } from '@/stores/propertyStore';
+import { ReactNode, Suspense } from 'react';
 import { ModeProvider } from '../xr/modes/ModeContext';
 
 export interface PropertyRoomStoreProviderProps {
@@ -22,9 +20,9 @@ export function PropertyRoomStoreProvider({ children }: PropertyRoomStoreProvide
 		// room locally. Internally, we provide a Stager experience with an extra option to pair
 		// a device with a user account.
 		return (
-			<RoomStoreProvider roomId="r-local">
+			<PropertyStoreProvider propertyId={null}>
 				<ModeProvider value="staging">{children}</ModeProvider>
-			</RoomStoreProvider>
+			</PropertyStoreProvider>
 		);
 	}
 
@@ -50,18 +48,9 @@ function WrappedWithPropertyAndRoom({ children }: { children: ReactNode }) {
 		throw new Error(`Expected the server to provision a default property`);
 	}
 
-	const {
-		data: { rooms },
-	} = useProperty(defaultProperty.id);
-	const defaultRoomId = Object.keys(rooms)[0] as PrefixedId<'r'>;
-
-	if (!defaultRoomId) {
-		throw new Error(`Expected the server to provision a default room`);
-	}
-
 	return (
-		<PropertySocketProvider propertyId={defaultProperty.id}>
-			<RoomStoreProvider roomId={defaultRoomId}>{children}</RoomStoreProvider>
-		</PropertySocketProvider>
+		<Suspense>
+			<PropertyStoreProvider propertyId={defaultProperty.id}>{children}</PropertyStoreProvider>
+		</Suspense>
 	);
 }

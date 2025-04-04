@@ -1,5 +1,5 @@
-import { useGlobalLighting } from '@/stores/roomStore';
-import { useIsEditorMode } from '@/stores/roomStore/hooks/editing';
+import { useGlobalLighting } from '@/stores/propertyStore';
+import { useIsEditorMode } from '@/stores/propertyStore/hooks/editing';
 import { ThreeElements } from '@react-three/fiber';
 import { useXR } from '@react-three/xr';
 import { getLightColor } from './getLightColor';

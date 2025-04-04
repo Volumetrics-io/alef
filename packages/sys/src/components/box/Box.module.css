@@ -133,6 +133,11 @@
 			bottom: 0.75rem;
 			right: 0.75rem;
 		}
+		&[data-float='top-center'] {
+			top: 0.75rem;
+			left: 50%;
+			transform: translateX(-50%);
+		}
 	}
 
 	.wrap {

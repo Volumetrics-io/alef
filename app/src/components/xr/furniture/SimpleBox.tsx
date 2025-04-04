@@ -11,7 +11,6 @@ export interface SimpleBoxProps extends GroupProps {
 }
 
 export const SimpleBox = forwardRef<Group, SimpleBoxProps>(function SimpleBox({ size, transparent, ...rest }, ref) {
-	console.log(size, rest);
 	return (
 		<group {...rest} ref={ref}>
 			<RoundedBox args={size} radius={0.1}>

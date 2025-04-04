@@ -6,13 +6,14 @@
 	position: relative;
 	z-index: 10;
 	border: var(--border);
+	display: flex;
 	&:focus-visible {
 		background: var(--paper);
 		outline: 2px solid var(--focus);
 	}
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
 	.root {
 		display: none;
 	}

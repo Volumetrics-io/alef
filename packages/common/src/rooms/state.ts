@@ -14,9 +14,9 @@ import {
 } from './state/roomData.js';
 import { ROOM_STATE_VERSION } from './version.js';
 
-export const roomStateShape = z.object({
-	id: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')),
+export const roomStateInitializationShape = z.object({
 	version: z.number(),
+	createdAt: z.number(),
 	planes: roomPlaneDataShape.array(),
 	planesUpdatedAt: z.number().nullable(),
 	layouts: z.record(
@@ -28,11 +28,19 @@ export const roomStateShape = z.object({
 		roomLightPlacementShape
 	),
 	globalLighting: roomGlobalLightingShape,
+});
 
+export const roomStateShapeWithoutEditor = roomStateInitializationShape.extend({
+	id: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')),
+	updatedAt: z.number().nullable(),
+});
+
+export const roomStateShape = roomStateShapeWithoutEditor.extend({
 	// some clients may not have an editor state -- the server, for example.
 	editor: editorStateShape.optional(),
 });
 export type RoomState = z.infer<typeof roomStateShape>;
+export type RoomStateInit = z.infer<typeof roomStateInitializationShape>;
 // a version of RoomState where editor is required.
 export type RoomStateWithEditor = RoomState & { editor: z.infer<typeof editorStateShape> };
 
@@ -75,6 +83,8 @@ export function migrateRoomState(oldState: any): RoomState {
 
 		return {
 			version: ROOM_STATE_VERSION,
+			createdAt: oldState.createdAt ?? defaults.createdAt,
+			updatedAt: oldState.updatedAt ?? defaults.updatedAt,
 			id: oldState.id ?? defaults.id,
 			planes,
 			planesUpdatedAt: oldState.planesUpdatedAt ?? defaults.planesUpdatedAt,

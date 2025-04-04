@@ -1,6 +1,6 @@
 import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
 import { usePerformanceStore } from '@/stores/performanceStore';
-import { useGlobalLighting, useLights } from '@/stores/roomStore';
+import { useGlobalLighting, useLights } from '@/stores/propertyStore';
 import { RefObject, useEffect } from 'react';
 import { Group, Vector3 } from 'three';
 import { getLightColor } from './getLightColor';

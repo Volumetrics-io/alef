@@ -1,5 +1,5 @@
 import { xrPlanesToRoomPlaneData } from '@/physics/xrPlaneTools';
-import { usePlanes } from '@/stores/roomStore';
+import { usePlanes } from '@/stores/propertyStore';
 import { matchPlane, RoomPlaneData } from '@alef/common';
 import { useSignal } from '@preact/signals-react';
 import { Billboard } from '@react-three/drei';

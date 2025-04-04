@@ -1,5 +1,5 @@
-import { useDeleteFurniturePlacement } from '@/stores/roomStore';
-import { useSelect } from '@/stores/roomStore/hooks/editing';
+import { useDeleteFurniturePlacement } from '@/stores/propertyStore';
+import { useSelect } from '@/stores/propertyStore/hooks/editing';
 import { PrefixedId } from '@alef/common';
 import { Button, Dialog, Icon } from '@alef/sys';
 import { useCallback } from 'react';

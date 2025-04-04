@@ -30,7 +30,7 @@ export const SelectContent = forwardRef<HTMLDivElement, SelectContentProps>(func
 					<Icon name="chevron-up" />
 				</Control>
 			</Primitive.ScrollUpButton>
-			<Primitive.Viewport className={cls.viewport}>{children}</Primitive.Viewport>
+			<Primitive.Viewport>{children}</Primitive.Viewport>
 			<Primitive.ScrollDownButton className={clsx(cls.scrollButton, cls.scrollDownButton)} asChild>
 				<Control>
 					<Icon name="chevron-down" />

@@ -1,4 +1,4 @@
-import { useFurniturePlacement, useFurnitureQuickSwap } from '@/stores/roomStore';
+import { useFurniturePlacement, useFurnitureQuickSwap } from '@/stores/propertyStore';
 import { PrefixedId, RoomFurniturePlacement } from '@alef/common';
 import { Box, Button, Icon } from '@alef/sys';
 import { DesktopDeleteFurniture } from './DesktopDeleteFurniture';

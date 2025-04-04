@@ -1,4 +1,4 @@
-import { useActiveRoomLayoutId, useDeleteRoomLayout, useRoomLayout, useRoomLayoutIds } from '@/stores/roomStore';
+import { useActiveRoomLayoutId, useDeleteRoomLayout, useRoomLayout, useRoomLayoutIds } from '@/stores/propertyStore';
 import { PrefixedId } from '@alef/common';
 import { Box, Button, Dialog, Icon, Text } from '@alef/sys';
 import { useCallback } from 'react';

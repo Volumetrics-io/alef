@@ -1,6 +1,6 @@
 import { BodyAnchor } from '@/components/xr/anchors/BodyAnchor';
-import { useDeleteFurniturePlacement, useFurniturePlacement, useFurnitureQuickSwap } from '@/stores/roomStore';
-import { useSelectedFurniturePlacementId } from '@/stores/roomStore/hooks/editing';
+import { useDeleteFurniturePlacement, useFurniturePlacement, useFurnitureQuickSwap } from '@/stores/propertyStore';
+import { useSelectedFurniturePlacementId } from '@/stores/propertyStore/hooks/editing';
 import { RoomFurniturePlacement } from '@alef/common';
 import { Container, ContainerProperties, Root } from '@react-three/uikit';
 import { ArrowLeft, ArrowRight, Trash } from '@react-three/uikit-lucide';

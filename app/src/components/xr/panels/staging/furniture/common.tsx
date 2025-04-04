@@ -6,7 +6,7 @@ import { Surface } from '@/components/xr/ui/Surface';
 import { colors } from '@/components/xr/ui/theme';
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
 import { useAllFilters, useCategoryFilter, useSetFilters } from '@/stores/FilterStore';
-import { useEditorMode } from '@/stores/roomStore/hooks/editing';
+import { useEditorMode } from '@/stores/propertyStore/hooks/editing';
 import { Attribute, AttributeKey } from '@alef/common';
 import { animated, useSpring } from '@react-spring/three';
 import { useFrame } from '@react-three/fiber';
@@ -215,6 +215,10 @@ function FurnitureAttributePickerItem({ attribute }: { attribute: Attribute }) {
 	const value = useAllFilters();
 	const selected = value.some((a) => a.key === attribute.key && a.value === attribute.value);
 	const setValue = useSetFilters();
+
+	if (!attribute.value) {
+		return null;
+	}
 
 	return (
 		<SelectorItem

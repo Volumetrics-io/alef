@@ -1,5 +1,5 @@
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
-import { usePlacingFurnitureId, useSetPlacingFurniture } from '@/stores/roomStore/hooks/editing';
+import { usePlacingFurnitureId, useSetPlacingFurniture } from '@/stores/propertyStore/hooks/editing';
 import { Box, Button, CardGrid, Icon } from '@alef/sys';
 import { DesktopFurnitureCard } from './DesktopFurnitureCard';
 
@@ -7,14 +7,15 @@ export interface DesktopFurnitureCollectionProps {
 	furniture: FurnitureItem[];
 	hasMore?: boolean;
 	onLoadMore?: () => void;
+	onSelect?: (item: FurnitureItem | null) => void;
 }
 
-export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore }: DesktopFurnitureCollectionProps) {
+export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore, onSelect }: DesktopFurnitureCollectionProps) {
 	return (
 		<Box full stacked>
 			<CardGrid small>
 				{furniture.map((item) => (
-					<FurnitureCard key={item.id} item={item} />
+					<FurnitureCard key={item.id} item={item} onSelect={onSelect} />
 				))}
 			</CardGrid>
 			{hasMore && (
@@ -27,7 +28,7 @@ export function DesktopFurnitureCollection({ furniture, hasMore, onLoadMore }: D
 	);
 }
 
-function FurnitureCard({ item }: { item: FurnitureItem }) {
+function FurnitureCard({ item, onSelect }: { item: FurnitureItem; onSelect?: (item: FurnitureItem | null) => void }) {
 	const selectedModelId = usePlacingFurnitureId();
 	const setSelectedModelId = useSetPlacingFurniture();
 
@@ -36,8 +37,10 @@ function FurnitureCard({ item }: { item: FurnitureItem }) {
 	const handleClick = () => {
 		if (isSelected) {
 			setSelectedModelId(null);
+			onSelect?.(null);
 		} else {
 			setSelectedModelId(item.id);
+			onSelect?.(item);
 		}
 	};
 

@@ -1,4 +1,4 @@
-import { useDeleteLightPlacement } from '@/stores/roomStore';
+import { useDeleteLightPlacement } from '@/stores/propertyStore';
 import { PrefixedId } from '@alef/common';
 import { Box, Button, Icon } from '@alef/sys';
 

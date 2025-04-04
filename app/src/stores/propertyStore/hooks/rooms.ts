@@ -47,7 +47,14 @@ export function useRoomStateSubscribe<T>(
 }
 
 export function useRoomIds() {
-	return usePropertyStore(useShallow((state) => Object.keys(state.rooms) as PrefixedId<'r'>[]));
+	return usePropertyStore(
+		useShallow(
+			(state) =>
+				Object.values(state.rooms)
+					.sort((a, b) => a.createdAt - b.createdAt)
+					.map((r) => r.id) as PrefixedId<'r'>[]
+		)
+	);
 }
 
 export function useCreateRoom() {

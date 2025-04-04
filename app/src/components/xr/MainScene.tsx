@@ -23,8 +23,8 @@ export function MainScene() {
 				<SelectRoomBlocker>
 					<RoomRenderer />
 					{/* <ModePanel /> */}
+					<StagerPanel />
 				</SelectRoomBlocker>
-				<StagerPanel />
 			</PropertyRoomStoreProvider>
 		</SceneWrapper>
 	);

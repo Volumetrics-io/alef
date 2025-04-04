@@ -142,8 +142,8 @@ export const devicesRouter = new Hono<Env>()
 				const accessList = await ctx.env.PUBLIC_STORE.getDeviceAccess(ownId);
 				if (accessList.length !== 0) {
 					// arbitrarily choose one user from those who have access to this device.
-					const assignedUserId = accessList[0].userId;
-					const userStore = await ctx.env.PUBLIC_STORE.getStoreForUser(assignedUserId);
+					const assigned = accessList[0];
+					const userStore = await ctx.env.PUBLIC_STORE.getStoreForUser(assigned.userId);
 					const user = await userStore.getMe();
 					if (!user) {
 						throw new AlefError(AlefError.Code.InternalServerError, 'Could not find user for device.');
@@ -152,9 +152,9 @@ export const devicesRouter = new Hono<Env>()
 						{
 							isProductAdmin: user.isProductAdmin,
 							name: user.name,
-							userId: assignedUserId,
+							userId: assigned.userId,
 							deviceId: ownId,
-							access: 'write:all',
+							access: assigned.access,
 						},
 						// TODO: don't ditch types here... while this is all the same ctx value,
 						// the types applied to SessionManager are particular.

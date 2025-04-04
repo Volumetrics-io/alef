@@ -7,6 +7,9 @@ import { Env } from '../public-api/config/ctx';
  * Middleware that ensures the connecting device is recorded in the database,
  * associated with the current user if logged in, and applying a ?description value
  * if provided.
+ *
+ * WARNING: upserted device will always have write:all access unless it has
+ * a session already, in which case it copies session access.
  */
 export const upsertDeviceMiddleware = createMiddleware<{
 	Variables: Env['Variables'] & {
@@ -20,12 +23,14 @@ export const upsertDeviceMiddleware = createMiddleware<{
 	const type = ctx.req.query('type') as DeviceType | undefined;
 	const description = ctx.req.query('description');
 	const userId = ctx.get('session')?.userId;
+	const access = ctx.get('session')?.access ?? 'write:all';
 	const ownId = await assignOrRefreshDeviceId(ctx);
 	const device = {
 		id: ownId,
 		name,
 		defaultName: description,
 		type,
+		access,
 	};
 	const upserted = await ctx.env.PUBLIC_STORE.ensureDeviceExists(device, userId);
 	ctx.set('device', upserted);

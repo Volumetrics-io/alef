@@ -139,6 +139,7 @@ export interface DeviceAccessTable {
 	createdAt: CreatedAt;
 	updatedAt: UpdatedAt;
 
+	access: 'write:all' | 'read:all';
 	deviceId: PrefixedId<'d'>;
 	userId: PrefixedId<'u'>;
 }

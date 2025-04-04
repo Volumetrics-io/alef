@@ -3,8 +3,8 @@ import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { z } from 'zod';
 import { wrapRpcData } from '../../helpers/wrapRpcData';
-import { upsertDeviceMiddleware } from '../../middleware/devices';
 import { writeAccessMiddleware } from '../../middleware/session';
+import { assignOrRefreshDeviceId } from '../auth/devices';
 import { sessions } from '../auth/session';
 import { Env } from '../config/ctx';
 
@@ -14,7 +14,7 @@ export const publicAccessTokensRouter = new Hono<Env>()
 		const token = await ctx.get('userStore').upsertDefaultPublicAccessToken();
 		return ctx.json(wrapRpcData(token));
 	})
-	.get('/:token/redeem', upsertDeviceMiddleware, zValidator('param', z.object({ token: z.string() })), async (ctx) => {
+	.get('/:token/redeem', zValidator('param', z.object({ token: z.string() })), async (ctx) => {
 		const token = ctx.req.valid('param').token;
 		const tokenData = await ctx.env.PUBLIC_STORE.getPublicAccessToken(token);
 		if (!tokenData) {
@@ -26,12 +26,13 @@ export const publicAccessTokensRouter = new Hono<Env>()
 		if (!user) {
 			throw new AlefError(AlefError.Code.BadRequest, 'Invalid or expired token (user not found)');
 		}
+		const ownId = await assignOrRefreshDeviceId(ctx);
 		const updates = await sessions.updateSession(
 			{
 				isProductAdmin: user?.isProductAdmin,
 				name: user.name,
 				userId: user.id,
-				deviceId: ctx.get('device').id,
+				deviceId: ownId,
 				access: 'read:all',
 			},
 			ctx as any

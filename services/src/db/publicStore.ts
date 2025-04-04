@@ -174,7 +174,10 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 	 *
 	 * TODO: once discovered and claimed, devices can only be modified by their owners
 	 */
-	async ensureDeviceExists(info: Omit<NewDevice, 'displayMode' | 'name' | 'type'> & { type?: DeviceType; name?: string; defaultName?: string }, owner?: PrefixedId<'u'>) {
+	async ensureDeviceExists(
+		info: Omit<NewDevice, 'displayMode' | 'name' | 'type'> & { type?: DeviceType; name?: string; defaultName?: string; access?: 'write:all' | 'read:all' },
+		owner?: PrefixedId<'u'>
+	) {
 		const conflictUpdates: DeviceUpdate = {};
 		if (info.name) {
 			// if a name is provided, we should update the name in case of conflicts.
@@ -204,7 +207,7 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 		if (owner) {
 			await this.#db
 				.insertInto('DeviceAccess')
-				.values({ userId: owner, deviceId: info.id })
+				.values({ userId: owner, deviceId: info.id, access: info.access ?? 'write:all' })
 				.onConflict((cb) => cb.columns(['userId', 'deviceId']).doNothing())
 				.execute();
 		}
@@ -216,7 +219,7 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 	}
 
 	async getDeviceAccess(deviceId: PrefixedId<'d'>) {
-		return this.#db.selectFrom('DeviceAccess').where('deviceId', '=', deviceId).select('userId').execute();
+		return this.#db.selectFrom('DeviceAccess').where('deviceId', '=', deviceId).select(['userId', 'access']).execute();
 	}
 
 	async getDevice(deviceId: PrefixedId<'d'>) {

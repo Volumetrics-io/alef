@@ -52,8 +52,8 @@ export function SceneWrapper({ children, disableEnterXR, ...rest }: SceneWrapper
 					}}
 					camera={{ position: [-5, 5, 5] }}
 				>
+					<PointerEvents />
 					<XR store={xrStore}>
-						<PointerEvents />
 						<QualityControl />
 						{import.meta.env.DEV && <Perf position="bottom-right" />}
 						<SplashScreen />

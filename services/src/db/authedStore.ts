@@ -33,8 +33,8 @@ export class AuthedStore extends RpcTarget {
 			.execute();
 	}
 
-	async claimDevice(deviceId: PrefixedId<'d'>) {
-		await this.#db.insertInto('DeviceAccess').values({ userId: this.#userId, deviceId }).execute();
+	async claimDevice(deviceId: PrefixedId<'d'>, access: 'write:all' | 'read:all' = 'write:all') {
+		await this.#db.insertInto('DeviceAccess').values({ userId: this.#userId, deviceId, access }).execute();
 	}
 
 	async deleteDevice(deviceId: PrefixedId<'d'>) {

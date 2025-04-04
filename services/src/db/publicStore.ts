@@ -236,7 +236,6 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 	}
 
 	async getPublicAccessToken(token: string) {
-		console.log('getting token', token);
 		const publicAccessToken = await this.#db.selectFrom('PublicAccessToken').where('token', '=', token).selectAll().executeTakeFirst();
 
 		if (!publicAccessToken) {

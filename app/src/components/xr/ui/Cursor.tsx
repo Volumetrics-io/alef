@@ -1,8 +1,8 @@
-import { ColorRepresentation } from '@pmndrs/uikit';
-import { colors } from './theme';
+import { GroupProps } from '@react-three/fiber';
+import { ColorRepresentation } from '@react-three/uikit';
 import { forwardRef } from 'react';
 import { DoubleSide, Group } from 'three';
-import { GroupProps } from '@react-three/fiber';
+import { colors } from './theme';
 
 export const Cursor = forwardRef<Group, { visible: boolean; color?: ColorRepresentation | string; children?: React.ReactNode } & GroupProps>(
 	({ visible, color, children, ...props }, ref) => {

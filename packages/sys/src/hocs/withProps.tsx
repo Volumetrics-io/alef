@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ComponentPropsWithoutRef, ComponentType, ElementType, forwardRef } from 'react';
+import { ComponentPropsWithoutRef, ComponentType, ElementType } from 'react';
 
 export function withProps<TComponent extends ComponentType<any> | ElementType<any>>(Component: TComponent, baseProps: Partial<ComponentPropsWithoutRef<TComponent>>): TComponent {
-	return forwardRef<any, any>(function WithProps(props, ref) {
+	return function WithProps(props: any) {
 		// @ts-ignore
-		return <Component ref={ref} {...baseProps} {...props} />;
-	}) as any;
+		return <Component {...baseProps} {...props} />;
+	} as any;
 }

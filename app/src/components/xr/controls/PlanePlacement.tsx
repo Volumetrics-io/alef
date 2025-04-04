@@ -1,8 +1,8 @@
 import { DEBUG } from '@/services/debug';
 import { RoomPlaneData } from '@alef/common';
 import { PointerEvent } from '@pmndrs/pointer-events';
-import { ColorRepresentation } from '@pmndrs/uikit';
 import { ThreeEvent } from '@react-three/fiber';
+import { ColorRepresentation } from '@react-three/uikit';
 import { useXR } from '@react-three/xr';
 import { ReactNode, Suspense, useRef } from 'react';
 import { Group, Matrix4, Vector3 } from 'three';

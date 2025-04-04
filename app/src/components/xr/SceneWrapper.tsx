@@ -2,7 +2,6 @@ import { useGeoStore } from '@/stores/geoStore';
 import { usePerformanceStore } from '@/stores/performanceStore';
 import { xrStore } from '@/stores/xrStore';
 import { Box, BoxProps, Button, ErrorBoundary, Icon } from '@alef/sys';
-import { reversePainterSortStable } from '@pmndrs/uikit';
 import { PerformanceMonitor } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitHandles } from '@react-three/handle';
@@ -40,7 +39,6 @@ export function SceneWrapper({ children, disableEnterXR, ...rest }: SceneWrapper
 					onCreated={(state) => {
 						state.gl.setClearColor(0xefffff);
 						state.gl.localClippingEnabled = true;
-						state.gl.setTransparentSort(reversePainterSortStable);
 						// @ts-ignore it does
 						if (window.getDigitalGoodsService !== undefined) {
 							if (navigator.xr) {

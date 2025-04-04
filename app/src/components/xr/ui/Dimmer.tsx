@@ -1,5 +1,4 @@
-import { isDarkMode } from '@pmndrs/uikit';
-import { Container, ContainerProperties } from '@react-three/uikit';
+import { Container, ContainerProperties, isDarkMode } from '@react-three/uikit';
 import { colors } from './theme';
 
 export const Dimmer = ({ children, ...props }: ContainerProperties & { children?: React.ReactNode }) => {

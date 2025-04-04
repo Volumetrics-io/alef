@@ -1,5 +1,5 @@
-import { basedOnPreferredColorScheme, ColorRepresentation } from '@pmndrs/uikit';
 import { ReadonlySignal } from '@preact/signals-core';
+import { basedOnPreferredColorScheme, ColorRepresentation } from '@react-three/uikit';
 import { Color } from 'three';
 
 function hsl(h: number, s: number, l: number) {

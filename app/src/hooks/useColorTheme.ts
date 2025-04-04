@@ -1,4 +1,4 @@
-import { PreferredColorScheme, setPreferredColorScheme } from '@pmndrs/uikit';
+import { PreferredColorScheme, setPreferredColorScheme } from '@react-three/uikit';
 import { useEffect } from 'react';
 import { useLocalStorage } from './useStorage';
 

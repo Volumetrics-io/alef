@@ -1,6 +1,6 @@
 import { publicApiOrigin } from '@/env';
+import { useAuthenticatedGLTF } from '@/hooks/useAuthenticatedGLTF';
 import { AlefError, AttributeKey, formatAttribute, FurnitureModelQuality, PrefixedId } from '@alef/common';
-import { useGLTF } from '@react-three/drei';
 import { useSuspenseInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import type { InferResponseType } from 'hono/client';
 import { publicApiClient } from './client';
@@ -63,9 +63,7 @@ export function useFurnitureDetails(furnitureId: PrefixedId<'f'> | null) {
 }
 export function useFurnitureModel(furnitureId: PrefixedId<'f'>, quality: FurnitureModelQuality = FurnitureModelQuality.Original) {
 	const src = `${publicApiOrigin}/furniture/${furnitureId}/model?quality=${quality}`;
-	return useGLTF(src, true, true, (loader) => {
-		loader.setWithCredentials(true);
-	});
+	return useAuthenticatedGLTF(src);
 }
 useFurnitureModel.preload = (
 	furnitureId: PrefixedId<'f'>,
@@ -73,9 +71,7 @@ useFurnitureModel.preload = (
 ) => {
 	for (const quality of qualities) {
 		const src = `${publicApiOrigin}/furniture/${furnitureId}/model?quality=${quality}`;
-		useGLTF.preload(src, true, true, (loader) => {
-			loader.setWithCredentials(true);
-		});
+		useAuthenticatedGLTF.preload(src);
 	}
 };
 

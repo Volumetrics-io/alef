@@ -6,15 +6,17 @@ import { DesktopFurnitureAttributePicker } from './DesktopFurnitureAttributePick
 import { DesktopFurnitureCategoryFilter } from './DesktopFurnitureCategoryFilter';
 import { DesktopFurnitureCollection } from './DesktopFurnitureCollection';
 
-export interface DesktopOnlineFurniturePickerProps extends Omit<BoxProps, 'onSelect'> {}
+export interface DesktopOnlineFurniturePickerProps extends Omit<BoxProps, 'onSelect'> {
+	onSelect?: () => void;
+}
 
-export function DesktopOnlineFurniturePicker({ ...props }: DesktopOnlineFurniturePickerProps) {
+export function DesktopOnlineFurniturePicker({ onSelect, ...props }: DesktopOnlineFurniturePickerProps) {
 	return (
 		<Box full stacked gapped {...props}>
 			<DesktopFurnitureFilters />
 			<ScrollArea>
 				<Suspense>
-					<DesktopFilteredFurniture />
+					<DesktopFilteredFurniture onSelect={onSelect} />
 				</Suspense>
 			</ScrollArea>
 		</Box>
@@ -39,7 +41,7 @@ function DesktopFurnitureFilters() {
 	);
 }
 
-function DesktopFilteredFurniture() {
+function DesktopFilteredFurniture({ onSelect }: { onSelect?: () => void }) {
 	const attributes = useAllFilters();
 	const { data: furniture, fetchNextPage } = useAllFurniture({
 		attributeFilter: attributes,
@@ -48,5 +50,5 @@ function DesktopFilteredFurniture() {
 	const allFurniture = furniture.pages.flatMap((page) => page.items);
 	const hasMore = furniture.pages[furniture.pages.length - 1].pageInfo.hasNextPage;
 
-	return <DesktopFurnitureCollection furniture={allFurniture} hasMore={hasMore} onLoadMore={() => fetchNextPage()} />;
+	return <DesktopFurnitureCollection furniture={allFurniture} hasMore={hasMore} onLoadMore={() => fetchNextPage()} onSelect={onSelect} />;
 }

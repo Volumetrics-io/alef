@@ -1,8 +1,8 @@
 import { useAABB } from '@/hooks/useAABB';
 import { useShadowControls } from '@/hooks/useShadowMapUpdate';
 import { useSetPanelState } from '@/stores/editorStore';
-import { useFurniturePlacement, useFurniturePlacementFurnitureId, useSubscribeToPlacementPosition, useUpdateFurniturePlacementTransform } from '@/stores/roomStore';
-import { useIsEditorMode, useIsSelected, useSelect } from '@/stores/roomStore/hooks/editing';
+import { useFurniturePlacement, useFurniturePlacementFurnitureId, useSubscribeToPlacementPosition, useUpdateFurniturePlacementTransform } from '@/stores/propertyStore';
+import { useIsEditorMode, useIsSelected, useSelect } from '@/stores/propertyStore/hooks/editing';
 import { PrefixedId } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
 import { Bvh } from '@react-three/drei';

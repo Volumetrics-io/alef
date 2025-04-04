@@ -12,3 +12,10 @@ export const editorStateShape = z.object({
 });
 
 export type EditorState = z.infer<typeof editorStateShape>;
+
+export const createDefaultEditorState = (): EditorState => ({
+	selectedLayoutId: null,
+	selectedObjectId: null,
+	placingFurnitureId: null,
+	mode: 'layouts',
+});

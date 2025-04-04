@@ -1,6 +1,6 @@
 import { useFurnitureDetails } from '@/services/publicApi/furnitureHooks';
-import { useFurniturePlacement, useFurniturePlacementIds } from '@/stores/roomStore';
-import { useIsSelected, useSelect } from '@/stores/roomStore/hooks/editing';
+import { useFurniturePlacement, useFurniturePlacementIds } from '@/stores/propertyStore';
+import { useIsSelected, useSelect } from '@/stores/propertyStore/hooks/editing';
 import { PrefixedId } from '@alef/common';
 import { CardGrid } from '@alef/sys';
 import { DesktopFurnitureCard } from './DesktopFurnitureCard';

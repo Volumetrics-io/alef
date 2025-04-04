@@ -2,7 +2,7 @@ import { AnimatedSurface, usePullAnimation } from '@/components/xr/ui/Animations
 import { colors, getColorForAnimation } from '@/components/xr/ui/theme';
 import { FurnitureItem } from '@/services/publicApi/furnitureHooks';
 import { usePerformanceStore } from '@/stores/performanceStore';
-import { usePlacingFurnitureId, useSetPlacingFurniture } from '@/stores/roomStore/hooks/editing';
+import { usePlacingFurnitureId, useSetPlacingFurniture } from '@/stores/propertyStore/hooks/editing';
 import { config, useSpring, useSpringRef } from '@react-spring/three';
 import { Image } from '@react-three/uikit';
 import { Suspense } from 'react';

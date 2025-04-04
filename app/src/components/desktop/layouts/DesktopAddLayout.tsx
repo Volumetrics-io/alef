@@ -1,4 +1,4 @@
-import { useCreateRoomLayout } from '@/stores/roomStore';
+import { useCreateRoomLayout } from '@/stores/propertyStore';
 import { Button, Icon } from '@alef/sys';
 
 export function DesktopAddLayout() {

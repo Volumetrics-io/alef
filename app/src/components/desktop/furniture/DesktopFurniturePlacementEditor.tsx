@@ -1,4 +1,4 @@
-import { useFurniturePlacement } from '@/stores/roomStore';
+import { useFurniturePlacement } from '@/stores/propertyStore';
 import { PrefixedId } from '@alef/common';
 import { Box } from '@alef/sys';
 import { DesktopSelectedFurnitureTools } from './DesktopFurnitureTools';

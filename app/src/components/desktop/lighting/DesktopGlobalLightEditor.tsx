@@ -1,5 +1,5 @@
 import { getLightColor } from '@/components/xr/lighting/getLightColor';
-import { useGlobalLighting } from '@/stores/roomStore';
+import { useGlobalLighting } from '@/stores/propertyStore';
 import { Box, Label, Slider } from '@alef/sys';
 
 export function DesktopGlobalLightEditor() {

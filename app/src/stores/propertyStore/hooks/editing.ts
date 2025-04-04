@@ -3,35 +3,45 @@ import { getVoidObject, PointerEventsMap } from '@pmndrs/pointer-events';
 import { useThree } from '@react-three/fiber';
 import { useEffect } from 'react';
 import { Object3D, Object3DEventMap } from 'three';
-import { useShallow } from 'zustand/react/shallow';
-import { useRoomStore, useRoomStoreSubscribe } from '../roomStore';
+import { usePropertyStore } from '../propertyStore.js';
+import { useRoomApi, useRoomState, useRoomStateSubscribe } from './rooms.js';
+
+export function useHasSelectedRoom() {
+	return usePropertyStore((s) => s.meta.selectedRoomId !== null);
+}
+
+export function useSelectRoom() {
+	return usePropertyStore((s) => s.api.selectRoom);
+}
 
 export function useEditorMode() {
-	return useRoomStore(useShallow((s) => [s.editor.mode, s.setEditorMode] as const));
+	const mode = useRoomState((s) => s.editor.mode);
+	const setMode = useRoomApi((api) => api.setEditorMode);
+	return [mode, setMode] as const;
 }
 
 export function useIsEditorMode(mode: EditorMode) {
-	return useRoomStore((s) => s.editor.mode === mode);
+	return useRoomState((s) => s.editor.mode === mode);
 }
 
 export function useSelect() {
-	return useRoomStore((s) => s.select);
+	return useRoomApi((s) => s.select);
 }
 
 export function useIsSelected(id: PrefixedId<'fp'> | PrefixedId<'lp'>) {
-	return useRoomStore((s) => s.editor.selectedObjectId === id);
+	return useRoomState((s) => s.editor.selectedObjectId === id);
 }
 
 export function useSelectedObjectId() {
-	return useRoomStore((s) => s.editor.selectedObjectId);
+	return useRoomState((s) => s.editor.selectedObjectId);
 }
 
 export function useSelectedFurniturePlacementId() {
-	return useRoomStore((s) => (s.editor.selectedObjectId && isPrefixedId(s.editor.selectedObjectId, 'fp') ? s.editor.selectedObjectId : null));
+	return useRoomState((s) => (s.editor.selectedObjectId && isPrefixedId(s.editor.selectedObjectId, 'fp') ? s.editor.selectedObjectId : null));
 }
 
 export function useSelectedLightPlacementId() {
-	return useRoomStore((s) => (s.editor.selectedObjectId && isPrefixedId(s.editor.selectedObjectId, 'lp') ? s.editor.selectedObjectId : null));
+	return useRoomState((s) => (s.editor.selectedObjectId && isPrefixedId(s.editor.selectedObjectId, 'lp') ? s.editor.selectedObjectId : null));
 }
 
 export function useResetSelectionOnClickAway() {
@@ -46,14 +56,14 @@ export function useResetSelectionOnClickAway() {
 }
 
 export function useSetPlacingFurniture() {
-	return useRoomStore((s) => s.setPlacingFurniture);
+	return useRoomApi((s) => s.setPlacingFurniture);
 }
 
 export function usePlacingFurnitureId() {
-	return useRoomStore((s) => s.editor.placingFurnitureId);
+	return useRoomState((s) => s.editor.placingFurnitureId);
 }
 
 export function useOnSelectionChanged(cb: (selectedId: PrefixedId<'fp'> | PrefixedId<'lp'> | null) => void, options?: { fireImmediately?: boolean }) {
 	// subscribe to changes in the selected object id
-	useRoomStoreSubscribe((s) => s.editor.selectedObjectId, cb, options);
+	useRoomStateSubscribe((s) => s.editor.selectedObjectId, cb, options);
 }

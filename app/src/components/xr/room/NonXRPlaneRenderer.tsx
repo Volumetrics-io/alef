@@ -1,5 +1,5 @@
 import { DEBUG } from '@/services/debug';
-import { usePlanes } from '@/stores/roomStore';
+import { usePlanes } from '@/stores/propertyStore';
 import { useXR } from '@react-three/xr';
 import { Quaternion } from 'three';
 import { RoomPlane } from './RoomPlane';

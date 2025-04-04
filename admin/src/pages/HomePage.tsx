@@ -12,6 +12,14 @@ const HomePage = () => {
 		},
 	});
 
+	if (!session.id) {
+		return (
+			<Box>
+				<Link to={`${import.meta.env.VITE_MAIN_UI_ORIGIN}/login`}>Login</Link>
+			</Box>
+		);
+	}
+
 	return (
 		<Box stacked>
 			<Heading level={1}>Alef Admin</Heading>

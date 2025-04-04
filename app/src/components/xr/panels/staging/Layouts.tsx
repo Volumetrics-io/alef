@@ -1,5 +1,5 @@
-import { useActiveRoomLayoutId, useCreateRoomLayout, useDeleteRoomLayout, useRoomLayout, useRoomLayoutIds, useUpdateRoomLayout } from '@/stores/roomStore';
-import { useEditorMode } from '@/stores/roomStore/hooks/editing';
+import { useActiveRoomLayoutId, useCreateRoomLayout, useDeleteRoomLayout, useRoomLayout, useRoomLayoutIds, useUpdateRoomLayout } from '@/stores/propertyStore';
+import { useEditorMode } from '@/stores/propertyStore/hooks/editing';
 import { PrefixedId, RoomType } from '@alef/common';
 import { Container, Text } from '@react-three/uikit';
 import { ArrowRightIcon, CheckIcon, HouseIcon, PencilIcon } from '@react-three/uikit-lucide';

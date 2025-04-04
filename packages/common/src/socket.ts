@@ -39,6 +39,12 @@ export const serverRoomUpdateMessageShape = baseServerMessageShape.extend({
 });
 export type ServerRoomUpdateMessage = z.infer<typeof serverRoomUpdateMessageShape>;
 
+export const serverRoomDeletedMessageShape = baseServerMessageShape.extend({
+	type: z.literal('roomDeleted'),
+	roomId: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')),
+});
+export type ServerRoomDeletedMessage = z.infer<typeof serverRoomDeletedMessageShape>;
+
 export const serverSyncOperationsMessageShape = baseServerMessageShape.extend({
 	type: z.literal('syncOperations'),
 	operations: operationShape.array(),
@@ -72,6 +78,7 @@ export const serverMessageShape = z.union([
 	serverAckMessageShape,
 	serverErrorMessageShape,
 	serverRoomUpdateMessageShape,
+	serverRoomDeletedMessageShape,
 	serverLayoutCreatedMessageShape,
 	serverSyncOperationsMessageShape,
 	serverDeviceConnectedMessageShape,

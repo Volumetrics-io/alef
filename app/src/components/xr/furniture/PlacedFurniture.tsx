@@ -84,7 +84,6 @@ export function PlacedFurniture({ furniturePlacementId }: PlacedFurnitureProps) 
 				quaternion={[placement.rotation.x, placement.rotation.y, placement.rotation.z, placement.rotation.w]}
 			>
 				<Handle targetRef={groupRef as any} translate={{ x: true, y: false, z: true }} scale={false} rotate={false} apply={applyWithSave}>
-					{/* @ts-expect-error - pointerEventsType not included in typings */}
 					<SimpleCollisionModel pointerEventsType={{ deny: 'touch' }} furnitureId={furnitureId} onClick={handleClick} enabled={isFurnitureMode} />
 				</Handle>
 
@@ -105,7 +104,6 @@ function RotationHandle({
 	return (
 		<Handle rotate={{ x: false, y: true, z: false }} translate="as-rotate" {...props}>
 			<Bvh
-				// @ts-ignore - pointerEvents not included in typings
 				pointerEvents={visible ? 'auto' : 'none'}
 				onPointerEnter={() => setHovered(true)}
 				onPointerLeave={() => setHovered(false)}
@@ -118,11 +116,7 @@ function RotationHandle({
 					<torusGeometry args={[radius, 0.025, 32]} />
 					<meshPhongMaterial color={colors.focus.value} emissive={colors.focus.value} emissiveIntensity={0.5} />
 				</mesh>
-				<mesh
-					visible={visible}
-					// @ts-expect-error - pointerEvents not included in typings
-					pointerEvents="none"
-				>
+				<mesh visible={visible} pointerEvents="none">
 					<torusGeometry args={[radius, 0.03, 32]} />
 					<meshPhongMaterial
 						color={hovered ? colors.faded.value : colors.border.value}

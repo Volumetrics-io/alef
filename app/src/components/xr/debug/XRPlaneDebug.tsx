@@ -23,8 +23,8 @@ export function XRPlaneDebug({ plane }: DebugPlaneCenterProps) {
 	const matchedIdSignal = useSignal('');
 
 	const reference = useXR((s) => s.originReferenceSpace);
-	useFrame((_, __, xrFrame: XRFrame) => {
-		if (!reference) return;
+	useFrame((_, __, xrFrame) => {
+		if (!reference || !xrFrame) return;
 		const worldPoint = worldRef.current;
 		if (!worldPoint) return;
 		const pose = xrFrame.getPose(plane.planeSpace, reference);

@@ -2,10 +2,11 @@ import { useCameraForward } from '@/hooks/useCameraOrigin';
 import { DEBUG } from '@/services/debug';
 import { RoomPlaneData } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
-import { GroupProps, useFrame } from '@react-three/fiber';
+import { ThreeElements, useFrame } from '@react-three/fiber';
 import { useRef } from 'react';
 import { ColorRepresentation, Mesh, Quaternion, Vector3 } from 'three';
 
+type GroupProps = ThreeElements['group'];
 export interface DemoPlaneProps extends GroupProps {
 	plane: RoomPlaneData;
 }

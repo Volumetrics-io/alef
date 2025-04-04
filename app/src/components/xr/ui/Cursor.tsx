@@ -1,9 +1,10 @@
-import { GroupProps } from '@react-three/fiber';
+import { ThreeElements } from '@react-three/fiber';
 import { ColorRepresentation } from '@react-three/uikit';
 import { forwardRef } from 'react';
 import { DoubleSide, Group } from 'three';
 import { colors } from './theme';
 
+type GroupProps = ThreeElements['group'];
 export const Cursor = forwardRef<Group, { visible: boolean; color?: ColorRepresentation | string; children?: React.ReactNode } & GroupProps>(
 	({ visible, color, children, ...props }, ref) => {
 		return (

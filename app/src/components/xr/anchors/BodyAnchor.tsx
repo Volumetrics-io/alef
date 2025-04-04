@@ -1,6 +1,6 @@
 import { animated, config, useSpring } from '@react-spring/three';
 import { ScreenSpace } from '@react-three/drei';
-import { GroupProps, useFrame } from '@react-three/fiber';
+import { ThreeElements, useFrame } from '@react-three/fiber';
 import { useXR } from '@react-three/xr';
 import React, { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { Group, Vector3 } from 'three';
@@ -9,6 +9,7 @@ import { Billboard } from '../Billboard';
 
 const AnimatedGroup = animated('group');
 
+type GroupProps = ThreeElements['group'];
 export interface BodyAnchorProps extends GroupProps {
 	position?: Vector3 | [number, number, number];
 	children: React.ReactNode;
@@ -109,7 +110,9 @@ const XRBodyAnchor = forwardRef<Group, BodyAnchorProps>(({ position = [0, -0.2, 
 
 	return (
 		<AnimatedGroup ref={groupRef} position={pos} {...groupProps}>
-			<Billboard lockZ lockX>{children}</Billboard>
+			<Billboard lockZ lockX>
+				{children}
+			</Billboard>
 		</AnimatedGroup>
 	);
 });

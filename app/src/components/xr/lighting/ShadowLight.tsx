@@ -1,12 +1,12 @@
 import { useShadowMapUpdate } from '@/hooks/useShadowMapUpdate';
 import { usePerformanceStore } from '@/stores/performanceStore';
 import { useGlobalLighting, useLights } from '@/stores/roomStore';
-import { useEffect } from 'react';
+import { RefObject, useEffect } from 'react';
 import { Group, Vector3 } from 'three';
 import { getLightColor } from './getLightColor';
 
 // Component to create a target for the shadow light
-export const ShadowLightTarget = ({ targetRef }: { targetRef: React.RefObject<Group> }) => {
+export const ShadowLightTarget = ({ targetRef }: { targetRef: RefObject<Group | null> }) => {
 	return <group position={[0, 0, 0]} ref={targetRef}></group>;
 };
 

@@ -1,8 +1,8 @@
-import { GroupProps } from '@react-three/fiber';
+import { ThreeElements } from '@react-three/fiber';
 import { useXRPlanes } from '@react-three/xr';
 import { PhysicalXRPlane } from './PhysicalXRPlane';
 
-export function Walls(props: GroupProps) {
+export function Walls(props: ThreeElements['group']) {
 	const planes = useXRPlanes('wall');
 
 	return (

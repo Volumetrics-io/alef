@@ -101,15 +101,7 @@ export const VoluShaderMaterialBase = shaderMaterial(
 	}
 );
 
-extend({ VoluShaderMaterial: VoluShaderMaterialBase });
-
-declare global {
-	namespace JSX {
-		interface IntrinsicElements {
-			voluShaderMaterial: any;
-		}
-	}
-}
+const VoluShader = extend(VoluShaderMaterialBase);
 
 export function VoluShaderMaterial() {
 	const ref = useRef<ShaderMaterial | null>(null);
@@ -119,5 +111,5 @@ export function VoluShaderMaterial() {
 			ref.current.needsUpdate = true;
 		}
 	});
-	return <voluShaderMaterial key={VoluShaderMaterialBase.key} ref={ref} />;
+	return <VoluShader key={VoluShaderMaterialBase.key} ref={ref} />;
 }

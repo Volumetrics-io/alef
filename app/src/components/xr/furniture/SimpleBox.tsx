@@ -1,12 +1,12 @@
 import { RoundedBox } from '@react-three/drei';
-import { GroupProps } from '@react-three/fiber';
+import { ThreeElements } from '@react-three/fiber';
 import { forwardRef } from 'react';
 import { Group } from 'three';
 import { VoluShaderMaterial } from '../shaders/VoluShader';
 
+type GroupProps = ThreeElements['group'];
 export interface SimpleBoxProps extends GroupProps {
 	size: [number, number, number];
-	pointerEvents?: 'none' | 'auto';
 	transparent?: boolean;
 }
 

@@ -122,7 +122,7 @@ const SunLight: React.FC = () => {
 
 	const { originReferenceSpace } = useXR();
 	// FIXME: lots of allocation in this frame loop
-	useFrame((_, delta, frame: XRFrame) => {
+	useFrame((_, delta, frame) => {
 		// Accumulate elapsed time
 		elapsedTimeRef.current += delta;
 
@@ -146,7 +146,7 @@ const SunLight: React.FC = () => {
 
 		const sunData = calculateSunData(latitude, longitude);
 
-		if (windowPlanes.length > 0 && originReferenceSpace) {
+		if (frame && windowPlanes.length > 0 && originReferenceSpace) {
 			const meshWorldPosition = new Vector3();
 			const meshWorldQuaternion = new Quaternion();
 			const forward = new Vector3(0, 0, 1); // Assuming forward is along Z axis

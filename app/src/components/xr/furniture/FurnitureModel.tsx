@@ -3,28 +3,25 @@ import { useFurnitureDetails, useFurnitureModel } from '@/services/publicApi/fur
 import { usePerformanceStore } from '@/stores/performanceStore';
 import { FurnitureModelQuality, PrefixedId, RANKED_FURNITURE_MODEL_QUALITIES } from '@alef/common';
 import { ErrorBoundary } from '@alef/sys';
-import { Bvh, Clone, Outlines, Preload } from '@react-three/drei';
-import { ThreeEvent } from '@react-three/fiber';
+import { Bvh, Clone, CloneProps, Outlines, Preload } from '@react-three/drei';
+import { ThreeElements, ThreeEvent } from '@react-three/fiber';
 import { forwardRef, ReactNode, Suspense, useCallback } from 'react';
 import { DoubleSide, Group, Mesh } from 'three';
-import { SimpleBox } from './SimpleBox';
+import { SimpleBox, SimpleBoxProps } from './SimpleBox';
 
-export interface FurnitureModelProps {
+type MeshProps = ThreeElements['mesh'];
+export interface FurnitureModelProps extends Omit<MeshProps, 'args'> {
 	furnitureId: PrefixedId<'f'>;
 	outline?: boolean;
-	pointerEvents?: 'none' | 'auto';
 	receiveShadow?: boolean;
 	castShadow?: boolean;
 	quality?: FurnitureModelQuality;
 	debugLod?: boolean;
 }
 
-interface FurnitureModelRendererProps {
+interface FurnitureModelRendererProps extends Omit<CloneProps, 'object' | 'inject'> {
 	furnitureId: PrefixedId<'f'>;
 	outline?: boolean;
-	pointerEvents?: 'none' | 'auto';
-	receiveShadow?: boolean;
-	castShadow?: boolean;
 	quality: FurnitureModelQuality;
 	transparent?: boolean;
 	colorWrite?: boolean;
@@ -78,7 +75,6 @@ export const MissingModel = forwardRef<any, { onClick?: () => void; transparent?
 				onClick?.();
 			}}
 			ref={ref}
-			// @ts-expect-error pointerEvents is not typed
 			pointerEvents={pointerEvents}
 		>
 			<boxGeometry args={[1, 1, 1]} />
@@ -87,10 +83,10 @@ export const MissingModel = forwardRef<any, { onClick?: () => void; transparent?
 	);
 });
 
-const PlaceholderModel = forwardRef<any, { onClick?: () => void; furnitureId: PrefixedId<'f'>; transparent?: boolean; pointerEvents?: 'none' | 'auto' }>(function PlaceholderModel(
-	{ onClick, furnitureId, transparent, pointerEvents },
-	ref
-) {
+interface PlaceholderModelProps extends Omit<SimpleBoxProps, 'size'> {
+	furnitureId: PrefixedId<'f'>;
+}
+const PlaceholderModel = forwardRef<any, PlaceholderModelProps>(function PlaceholderModel({ onClick, furnitureId, transparent, pointerEvents }, ref) {
 	const { data } = useFurnitureDetails(furnitureId);
 	// data contains metadata about measured dimensions, which we can use to show a more accurate placeholder.
 	const hasDimensions = data?.measuredDimensionsX && data?.measuredDimensionsY && data?.measuredDimensionsZ;
@@ -106,15 +102,7 @@ export const SimpleCollisionModel = forwardRef<Mesh, FurnitureModelProps & { err
 		const hasDimensions = data?.measuredDimensionsX && data?.measuredDimensionsY && data?.measuredDimensionsZ;
 		const dimensions: [number, number, number] = hasDimensions ? [data.measuredDimensionsX!, data.measuredDimensionsY!, data.measuredDimensionsZ!] : [1, 1, 1];
 		return (
-			<mesh
-				{...props}
-				// @ts-ignore pointerEvents is not typed
-				pointerEvents={enabled === false ? 'none' : pointerEvents}
-				position={[0, dimensions[1] / 2, 0]}
-				onClick={onClick}
-				renderOrder={1000}
-				ref={ref}
-			>
+			<mesh {...props} pointerEvents={enabled === false ? 'none' : pointerEvents} position={[0, dimensions[1] / 2, 0]} onClick={onClick} renderOrder={1000} ref={ref}>
 				<boxGeometry args={dimensions} />
 				<meshBasicMaterial colorWrite={colorWrite} depthWrite={false} color="red" side={DoubleSide} />
 			</mesh>

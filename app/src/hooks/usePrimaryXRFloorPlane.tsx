@@ -8,7 +8,7 @@ export function usePrimaryXRFloorPlane() {
 	const floorPlanes = useXRPlanes('floor');
 	const reference = useXR((state) => state.originReferenceSpace);
 	useFrame((_, __, xrFrame) => {
-		if (!reference) return;
+		if (!reference || !xrFrame) return;
 		if (floorPlanes.length > 0) {
 			const selected = getPrimaryFloorPlane(xrFrame, reference, floorPlanes);
 			if (plane !== selected) {

@@ -30,7 +30,8 @@ function useUpdatePlanesAsNeeded() {
 	const updatePlanes = useUpdatePlanes();
 	const referenceSpace = useXR((s) => s.originReferenceSpace);
 
-	useFrame((_, __, xrFrame: XRFrame) => {
+	useFrame((_, __, xrFrame) => {
+		if (!xrFrame) return;
 		const planesAreOld = planesUpdatedAt === null || Date.now() - planesUpdatedAt > 1000 * 60; /* One hour */
 		if (hasPlanes && !planesAreOld) {
 			return;

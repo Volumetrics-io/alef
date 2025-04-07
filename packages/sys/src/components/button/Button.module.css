@@ -74,6 +74,11 @@
 		padding: 0.5rem;
 	}
 
+	.button:hover:not(:disabled):not([data-disabled='true']) {
+		transform: scale(1.02);
+		transition: transform var(--animation-duration) ease;
+	}
+
 	/* container with fallback for screen size */
 	@media (max-width: 720px) {
 		.button[data-has-label='true'][data-has-icon='true']:has(.responsiveLabel) {

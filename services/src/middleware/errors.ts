@@ -1,6 +1,7 @@
 import { AuthError } from '@a-type/auth';
 import { AlefError } from '@alef/common';
 import { ZodError } from 'zod';
+import { sessions } from '../public-api/auth/session';
 
 export function handleError(reason: unknown): Response {
 	if (AlefError.isInstance(reason)) {
@@ -11,6 +12,18 @@ export function handleError(reason: unknown): Response {
 	}
 
 	if (reason instanceof AuthError) {
+		// for invalid sessions, log the user out.
+		if (reason.message === AuthError.Messages.InvalidSession || reason.message === AuthError.Messages.InvalidRefreshToken) {
+			const { headers } = sessions.clearSession({} as any);
+			return new Response(reason.message, {
+				status: 401,
+				headers: {
+					'Content-Type': 'text/plain',
+					'x-alef-error': AlefError.Code.Unauthorized.toString(),
+					...headers,
+				},
+			});
+		}
 		return reason.toResponse();
 	}
 

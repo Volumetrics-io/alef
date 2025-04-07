@@ -15,6 +15,9 @@ export async function fallbackWhenOfflineOrError<TResponseData, TFallback = null
 	try {
 		const res = await req;
 		if (!res.ok) {
+			if (res.status === 401) {
+				return fallback;
+			}
 			const asAlefError = AlefError.fromResponse(res);
 			console.error(asAlefError);
 			toast.error(!asAlefError ? 'Server error! Check your network.' : asAlefError.message);

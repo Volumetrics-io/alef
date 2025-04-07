@@ -1,4 +1,4 @@
-import { AuthError, Session } from '@a-type/auth';
+import { Session } from '@a-type/auth';
 import { AlefError, assertPrefixedId, PrefixedId } from '@alef/common';
 import { RpcStub } from 'cloudflare:workers';
 import { Context } from 'hono';
@@ -12,23 +12,7 @@ export type SessionWithPrefixedIds = Omit<Session, 'userId'> & {
 };
 
 async function getRequestSessionOrThrow(ctx: Context): Promise<SessionWithPrefixedIds> {
-	let session: Session | null = null;
-	try {
-		session = await sessions.getSession(ctx);
-	} catch (err) {
-		if (err instanceof AuthError) {
-			if (err.message === AuthError.Messages.SessionExpired) {
-				throw new AlefError(AlefError.Code.SessionExpired, 'Session expired. Please refresh your session or log in again.', err);
-			} else if (err.message === AuthError.Messages.InvalidSession) {
-				// remove the invalid session
-				const { headers } = sessions.clearSession(ctx);
-				throw new AlefError(AlefError.Code.SessionInvalid, 'Invalid session. Please log in again.', err, {
-					headers,
-				});
-			}
-		}
-		throw err;
-	}
+	const session = await sessions.getSession(ctx);
 
 	if (!session) {
 		throw new AlefError(AlefError.Code.Unauthorized, 'You must be logged in to access this functionality.');

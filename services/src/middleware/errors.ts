@@ -11,12 +11,7 @@ export function handleError(reason: unknown): Response {
 	}
 
 	if (reason instanceof AuthError) {
-		return new Response(reason.message, {
-			status: reason.statusCode,
-			headers: {
-				'Content-Type': 'text/plain',
-			},
-		});
+		return reason.toResponse();
 	}
 
 	if (reason instanceof ZodError) {

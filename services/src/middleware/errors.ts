@@ -1,8 +1,11 @@
 import { AuthError } from '@a-type/auth';
 import { AlefError } from '@alef/common';
+import { Context } from 'hono';
 import { ZodError } from 'zod';
+import { sessions } from '../public-api/auth/session';
+import { Env } from '../public-api/config/ctx';
 
-export function handleError(reason: unknown): Response {
+export function handleError(reason: unknown, ctx: Context<Env>): Response {
 	if (AlefError.isInstance(reason)) {
 		if (reason.code > AlefError.Code.InternalServerError) {
 			console.error('Unexpected AlefError:', reason);
@@ -11,12 +14,19 @@ export function handleError(reason: unknown): Response {
 	}
 
 	if (reason instanceof AuthError) {
-		return new Response(reason.message, {
-			status: reason.statusCode,
-			headers: {
-				'Content-Type': 'text/plain',
-			},
-		});
+		// for invalid sessions, log the user out.
+		if (reason.message === AuthError.Messages.InvalidSession || reason.message === AuthError.Messages.InvalidRefreshToken) {
+			const { headers } = sessions.clearSession(ctx);
+			return new Response(reason.message, {
+				status: 401,
+				headers: {
+					'Content-Type': 'text/plain',
+					'x-alef-error': AlefError.Code.Unauthorized.toString(),
+					...headers,
+				},
+			});
+		}
+		return reason.toResponse();
 	}
 
 	if (reason instanceof ZodError) {

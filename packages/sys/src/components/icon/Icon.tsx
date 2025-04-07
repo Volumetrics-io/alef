@@ -1,13 +1,14 @@
-import { forwardRef, lazy, Suspense, SVGAttributes, useContext } from 'react';
-import { IconName, LucideIconName } from './iconNames.js';
-import { CustomIconName, customIcons } from './customGlyphs/index.js';
-import dynamicIconImports from 'lucide-react/dynamicIconImports.js';
-import clsx from 'clsx';
-import { ICON_CLASS_NAME } from './constants.js';
 import { Slot } from '@radix-ui/react-slot';
-import cls from './Icon.module.css';
+import clsx from 'clsx';
+import dynamicIconImports from 'lucide-react/dynamicIconImports.js';
+import { forwardRef, lazy, Suspense, SVGAttributes, useContext } from 'react';
 import { ButtonContext } from '../button/ButtonContext.js';
+import { ErrorBoundary } from '../errorBoundary/ErrorBoundary.js';
 import { Spinner } from '../spinner/Spinner.js';
+import { ICON_CLASS_NAME } from './constants.js';
+import { CustomIconName, customIcons } from './customGlyphs/index.js';
+import cls from './Icon.module.css';
+import { IconName, LucideIconName } from './iconNames.js';
 
 export type { IconName } from './iconNames.js';
 
@@ -55,9 +56,11 @@ export const Icon = forwardRef<SVGSVGElement, IconProps>(function Icon({ name, c
 	const LucideIcon = lazy(dynamicIconImports[name as LucideIconName]);
 
 	return (
-		<Suspense fallback={<IconFallback />}>
-			<LucideIcon {...rest} absoluteStrokeWidth={absoluteStrokeWidth} className={clsx(ICON_CLASS_NAME, cls.icon, className)} ref={ref} />
-		</Suspense>
+		<ErrorBoundary fallback={<IconFallback ref={ref} />}>
+			<Suspense fallback={<IconFallback ref={ref} />}>
+				<LucideIcon {...rest} absoluteStrokeWidth={absoluteStrokeWidth} className={clsx(ICON_CLASS_NAME, cls.icon, className)} ref={ref} />
+			</Suspense>
+		</ErrorBoundary>
 	);
 });
 

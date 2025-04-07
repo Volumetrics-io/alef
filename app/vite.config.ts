@@ -111,9 +111,10 @@ export default defineConfig({
 			output: {
 				chunkFileNames(chunkInfo) {
 					// mark dynamically imported icon chunks with a filename prefix so they can be handled differently
-					// by the PWA precache -- there are a lot of them.
+					// by the PWA precache -- there are a lot of them. No hashes so that they remain resolvable across builds
+					// even if they weren't cached, since we are not precaching all of them.
 					if (chunkInfo.moduleIds.some((id) => id.includes('lucide-react/dist/esm/icons/'))) {
-						return 'assets/icon-[name]-[hash].js';
+						return 'assets/icon-[name].js';
 					}
 					return 'assets/[name]-[hash].js';
 				},

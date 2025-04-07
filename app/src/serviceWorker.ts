@@ -40,6 +40,23 @@ const fallbackToOfflineCachePlugin: WorkboxPlugin = {
 	},
 };
 
+const iconPathMatch = /\/assets\/icon-\w+\.js/;
+// Cache icon files as they are fetched. we don't precache all icons
+// since there are hundreds of them and they are not all used in the app.
+// We just cache the ones that are used.
+registerRoute(
+	// Add in any other file extensions or routing criteria as needed.
+	({ url }) => url.origin === import.meta.env.VITE_PUBLIC_API_ORIGIN && iconPathMatch.test(url.pathname),
+	new StaleWhileRevalidate({
+		cacheName: 'icons',
+		plugins: [
+			// Ensure that once this runtime cache reaches a maximum size the
+			// least-recently used files are removed.
+			new ExpirationPlugin({ maxEntries: 200 }),
+		],
+	})
+);
+
 // Cache model files as they are fetched
 const modelPathMatch = /\/furniture\/.+\/model$/;
 registerRoute(

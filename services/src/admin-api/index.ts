@@ -10,7 +10,7 @@ import { furnitureRouter } from './routers/furniture.js';
 import { usersRouter } from './routers/users.js';
 
 const adminApp = new Hono<Env>()
-	.onError(handleError)
+	.onError(handleError as any /* TODO: fix ctx type compatibility junk */)
 	.use(requestId())
 	.use(
 		cors({

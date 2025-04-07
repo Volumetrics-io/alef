@@ -13,7 +13,7 @@ function createDefaultLocalProperty() {
 	return {
 		id: 'p-local' as PrefixedId<'p'>,
 		rooms: {
-			'r-local': getDemoRoomState(),
+			'r-local': getDemoRoomState('r-local'),
 		},
 		propertySocket: null,
 		fromApi: false,

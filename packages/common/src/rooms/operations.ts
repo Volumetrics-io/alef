@@ -13,3 +13,5 @@ export type OperationByType<T extends OperationType> = Extract<Operation, { type
 export function createOp(op: DistributiveOmit<Operation, 'opId'>): Operation {
 	return operationShape.parse({ ...op, opId: id('op') });
 }
+
+export { roomOperationShape };

@@ -28,6 +28,9 @@ binding = "ADMIN_STORE"
 service = "db-service"
 entrypoint = "AdminStore"
 
+[ai]
+binding = "AI"
+
 [[durable_objects.bindings]]
 name = "DEVICE_DISCOVERY"
 class_name = "DeviceDiscovery"
@@ -40,6 +43,9 @@ class_name = "Property"
 name = "PAIRCODES"
 class_name = "Paircodes"
 
+[[durable_objects.bindings]]
+name = "LAYOUT_AGENT"
+class_name = "LayoutAgent"
 
 [[migrations]]
 tag = "v1"
@@ -52,3 +58,7 @@ new_classes = ["Property"]
 [[migrations]]
 tag = "v3"
 new_classes = ["Paircodes"]
+
+[[migrations]]
+tag = "v4"
+new_sqlite_classes = ["LayoutAgent"]

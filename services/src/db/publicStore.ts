@@ -50,6 +50,26 @@ export class PublicStore extends WorkerEntrypoint<Env> {
 		return builder.executeTakeFirst();
 	}
 
+	async getMultipleFurniture(
+		ids: PrefixedId<'f'>[],
+		{
+			includeNonPublic,
+		}: {
+			includeNonPublic?: boolean;
+		} = {}
+	) {
+		ids.forEach((id) => assertPrefixedId(id, 'f'));
+		let builder = this.#db
+			.selectFrom('Furniture')
+			.where('id', 'in', ids)
+			.select((eb) => ['id', 'name', 'modelUpdatedAt', 'measuredDimensionsX', 'measuredDimensionsY', 'measuredDimensionsZ', 'madePublicAt', this.selectFurnitureAttributes(eb)]);
+		if (!includeNonPublic) {
+			builder = builder.where('madePublicAt', 'is not', null);
+		}
+
+		return builder.execute();
+	}
+
 	async getFurnitureModelResponse(id: PrefixedId<'f'>, quality = FurnitureModelQuality.Original) {
 		const object = await this.env.FURNITURE_MODELS_BUCKET.get(getFurnitureModelPath(id, quality));
 		if (!object) {

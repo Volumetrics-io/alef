@@ -1,5 +1,7 @@
+import { AgentNamespace } from 'agents';
 import type { AdminStore, PublicStore } from '../../db/index.js';
 import { SessionWithPrefixedIds } from '../../middleware/session.js';
+import type { LayoutAgent } from '../agents/layout/LayoutAgent.js';
 import type { DeviceDiscovery } from '../durableObjects/DeviceDiscovery.js';
 import type { Paircodes } from '../durableObjects/Paircodes.js';
 import type { Property } from '../durableObjects/Property.js';
@@ -31,6 +33,8 @@ export interface Bindings {
 	DEVICE_DISCOVERY: DurableObjectNamespace<DeviceDiscovery>;
 	PROPERTY: DurableObjectNamespace<Property>;
 	PAIRCODES: DurableObjectNamespace<Paircodes>;
+	LAYOUT_AGENT: AgentNamespace<LayoutAgent>;
+	AI: Ai;
 }
 
 export interface CtxVars {

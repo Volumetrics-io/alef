@@ -19,6 +19,7 @@ import cls from './DesktopUI.module.css';
 import { DesktopAddFurniture } from './furniture/DesktopAddFurniture';
 import { DesktopFurnitureMobileInstructions } from './furniture/DesktopFurnitureMobileInstructions';
 import { DesktopFurniturePlacementEditor } from './furniture/DesktopFurniturePlacementEditor';
+import { DesktopMagicLayout } from './furniture/DesktopMagicLayout';
 import { DesktopPlacedFurnitureList } from './furniture/DesktopPlacedFurnitureList';
 import { DesktopLayoutsPicker } from './layouts/DesktopLayoutsPicker';
 import { DesktopLayoutTools } from './layouts/DesktopLayoutTools';
@@ -106,7 +107,10 @@ function DesktopEditor() {
 			<DesktopUITabContent value="furniture">
 				<DesktopFurnitureMobileInstructions />
 				<DesktopPlacedFurnitureList />
-				<DesktopAddFurniture className={cls.controls} />
+				<Box className={cls.controls} stacked gapped>
+					<DesktopAddFurniture />
+					<DesktopMagicLayout />
+				</Box>
 			</DesktopUITabContent>
 			<DesktopUITabContent value="lighting">
 				<DesktopLightsMainEditor />

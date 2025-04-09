@@ -75,6 +75,10 @@ export class AuthedStore extends RpcTarget {
 	}
 
 	async getProperty(propertyId: PrefixedId<'p'>) {
-		return this.#db.selectFrom('Property').where('id', '=', propertyId).selectAll().executeTakeFirst();
+		return this.#db.selectFrom('Property').where('id', '=', propertyId).where('Property.ownerId', '=', this.#userId).selectAll().executeTakeFirst();
+	}
+
+	async hasProperty(propertyId: PrefixedId<'p'>) {
+		return this.#db.selectFrom('Property').where('id', '=', propertyId).where('Property.ownerId', '=', this.#userId).select('id').executeTakeFirst();
 	}
 }

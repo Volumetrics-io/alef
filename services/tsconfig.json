@@ -4,7 +4,8 @@
 		"jsx": "react-jsx",
 		"jsxImportSource": "hono/jsx",
 		"lib": ["ESNext"],
-		"declaration": false
+		"declaration": false,
+		"types": ["node", "@cloudflare/workers-types"]
 	},
 	"include": ["src"]
 }

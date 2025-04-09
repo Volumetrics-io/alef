@@ -11,6 +11,7 @@ declare module '@a-type/auth' {
 		name: string | null;
 		isProductAdmin: boolean;
 		deviceId?: PrefixedId<'d'>;
+		access?: 'write:all' | 'read:all';
 	}
 }
 
@@ -25,7 +26,10 @@ export const sessions = new SessionManager<Context<Env>>({
 				sameSite: 'lax',
 				domain: getRootDomain(ctx.env.API_ORIGIN),
 			},
-			expiration: ctx.env.NODE_ENV === 'production' ? '1d' : '1m',
+			// Grant note: I like to set this super low in dev mode to test expiration and renewal,
+			// but for now let's leave it at 1 day.
+			// expiration: ctx.env.NODE_ENV === 'production' ? '1d' : '1m','
+			expiration: '1d',
 			async createSession(userId) {
 				assertPrefixedId(userId, 'u');
 				const user = await (await ctx.env.PUBLIC_STORE.getStoreForUser(userId)).getSession();
@@ -41,6 +45,8 @@ export const sessions = new SessionManager<Context<Env>>({
 					name: user.name,
 					isProductAdmin: user.isProductAdmin,
 					deviceId,
+					// users who log in via sign-in have write access.
+					access: 'write:all',
 				};
 			},
 			secret: ctx.env.SESSION_SECRET,
@@ -56,6 +62,7 @@ export const sessions = new SessionManager<Context<Env>>({
 		name: 'name',
 		isProductAdmin: 'pad',
 		deviceId: 'dev',
+		access: 'acc',
 	},
 	adapter: honoAdapter,
 });

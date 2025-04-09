@@ -5,7 +5,7 @@ import { createMiddleware } from 'hono/factory';
 import { z } from 'zod';
 import { Property as PropertyData } from '../../db/kysely/tables';
 import { wrapRpcData } from '../../helpers/wrapRpcData';
-import { loggedInMiddleware, userStoreMiddleware } from '../../middleware/session';
+import { loggedInMiddleware, userStoreMiddleware, writeAccessMiddleware } from '../../middleware/session';
 import { getSocketToken } from '../auth/socketTokens';
 import { Env, EnvWith } from '../config/ctx';
 import { Property } from '../durableObjects/Property';
@@ -59,13 +59,13 @@ const propertyRouter = new Hono<EnvWith<'session'>>()
 		const state = await property.getRoom(roomId);
 		return ctx.json(wrapRpcData(state));
 	})
-	.delete('/rooms/:roomId', zValidator('param', z.object({ roomId: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')) })), async (ctx) => {
+	.delete('/rooms/:roomId', writeAccessMiddleware, zValidator('param', z.object({ roomId: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')) })), async (ctx) => {
 		const property = ctx.get('property');
 		const roomId = ctx.req.valid('param').roomId;
 		const result = await property.deleteRoom(roomId);
 		return ctx.json(wrapRpcData(result));
 	})
-	.post('/rooms', zValidator('json', roomStateInitializationShape), async (ctx) => {
+	.post('/rooms', writeAccessMiddleware, zValidator('json', roomStateInitializationShape), async (ctx) => {
 		const property = ctx.get('property');
 		const roomData = ctx.req.valid('json');
 		if (roomData.version !== ROOM_STATE_VERSION) {
@@ -74,7 +74,10 @@ const propertyRouter = new Hono<EnvWith<'session'>>()
 		const state = await property.createRoom(roomData);
 		return ctx.json(wrapRpcData(state));
 	})
-	.get('/socketToken', async (ctx) => {
+	// NOTE: socket access is restricted to write access since sockets can write. if we want
+	// something more granular we will need to start differentiating access when processing
+	// socket messages in Property.
+	.get('/socketToken', writeAccessMiddleware, async (ctx) => {
 		const session = ctx.get('session');
 		if (!session) {
 			throw new AlefError(AlefError.Code.Unauthorized, 'Not logged in');

@@ -33,8 +33,8 @@ export class AuthedStore extends RpcTarget {
 			.execute();
 	}
 
-	async claimDevice(deviceId: PrefixedId<'d'>) {
-		await this.#db.insertInto('DeviceAccess').values({ userId: this.#userId, deviceId }).execute();
+	async claimDevice(deviceId: PrefixedId<'d'>, access: 'write:all' | 'read:all' = 'write:all') {
+		await this.#db.insertInto('DeviceAccess').values({ userId: this.#userId, deviceId, access }).execute();
 	}
 
 	async deleteDevice(deviceId: PrefixedId<'d'>) {
@@ -76,5 +76,33 @@ export class AuthedStore extends RpcTarget {
 
 	async getProperty(propertyId: PrefixedId<'p'>) {
 		return this.#db.selectFrom('Property').where('id', '=', propertyId).selectAll().executeTakeFirst();
+	}
+
+	async upsertDefaultPublicAccessToken() {
+		const token = crypto.randomUUID();
+		const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 1 day
+
+		const existingToken = await this.#db
+			.selectFrom('PublicAccessToken')
+			.where('userId', '=', this.#userId)
+			.where('name', '=', 'DEFAULT')
+			.select(['id', 'token', 'expiresAt'])
+			.executeTakeFirst();
+
+		// if existing token hasn't expired, return it
+		if (existingToken) {
+			if (new Date(existingToken.expiresAt) > new Date()) {
+				return existingToken;
+			} else {
+				// if it has expired, delete it. new one will be created.
+				await this.#db.deleteFrom('PublicAccessToken').where('id', '=', existingToken.id).execute();
+			}
+		}
+
+		return this.#db
+			.insertInto('PublicAccessToken')
+			.values({ id: id('pat'), token, expiresAt, userId: this.#userId, name: 'DEFAULT' })
+			.returning(['id', 'token', 'expiresAt'])
+			.executeTakeFirstOrThrow();
 	}
 }

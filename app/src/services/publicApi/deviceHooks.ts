@@ -156,3 +156,11 @@ export function useCurrentDevice() {
 }
 
 export type DeviceResponseData = InferResponseType<typeof publicApiClient.devices.$get>[number];
+
+export function useUpsertDefaultPublicAccessToken() {
+	return useMutation({
+		mutationFn: async () => {
+			return handleErrors(publicApiClient.publicAccessTokens.default.$put());
+		},
+	});
+}

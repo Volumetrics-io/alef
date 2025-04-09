@@ -8,6 +8,7 @@ import { authRouter } from './routers/auth.js';
 import { devicesRouter } from './routers/devices.js';
 import { furnitureRouter } from './routers/furniture.js';
 import { propertiesRouter } from './routers/properties.js';
+import { publicAccessTokensRouter } from './routers/publicAccessTokens.js';
 import { socketRouter } from './routers/sockets.js';
 import { usersRouter } from './routers/users.js';
 
@@ -41,7 +42,8 @@ const app = new Hono<Env>()
 	.route('/users', usersRouter)
 	.route('/furniture', furnitureRouter)
 	.route('/devices', devicesRouter)
-	.route('/properties', propertiesRouter);
+	.route('/properties', propertiesRouter)
+	.route('/publicAccessTokens', publicAccessTokensRouter);
 
 // no need to include these routes in typings
 app.route('/auth', authRouter);

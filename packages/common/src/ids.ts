@@ -14,6 +14,7 @@ export const resourceIdTypes = {
 	p: 'Property',
 	rp: 'RoomPlane',
 	op: 'Operation',
+	pat: 'PublicAccessToken',
 } as const;
 export type ResourceIdPrefix = keyof typeof resourceIdTypes;
 export type ResourceTypeName = (typeof resourceIdTypes)[ResourceIdPrefix];

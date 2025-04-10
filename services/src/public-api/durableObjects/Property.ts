@@ -61,7 +61,7 @@ export class Property extends DurableObject<Bindings> {
 	 * To avoid potential state drift bugs, every so often after rooms are modified
 	 * we resync the server state to all connected clients.
 	 */
-	#roomUpdateTimeouts = new Map<PrefixedId<'r'>, number>();
+	#roomUpdateTimeouts = new Map<PrefixedId<'r'>, any>();
 	#enqueueRoomUpdate(roomId: PrefixedId<'r'>) {
 		if (this.#roomUpdateTimeouts.has(roomId)) {
 			// already enqueued

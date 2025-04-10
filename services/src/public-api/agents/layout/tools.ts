@@ -1,4 +1,4 @@
-import { idShapes, isPrefixedId, PrefixedId, roomOperationShape } from '@alef/common';
+import { id, idShapes, PrefixedId, roomOperationShape } from '@alef/common';
 import { tool } from 'ai';
 import { z } from 'zod';
 import { agentContext } from './LayoutAgent';
@@ -9,18 +9,34 @@ async function getProperty(propertyId: PrefixedId<'p'>) {
 		throw new Error('Agent context not found');
 	}
 	const env = context.env;
-	const property = await env.PROPERTY.get(env.PROPERTY.idFromName(propertyId));
+	const doId = await env.PROPERTY.idFromName(propertyId);
+	const property = await env.PROPERTY.get(doId);
 	return property;
 }
 
 export const modifyRoom = tool({
-	description: "Make changes to a user's room using our discrete operations API.",
+	description: `Make changes to a user's room using our discrete operations API. Please note that this tool accepts a variety of named 'operations,' which are objects describing a discrete change to the layout, but are not tools themselves. In order to apply these discrete operations, you must call this tool (modifyRoom) with a list of operations you want to apply.`,
 	parameters: z.object({
-		propertyId: z.custom<PrefixedId<'p'>>((v) => isPrefixedId(v, 'p')),
-		operations: roomOperationShape.array(),
+		propertyId: idShapes.Property,
+		operations: roomOperationShape
+			.array()
+			.describe(
+				'A list of discrete operations to apply to the room. Each operation has a type which determines what kind of change it applies, and other payload data which describe the change.'
+			),
 	}),
 	execute: async ({ propertyId, operations }) => {
+		console.debug(`Agent is applying operations to property ${propertyId}:`, JSON.stringify(operations));
 		const property = await getProperty(propertyId);
+		if (!property) {
+			throw new Error(`Property ${propertyId} not found`);
+		}
+		// validate/sanitize the operations
+		operations = operations.map((op) => ({
+			...op,
+			// generate a new random ID.
+			opId: id('op'),
+		}));
+		// apply the operations to the property
 		await property.applyOperations(operations);
 	},
 });
@@ -33,6 +49,7 @@ export const getRoomLayoutContext = tool({
 		layoutId: idShapes.RoomLayout,
 	}),
 	execute: async ({ propertyId, roomId, layoutId }) => {
+		console.debug(`Agent is retrieving layout for property ${propertyId}, room ${roomId}, layout ${layoutId}`);
 		const context = agentContext.getStore();
 		if (!context) {
 			throw new Error('Agent context not found');

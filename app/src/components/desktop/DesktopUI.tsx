@@ -2,7 +2,7 @@ import { NavBar } from '@/components/navBar/NavBar';
 import { useDetectSticky } from '@/hooks/useDetectSticky';
 import { useMedia } from '@/hooks/useMedia';
 import { useIsLoggedIn } from '@/services/publicApi/userHooks';
-import { useUndo } from '@/stores/propertyStore';
+import { useIsPropertyBackedByApi, useUndo } from '@/stores/propertyStore';
 import { useEditorMode, useSelect, useSelectedObjectId } from '@/stores/propertyStore/hooks/editing';
 import { EditorMode, isPrefixedId } from '@alef/common';
 import { Box, Heading, Icon, Tabs, Text } from '@alef/sys';
@@ -76,6 +76,8 @@ function DesktopEditor() {
 		offset: 16,
 	});
 
+	const isApi = useIsPropertyBackedByApi();
+
 	return (
 		<>
 			<Box p="small" layout="center center">
@@ -109,7 +111,7 @@ function DesktopEditor() {
 				<DesktopPlacedFurnitureList />
 				<Box className={cls.controls} stacked gapped>
 					<DesktopAddFurniture />
-					<DesktopMagicLayout />
+					{isApi && <DesktopMagicLayout />}
 				</Box>
 			</DesktopUITabContent>
 			<DesktopUITabContent value="lighting">

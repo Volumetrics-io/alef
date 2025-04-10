@@ -19,6 +19,7 @@ const app = new Hono<Env>()
 	// before CORS, we have the socket endpoint -- the CORS middleware messes
 	// up the response handling.
 	.route('/socket', socketRouter)
+	.route('/ai', aiRouter)
 	.use(
 		cors({
 			origin: (origin, ctx) => {
@@ -35,15 +36,14 @@ const app = new Hono<Env>()
 			},
 			credentials: true,
 			allowHeaders: ['Authorization', 'Content-Type', 'X-Request-Id', 'X-Csrf-Token'],
-			exposeHeaders: ['Content-Type', 'Content-Length', 'X-Request-Id', 'Set-Cookie', 'X-Alef-Error', 'X-Alef-Message', 'X-Csrf-Token'],
+			exposeHeaders: ['Content-Type', 'Content-Length', 'X-Request-Id', 'Set-Cookie', 'X-Alef-Error', 'X-Alef-Message', 'X-Csrf-Token', 'X-Auth-Error'],
 		})
 	)
 	.get('/', (ctx) => ctx.text('Hello, world!'))
 	.route('/users', usersRouter)
 	.route('/furniture', furnitureRouter)
 	.route('/devices', devicesRouter)
-	.route('/properties', propertiesRouter)
-	.route('/ai', aiRouter);
+	.route('/properties', propertiesRouter);
 
 // no need to include these routes in typings
 app.route('/auth', authRouter);

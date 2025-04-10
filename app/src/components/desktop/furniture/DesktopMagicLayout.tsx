@@ -1,36 +1,42 @@
-import { useActiveRoomLayoutId } from '@/stores/propertyStore';
-import { usePropertyId } from '@/stores/propertyStore/hooks/property';
-import { useSelectedRoomId } from '@/stores/propertyStore/hooks/rooms';
-import { Box, Button, Dialog, Icon, ScrollArea } from '@alef/sys';
+import { useActiveRoomLayoutId, usePropertyId, useSelectedRoomId } from '@/stores/propertyStore';
+import { Box, Button, Dialog, Icon, Input, ScrollArea } from '@alef/sys';
 import { useAgentChat } from 'agents/ai-react';
 import { useAgent } from 'agents/react';
+import toast from 'react-hot-toast';
 
 export interface DesktopMagicLayoutProps {}
 
 export function DesktopMagicLayout({}: DesktopMagicLayoutProps) {
 	const propertyId = usePropertyId();
 	const roomId = useSelectedRoomId();
-	const layoutId = useActiveRoomLayoutId();
+	const [layoutId] = useActiveRoomLayoutId();
 
 	const agent = useAgent({
 		agent: 'layout',
-		path: `ai/layout/${propertyId}`,
+		basePath: `ai/layout/${propertyId}`,
 		host: import.meta.env.VITE_PUBLIC_API_ORIGIN,
 	});
 
-	const { setInput, handleSubmit, messages, isLoading } = useAgentChat({
+	const { handleInputChange, input, setInput, handleSubmit, messages, isLoading, clearHistory, append } = useAgentChat({
 		agent,
 		maxSteps: 5,
+		onError: (err) => {
+			toast.error(err.message);
+		},
 	});
 
+	const prompt = `Rearrange the furniture currently in the room with ID ${roomId} and layout ID ${layoutId} to make sense in the space.`;
+
 	const sendLayoutRequest = async () => {
-		setInput(`Rearrange the furniture currently in the room with ID ${roomId} and layout ID ${layoutId} to make sense in the space.`);
-		handleSubmit();
+		append({
+			role: 'user',
+			content: prompt,
+		});
 	};
 
 	return (
-		<Box gapped align="center">
-			<Button onClick={sendLayoutRequest} loading={isLoading}>
+		<Box gapped align="center" full="width">
+			<Button onClick={sendLayoutRequest} loading={isLoading} stretched>
 				<Icon name="sparkles" />
 				Layout for me
 			</Button>
@@ -41,15 +47,29 @@ export function DesktopMagicLayout({}: DesktopMagicLayoutProps) {
 					</Button>
 				</Dialog.Trigger>
 				<Dialog.Content title="Chat log">
-					<ScrollArea>
-						<Box stacked gapped>
+					<ScrollArea style={{ maxHeight: '70vh' }}>
+						<Box stacked gapped p="small">
 							{messages.map((m, i) => (
-								<Box p="small" key={i}>
-									{JSON.stringify(m)}
-								</Box>
+								<div key={i}>
+									<strong style={{ width: 100 }}>[{m.role}]</strong> {m.content}
+								</div>
 							))}
 						</Box>
 					</ScrollArea>
+					<Box gapped asChild>
+						<form onSubmit={handleSubmit}>
+							<Button onClick={() => setInput(prompt)} loading={isLoading}>
+								<Icon name="sparkles" />
+							</Button>
+							<Button onClick={clearHistory} color="destructive">
+								<Icon name="ban" /> Forget
+							</Button>
+							<Input value={input} onChange={handleInputChange} placeholder="Send a message" />
+							<Button type="submit" loading={isLoading}>
+								<Icon name="send" />
+							</Button>
+						</form>
+					</Box>
 				</Dialog.Content>
 			</Dialog>
 		</Box>

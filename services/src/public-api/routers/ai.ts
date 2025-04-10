@@ -6,8 +6,8 @@ import { z } from 'zod';
 import { userStoreMiddleware } from '../../middleware/session';
 import { Env } from '../config/ctx';
 
-export const aiRouter = new Hono<Env>().post(
-	'/layout/:propertyId',
+export const aiRouter = new Hono<Env>().all(
+	'/layout/:propertyId/*',
 	userStoreMiddleware,
 	zValidator(
 		'param',

@@ -52,7 +52,7 @@ export function DesktopMagicLayout({}: DesktopMagicLayoutProps) {
 						<Box stacked gapped p="small">
 							{messages.map((m, i) => (
 								<div key={i}>
-									<strong style={{ width: 100 }}>[{m.role}]</strong> {m.content}
+									<strong style={{ width: 100 }}>[{m.role}]</strong> {m.content} {!m.content && JSON.stringify(m.parts)}
 								</div>
 							))}
 						</Box>

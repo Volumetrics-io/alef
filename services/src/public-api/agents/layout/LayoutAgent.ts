@@ -4,7 +4,6 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { createWorkersAI } from 'workers-ai-provider';
 import { Bindings } from '../../config/ctx';
 import { tools } from './tools';
-import { processToolCalls } from './utils';
 
 export class LayoutAgent extends AIChatAgent<Bindings> {
 	#model;
@@ -23,23 +22,36 @@ export class LayoutAgent extends AIChatAgent<Bindings> {
 			const dataStreamResponse = createDataStreamResponse({
 				execute: async (dataStream) => {
 					// If the AI responds with tool calls, we want to process them now
-					const processedMessages = await processToolCalls({
-						messages: this.messages,
-						dataStream,
-						tools,
-						// none of our tools require confirmation for execution (yet)
-						// if we add confirmed tools, the actual execution of said tools
-						// will live here.
-						executions: {},
+					let processedMessages = this.messages;
+					// try {
+					// 	processedMessages = await processToolCalls({
+					// 		messages: this.messages,
+					// 		dataStream,
+					// 		tools,
+					// 		// none of our tools require confirmation for execution (yet)
+					// 		// if we add confirmed tools, the actual execution of said tools
+					// 		// will live here.
+					// 		executions: {},
+					// 	});
+					// } catch (err) {
+					// 	console.error(err);
+					// }
+					processedMessages.unshift({
+						role: 'system',
+						content: this.#getSystemPrompt(),
+						id: 'system',
 					});
 
 					const result = streamText({
 						model: this.#model,
-						system: this.#getSystemPrompt(),
+						// system: this.#getSystemPrompt(),
 						messages: processedMessages,
 						tools,
 						onFinish,
-						onError: console.error,
+						onError: ({ error }) => {
+							console.error(`Error in AI model: ${error}`);
+						},
+
 						maxSteps: 10,
 					});
 

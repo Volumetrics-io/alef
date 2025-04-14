@@ -28,7 +28,10 @@ export const modifyRoom = tool({
 		console.debug(`Agent is applying operations to property ${propertyId}:`, JSON.stringify(operations));
 		const property = await getProperty(propertyId);
 		if (!property) {
-			throw new Error(`Property ${propertyId} not found`);
+			return {
+				success: false,
+				message: `Property ${propertyId} not found`,
+			};
 		}
 		// validate/sanitize the operations
 		operations = operations.map((op) => ({
@@ -36,8 +39,20 @@ export const modifyRoom = tool({
 			// generate a new random ID.
 			opId: id('op'),
 		}));
-		// apply the operations to the property
-		await property.applyOperations(operations);
+		try {
+			// apply the operations to the property
+			await property.applyOperations(operations);
+			return {
+				success: true,
+				message: 'Changes were applied',
+			};
+		} catch (err) {
+			console.error(`Error applying operations to property ${propertyId}:`, err);
+			return {
+				success: false,
+				message: 'Unexpected error applying operations',
+			};
+		}
 	},
 });
 
@@ -52,52 +67,75 @@ export const getRoomLayout = tool({
 		console.log(`Agent is retrieving layout for property ${propertyId}, room ${roomId}, layout ${layoutId}`);
 		const context = agentContext.getStore();
 		if (!context) {
-			throw new Error('Agent context not found');
+			return {
+				success: false,
+				message: 'Agent context not found. Internal error.',
+			};
 		}
 
 		const property = await getProperty(propertyId);
+		if (!property) {
+			return {
+				success: false,
+				message: `Property ${propertyId} not found`,
+			};
+		}
 		const room = await property.getRoom(roomId);
 		if (!room) {
-			throw new Error(`Room ${roomId} not found`);
+			return {
+				success: false,
+				message: `Room ${roomId} not found in property ${propertyId}`,
+			};
 		}
 		const layout = room.layouts[layoutId];
 		if (!layout) {
-			throw new Error(`Layout ${layoutId} not found in room ${roomId}`);
+			return {
+				success: false,
+				message: `Layout ${layoutId} not found in room ${roomId} of property ${propertyId}`,
+			};
 		}
 
-		// connect the global room data, layout, and furniture details
-		const furnitureIds = Object.values(layout.furniture)
-			.map((f) => f?.furnitureId)
-			.filter((f) => !!f);
-		const furnitureDetails = await context.env.PUBLIC_STORE.getMultipleFurniture(furnitureIds);
-		const furniture = Object.fromEntries(
-			Object.entries(layout.furniture)
-				.map(([id, furniturePlacement]) => {
-					if (!furniturePlacement) {
-						return [id, furniturePlacement];
-					}
-					const furnitureDetail = furnitureDetails.find((f) => f.id === furniturePlacement?.furnitureId);
-					return [
-						id,
-						{
-							...furniturePlacement,
-							dimensions: { x: furnitureDetail?.measuredDimensionsX ?? 0, y: furnitureDetail?.measuredDimensionsY ?? 0, z: furnitureDetail?.measuredDimensionsZ ?? 0 },
-							attributes: furnitureDetail?.attributes,
-							name: furnitureDetail?.name,
-						},
-					];
-				})
-				.filter(([, f]) => !!f)
-		);
+		try {
+			// connect the global room data, layout, and furniture details
+			const furnitureIds = Object.values(layout.furniture)
+				.map((f) => f?.furnitureId)
+				.filter((f) => !!f);
+			const furnitureDetails = await context.env.PUBLIC_STORE.getMultipleFurniture(furnitureIds);
+			const furniture = Object.fromEntries(
+				Object.entries(layout.furniture)
+					.map(([id, furniturePlacement]) => {
+						if (!furniturePlacement) {
+							return [id, furniturePlacement];
+						}
+						const furnitureDetail = furnitureDetails.find((f) => f.id === furniturePlacement?.furnitureId);
+						return [
+							id,
+							{
+								...furniturePlacement,
+								dimensions: { x: furnitureDetail?.measuredDimensionsX ?? 0, y: furnitureDetail?.measuredDimensionsY ?? 0, z: furnitureDetail?.measuredDimensionsZ ?? 0 },
+								attributes: furnitureDetail?.attributes,
+								name: furnitureDetail?.name,
+							},
+						];
+					})
+					.filter(([, f]) => !!f)
+			);
 
-		return {
-			id: layout.id,
-			lights: room.lights,
-			planes: room.planes,
-			furniture,
-			name: layout.name,
-			type: layout.type,
-		};
+			return {
+				id: layout.id,
+				lights: room.lights,
+				planes: room.planes,
+				furniture,
+				name: layout.name,
+				type: layout.type,
+			};
+		} catch (err) {
+			console.error(`Error retrieving layout for property ${propertyId}, room ${roomId}, layout ${layoutId}:`, err);
+			return {
+				success: false,
+				message: 'Unexpected error retrieving layout',
+			};
+		}
 	},
 });
 

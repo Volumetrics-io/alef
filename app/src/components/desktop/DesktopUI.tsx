@@ -5,7 +5,7 @@ import { useIsLoggedIn } from '@/services/publicApi/userHooks';
 import { useIsPropertyBackedByApi, useUndo } from '@/stores/propertyStore';
 import { useEditorMode, useSelect, useSelectedObjectId } from '@/stores/propertyStore/hooks/editing';
 import { EditorMode, isPrefixedId } from '@alef/common';
-import { Box, Heading, Icon, Tabs, Text } from '@alef/sys';
+import { Box, Button, ErrorBoundary, Heading, Icon, Tabs, Text } from '@alef/sys';
 import clsx from 'clsx';
 import { ReactNode, Suspense } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -111,7 +111,17 @@ function DesktopEditor() {
 				<DesktopPlacedFurnitureList />
 				<Box className={cls.controls} stacked gapped>
 					<DesktopAddFurniture />
-					{isApi && <DesktopMagicLayout />}
+					{isApi && (
+						<ErrorBoundary
+							fallback={
+								<Button color="destructive" disabled>
+									Error
+								</Button>
+							}
+						>
+							<DesktopMagicLayout />
+						</ErrorBoundary>
+					)}
 				</Box>
 			</DesktopUITabContent>
 			<DesktopUITabContent value="lighting">

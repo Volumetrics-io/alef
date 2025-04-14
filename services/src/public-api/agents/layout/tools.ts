@@ -1,15 +1,15 @@
-import { id, idShapes, PrefixedId, roomOperationShape } from '@alef/common';
+import { id, idShapes, roomOperationShape } from '@alef/common';
 import { tool } from 'ai';
 import { z } from 'zod';
 import { agentContext } from './LayoutAgent';
 
-async function getProperty(propertyId: PrefixedId<'p'>) {
+async function getProperty() {
 	const context = agentContext.getStore();
 	if (!context) {
 		throw new Error('Agent context not found');
 	}
 	const env = context.env;
-	const doId = await env.PROPERTY.idFromName(propertyId);
+	const doId = await env.PROPERTY.idFromName(context.propertyId);
 	const property = await env.PROPERTY.get(doId);
 	return property;
 }
@@ -26,11 +26,11 @@ export const modifyRoom = tool({
 	}),
 	execute: async ({ propertyId, operations }) => {
 		console.debug(`Agent is applying operations to property ${propertyId}:`, JSON.stringify(operations));
-		const property = await getProperty(propertyId);
+		const property = await getProperty();
 		if (!property) {
 			return {
 				success: false,
-				message: `Property ${propertyId} not found`,
+				message: `Property not found`,
 			};
 		}
 		// validate/sanitize the operations
@@ -47,7 +47,7 @@ export const modifyRoom = tool({
 				message: 'Changes were applied',
 			};
 		} catch (err) {
-			console.error(`Error applying operations to property ${propertyId}:`, err);
+			console.error(`Error applying operations:`, err);
 			return {
 				success: false,
 				message: 'Unexpected error applying operations',
@@ -59,12 +59,11 @@ export const modifyRoom = tool({
 export const getRoomLayout = tool({
 	description: 'Retrieve the layout of a room, including context about the physical planes (floor, ceiling, walls, windows, doors), and furniture in the room.',
 	parameters: z.object({
-		propertyId: idShapes.Property,
 		roomId: idShapes.Room,
 		layoutId: idShapes.RoomLayout,
 	}),
-	execute: async ({ propertyId, roomId, layoutId }) => {
-		console.log(`Agent is retrieving layout for property ${propertyId}, room ${roomId}, layout ${layoutId}`);
+	execute: async ({ roomId, layoutId }) => {
+		console.log(`Agent is retrieving layout for room ${roomId}, layout ${layoutId}`);
 		const context = agentContext.getStore();
 		if (!context) {
 			return {
@@ -73,25 +72,25 @@ export const getRoomLayout = tool({
 			};
 		}
 
-		const property = await getProperty(propertyId);
+		const property = await getProperty();
 		if (!property) {
 			return {
 				success: false,
-				message: `Property ${propertyId} not found`,
+				message: `Property ${context.propertyId} not found`,
 			};
 		}
 		const room = await property.getRoom(roomId);
 		if (!room) {
 			return {
 				success: false,
-				message: `Room ${roomId} not found in property ${propertyId}`,
+				message: `Room ${roomId} not found in property ${context.propertyId}`,
 			};
 		}
 		const layout = room.layouts[layoutId];
 		if (!layout) {
 			return {
 				success: false,
-				message: `Layout ${layoutId} not found in room ${roomId} of property ${propertyId}`,
+				message: `Layout ${layoutId} not found in room ${roomId} of property ${context.propertyId}`,
 			};
 		}
 
@@ -130,7 +129,7 @@ export const getRoomLayout = tool({
 				type: layout.type,
 			};
 		} catch (err) {
-			console.error(`Error retrieving layout for property ${propertyId}, room ${roomId}, layout ${layoutId}:`, err);
+			console.error(`Error retrieving layout for property ${context.propertyId}, room ${roomId}, layout ${layoutId}:`, err);
 			return {
 				success: false,
 				message: 'Unexpected error retrieving layout',

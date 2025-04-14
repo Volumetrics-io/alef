@@ -7,12 +7,18 @@ import { tools } from './tools';
 import { processToolCalls } from './utils';
 
 export class LayoutAgent extends AIChatAgent<Bindings> {
+	#model;
+
+	constructor(state: DurableObjectState, env: Bindings) {
+		super(state, env);
+		this.#model = createWorkersAI({ binding: env.AI })('@cf/meta/llama-3.3-70b-instruct-fp8-fast');
+	}
+
 	async onStart() {
 		console.log('LayoutAgent started');
 	}
 
 	async onChatMessage(onFinish: StreamTextOnFinishCallback<{}>): Promise<Response | undefined> {
-		const model = createWorkersAI({ binding: this.env.AI })('@cf/meta/llama-3.3-70b-instruct-fp8-fast');
 		return agentContext.run({ env: this.env }, async () => {
 			const dataStreamResponse = createDataStreamResponse({
 				execute: async (dataStream) => {
@@ -28,7 +34,7 @@ export class LayoutAgent extends AIChatAgent<Bindings> {
 					});
 
 					const result = streamText({
-						model,
+						model: this.#model,
 						system: this.#getSystemPrompt(),
 						messages: processedMessages,
 						tools,
@@ -56,7 +62,7 @@ export class LayoutAgent extends AIChatAgent<Bindings> {
 
 		It is your job to know how to arrange furniture in a room, as the interior decorator. The user will provide you with a reference to the room layout and the furniture they want to place in the room. You will use this information to make the necessary changes using the tools available.
 
-		To learn about the room itself and the furniture in it, you will use the getRoomLayoutContext tool. This will provide you with the context you need to make informed decisions about the layout. It includes the so-called planes of the room, meaning the floor, ceiling, walls, windows, doors, and other features of the room itself. These are represented as 3-dimensional planes with positions and orientations. From these planes you should get an idea of how the room itself is structured.
+		To learn about the room itself and the furniture in it, you will use the getRoomLayout tool. This will provide you with the context you need to make informed decisions about the layout. It includes the so-called planes of the room, meaning the floor, ceiling, walls, windows, doors, and other features of the room itself. These are represented as 3-dimensional planes with positions and orientations. From these planes you should get an idea of how the room itself is structured.
 
 		You will also have access to the furniture which is placed in the room. This data includes position and orientation of each piece of furniture, and also the dimensions of the furniture itself in X,Y,and Z dimensions. To know what kind of furniture you are working with, a name and a collection of attributes is also attached to each placed furniture in the room.
 

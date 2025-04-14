@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
-import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { requestId } from 'hono/request-id';
+import { corsWithSocket } from '../middleware/cors.js';
 import { handleError } from '../middleware/errors.js';
 import { Env } from './config/ctx.js';
 import { aiRouter } from './routers/ai.js';
@@ -16,35 +16,14 @@ const app = new Hono<Env>()
 	.onError(handleError)
 	.use(requestId())
 	.use(logger())
-	// before CORS, we have the socket endpoint -- the CORS middleware messes
-	// up the response handling.
-	.route('/socket', socketRouter)
-	.route('/ai', aiRouter)
-	.use(
-		cors({
-			origin: (origin, ctx) => {
-				if (origin === ctx.env.UI_ORIGIN || origin === ctx.env.ADMIN_UI_ORIGIN || origin === ctx.env.HOMEPAGE_ORIGIN) {
-					return origin;
-				}
-				if (ctx.env.EXTRA_CORS_ORIGINS) {
-					const origins = ctx.env.EXTRA_CORS_ORIGINS.split(',');
-					if (origins.includes(origin)) {
-						return origin;
-					}
-				}
-				return null;
-			},
-			credentials: true,
-			allowHeaders: ['Authorization', 'Content-Type', 'X-Request-Id', 'X-Csrf-Token'],
-			exposeHeaders: ['Content-Type', 'Content-Length', 'X-Request-Id', 'Set-Cookie', 'X-Alef-Error', 'X-Alef-Message', 'X-Csrf-Token', 'X-Auth-Error'],
-		})
-	)
+	.use(corsWithSocket)
 	.get('/', (ctx) => ctx.text('Hello, world!'))
 	.route('/users', usersRouter)
 	.route('/furniture', furnitureRouter)
 	.route('/devices', devicesRouter)
-	.route('/properties', propertiesRouter);
-
+	.route('/properties', propertiesRouter)
+	.route('/socket', socketRouter)
+	.route('/ai', aiRouter);
 // no need to include these routes in typings
 app.route('/auth', authRouter);
 

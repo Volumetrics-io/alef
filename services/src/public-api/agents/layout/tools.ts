@@ -41,7 +41,7 @@ export const modifyRoom = tool({
 	},
 });
 
-export const getRoomLayoutContext = tool({
+export const getRoomLayout = tool({
 	description: 'Retrieve the layout of a room, including context about the physical planes (floor, ceiling, walls, windows, doors), and furniture in the room.',
 	parameters: z.object({
 		propertyId: idShapes.Property,
@@ -49,7 +49,7 @@ export const getRoomLayoutContext = tool({
 		layoutId: idShapes.RoomLayout,
 	}),
 	execute: async ({ propertyId, roomId, layoutId }) => {
-		console.debug(`Agent is retrieving layout for property ${propertyId}, room ${roomId}, layout ${layoutId}`);
+		console.log(`Agent is retrieving layout for property ${propertyId}, room ${roomId}, layout ${layoutId}`);
 		const context = agentContext.getStore();
 		if (!context) {
 			throw new Error('Agent context not found');
@@ -101,4 +101,4 @@ export const getRoomLayoutContext = tool({
 	},
 });
 
-export const tools = { modifyRoom, getRoomLayoutContext };
+export const tools = { modifyRoom, getRoomLayout };

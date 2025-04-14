@@ -42,6 +42,7 @@
 		"agents": "^0.0.55",
 		"ai": "^4.3.4",
 		"hono": "catalog:",
+		"hono-agents": "^0.0.50",
 		"jose": "^5.9.6",
 		"kysely": "^0.27.5",
 		"kysely-d1": "0.3.0",

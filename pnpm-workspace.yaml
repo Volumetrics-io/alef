@@ -11,9 +11,9 @@ catalog:
   react-dom: 19.1.0
   '@types/react': ^19.1.0
   '@types/react-dom': ^19.1.1
-  wrangler: ^3.105.1
+  wrangler: ^4.10.0
   typescript: ^5.8.2
-  '@cloudflare/workers-types': ^4.20250124.3
+  '@cloudflare/workers-types': ^4.20250414.0
   zod: ^3.24.1
   '@a-type/auth': 1.3.12
   '@a-type/utils': 1.1.5

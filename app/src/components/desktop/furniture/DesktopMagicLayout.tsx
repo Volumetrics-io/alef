@@ -18,6 +18,7 @@ export function DesktopMagicLayout({}: DesktopMagicLayoutProps) {
 	});
 
 	const { handleInputChange, input, setInput, handleSubmit, messages, isLoading, clearHistory, append } = useAgentChat({
+		credentials: 'include',
 		agent,
 		maxSteps: 5,
 		onError: (err) => {

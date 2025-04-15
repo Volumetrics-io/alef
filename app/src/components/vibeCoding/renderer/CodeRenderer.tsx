@@ -19,6 +19,7 @@ export function CodeRenderer({ className }: CodeRendererProps) {
 		const frame = ref.current;
 
 		frame.srcdoc = code;
+		frame.src = 'about:blank';
 	}, [code]);
 
 	if (!code) {

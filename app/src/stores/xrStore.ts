@@ -36,7 +36,7 @@ const controllerConfig: DefaultXRControllerOptions = {
 export const xrStore: XRStore = createXRStore({
 	depthSensing: true,
 	bounded: false,
-	// emulate: false,
+	emulate: false,
 	hand: {
 		left: handConfig,
 		right: false,

@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 import { forwardRef, useCallback, useRef } from 'react';
-import { Box } from '../box/Box.js';
+import { Box, BoxProps } from '../box/Box.js';
 import cls from './ScrollArea.module.css';
 
-export interface ScrollAreaProps extends React.HTMLAttributes<HTMLDivElement> {}
+export interface ScrollAreaProps extends BoxProps {}
 
 export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(function ScrollArea({ children, onScroll, onScrollCapture, className, ...rest }, ref) {
 	const stableOnScroll = useRef(onScroll);

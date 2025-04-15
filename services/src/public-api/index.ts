@@ -30,6 +30,7 @@ app.route('/auth', authRouter);
 export default app;
 
 export { LayoutAgent } from './agents/layout/LayoutAgent.js';
+export { VibeCoderAgent } from './agents/vibeCoder/VibeCoderAgent.js';
 export { DeviceDiscovery } from './durableObjects/DeviceDiscovery.js';
 export { Paircodes } from './durableObjects/Paircodes.js';
 export { Property } from './durableObjects/Property.js';

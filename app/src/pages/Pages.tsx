@@ -62,6 +62,21 @@ const routes = makeRoutes([
 		component: lazy(() => import('./DesktopModePage.js')),
 	},
 	{
+		path: '/projects',
+		component: Outlet,
+		children: [
+			{
+				path: '',
+				index: true,
+				component: lazy(() => import('./ProjectsPage.js')),
+			},
+			{
+				path: ':projectId',
+				component: lazy(() => import('./ProjectPage.js')),
+			},
+		],
+	},
+	{
 		path: '*',
 		component: lazy(() => import('./NotFoundPage.js')),
 	},

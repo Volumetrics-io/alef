@@ -1,0 +1,10 @@
+.root {
+}
+
+.chat {
+	flex: 0 0 300px;
+}
+
+.renderer {
+	flex: 1 1 0;
+}

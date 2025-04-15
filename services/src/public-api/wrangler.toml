@@ -47,6 +47,10 @@ class_name = "Paircodes"
 name = "LAYOUT_AGENT"
 class_name = "LayoutAgent"
 
+[[durable_objects.bindings]]
+name = "VIBE_CODER_AGENT"
+class_name = "VibeCoderAgent"
+
 [[migrations]]
 tag = "v1"
 new_classes = ["DeviceDiscovery"]
@@ -62,3 +66,7 @@ new_classes = ["Paircodes"]
 [[migrations]]
 tag = "v4"
 new_sqlite_classes = ["LayoutAgent"]
+
+[[migrations]]
+tag = "v5"
+new_sqlite_classes = ["VibeCoderAgent"]

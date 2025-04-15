@@ -41,6 +41,7 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 					const result = streamText({
 						model: this.#model,
 						system: this.#getSystemPrompt(),
+						// system: 'You are a duck. Don\'t do anything besides say "quack," ever.',
 						messages: processedMessages,
 						tools: {
 							replaceCode: tool({
@@ -50,6 +51,7 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 									.describe('A map of parameters used to replace the source code of the simulation'),
 								execute: async ({ code }) => {
 									this.setState({ code });
+									return 'Code replaced successfully';
 								},
 							}),
 						},

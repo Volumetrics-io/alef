@@ -36,17 +36,25 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 					let processedMessages = this.messages;
 					const result = streamText({
 						model: this.#model,
-						system: this.#getSystemPrompt(),
+						system: this.#getSystemComponentPrompt(),
 						messages: processedMessages,
-						onFinish: (result) => {
-							console.log(result.text);
-							const parsedResult = JSON.parse(result.text);
-							this.setState({
-								code: parsedResult.code ?? '',
-								description: parsedResult.description ?? '',
-							});
-							onFinish(parsedResult as any);
+						onStepFinish: (stepResult) => {
+							console.log(`Step result: ${stepResult.text}`);
+							if (stepResult.text.startsWith('{')) {
+								try {
+									const parsedResult = JSON.parse(stepResult.text);
+									if (parsedResult.code) {
+										this.setState({
+											code: parsedResult.code ?? '',
+											description: parsedResult.description ?? '',
+										});
+									}
+								} finally {
+									// do nothing
+								}
+							}
 						},
+						onFinish,
 						onError: ({ error }) => {
 							console.error(`Error in AI model: ${error}`);
 						},
@@ -90,27 +98,34 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 		return `You are a web developer with expertise in THREE.js and React-Three-Fiber. use the following template to create a r3f component:
 
 				- DO NOT rename the component
-				const export UserScene = () => {
+				- DO NOT use TypeScript
+				- DO NOT import any libraries besides "react" and "@react-three/fiber"
 
-				const mainRef = useRef<Group>()
+				\`\`\`
+				import { useRef } from 'react';
+				import { useFrame } from '@react-three/fiber';
 
-				// init variables here and here only
-				// lean towards good r3f practices
-				// like using refs when necessary
+				export const App = () => {
+					const mainRef = useRef();
 
-				// utilize for per frame logic such as animations
-				// DO NOT initialize variable in useFrame.
-				useFrame(() => {
+					// init variables here and here only
+					// lean towards good r3f practices
+					// like using refs when necessary
 
-				})
+					useFrame(() => {
+						// utilize for per frame logic such as animations
+						// DO NOT initialize variable in useFrame.
+					});
 
-				return (
-					<group ref={mainRef}>
-						{/* add any necessary markup here but 
-							ONLY r3f compatible elements, DO 
-							NOT USE DOM Elements */}
-					</group>
-				)}
+					return (
+						<group ref={mainRef}>
+							{/* add any necessary markup here but
+								ONLY r3f compatible elements, DO
+								NOT USE DOM Elements */}
+						</group>
+					);
+				};
+				\`\`\`
 
 			- your response should be formatted as a valid json object using the following schema:
 

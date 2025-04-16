@@ -1,0 +1,35 @@
+{
+	"name": "@alef/framework",
+	"version": "0.0.1",
+	"private": true,
+	"type": "module",
+	"exports": {
+		"./runtime": {
+			"import": "./dist-runtime/runtime.js"
+		},
+		".": {
+			"import": "./dist/client/index.js",
+			"types": "./dist/client/index.d.ts"
+		}
+	},
+	"scripts": {
+		"build": "pnpm build:client && pnpm build:runtimne",
+		"build:client": "tsc -p tsconfig.json",
+		"build:runtimne": "tsup",
+		"dev": "pnpm run --filter @alef/framework --parallel /dev:.*/",
+		"dev:client": "tsc -p tsconfig.json --watch",
+		"dev:runtime": "tsup --watch"
+	},
+	"dependencies": {
+		"three": "0.175.0",
+		"react": "19.1.0",
+		"react-dom": "19.1.0",
+		"@react-three/fiber": "9.1.2"
+	},
+	"devDependencies": {
+		"@types/three": "^0.175.0",
+		"@types/react": "^19.1.2",
+		"@types/react-dom": "^19.1.2",
+		"tsup": "8.4.0"
+	}
+}

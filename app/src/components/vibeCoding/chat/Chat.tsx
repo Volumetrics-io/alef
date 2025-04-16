@@ -34,6 +34,16 @@ export function Chat({ className }: ChatProps) {
 }
 
 function ChatMessage({ message }: { message: UIMessage }) {
+	if (message.role === 'assistant' && message.content.startsWith('{')) {
+		// this is probably a code result
+		return (
+			<Box p="squeeze">
+				<div>
+					<strong>{message.role}</strong>: (Generating code)
+				</div>
+			</Box>
+		);
+	}
 	return (
 		<Box p="squeeze">
 			<div>

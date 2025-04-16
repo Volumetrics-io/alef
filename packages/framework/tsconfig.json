@@ -1,0 +1,15 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"lib": ["es2021", "es2022", "esnext", "DOM"],
+		"customConditions": ["development"],
+		"declaration": true,
+		"target": "ES6",
+		"moduleResolution": "Bundler",
+		"module": "Preserve"
+	},
+	"include": ["src/**/*.ts", "src/**/*.tsx"],
+	"exclude": ["src/runtime/**/*", "node_modules", "dist"]
+}

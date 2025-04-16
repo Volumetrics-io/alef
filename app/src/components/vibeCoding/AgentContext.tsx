@@ -18,6 +18,7 @@ export function useVibeCoder() {
 	const projectId = useProjectId();
 	const [state, setState] = useState<VibeCoderState>({
 		code: '',
+		description: '',
 	});
 	const agent = useAgent({
 		agent: 'vibe-coder',

@@ -1,6 +1,6 @@
 import { AlefError, isPrefixedId, PrefixedId } from '@alef/common';
 import { AIChatAgent } from 'agents/ai-chat-agent';
-import { createDataStreamResponse, streamText, StreamTextOnFinishCallback, tool } from 'ai';
+import { createDataStreamResponse, streamText, StreamTextOnFinishCallback } from 'ai';
 import { AsyncLocalStorage } from 'async_hooks';
 import { createWorkersAI } from 'workers-ai-provider';
 import { z } from 'zod';
@@ -18,7 +18,7 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 
 	constructor(state: DurableObjectState, env: Bindings) {
 		super(state, env);
-		this.#model = createWorkersAI({ binding: env.AI })('@cf/meta/llama-3.3-70b-instruct-fp8-fast');
+		this.#model = createWorkersAI({ binding: env.AI })('@cf/meta/llama-4-scout-17b-16e-instruct');
 	}
 
 	async onStart() {
@@ -33,36 +33,23 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 			const dataStreamResponse = createDataStreamResponse({
 				execute: async (dataStream) => {
 					let processedMessages = this.messages;
-					processedMessages.unshift({
-						role: 'user',
-						content: `Here's the current code of the simulation: ${this.state.code}`,
-						id: 'user-code',
-					});
 					const result = streamText({
 						model: this.#model,
 						system: this.#getSystemPrompt(),
-						// system: 'You are a duck. Don\'t do anything besides say "quack," ever.',
 						messages: processedMessages,
-						tools: {
-							replaceCode: tool({
-								description: 'Replace the source code of the simulation',
-								parameters: z
-									.object({ code: z.string().describe('The source code of the simulation') })
-									.describe('A map of parameters used to replace the source code of the simulation'),
-								execute: async ({ code }) => {
-									this.setState({ code });
-									return 'Code replaced successfully';
-								},
-							}),
-						},
 						onFinish,
 						onError: ({ error }) => {
 							console.error(`Error in AI model: ${error}`);
 						},
+						maxTokens: 10000,
 						maxSteps: 5,
 					});
 
 					result.mergeIntoDataStream(dataStream);
+				},
+				onError: (error) => {
+					console.error(`Error in AI model: ${error}`);
+					return 'Error in AI model';
 				},
 			});
 
@@ -71,15 +58,39 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 	}
 
 	#getSystemPrompt() {
-		return `You are a helpful software developer who is implementing a ThreeJS-based interactive simulation for a client.
+		return `You are a web developer with expertise in THREE.js and React-Three-Fiber. use the following template to create a r3f component that the user will copy and add to an existing r3f scene. DO NOT add a camera or scene, that already exists in the users code.
 
-		Your task is to assist the user in creating a simulation that meets their requirements and specifications. You are provided with a tool you can invoke to replace the code of the simulation.
+				// DO NOT rename the component
+				const export UserScene = () => {
 
-		You may converse with the user to understand their desires and requirements. You may also ask clarifying questions to ensure you understand their needs. When you know what the user wants, you can use the tool to replace the code of the simulation.
+				const mainRef = useRef<Group>()
 
-		Do not respond with code examples or snippets unless the user asks for them. If you want to make a change to the code, do so with the provided tools.
+				// init variables here and here only
+				// lean towards good r3f practices
+				// like using refs when necessary
 
-		Your code should always include the entire HTML, CSS, and JavaScript code needed to run the simulation, including importing ThreeJS from a CDN.
+				// utilize for per frame logic such as animations
+				// DO NOT initialize variable in useFrame.
+				useFrame(() => {
+
+				})
+
+				return (
+					<group ref={mainRef}>
+						{/* add any necessary markup here but 
+							ONLY r3f compatible elements, DO 
+							NOT USE DOM Elements */}
+					</group>
+				)}
+
+			your response should be formatted as a valid json object using the following schema:
+
+			{
+				"code": "<the code generated using the provided template>"
+				"description": "<a short description of the changes you made to the code>"
+			}
+
+			DO NOT include any other text or characters in your response. it must be a valid json object. it should be parseable using JSON.parse().
 		`;
 	}
 }

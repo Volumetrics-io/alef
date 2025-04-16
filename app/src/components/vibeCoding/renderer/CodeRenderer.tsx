@@ -31,6 +31,7 @@ export function CodeRenderer({ className }: CodeRendererProps) {
 	}
 
 	return (
+		// TODO: Finish and add CodeFrame here
 		<Box asChild full className={className}>
 			<iframe ref={ref} />
 		</Box>

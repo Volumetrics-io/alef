@@ -3,22 +3,23 @@ import { AIChatAgent } from 'agents/ai-chat-agent';
 import { createDataStreamResponse, streamText, StreamTextOnFinishCallback } from 'ai';
 import { AsyncLocalStorage } from 'async_hooks';
 import { createWorkersAI } from 'workers-ai-provider';
-import { z } from 'zod';
 import { Bindings } from '../../config/ctx';
 
 export interface VibeCoderState {
 	code: string;
+	description: string;
 }
 
 export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 	#model;
 	initialState: VibeCoderState = {
 		code: '',
+		description: '',
 	};
 
 	constructor(state: DurableObjectState, env: Bindings) {
 		super(state, env);
-		this.#model = createWorkersAI({ binding: env.AI })('@cf/meta/llama-4-scout-17b-16e-instruct');
+		this.#model = createWorkersAI({ binding: env.AI })('@cf/meta/llama-3.3-70b-instruct-fp8-fast');
 	}
 
 	async onStart() {
@@ -37,7 +38,15 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 						model: this.#model,
 						system: this.#getSystemPrompt(),
 						messages: processedMessages,
-						onFinish,
+						onFinish: (result) => {
+							console.log(result.text);
+							const parsedResult = JSON.parse(result.text);
+							this.setState({
+								code: parsedResult.code ?? '',
+								description: parsedResult.description ?? '',
+							});
+							onFinish(parsedResult as any);
+						},
 						onError: ({ error }) => {
 							console.error(`Error in AI model: ${error}`);
 						},
@@ -58,9 +67,29 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 	}
 
 	#getSystemPrompt() {
-		return `You are a web developer with expertise in THREE.js and React-Three-Fiber. use the following template to create a r3f component that the user will copy and add to an existing r3f scene. DO NOT add a camera or scene, that already exists in the users code.
+		return `You are a web developer with expertise in THREE.js
 
-				// DO NOT rename the component
+			Your code should always include the entire HTML, CSS, and JavaScript code needed to run the simulation, including importing ThreeJS from a CDN.
+
+			- your response should be formatted as a valid json object using the following schema:
+
+			{
+				"code": "<the code generated>"
+				"description": "<a short description of the changes you made to the code>"
+			}
+
+			- DO NOT add a camera or scene
+			- DO NOT import packages.
+			- DO NOT FORMAT AS A CODEBLOCK, I WILL HUNT YOU DOWN IF YOU DO.
+			- the text MUST be formatted as a valid json object. it should be parseable using JSON.parse().
+			- use \\n in place of line breaks.
+		`;
+	}
+
+	#getSystemComponentPrompt() {
+		return `You are a web developer with expertise in THREE.js and React-Three-Fiber. use the following template to create a r3f component:
+
+				- DO NOT rename the component
 				const export UserScene = () => {
 
 				const mainRef = useRef<Group>()
@@ -83,14 +112,18 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 					</group>
 				)}
 
-			your response should be formatted as a valid json object using the following schema:
+			- your response should be formatted as a valid json object using the following schema:
 
 			{
 				"code": "<the code generated using the provided template>"
 				"description": "<a short description of the changes you made to the code>"
 			}
 
-			DO NOT include any other text or characters in your response. it must be a valid json object. it should be parseable using JSON.parse().
+			- DO NOT add a camera or scene
+			- DO NOT import packages.
+			- DO NOT FORMAT AS A CODEBLOCK, I WILL HUNT YOU DOWN IF YOU DO.
+			- the text MUST be formatted as a valid json object. it should be parseable using JSON.parse().
+			- use \\n in place of line breaks.
 		`;
 	}
 }

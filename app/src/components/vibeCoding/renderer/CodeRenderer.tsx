@@ -1,10 +1,9 @@
-import { frameworkCodePromise } from '@/services/framework';
-import { getHtml, getMainJs } from '@alef/framework';
-import { Box } from '@alef/sys';
-import { useEffect, useRef, useState } from 'react';
+import { Box, Button, Icon } from '@alef/sys';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { PreviewController } from 'static-browser-server';
 import { useAgentContext } from '../AgentContext';
-import { fileBuilder } from './ProjectFileBuilder';
+import { useVibeCoderChat } from '../hooks';
+import { ProjectFileBuilder } from './ProjectFileBuilder';
 
 export interface CodeRendererProps {
 	className?: string;
@@ -12,37 +11,44 @@ export interface CodeRendererProps {
 
 export function CodeRenderer({ className }: CodeRendererProps) {
 	const { state } = useAgentContext();
+	const { append } = useVibeCoderChat();
+	const ref = useRef<HTMLIFrameElement>(null);
 
 	const code = state.code;
 	const codeRef = useRef(code);
 	codeRef.current = code;
 
+	const reloadFrame = useCallback(() => {
+		if (ref.current) {
+			ref.current.src = ref.current.src;
+		}
+	}, []);
+
+	const [error, setError] = useState<Error | null>(null);
+
+	const [builder] = useState(
+		() =>
+			new ProjectFileBuilder({
+				onUpdate: reloadFrame,
+				onError: setError,
+			})
+	);
+
+	const fixError = useCallback(() => {
+		if (!builder.error) return;
+		append({
+			role: 'user',
+			content: `Fix the error in the last coder:
+
+			${builder.error.message}
+			${builder.error.stack}`,
+		});
+	}, [append, builder]);
+
 	const controller = useState(() => {
 		return new PreviewController({
 			baseUrl: 'https://preview.sandpack-static-server.codesandbox.io',
-			getFileContent: async (filePath) => {
-				if (filePath === '/index.html') {
-					return getHtml({});
-				}
-				if (filePath === '/runtime.js') {
-					return frameworkCodePromise;
-				}
-				if (filePath === '/main.js') {
-					return getMainJs();
-				}
-				if (filePath !== '/src/index.js') {
-					throw new Error('Only ~/index.js is supported');
-				}
-				try {
-					const result = await fileBuilder.build(codeRef.current, 'index.js');
-					console.log('~/index.js', result);
-					return result;
-				} catch (error) {
-					console.error(error);
-					const message = error instanceof Error ? error.message : String(error);
-					return `export const App = () => <div>Failed to compile app: ${message}</div>;`;
-				}
-			},
+			getFileContent: builder.getFile.bind(builder),
 		});
 	})[0];
 
@@ -54,15 +60,10 @@ export function CodeRenderer({ className }: CodeRendererProps) {
 			.catch(console.error);
 	}, [controller]);
 
-	const ref = useRef<HTMLIFrameElement>(null);
-
-	// reload frame on code change
+	// update on code change
 	useEffect(() => {
-		if (ref.current && src) {
-			console.log('new code', code);
-			ref.current.src = src;
-		}
-	}, [src, code]);
+		builder.updateSource(code);
+	}, [builder, code]);
 
 	if (!code) {
 		return (
@@ -73,8 +74,16 @@ export function CodeRenderer({ className }: CodeRendererProps) {
 	}
 
 	return (
-		<Box asChild full className={className}>
-			<iframe ref={ref} src={src} />
+		<Box full className={className}>
+			<Box asChild full>
+				<iframe ref={ref} src={src} />
+			</Box>
+			{error && (
+				<Button float="bottom-right" color="destructive" onClick={fixError}>
+					<Icon name="bug" />
+					Fix
+				</Button>
+			)}
 		</Box>
 	);
 }

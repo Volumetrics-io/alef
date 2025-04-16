@@ -74,32 +74,12 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 		});
 	}
 
-	#getSystemPrompt() {
-		return `You are a web developer with expertise in THREE.js
-
-			Your code should always include the entire HTML, CSS, and JavaScript code needed to run the simulation, including importing ThreeJS from a CDN.
-
-			- your response should be formatted as a valid json object using the following schema:
-
-			{
-				"code": "<the code generated>"
-				"description": "<a short description of the changes you made to the code>"
-			}
-
-			- DO NOT add a camera or scene
-			- DO NOT import packages.
-			- DO NOT FORMAT AS A CODEBLOCK, I WILL HUNT YOU DOWN IF YOU DO.
-			- the text MUST be formatted as a valid json object. it should be parseable using JSON.parse().
-			- use \\n in place of line breaks.
-		`;
-	}
-
 	#getSystemComponentPrompt() {
 		return `You are a web developer with expertise in THREE.js and React-Three-Fiber. use the following template to create a r3f component:
 
 				- DO NOT rename the component
 				- DO NOT use TypeScript
-				- DO NOT import any libraries besides "react" and "@react-three/fiber"
+				- DO NOT import any libraries directly besides "react", "react-dom", "@react-three/fiber", and "@react-three/drei". For all other libraries you want to use, utilize the "https://esm.sh" CDN.
 
 				\`\`\`
 				import { useRef } from 'react';

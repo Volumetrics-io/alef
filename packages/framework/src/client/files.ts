@@ -3,6 +3,7 @@
 const THREE_VERSION = '0.175.0';
 const REACT_VERSION = `19.1.0`;
 const R3F_VERSION = '9.1.2';
+const DREI_VERSION = '10.0.6';
 
 const CDN = 'https://esm.sh';
 
@@ -20,6 +21,7 @@ const importMap = {
 	'react-dom': `${CDN}/react-dom@${REACT_VERSION}`,
 	'react-dom/client': `${CDN}/react-dom@${REACT_VERSION}/client.js`,
 	'@react-three/fiber': `${CDN}/@react-three/fiber@${R3F_VERSION}?external=react,react-dom,three`,
+	'@react-three/drei': `${CDN}/@react-three/drei@${DREI_VERSION}?external=three,react,react-dom,@react-three/fiber`,
 };
 
 export const getHtml = ({ importMap: extraImportMap = {} }: { importMap?: Record<string, string> } = {}) => `<!DOCTYPE html>
@@ -44,3 +46,37 @@ import { mountApp } from '@alef/framework/runtime';
 import { App } from '~/${userSourceRoot}';
 mountApp(App);
 `;
+
+export const getFailurePage = (error: Error) => `<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Alef Project</title>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			background-color: rgb(255, 241, 241);
+			color: #721c24;
+			padding: 20px;
+		}
+		h1 {
+			color: #721c24;
+		}
+		h2 {
+			color: #6b1500;
+		}
+		pre {
+			background-color: #ffe0e0;
+			padding: 10px;
+			border-radius: 5px;
+			overflow-x: auto;
+		}
+	</style>
+</head>
+<body>
+	<h1>App failed to compile.</h1>
+	<h2>${error.message}</h2>
+	<pre>${error.stack}</pre>
+</body>
+</html>`;

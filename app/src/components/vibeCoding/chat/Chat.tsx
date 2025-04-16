@@ -36,10 +36,17 @@ export function Chat({ className }: ChatProps) {
 function ChatMessage({ message }: { message: UIMessage }) {
 	if (message.role === 'assistant' && message.content.startsWith('{')) {
 		// this is probably a code result
+		let parsed: { code?: string; description?: string };
+		try {
+			parsed = JSON.parse(message.content);
+		} catch (e) {
+			// message may not be done streaming yet.
+			parsed = {};
+		}
 		return (
 			<Box p="squeeze">
 				<div>
-					<strong>{message.role}</strong>: (Generating code)
+					<strong>{message.role}</strong>: {parsed.description ? parsed.description : '(Generating code)'}
 				</div>
 			</Box>
 		);

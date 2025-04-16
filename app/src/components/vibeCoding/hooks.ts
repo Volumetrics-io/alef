@@ -21,5 +21,7 @@ export function useVibeCoderChat() {
 			console.error(err);
 			toast.error(err.message);
 		},
+		// reuses data between hook invocations
+		id: 'vibe-coder',
 	});
 }

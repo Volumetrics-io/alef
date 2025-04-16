@@ -1,7 +1,7 @@
 import { Slot } from '@radix-ui/react-slot';
 import clsx from 'clsx';
 import dynamicIconImports from 'lucide-react/dynamicIconImports.js';
-import { forwardRef, lazy, Suspense, SVGAttributes, useContext } from 'react';
+import { forwardRef, lazy, Suspense, SVGAttributes, useContext, useMemo } from 'react';
 import { ButtonContext } from '../button/ButtonContext.js';
 import { ErrorBoundary } from '../errorBoundary/ErrorBoundary.js';
 import { Spinner } from '../spinner/Spinner.js';
@@ -53,7 +53,7 @@ export const Icon = forwardRef<SVGSVGElement, IconProps>(function Icon({ name, c
 		return <IconFallback ref={ref} />;
 	}
 	// @ts-ignore -- something's up with Lucide package typings, but this does work.
-	const LucideIcon = lazy(dynamicIconImports[name as LucideIconName]);
+	const LucideIcon = useMemo(() => lazy(dynamicIconImports[name as LucideIconName]), [name]);
 
 	return (
 		<ErrorBoundary fallback={<IconFallback ref={ref} />}>

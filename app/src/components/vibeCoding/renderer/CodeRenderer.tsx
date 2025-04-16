@@ -38,7 +38,7 @@ export function CodeRenderer({ className }: CodeRendererProps) {
 		if (!builder.error) return;
 		append({
 			role: 'user',
-			content: `Fix the error in the last coder:
+			content: `Fix the error in the last code:
 
 			${builder.error.message}
 			${builder.error.stack}`,

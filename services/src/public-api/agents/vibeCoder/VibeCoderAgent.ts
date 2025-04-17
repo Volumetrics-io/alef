@@ -19,7 +19,7 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 
 	constructor(state: DurableObjectState, env: Bindings) {
 		super(state, env);
-		this.#model = createWorkersAI({ binding: env.AI })('@cf/meta/llama-3.3-70b-instruct-fp8-fast');
+		this.#model = createWorkersAI({ binding: env.AI })('@cf/google/gemma-3-12b-it');
 	}
 
 	async onStart() {
@@ -40,9 +40,19 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 						messages: processedMessages,
 						onStepFinish: (stepResult) => {
 							console.log(`Step result: ${stepResult.text}`);
-							if (stepResult.text.startsWith('{')) {
+							let result = stepResult.text;
+							if (result.includes('</think>')) {
+								result = result.split('</think>')[1].replace(/^[\s\r\n]+/, '');
+								console.log(`Result: ${result}`);
+							}
+							if (result.includes('```json')) {
+								result = result.split('```json')[1].replace(/^[\s\r\n]+/, '');
+								result = result.split('```')[0].replace(/^[\s\r\n]+/, '');
+								console.log(`Result: ${result}`);
+							}
+							if (result.startsWith('{')) {
 								try {
-									const parsedResult = JSON.parse(stepResult.text);
+									const parsedResult = JSON.parse(result);
 									if (parsedResult.code) {
 										this.setState({
 											code: parsedResult.code ?? '',
@@ -82,6 +92,8 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 				- DO NOT import any libraries directly besides "react", "react-dom", "@react-three/fiber", and "@react-three/drei". For all other libraries you want to use, utilize the "https://esm.sh" CDN.
 
 				\`\`\`
+				import { <objects needed> } from 'three';
+				import { <objects needed> } from '@react-three/drei';
 				import { useRef } from 'react';
 				import { useFrame } from '@react-three/fiber';
 

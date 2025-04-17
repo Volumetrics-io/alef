@@ -30,6 +30,15 @@ export const getHtml = ({ importMap: extraImportMap = {} }: { importMap?: Record
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Alef Project</title>
+	<style>
+		html, body {
+			margin: 0;
+			padding: 0;
+			width: 100%;
+			height: 100dvh;
+			background-color: #000;
+		}
+	</style>
 	<script type="importmap">
 		{
 			"imports": ${JSON.stringify({ ...importMap, ...extraImportMap })}

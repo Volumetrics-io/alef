@@ -9,7 +9,7 @@ export interface RootSceneProps {
 export function RootScene({ children }: RootSceneProps) {
 	return (
 		<ErrorBoundary fallback={<div>The app crashed</div>}>
-			<Canvas shadows camera={{ position: [0, 0, 5], fov: 50 }}>
+			<Canvas style={{ width: '100%', height: '100%' }} shadows camera={{ position: [0, 0, 5], fov: 75 }}>
 				<Suspense fallback={null}>{children}</Suspense>
 			</Canvas>
 		</ErrorBoundary>

@@ -1,4 +1,4 @@
-import { Box, Button, Icon, Input, ScrollArea } from '@alef/sys';
+import { Box, Button, Icon, Input, ScrollArea, Form } from '@alef/sys';
 import { UIMessage } from 'ai';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useVibeCoderChat } from '../hooks';
@@ -8,7 +8,7 @@ export interface ChatProps {
 }
 
 export function Chat({ className }: ChatProps) {
-	const { messages, handleSubmit, input, handleInputChange, isLoading, clearHistory } = useVibeCoderChat();
+	const { messages } = useVibeCoderChat();
 	const { ref, onScroll } = useStayScrolledToBottom();
 
 	return (
@@ -18,17 +18,26 @@ export function Chat({ className }: ChatProps) {
 					<ChatMessage key={msg.id} message={msg} />
 				))}
 			</ScrollArea>
-			<Box gapped asChild>
-				<form onSubmit={handleSubmit}>
-					<Button color="destructive" onClick={clearHistory}>
-						<Icon name="trash" />
-					</Button>
+			<ChatForm />
+		</Box>
+	);
+}
+
+function ChatForm() {
+	const { handleSubmit, input, handleInputChange, isLoading, clearHistory } = useVibeCoderChat();
+	return (
+		<Box gapped asChild>
+			<Form onSubmit={handleSubmit}>
+				<Box gapped>
 					<Input value={input} onChange={handleInputChange} placeholder="Type your message..." />
 					<Button type="submit" loading={isLoading}>
 						<Icon name="send" />
 					</Button>
-				</form>
-			</Box>
+				</Box>
+				<Button color="destructive" onClick={clearHistory}>
+					<Icon name="trash" />
+				</Button>
+			</Form>
 		</Box>
 	);
 }

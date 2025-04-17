@@ -1,87 +1,57 @@
 import { AlefError, isPrefixedId, PrefixedId } from '@alef/common';
-import { AIChatAgent } from 'agents/ai-chat-agent';
-import { createDataStreamResponse, streamText, StreamTextOnFinishCallback } from 'ai';
+import { Agent, routeAgentRequest, unstable_callable as callable } from 'agents';
+import { createDataStreamResponse, generateObject, streamObject, StreamObjectOnFinishCallback } from 'ai';
 import { AsyncLocalStorage } from 'async_hooks';
 import { createWorkersAI } from 'workers-ai-provider';
-import { Bindings } from '../../config/ctx';
+import { Bindings, Env } from '../../config/ctx';
+import { z } from 'zod';
 
 export interface VibeCoderState {
 	code: string;
 	description: string;
+	messages: any[];
 }
 
-export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
+export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 	#model;
 	initialState: VibeCoderState = {
 		code: '',
 		description: '',
+		messages: [],
 	};
 
 	constructor(state: DurableObjectState, env: Bindings) {
 		super(state, env);
-		this.#model = createWorkersAI({ binding: env.AI })('@cf/google/gemma-3-12b-it');
+		this.#model = createWorkersAI({ binding: env.AI })('@cf/meta/llama-3.3-70b-instruct-fp8-fast');
+		this.state.messages = [];
 	}
 
 	async onStart() {
 		console.log('VibeCoderAgent started');
 	}
 
-	async onChatMessage(onFinish: StreamTextOnFinishCallback<{}>): Promise<Response | undefined> {
-		if (!isPrefixedId(this.name, 'p')) {
-			throw new AlefError(AlefError.Code.InternalServerError, 'LayoutAgent must be created with a property ID');
-		}
-		return agentContext.run({ env: this.env, propertyId: this.name }, async () => {
-			const dataStreamResponse = createDataStreamResponse({
-				execute: async (dataStream) => {
-					let processedMessages = this.messages;
-					const result = streamText({
-						model: this.#model,
-						system: this.#getSystemComponentPrompt(),
-						messages: processedMessages,
-						onStepFinish: (stepResult) => {
-							console.log(`Step result: ${stepResult.text}`);
-							let result = stepResult.text;
-							if (result.includes('</think>')) {
-								result = result.split('</think>')[1].replace(/^[\s\r\n]+/, '');
-								console.log(`Result: ${result}`);
-							}
-							if (result.includes('```json')) {
-								result = result.split('```json')[1].replace(/^[\s\r\n]+/, '');
-								result = result.split('```')[0].replace(/^[\s\r\n]+/, '');
-								console.log(`Result: ${result}`);
-							}
-							if (result.startsWith('{')) {
-								try {
-									const parsedResult = JSON.parse(result);
-									if (parsedResult.code) {
-										this.setState({
-											code: parsedResult.code ?? '',
-											description: parsedResult.description ?? '',
-										});
-									}
-								} finally {
-									// do nothing
-								}
-							}
-						},
-						onFinish,
-						onError: ({ error }) => {
-							console.error(`Error in AI model: ${error}`);
-						},
-						maxTokens: 10000,
-						maxSteps: 5,
-					});
-
-					result.mergeIntoDataStream(dataStream);
-				},
-				onError: (error) => {
-					console.error(`Error in AI model: ${error}`);
-					return 'Error in AI model';
-				},
-			});
-
-			return dataStreamResponse;
+	@callable()
+	async generateCode(prompt: string) {
+		console.log('generateCode', prompt);
+		this.state.messages.push({ role: 'user', content: prompt });
+		const result = await generateObject({
+			model: this.#model,
+			system: this.#getSystemComponentPrompt(),
+			messages: this.state.messages,
+			output: 'object',
+			schema: z.object({
+				code: z.string(),
+				description: z.string(),
+			}),
 		});
+
+		this.setState({
+			code: result.object?.code ?? '',
+			description: result.object?.description ?? '',
+			messages: [...this.state.messages, { role: 'assistant', content: result.object?.description ?? '' }],
+		});
+
+		return;
 	}
 
 	#getSystemComponentPrompt() {
@@ -90,10 +60,12 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 				- DO NOT rename the component
 				- DO NOT use TypeScript
 				- DO NOT import any libraries directly besides "react", "react-dom", "@react-three/fiber", and "@react-three/drei". For all other libraries you want to use, utilize the "https://esm.sh" CDN.
+				- prioritize React-Three-Fiber and Drei over ThreeJS.
+				- if adding controls, use the ones provided by "@react-three/drei", DO NOT use the ones provided by "three".
+				- remember to always add lighting to your scene.
 
 				\`\`\`
 				import { <objects needed> } from 'three';
-				import { <objects needed> } from '@react-three/drei';
 				import { useRef } from 'react';
 				import { useFrame } from '@react-three/fiber';
 
@@ -119,13 +91,6 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 				};
 				\`\`\`
 
-			- your response should be formatted as a valid json object using the following schema:
-
-			{
-				"code": "<the code generated using the provided template>"
-				"description": "<a short description of the changes you made to the code>"
-			}
-
 			- DO NOT add a camera or scene
 			- DO NOT import packages.
 			- DO NOT FORMAT AS A CODEBLOCK, I WILL HUNT YOU DOWN IF YOU DO.
@@ -134,5 +99,11 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 		`;
 	}
 }
+
+export default {
+	async fetch(request: Request, env: Env) {
+		return (await routeAgentRequest(request, env, { prefix: 'some/prefix' })) || new Response('Not found', { status: 404 });
+	},
+} satisfies ExportedHandler<Env>;
 
 export const agentContext = new AsyncLocalStorage<{ env: Bindings; propertyId: PrefixedId<'p'> }>();

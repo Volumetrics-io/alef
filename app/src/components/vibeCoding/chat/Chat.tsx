@@ -1,20 +1,20 @@
 import { Box, Button, Icon, Input, ScrollArea, Form } from '@alef/sys';
 import { UIMessage } from 'ai';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useVibeCoderChat } from '../hooks';
+import { useAgentContext } from '../AgentContext';
 
 export interface ChatProps {
 	className?: string;
 }
 
 export function Chat({ className }: ChatProps) {
-	const { messages } = useVibeCoderChat();
+	const { state } = useAgentContext();
 	const { ref, onScroll } = useStayScrolledToBottom();
 
 	return (
 		<Box full stacked p="small" className={className}>
 			<ScrollArea stretched gapped stacked ref={ref} onScroll={onScroll}>
-				{messages.map((msg) => (
+				{state.messages.map((msg) => (
 					<ChatMessage key={msg.id} message={msg} />
 				))}
 			</ScrollArea>
@@ -24,19 +24,38 @@ export function Chat({ className }: ChatProps) {
 }
 
 function ChatForm() {
-	const { handleSubmit, input, handleInputChange, isLoading, clearHistory } = useVibeCoderChat();
+	const { agent } = useAgentContext();
+
+	const inputRef = useRef<HTMLInputElement>(null);
+	const [isLoading, setIsLoading] = useState(false);
+
+	const handleSubmit = useCallback(
+		async (e: React.FormEvent<HTMLFormElement>) => {
+			e.preventDefault();
+			setIsLoading(true);
+			try {
+				await agent.call('generateCode', [inputRef.current?.value]);
+			} catch (error) {
+				console.error(error);
+			} finally {
+				setIsLoading(false);
+			}
+		},
+		[agent, inputRef]
+	);
+
 	return (
 		<Box gapped asChild>
 			<Form onSubmit={handleSubmit}>
 				<Box gapped>
-					<Input value={input} onChange={handleInputChange} placeholder="Type your message..." />
+					<Input ref={inputRef} placeholder="Type your message..." />
 					<Button type="submit" loading={isLoading}>
 						<Icon name="send" />
 					</Button>
 				</Box>
-				<Button color="destructive" onClick={clearHistory}>
+				{/* <Button color="destructive" onClick={clearHistory}>
 					<Icon name="trash" />
-				</Button>
+				</Button> */}
 			</Form>
 		</Box>
 	);

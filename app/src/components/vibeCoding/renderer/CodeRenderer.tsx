@@ -2,7 +2,6 @@ import { Box, Button, Icon } from '@alef/sys';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { PreviewController } from 'static-browser-server';
 import { useAgentContext } from '../AgentContext';
-import { useVibeCoderChat } from '../hooks';
 import { ProjectFileBuilder } from './ProjectFileBuilder';
 
 export interface CodeRendererProps {
@@ -10,8 +9,7 @@ export interface CodeRendererProps {
 }
 
 export function CodeRenderer({ className }: CodeRendererProps) {
-	const { state } = useAgentContext();
-	const { append } = useVibeCoderChat();
+	const { agent, state } = useAgentContext();
 	const ref = useRef<HTMLIFrameElement>(null);
 
 	const code = state.code;
@@ -36,14 +34,13 @@ export function CodeRenderer({ className }: CodeRendererProps) {
 
 	const fixError = useCallback(() => {
 		if (!builder.error) return;
-		append({
-			role: 'user',
-			content: `Fix the error in the last code:
+		agent.call('generateCode', [
+			`Fix the error in the last code:
 
-			${builder.error.message}
-			${builder.error.stack}`,
-		});
-	}, [append, builder]);
+		${builder.error.message}
+		${builder.error.stack}`,
+		]);
+	}, [agent, builder]);
 
 	const controller = useState(() => {
 		return new PreviewController({

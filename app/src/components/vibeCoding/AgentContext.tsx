@@ -19,9 +19,11 @@ export function useVibeCoder() {
 	const [state, setState] = useState<VibeCoderState>({
 		code: '',
 		description: '',
+		messages: [],
 	});
 	const agent = useAgent({
 		agent: 'vibe-coder',
+		prefix: 'some/prefix',
 		name: projectId,
 		basePath: `ai/vibe-coder/${projectId}`,
 		host: import.meta.env.VITE_PUBLIC_API_ORIGIN,

@@ -2,11 +2,11 @@
 	"compilerOptions": {
 		"noImplicitAny": true,
 		"noLib": false,
-		"target": "ESNext",
+		"target": "ES2021",
 		"sourceMap": true,
 		"module": "Preserve",
 		"moduleResolution": "bundler",
-		"lib": ["esnext"],
+		"lib": ["ES2022"],
 		"skipLibCheck": true,
 		"strict": true,
 		"forceConsistentCasingInFileNames": true,
@@ -15,7 +15,6 @@
 		"resolveJsonModule": true,
 		"jsx": "react-jsx",
 		"downlevelIteration": true,
-		"experimentalDecorators": true,
 		"isolatedModules": true,
 		"customConditions": ["development"],
 		"types": ["@cloudflare/workers-types"]

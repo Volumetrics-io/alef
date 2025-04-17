@@ -32,7 +32,6 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 
 	@callable()
 	async generateCode(prompt: string) {
-		console.log('generateCode', prompt);
 		this.state.messages.push({ role: 'user', content: prompt });
 		const result = await generateObject({
 			model: this.#model,

@@ -3,7 +3,7 @@ import { FurnitureModelQuality, PrefixedId, assertAttributeKey, assertPrefixedId
 import { WorkerEntrypoint } from 'cloudflare:workers';
 import { Env } from './env.js';
 import { DB, comparePassword, getDatabase, hashPassword } from './kysely/index.js';
-import { FurnitureUpdate } from './kysely/tables.js';
+import { FurnitureUpdate, OrganizationUpdate } from './kysely/tables.js';
 
 export class AdminStore extends WorkerEntrypoint<Env> {
 	#db: DB;
@@ -33,6 +33,11 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 
 	async getUserByEmail(email: string) {
 		return this.#db.selectFrom('User').where('email', '=', email).selectAll().executeTakeFirst();
+	}
+
+	async getUser(id: PrefixedId<'u'>) {
+		assertPrefixedId(id, 'u');
+		return this.#db.selectFrom('User').where('id', '=', id).selectAll().executeTakeFirst();
 	}
 
 	async insertAccount({ expiresAt, userId, ...account }: Omit<AuthAccount, 'id'>) {
@@ -248,5 +253,42 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 			.execute();
 
 		return res.length;
+	}
+
+	async getOrganization(organizationId: PrefixedId<'or'>) {
+		return this.#db.selectFrom('Organization').where('id', '=', organizationId).selectAll().executeTakeFirst();
+	}
+
+	async updateOrganization(organizationId: PrefixedId<'or'>, data: Omit<OrganizationUpdate, 'id'>) {
+		assertPrefixedId(organizationId, 'or');
+		await this.#db.updateTable('Organization').set(data).where('id', '=', organizationId).execute();
+	}
+
+	async getOrganizationAdmins(organizationId: PrefixedId<'or'>) {
+		return this.#db
+			.selectFrom('Membership')
+			.innerJoin('User', 'Membership.userId', 'User.id')
+			.where('Membership.organizationId', '=', organizationId)
+			.where('Membership.role', '=', 'admin')
+			.selectAll('User')
+			.execute();
+	}
+
+	async getOrganizationBySubscription(stripeSubscriptionId: string) {
+		return this.#db.selectFrom('Organization').where('Organization.stripeSubscriptionId', '=', stripeSubscriptionId).selectAll('Organization').executeTakeFirst();
+	}
+
+	async getOrganizationByCustomer(customerId: string) {
+		return this.#db.selectFrom('Organization').where('Organization.stripeCustomerId', '=', customerId).selectAll('Organization').executeTakeFirst();
+	}
+
+	async getIsUserOrganizationAdmin(userId: PrefixedId<'u'>, organizationId: PrefixedId<'or'>) {
+		const membership = await this.#db.selectFrom('Membership').where('userId', '=', userId).where('organizationId', '=', organizationId).select(['role']).executeTakeFirst();
+
+		if (!membership) {
+			return false;
+		}
+
+		return membership.role === 'admin';
 	}
 }

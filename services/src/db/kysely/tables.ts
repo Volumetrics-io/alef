@@ -11,6 +11,8 @@ export interface Database {
 	Device: DeviceTable;
 	DeviceAccess: DeviceAccessTable;
 	Property: PropertyTable;
+	Organization: OrganizationTable;
+	Membership: MembershipTable;
 }
 
 // date serialization: Dates go in, strings come out.
@@ -156,3 +158,30 @@ export interface PropertyTable {
 export type Property = Selectable<PropertyTable>;
 export type NewProperty = Insertable<PropertyTable>;
 export type PropertyUpdate = Updateable<PropertyTable>;
+
+export interface OrganizationTable {
+	id: PrefixedId<'or'>;
+	createdAt: CreatedAt;
+	updatedAt: UpdatedAt;
+
+	name: string;
+	hasExtendedAIAccess: boolean;
+	stripeSubscriptionId: string | null;
+	stripeCustomerId: string | null;
+}
+export type Organization = Selectable<OrganizationTable>;
+export type NewOrganization = Insertable<OrganizationTable>;
+export type OrganizationUpdate = Updateable<OrganizationTable>;
+
+export interface MembershipTable {
+	id: PrefixedId<'me'>;
+	createdAt: CreatedAt;
+	updatedAt: UpdatedAt;
+
+	userId: PrefixedId<'u'>;
+	organizationId: PrefixedId<'or'>;
+	role: 'admin' | 'member';
+}
+export type Membership = Selectable<MembershipTable>;
+export type NewMembership = Insertable<MembershipTable>;
+export type MembershipUpdate = Updateable<MembershipTable>;

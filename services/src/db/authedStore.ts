@@ -81,4 +81,37 @@ export class AuthedStore extends RpcTarget {
 	async hasProperty(propertyId: PrefixedId<'p'>) {
 		return this.#db.selectFrom('Property').where('id', '=', propertyId).where('Property.ownerId', '=', this.#userId).select('id').executeTakeFirst();
 	}
+
+	async getOrganizations() {
+		return this.#db
+			.selectFrom('Organization')
+			.innerJoin('Membership', 'Organization.id', 'Membership.organizationId')
+			.where('Membership.userId', '=', this.#userId)
+			.selectAll('Organization')
+			.execute();
+	}
+
+	async getOrganization(organizationId: PrefixedId<'or'>) {
+		return this.#db
+			.selectFrom('Organization')
+			.innerJoin('Membership', 'Organization.id', 'Membership.organizationId')
+			.where('Membership.userId', '=', this.#userId)
+			.where('Organization.id', '=', organizationId)
+			.selectAll('Organization')
+			.executeTakeFirst();
+	}
+
+	async getOrganizationAdmins(organizationId: PrefixedId<'or'>) {
+		if (!(await this.getOrganization(organizationId))) {
+			// no access or not exist
+			return [];
+		}
+		return this.#db
+			.selectFrom('Membership')
+			.innerJoin('User', 'Membership.userId', 'User.id')
+			.where('Membership.organizationId', '=', organizationId)
+			.where('Membership.role', '=', 'admin')
+			.selectAll('User')
+			.execute();
+	}
 }

@@ -15,6 +15,8 @@ export const resourceIdTypes = {
 	p: 'Property',
 	rp: 'RoomPlane',
 	op: 'Operation',
+	or: 'Organization',
+	me: 'Membership',
 } as const;
 export type ResourceNameMap = typeof resourceIdTypes;
 export type ResourceIdPrefix = keyof typeof resourceIdTypes;

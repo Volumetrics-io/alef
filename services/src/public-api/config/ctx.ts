@@ -25,6 +25,8 @@ export interface Bindings {
 	EXTRA_CORS_ORIGINS?: string;
 	TOKEN_ISSUER_OVERRIDE?: string;
 	TOKEN_AUDIENCE_OVERRIDE?: string;
+	STRIPE_SECRET_KEY: string;
+	STRIPE_WEBHOOK_SECRET: string;
 
 	// services
 	// TODO: use Service<T> wrapper, but this breaks Hono RPC client types

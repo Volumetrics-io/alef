@@ -38,6 +38,9 @@ export function useVibeCoder() {
 		basePath: `ai/vibe-coder/${projectId}`,
 		host: import.meta.env.VITE_PUBLIC_API_ORIGIN,
 		onStateUpdate: setState,
+		onError(event) {
+			console.error('Agent error', event);
+		},
 	});
 
 	return { agent, state };

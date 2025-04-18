@@ -1,18 +1,39 @@
 import { Box, Button, Icon, Input, ScrollArea, Form } from '@alef/sys';
 import { UIMessage } from 'ai';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useAgentContext } from '../AgentContext';
+import { useAgentContext, VibeCoderModelNames } from '../AgentContext';
+import { Select } from '@alef/sys';
+import { VibeCoderModel } from '@alef/services/public-api';
 
 export interface ChatProps {
 	className?: string;
 }
 
 export function Chat({ className }: ChatProps) {
-	const { state } = useAgentContext();
+	const { state, agent } = useAgentContext();
 	const { ref, onScroll } = useStayScrolledToBottom();
+
+	const setModel = useCallback(
+		(model: VibeCoderModel) => {
+			console.log('setting model', model);
+			agent.call('setModel', [model]);
+		},
+		[agent]
+	);
+
+	console.log(state.model);
 
 	return (
 		<Box full stacked p="small" className={className}>
+			<Box full="width" stacked>
+				<Select value={state.model} onValueChange={(value) => setModel(value as VibeCoderModel)}>
+					{VibeCoderModelNames.map((key) => (
+						<Select.Item key={key} value={key}>
+							{key}
+						</Select.Item>
+					))}
+				</Select>
+			</Box>
 			<ScrollArea stretched gapped stacked ref={ref} onScroll={onScroll}>
 				{state.messages.map((msg) => (
 					<ChatMessage key={msg.id} message={msg} />
@@ -40,9 +61,14 @@ function ChatForm() {
 			} finally {
 				setIsLoading(false);
 			}
+			inputRef.current!.value = '';
 		},
 		[agent, inputRef]
 	);
+
+	const clearHistory = useCallback(() => {
+		agent.call('clearMessages');
+	}, [agent]);
 
 	return (
 		<Box gapped asChild>
@@ -53,9 +79,9 @@ function ChatForm() {
 						<Icon name="send" />
 					</Button>
 				</Box>
-				{/* <Button color="destructive" onClick={clearHistory}>
+				<Button color="destructive" onClick={clearHistory}>
 					<Icon name="trash" />
-				</Button> */}
+				</Button>
 			</Form>
 		</Box>
 	);

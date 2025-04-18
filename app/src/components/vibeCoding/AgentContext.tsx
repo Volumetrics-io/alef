@@ -3,6 +3,8 @@ import { useAgent } from 'agents/react';
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { useProjectId } from './hooks';
 
+export const VibeCoderModelNames = ['llama-3.3-70b', 'deepseek-r1-qwen-32b', 'llama-4-scout-17b', 'gemma-3-12b', 'qwq-32b', 'qwen2.5-coder-32b'] as const;
+
 const AgentContext = createContext<{ agent: any; state: VibeCoderState } | null>(null);
 
 export function useAgentContext() {
@@ -17,6 +19,7 @@ export function useAgentContext() {
 export function useVibeCoder() {
 	const projectId = useProjectId();
 	const [state, setState] = useState<VibeCoderState>({
+		model: 'qwq-32b',
 		code: '',
 		description: '',
 		messages: [],
@@ -27,7 +30,10 @@ export function useVibeCoder() {
 		name: projectId,
 		basePath: `ai/vibe-coder/${projectId}`,
 		host: import.meta.env.VITE_PUBLIC_API_ORIGIN,
-		onStateUpdate: setState,
+		onStateUpdate: (state) => {
+			console.log('state update', state);
+			setState(state as VibeCoderState);
+		},
 	});
 
 	return { agent, state };

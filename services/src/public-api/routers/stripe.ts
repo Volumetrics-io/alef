@@ -3,6 +3,7 @@ import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import Stripe from 'stripe';
 import { z } from 'zod';
+import { loggedInMiddleware } from '../../middleware/session.js';
 import { sessions } from '../auth/session.js';
 import { Bindings, CtxVars, Env } from '../config/ctx.js';
 import { handleEntitlementsUpdated, handleSubscriptionCreated, handleSubscriptionDeleted, handleSubscriptionUpdated, handleTrialEnd } from '../management/subscription.js';
@@ -16,7 +17,7 @@ export const stripeRouter = new Hono<Env>()
 		};
 	}>(async (ctx, next) => {
 		ctx.set('stripe', getStripe(ctx.env));
-		next();
+		return next();
 	})
 	.post('/webhook', async (ctx) => {
 		const stripe = ctx.get('stripe');
@@ -61,17 +62,60 @@ export const stripeRouter = new Hono<Env>()
 			throw new AlefError(AlefError.Code.InternalServerError, 'Error handling webhook event', err);
 		}
 	})
+	.get('/products', async (ctx) => {
+		const stripe = ctx.get('stripe');
+		const products = await stripe.products.list({
+			active: true,
+			expand: ['data.default_price'],
+		});
+		return ctx.json(products.data || []);
+	})
+	.post('/cancel-subscription', loggedInMiddleware, async (ctx) => {
+		const session = await sessions.getSession(ctx);
+		if (!session) {
+			throw new AlefError(AlefError.Code.Unauthorized, 'Unauthorized', 'No session found');
+		}
+
+		assertPrefixedId(session.userId, 'u');
+		const organizationId = ctx.get('session').organizationId;
+		if (!organizationId) {
+			throw new AlefError(AlefError.Code.BadRequest, 'No organization ID found in session');
+		}
+
+		const organization = await ctx.env.ADMIN_STORE.getOrganization(organizationId);
+		if (!organization) {
+			throw new AlefError(AlefError.Code.BadRequest, 'Invalid organization. Please contact support.');
+		}
+
+		if (!(await ctx.env.ADMIN_STORE.getIsUserOrganizationAdmin(session.userId, organizationId))) {
+			throw new AlefError(AlefError.Code.Unauthorized, 'You must be an organization admin to cancel subscriptions');
+		}
+
+		if (!organization.stripeSubscriptionId) {
+			throw new AlefError(AlefError.Code.BadRequest, 'No stripe customer ID found for this organization. Are you subscribed to a paid product?');
+		}
+
+		const stripe = ctx.get('stripe');
+		await stripe.subscriptions.cancel(organization.stripeSubscriptionId);
+
+		return ctx.json({ success: true });
+	})
 	.post(
 		'/checkout-session',
+		loggedInMiddleware,
 		zValidator(
-			'json',
+			'form',
 			z.object({
 				priceKey: z.string(),
-				organizationId: idShapes.Organization,
 			})
 		),
 		async (ctx) => {
-			const body = ctx.req.valid('json');
+			const organizationId = ctx.get('session').organizationId;
+			if (!organizationId) {
+				throw new AlefError(AlefError.Code.BadRequest, 'No organization ID found in session');
+			}
+
+			const body = ctx.req.valid('form');
 			const priceKey = body.priceKey;
 
 			const session = await sessions.getSession(ctx);
@@ -80,7 +124,7 @@ export const stripeRouter = new Hono<Env>()
 			}
 
 			assertPrefixedId(session.userId, 'u');
-			const isUserAdmin = await ctx.env.ADMIN_STORE.getIsUserOrganizationAdmin(session.userId, body.organizationId);
+			const isUserAdmin = await ctx.env.ADMIN_STORE.getIsUserOrganizationAdmin(session.userId, organizationId);
 
 			if (!isUserAdmin) {
 				throw new AlefError(AlefError.Code.Unauthorized, 'You must be an organization admin to purchase subscriptions');
@@ -118,7 +162,7 @@ export const stripeRouter = new Hono<Env>()
 				billing_address_collection: 'auto',
 				subscription_data: {
 					metadata: {
-						organizationId: body.organizationId,
+						organizationId,
 					},
 					trial_period_days: 14,
 				},

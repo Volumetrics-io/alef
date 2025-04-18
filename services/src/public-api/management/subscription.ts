@@ -189,13 +189,15 @@ export async function handleEntitlementsUpdated(ev: Stripe.EntitlementsActiveEnt
 
 function getEntitlementsAsMap(entitlements: Stripe.EntitlementsActiveEntitlementSummaryUpdatedEvent) {
 	const map = new Map<string, boolean>();
-	entitlements.data.object.entitlements.data.forEach((entitlement) => {
-		const featureName = typeof entitlement.feature === 'string' ? entitlement.feature : entitlement.feature.name;
-		map.set(featureName, true);
-	});
+	for (const entitlement of entitlements.data.object.entitlements.data) {
+		if (!entitlement.feature) {
+			continue;
+		}
+		map.set(entitlement.lookup_key, true);
+	}
 	return map;
 }
 
 export const ENTITLEMENT_NAMES = {
-	EXTENDED_AI_ACCESS: 'extended_ai_access',
+	EXTENDED_AI_ACCESS: 'extended-ai-access',
 };

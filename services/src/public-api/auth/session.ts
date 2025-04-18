@@ -11,6 +11,7 @@ declare module '@a-type/auth' {
 		name: string | null;
 		isProductAdmin: boolean;
 		deviceId?: PrefixedId<'d'>;
+		organizationId?: PrefixedId<'or'>;
 	}
 }
 
@@ -57,6 +58,7 @@ export const sessions = new SessionManager<Context>({
 		name: 'name',
 		isProductAdmin: 'pad',
 		deviceId: 'dev',
+		organizationId: 'org',
 	},
 	adapter: honoAdapter,
 });

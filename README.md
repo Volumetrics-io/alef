@@ -15,6 +15,18 @@ After that, run `pnpm dev` in the root directory. This will run all services loc
 - Public API: [localhost:4201](http://localhost:4201)
 - Admin API: [localhost:4202](http://localhost:4202)
 
+### Set up Stripe
+
+We use Stripe for subscription processing. You can use the app in anonymous mode without needing it, but to test accounts with subscriptions you will have to set up your local keys and CLI.
+
+[First, install Stripe's CLI for your OS and login.](https://docs.stripe.com/stripe-cli?install-method=homebrew)
+
+[Then, get a test mode secret key to provide to `services/public-api/.dev.vars`.](https://dashboard.stripe.com/test/apikeys) Put it in as `STRIPE_SECRET_KEY`.
+
+Finally, run `pnpm stripe` in `./services`. This will output a webhook signing secret. Place this value in `/services/public-api/.dev.vars` too, under `STRIPE_WEBHOOK_SECRET`.
+
+As long as `pnpm stripe` is running, it should forward test mode webhook events to your local server. This will close the loop and should update user accounts with paid features when you sign up for subscriptions in your local dev app.
+
 ## Architecture
 
 This is a Cloudflare full-stack app which uses Workers for the backend, D1 for SQL, R2 for object storage.

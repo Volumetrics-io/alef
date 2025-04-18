@@ -114,4 +114,14 @@ export class AuthedStore extends RpcTarget {
 			.selectAll('User')
 			.execute();
 	}
+
+	async createOrganization(name: string) {
+		const organizationId = id('or');
+		const membershipId = id('me');
+
+		const org = await this.#db.insertInto('Organization').values({ id: organizationId, name, hasExtendedAIAccess: false }).returningAll().executeTakeFirstOrThrow();
+		await this.#db.insertInto('Membership').values({ id: membershipId, userId: this.#userId, organizationId, role: 'admin' }).execute();
+
+		return org;
+	}
 }

@@ -10,8 +10,17 @@ export interface ChatProps {
 }
 
 export function Chat({ className }: ChatProps) {
+	return (
+		<Box full stacked p="small" className={className}>
+			<ChatSettings />
+			<ChatHistory />
+			<ChatForm />
+		</Box>
+	);
+}
+
+function ChatSettings() {
 	const { state, agent } = useAgentContext();
-	const { ref, onScroll } = useStayScrolledToBottom();
 
 	const setModel = useCallback(
 		(model: VibeCoderModel) => {
@@ -21,26 +30,29 @@ export function Chat({ className }: ChatProps) {
 		[agent]
 	);
 
-	console.log(state.model);
-
 	return (
-		<Box full stacked p="small" className={className}>
-			<Box full="width" stacked>
-				<Select value={state.model} onValueChange={(value) => setModel(value as VibeCoderModel)}>
-					{VibeCoderModelNames.map((key) => (
-						<Select.Item key={key} value={key}>
-							{key}
-						</Select.Item>
-					))}
-				</Select>
-			</Box>
-			<ScrollArea stretched gapped stacked ref={ref} onScroll={onScroll}>
-				{state.messages.map((msg) => (
-					<ChatMessage key={msg.id} message={msg} />
+		<Box full="width" stacked>
+			<Select value={state.model} onValueChange={(value) => setModel(value as VibeCoderModel)}>
+				{VibeCoderModelNames.map((key) => (
+					<Select.Item key={key} value={key}>
+						{key}
+					</Select.Item>
 				))}
-			</ScrollArea>
-			<ChatForm />
+			</Select>
 		</Box>
+	);
+}
+
+function ChatHistory() {
+	const { state } = useAgentContext();
+	const { ref, onScroll } = useStayScrolledToBottom();
+	return (
+		<ScrollArea stretched gapped stacked ref={ref} onScroll={onScroll}>
+			{state.messages.map((msg) => (
+				<ChatMessage key={msg.id} message={msg} />
+			))}
+			<Box full="width" style={{ marginBottom: '3dvh' }}></Box>
+		</ScrollArea>
 	);
 }
 
@@ -54,14 +66,15 @@ function ChatForm() {
 		async (e: React.FormEvent<HTMLFormElement>) => {
 			e.preventDefault();
 			setIsLoading(true);
+			let message = inputRef.current?.value;
+			inputRef.current!.value = '';
 			try {
-				await agent.call('generateCode', [inputRef.current?.value]);
+				await agent.call('generateCode', [message]);
 			} catch (error) {
 				console.error(error);
 			} finally {
 				setIsLoading(false);
 			}
-			inputRef.current!.value = '';
 		},
 		[agent, inputRef]
 	);

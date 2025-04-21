@@ -1,16 +1,15 @@
 import { AlefError, isPrefixedId, PrefixedId } from '@alef/common';
-import { Agent, routeAgentRequest, unstable_callable as callable } from 'agents';
-import { generateObject, NoObjectGeneratedError } from 'ai';
+import { unstable_callable as callable } from 'agents';
+import { createDataStreamResponse, streamText, StreamTextOnFinishCallback } from 'ai';
 import { AsyncLocalStorage } from 'async_hooks';
 import { createWorkersAI } from 'workers-ai-provider';
-import { Bindings, Env } from '../../config/ctx';
-import { z } from 'zod';
+import { Bindings } from '../../config/ctx';
+import { AIChatAgent } from 'agents/ai-chat-agent';
 
 export interface VibeCoderState {
 	model: VibeCoderModel;
 	code: string;
 	description: string;
-	messages: any[];
 }
 
 const VibeCoderModels = {
@@ -26,13 +25,12 @@ export const VibeCoderModelNames = ['llama-3.3-70b', 'deepseek-r1-qwen-32b', 'll
 
 export type VibeCoderModel = (typeof VibeCoderModelNames)[number];
 
-export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
+export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 	#model;
 	initialState: VibeCoderState = {
 		model: 'qwq-32b',
 		code: '',
 		description: '',
-		messages: [],
 	};
 
 	constructor(state: DurableObjectState, env: Bindings) {
@@ -51,66 +49,71 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 			model: modelURI,
 			code: this.state.code,
 			description: this.state.description,
-			messages: this.state.messages,
 		});
 
 		this.#model = createWorkersAI({ binding: this.env.AI })(VibeCoderModels[modelURI] as any);
 	}
 
-	@callable()
-	async generateCode(prompt: string) {
-		this.state.messages.push({ role: 'user', content: prompt });
-		let result;
-		try {
-			result = await generateObject({
-				model: this.#model,
-				system: this.#getSystemComponentPrompt(),
-				messages: this.state.messages,
-				output: 'object',
-				maxTokens: 10000,
-				schema: z.object({
-					code: z.string(),
-					description: z.string(),
-				}),
+	async onChatMessage(onFinish: StreamTextOnFinishCallback<{}>): Promise<Response | undefined> {
+		if (!isPrefixedId(this.name, 'p')) {
+			throw new AlefError(AlefError.Code.InternalServerError, 'LayoutAgent must be created with a property ID');
+		}
+		return agentContext.run({ env: this.env, propertyId: this.name }, async () => {
+			const dataStreamResponse = createDataStreamResponse({
+				execute: async (dataStream) => {
+					let processedMessages = this.messages;
+					const result = streamText({
+						model: this.#model,
+						system: this.#getSystemComponentPrompt(),
+						messages: processedMessages,
+						onStepFinish: (stepResult) => {
+							console.log(`Step result: ${stepResult.text}`);
+							let result = stepResult.text;
+							if (result.includes('</think>')) {
+								result = result.split('</think>')[1].replace(/^[\s\r\n]+/, '');
+								console.log(`Result: ${result}`);
+							}
+							if (result.includes('```json')) {
+								result = result.split('```json')[1].replace(/^[\s\r\n]+/, '');
+								result = result.split('```')[0].replace(/^[\s\r\n]+/, '');
+								console.log(`Result: ${result}`);
+							}
+							if (result.startsWith('{')) {
+								try {
+									console.log(`Result: ${result}`);
+									const parsedResult = JSON.parse(result);
+									if (parsedResult.code) {
+										this.setState({
+											model: this.state.model ?? 'qwq-32b',
+											code: parsedResult.code ?? '',
+											description: parsedResult.description ?? '',
+										});
+									}
+								} finally {
+									// do nothing
+								}
+							}
+						},
+						onFinish,
+						onError: ({ error }) => {
+							console.error(`Error in AI model: ${error}`);
+						},
+						maxTokens: 10000,
+						maxSteps: 5,
+					});
+
+					result.mergeIntoDataStream(dataStream);
+				},
+				onError: (error) => {
+					console.error(`Error in AI model: ${error}`);
+					return 'Error in AI model';
+				},
 			});
-		} catch (error) {
-			if (NoObjectGeneratedError.isInstance(error)) {
-				console.log('NoObjectGeneratedError');
-				console.log('Cause:', error.cause);
-				console.log('Text:', error.text);
-				console.log('Response:', error.response);
-				console.log('Usage:', error.usage);
-				console.log('Finish Reason:', error.finishReason);
-			}
-			return;
-		}
 
-		if (!result) {
-			console.error('No result from generateObject');
-			return;
-		}
-
-		console.log('result', result.object);
-
-		this.setState({
-			model: this.state.model ?? 'qwq-32b',
-			code: result.object?.code ?? '',
-			description: result.object?.description ?? '',
-			messages: [...this.state.messages, { role: 'assistant', content: result.object?.description ?? '' }],
-		});
-
-		return;
-	}
-
-	@callable()
-	clearMessages() {
-		this.setState({
-			model: this.state.model ?? 'qwq-32b',
-			code: '',
-			description: '',
-			messages: [],
+			return dataStreamResponse;
 		});
 	}
+
 	#getSystemComponentPrompt() {
 		return `You are a web developer with expertise in THREE.js and React-Three-Fiber. use the following template to create a r3f component:
 
@@ -159,11 +162,5 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 		`;
 	}
 }
-
-export default {
-	async fetch(request: Request, env: Env) {
-		return (await routeAgentRequest(request, env, { prefix: 'some/prefix' })) || new Response('Not found', { status: 404 });
-	},
-} satisfies ExportedHandler<Env>;
 
 export const agentContext = new AsyncLocalStorage<{ env: Bindings; propertyId: PrefixedId<'p'> }>();

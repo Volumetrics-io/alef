@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAgentContext, VibeCoderModelNames } from '../AgentContext';
 import { Select } from '@alef/sys';
 import { VibeCoderModel } from '@alef/services/public-api';
+import { useVibeCoderChat } from '../hooks';
 
 export interface ChatProps {
 	className?: string;
@@ -44,11 +45,11 @@ function ChatSettings() {
 }
 
 function ChatHistory() {
-	const { state } = useAgentContext();
+	const { messages } = useVibeCoderChat();
 	const { ref, onScroll } = useStayScrolledToBottom();
 	return (
 		<ScrollArea stretched gapped stacked ref={ref} onScroll={onScroll}>
-			{state.messages.map((msg) => (
+			{messages.map((msg) => (
 				<ChatMessage key={msg.id} message={msg} />
 			))}
 			<Box full="width" style={{ marginBottom: '3dvh' }}></Box>
@@ -57,37 +58,13 @@ function ChatHistory() {
 }
 
 function ChatForm() {
-	const { agent } = useAgentContext();
-
-	const inputRef = useRef<HTMLInputElement>(null);
-	const [isLoading, setIsLoading] = useState(false);
-
-	const handleSubmit = useCallback(
-		async (e: React.FormEvent<HTMLFormElement>) => {
-			e.preventDefault();
-			setIsLoading(true);
-			let message = inputRef.current?.value;
-			inputRef.current!.value = '';
-			try {
-				await agent.call('generateCode', [message]);
-			} catch (error) {
-				console.error(error);
-			} finally {
-				setIsLoading(false);
-			}
-		},
-		[agent, inputRef]
-	);
-
-	const clearHistory = useCallback(() => {
-		agent.call('clearMessages');
-	}, [agent]);
+	const { handleSubmit, input, handleInputChange, isLoading, clearHistory } = useVibeCoderChat();
 
 	return (
 		<Box gapped asChild>
 			<Form onSubmit={handleSubmit}>
 				<Box gapped>
-					<Input ref={inputRef} placeholder="Type your message..." />
+					<Input value={input} onChange={handleInputChange} placeholder="Type your message..." />
 					<Button type="submit" loading={isLoading}>
 						<Icon name="send" />
 					</Button>

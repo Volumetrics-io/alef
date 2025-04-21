@@ -22,7 +22,6 @@ export function useVibeCoder() {
 		model: 'qwq-32b',
 		code: '',
 		description: '',
-		messages: [],
 	});
 	const agent = useAgent({
 		agent: 'vibe-coder',

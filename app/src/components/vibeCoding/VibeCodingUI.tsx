@@ -9,15 +9,17 @@ export interface VibeCodingUIProps {}
 
 export function VibeCodingUI({}: VibeCodingUIProps) {
 	return (
-		<AgentProvider>
-			<Box full className={cls.root}>
-				<Suspense>
-					<Chat className={cls.chat} />
-				</Suspense>
-				<Suspense>
-					<CodeRenderer className={cls.renderer} />
-				</Suspense>
-			</Box>
-		</AgentProvider>
+		<Suspense>
+			<AgentProvider>
+				<Box full className={cls.root}>
+					<Suspense>
+						<Chat className={cls.chat} />
+					</Suspense>
+					<Suspense>
+						<CodeRenderer className={cls.renderer} />
+					</Suspense>
+				</Box>
+			</AgentProvider>
+		</Suspense>
 	);
 }

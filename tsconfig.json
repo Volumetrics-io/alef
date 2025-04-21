@@ -2,11 +2,11 @@
 	"compilerOptions": {
 		"noImplicitAny": true,
 		"noLib": false,
-		"target": "ES2021",
+		"target": "ESNext",
 		"sourceMap": true,
 		"module": "Preserve",
 		"moduleResolution": "bundler",
-		"lib": ["ES2022"],
+		"lib": ["ESNext"],
 		"skipLibCheck": true,
 		"strict": true,
 		"forceConsistentCasingInFileNames": true,

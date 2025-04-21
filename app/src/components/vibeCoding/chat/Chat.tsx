@@ -2,15 +2,14 @@ import { VibeCoderModel } from '@alef/services/public-api';
 import { Box, Button, Icon, Input, ScrollArea, Select } from '@alef/sys';
 import { UIMessage } from 'ai';
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
-import { useAgentContext, VibeCoderModelNames } from '../AgentContext';
-import { useVibeCoderChat, VibeCoderChat } from '../hooks';
+import { useAgentContext, VibeCoderChat, VibeCoderModelNames } from '../AgentContext';
 
 export interface ChatProps {
 	className?: string;
 }
 
 export function Chat({ className }: ChatProps) {
-	const chat = useVibeCoderChat();
+	const { chat } = useAgentContext();
 
 	return (
 		<Box full stacked p="small" className={className}>

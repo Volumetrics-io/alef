@@ -273,9 +273,6 @@ importers:
       esbuild-wasm:
         specifier: ^0.25.2
         version: 0.25.2
-      formik:
-        specifier: 2.4.6
-        version: 2.4.6(react@19.1.0)
       hono:
         specifier: 'catalog:'
         version: 4.6.19

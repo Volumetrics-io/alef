@@ -38,7 +38,6 @@
 		"change-case": "^5.4.4",
 		"clsx": "2.1.1",
 		"esbuild-wasm": "^0.25.2",
-		"formik": "2.4.6",
 		"hono": "catalog:",
 		"immer": "^10.1.1",
 		"optics-ts": "^2.4.1",

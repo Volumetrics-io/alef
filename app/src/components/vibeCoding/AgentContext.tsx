@@ -24,8 +24,9 @@ export function useVibeCoder() {
 		description: '',
 	});
 	const agent = useAgent({
+		id: 'vibe-coder',
 		agent: 'vibe-coder',
-		prefix: 'some/prefix',
+		debug: true,
 		name: projectId,
 		basePath: `ai/vibe-coder/${projectId}`,
 		host: import.meta.env.VITE_PUBLIC_API_ORIGIN,

@@ -13,8 +13,6 @@ export function CodeRenderer({ className }: CodeRendererProps) {
 	const ref = useRef<HTMLIFrameElement>(null);
 
 	const code = state.code;
-	const codeRef = useRef(code);
-	codeRef.current = code;
 
 	const reloadFrame = useCallback(() => {
 		if (ref.current) {

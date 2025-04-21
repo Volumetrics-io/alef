@@ -1,21 +1,28 @@
-import { Box, Button, Icon, Input, ScrollArea, Form } from '@alef/sys';
-import { UIMessage } from 'ai';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useAgentContext, VibeCoderModelNames } from '../AgentContext';
-import { Select } from '@alef/sys';
 import { VibeCoderModel } from '@alef/services/public-api';
-import { useVibeCoderChat } from '../hooks';
+import { Box, Button, Icon, Input, ScrollArea, Select } from '@alef/sys';
+import { UIMessage } from 'ai';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { useAgentContext, VibeCoderModelNames } from '../AgentContext';
+import { useVibeCoderChat, VibeCoderChat } from '../hooks';
 
 export interface ChatProps {
 	className?: string;
 }
 
 export function Chat({ className }: ChatProps) {
+	const chat = useVibeCoderChat();
+
 	return (
 		<Box full stacked p="small" className={className}>
-			<ChatSettings />
-			<ChatHistory />
-			<ChatForm />
+			<Suspense>
+				<ChatSettings />
+			</Suspense>
+			<Suspense>
+				<ChatHistory chat={chat} />
+			</Suspense>
+			<Suspense>
+				<ChatForm chat={chat} />
+			</Suspense>
 		</Box>
 	);
 }
@@ -44,12 +51,11 @@ function ChatSettings() {
 	);
 }
 
-function ChatHistory() {
-	const { messages } = useVibeCoderChat();
+function ChatHistory({ chat }: { chat: VibeCoderChat }) {
 	const { ref, onScroll } = useStayScrolledToBottom();
 	return (
 		<ScrollArea stretched gapped stacked ref={ref} onScroll={onScroll}>
-			{messages.map((msg) => (
+			{chat.messages.map((msg) => (
 				<ChatMessage key={msg.id} message={msg} />
 			))}
 			<Box full="width" style={{ marginBottom: '3dvh' }}></Box>
@@ -57,22 +63,20 @@ function ChatHistory() {
 	);
 }
 
-function ChatForm() {
-	const { handleSubmit, input, handleInputChange, isLoading, clearHistory } = useVibeCoderChat();
-
+function ChatForm({ chat }: { chat: VibeCoderChat }) {
 	return (
-		<Box gapped asChild>
-			<Form onSubmit={handleSubmit}>
+		<Box stacked gapped asChild>
+			<form onSubmit={chat.handleSubmit}>
 				<Box gapped>
-					<Input value={input} onChange={handleInputChange} placeholder="Type your message..." />
-					<Button type="submit" loading={isLoading}>
+					<Input value={chat.input} onChange={chat.handleInputChange} placeholder="Type your message..." />
+					<Button type="submit" loading={chat.isLoading}>
 						<Icon name="send" />
 					</Button>
 				</Box>
-				<Button color="destructive" onClick={clearHistory}>
+				<Button color="destructive" onClick={chat.clearHistory}>
 					<Icon name="trash" />
 				</Button>
-			</Form>
+			</form>
 		</Box>
 	);
 }

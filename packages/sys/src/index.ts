@@ -10,7 +10,7 @@ export * from './components/control/Control.js';
 export * from './components/dialog/Dialog.js';
 export * from './components/dropdownMenu/DropdownMenu.js';
 export * from './components/errorBoundary/ErrorBoundary.js';
-// export * from './components/forms/index.js';
+export * from './components/forms/index.js';
 export * from './components/frame/Frame.js';
 export * from './components/heading/Heading.js';
 export * from './components/hero/Hero.js';

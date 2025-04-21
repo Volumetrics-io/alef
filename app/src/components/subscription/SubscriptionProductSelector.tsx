@@ -26,7 +26,7 @@ export function SubscriptionProductSelector({ showFree }: SubscriptionProductSel
 					{planKeySelected !== 'free' && (
 						<Card.Details>
 							<Toolbar>
-								<Button onClick={() => cancel.mutate()} loading={cancel.isPending}>
+								<Button color="destructive" onClick={() => cancel.mutate()} loading={cancel.isPending}>
 									Downgrade to Free
 								</Button>
 							</Toolbar>
@@ -50,7 +50,9 @@ export function SubscriptionProductSelector({ showFree }: SubscriptionProductSel
 							{planKeySelected !== 'premium' && (
 								<Card.Details>
 									<Toolbar>
-										<Button type="submit">Upgrade</Button>
+										<Button color="suggested" type="submit">
+											Upgrade
+										</Button>
 									</Toolbar>
 								</Card.Details>
 							)}

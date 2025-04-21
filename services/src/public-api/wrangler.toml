@@ -51,6 +51,10 @@ class_name = "LayoutAgent"
 name = "VIBE_CODER_AGENT"
 class_name = "VibeCoderAgent"
 
+[[durable_objects.bindings]]
+name = "TOKEN_QUOTA"
+class_name = "TokenQuota"
+
 [[migrations]]
 tag = "v1"
 new_classes = ["DeviceDiscovery"]
@@ -70,3 +74,7 @@ new_sqlite_classes = ["LayoutAgent"]
 [[migrations]]
 tag = "v5"
 new_sqlite_classes = ["VibeCoderAgent"]
+
+[[migrations]]
+tag = "v6"
+new_classes = ["TokenQuota"]

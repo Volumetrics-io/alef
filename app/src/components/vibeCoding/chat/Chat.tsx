@@ -1,5 +1,7 @@
+import { AGENT_ERRORS } from '@alef/common';
 import { VibeCoderModel } from '@alef/services/public-api';
-import { Box, Button, Icon, Input, ScrollArea, Select } from '@alef/sys';
+import { Box, Button, Frame, Icon, Input, ScrollArea, Select } from '@alef/sys';
+import { Link } from '@verdant-web/react-router';
 import { UIMessage } from 'ai';
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { useAgentContext, VibeCoderChat, VibeCoderModelNames } from '../AgentContext';
@@ -9,7 +11,7 @@ export interface ChatProps {
 }
 
 export function Chat({ className }: ChatProps) {
-	const { chat } = useAgentContext();
+	const { chat, error } = useAgentContext();
 
 	return (
 		<Box full stacked p="small" className={className}>
@@ -20,7 +22,16 @@ export function Chat({ className }: ChatProps) {
 				<ChatHistory chat={chat} />
 			</Suspense>
 			<Suspense>
-				<ChatForm chat={chat} />
+				{error === AGENT_ERRORS.QUOTA_EXCEEDED ? (
+					<Frame color="error" stacked gapped p="small">
+						Daily AI usage limits exceeded. Upgrade for more, or try again tomorrow.
+						<Button asChild>
+							<Link to="/settings">Upgrade</Link>
+						</Button>
+					</Frame>
+				) : (
+					<ChatForm chat={chat} />
+				)}
 			</Suspense>
 		</Box>
 	);

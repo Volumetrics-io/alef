@@ -26,7 +26,8 @@
 		"db:run:local": "wrangler d1 execute prod-alef-core-d1 -c src/db/wrangler.toml --local --command",
 		"build": "pnpm run --filter @alef/services --parallel \"/^build:.*/\"",
 		"build:client": "tsc -p tsconfig.client.json",
-		"createUser": "node ./scripts/createUser.mjs"
+		"createUser": "node ./scripts/createUser.mjs",
+		"wrangler": "wrangler"
 	},
 	"dependencies": {
 		"@a-type/auth": "catalog:",
@@ -42,6 +43,7 @@
 		"@types/node": "^22.14.0",
 		"agents": "^0.0.60",
 		"ai": "^4.3.7",
+		"date-fns": "^4.1.0",
 		"hono": "catalog:",
 		"hono-agents": "^0.0.50",
 		"jose": "^5.9.6",

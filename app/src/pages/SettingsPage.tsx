@@ -6,6 +6,7 @@ const SettingsPage = () => {
 		<Box full>
 			<Box stacked gapped constrained>
 				<Heading level={1}>Settings</Heading>
+				<Heading level={2}>Your plan</Heading>
 				<SubscriptionProductSelector showFree />
 			</Box>
 		</Box>

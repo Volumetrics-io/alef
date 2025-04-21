@@ -72,11 +72,34 @@ export class AdminStore extends WorkerEntrypoint<Env> {
 				...user,
 			})
 			.returning('id')
+			.onConflict((cb) => cb.columns(['email']).doNothing())
 			.executeTakeFirst();
 
 		if (!userResult) {
 			throw new Error('Failed to insert user');
 		}
+
+		// create the user's default organization
+		const organizationId = id('or');
+		await this.#db
+			.insertInto('Organization')
+			.values({
+				id: organizationId,
+				name: 'Default Organization',
+				hasExtendedAIAccess: false,
+			})
+			.execute();
+
+		// create the membership
+		await this.#db
+			.insertInto('Membership')
+			.values({
+				id: id('me'),
+				userId: userResult.id,
+				organizationId,
+				role: 'admin',
+			})
+			.execute();
 
 		return userResult;
 	}

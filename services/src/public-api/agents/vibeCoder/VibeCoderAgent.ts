@@ -1,10 +1,10 @@
-import { AlefError, isPrefixedId, PrefixedId } from '@alef/common';
+import { AGENT_ERRORS, AlefError, assertPrefixedId, isPrefixedId, PrefixedId } from '@alef/common';
 import { unstable_callable as callable } from 'agents';
-import { createDataStreamResponse, streamText, StreamTextOnFinishCallback } from 'ai';
+import { AIChatAgent } from 'agents/ai-chat-agent';
+import { createDataStreamResponse, formatDataStreamPart, streamText, StreamTextOnFinishCallback } from 'ai';
 import { AsyncLocalStorage } from 'async_hooks';
 import { createWorkersAI } from 'workers-ai-provider';
 import { Bindings } from '../../config/ctx';
-import { AIChatAgent } from 'agents/ai-chat-agent';
 
 export interface VibeCoderState {
 	model: VibeCoderModel;
@@ -26,6 +26,7 @@ export const VibeCoderModelNames = ['llama-3.3-70b', 'deepseek-r1-qwen-32b', 'll
 export type VibeCoderModel = (typeof VibeCoderModelNames)[number];
 
 export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
+	#organizationId: PrefixedId<'or'> | null = null;
 	#model;
 	initialState: VibeCoderState = {
 		model: 'qwq-32b',
@@ -36,10 +37,60 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 	constructor(state: DurableObjectState, env: Bindings) {
 		super(state, env);
 		this.#model = createWorkersAI({ binding: env.AI })(VibeCoderModels[this.state.model] as any);
+		// setup SQL tables
+		this.sql`
+			CREATE TABLE IF NOT EXISTS metadata (
+				key TEXT PRIMARY KEY,
+				value TEXT NULL
+			);
+		`;
+		const { organizationId } = this.#getOwnership();
+		if (organizationId) {
+			assertPrefixedId(organizationId, 'or');
+			this.#organizationId = organizationId;
+		}
 	}
 
 	async onStart() {
 		console.log('VibeCoderAgent started');
+	}
+
+	#getOwnership() {
+		const rows = this.sql<{ key: string; value: string }>`SELECT * FROM metadata WHERE key = ${'ownership'}`;
+		if (rows.length > 0) {
+			const row = rows[0];
+			return {
+				organizationId: row.value,
+			};
+		}
+		return { organizationId: null };
+	}
+
+	#getQuotaId() {
+		if (!this.#organizationId) {
+			throw new AlefError(AlefError.Code.InternalServerError, 'No organization ID found');
+		}
+		return this.env.TOKEN_QUOTA.idFromName(this.#organizationId);
+	}
+
+	async #getQuota() {
+		const quotaObject = this.env.TOKEN_QUOTA.get(this.#getQuotaId());
+		return quotaObject.getDetails();
+	}
+
+	/**
+	 * Updates the organization association with this agent, which
+	 * determines the quota limits and how usage is tracked.
+	 *
+	 * If this is not called after the agent is created, the agent will
+	 * not be able to process requests.
+	 */
+	updateOrganizationOwner(organizationId: PrefixedId<'or'>) {
+		this.#organizationId = organizationId;
+		this.sql`
+			INSERT INTO metadata (key, value)
+				VALUES (${'ownership'}, ${organizationId})
+				ON CONFLICT(key) DO UPDATE SET value = excluded.value;`;
 	}
 
 	@callable()
@@ -61,6 +112,13 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 		return agentContext.run({ env: this.env, propertyId: this.name }, async () => {
 			const dataStreamResponse = createDataStreamResponse({
 				execute: async (dataStream) => {
+					// ensure we have not exceeded the daily token limit
+					const quota = await this.#getQuota();
+					if (quota.exceeded) {
+						// IDK how to actually communicate this to the client
+						console.error(`Quota exceeded for ${this.#organizationId}`);
+						dataStream.write(formatDataStreamPart('error', AGENT_ERRORS.QUOTA_EXCEEDED));
+					}
 					let processedMessages = this.messages;
 					const result = streamText({
 						model: this.#model,
@@ -94,7 +152,13 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 								}
 							}
 						},
-						onFinish,
+						onFinish: (event) => {
+							onFinish?.(event as any);
+							const { completionTokens, promptTokens } = event.usage;
+							if (this.#organizationId) {
+								this.env.TOKEN_QUOTA.get(this.#getQuotaId()).addUsage(completionTokens + promptTokens, `VibeCoderAgent ${this.name} - ${this.#organizationId}`);
+							}
+						},
 						onError: ({ error }) => {
 							console.error(`Error in AI model: ${error}`);
 						},

@@ -24,7 +24,7 @@ export const stripeRouter = new Hono<Env>()
 		const signature = ctx.req.header('stripe-signature')!;
 		let event;
 		try {
-			event = stripe.webhooks.constructEvent(await ctx.req.text(), signature, ctx.env.STRIPE_WEBHOOK_SECRET);
+			event = await stripe.webhooks.constructEventAsync(await ctx.req.text(), signature, ctx.env.STRIPE_WEBHOOK_SECRET);
 		} catch (err) {
 			console.log(`⚠️  Webhook signature verification failed.`, err);
 			throw new AlefError(AlefError.Code.BadRequest, 'Webhook signature verification failed', err);

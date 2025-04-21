@@ -38,3 +38,4 @@ export { VibeCoderAgent } from './agents/vibeCoder/VibeCoderAgent.js';
 export { DeviceDiscovery } from './durableObjects/DeviceDiscovery.js';
 export { Paircodes } from './durableObjects/Paircodes.js';
 export { Property } from './durableObjects/Property.js';
+export { TokenQuota } from './durableObjects/TokenQuota.js';

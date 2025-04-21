@@ -6,6 +6,7 @@ import { VibeCoderAgent } from '../agents/vibeCoder/VibeCoderAgent.js';
 import type { DeviceDiscovery } from '../durableObjects/DeviceDiscovery.js';
 import type { Paircodes } from '../durableObjects/Paircodes.js';
 import type { Property } from '../durableObjects/Property.js';
+import { TokenQuota } from '../durableObjects/TokenQuota.js';
 
 export interface Bindings {
 	// env
@@ -39,6 +40,7 @@ export interface Bindings {
 	LAYOUT_AGENT: AgentNamespace<LayoutAgent>;
 	VIBE_CODER_AGENT: AgentNamespace<VibeCoderAgent>;
 	AI: Ai;
+	TOKEN_QUOTA: DurableObjectNamespace<TokenQuota>;
 }
 
 export interface CtxVars {

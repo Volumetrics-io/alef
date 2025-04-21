@@ -1,7 +1,9 @@
-import { PrefixedId } from '@alef/common';
+import { assert } from '@a-type/utils';
+import { assertPrefixedId, PrefixedId } from '@alef/common';
 import { Context } from 'hono';
 import Stripe from 'stripe';
 import { Bindings, CtxVars } from '../config/ctx.js';
+import { DAILY_TOKEN_LIMIT } from '../constants/usageLimits.js';
 import { email } from '../services/email.js';
 import { stripeDateToDate } from '../services/stripe.js';
 
@@ -71,12 +73,27 @@ export async function handleSubscriptionDeleted(event: Stripe.CustomerSubscripti
 
 export async function handleSubscriptionCreated(event: Stripe.CustomerSubscriptionCreatedEvent, ctx: Context<EnvWithStripe>) {
 	const subscription = event.data.object;
-	const organization = await ctx.env.ADMIN_STORE.getOrganizationBySubscription(subscription.id);
+	// attach subscription and customer to the organization based on metadata
+	// we added during checkout
+
+	const metadata = subscription.metadata as {
+		organizationId: string;
+	};
+	const organizationId = metadata.organizationId;
+	assertPrefixedId(organizationId, 'or');
+	const organization = await ctx.env.ADMIN_STORE.getOrganization(organizationId);
 
 	if (!organization) {
-		console.error(`No organization found for subscription ${subscription.id}`);
+		console.error(`No organization found for subscription ${subscription.id} based on metadata ${JSON.stringify(metadata)}`);
 		return;
 	}
+
+	// update the organization with the subscription
+	assert(typeof subscription.customer === 'string', 'customer is not a string');
+	await ctx.env.ADMIN_STORE.updateOrganization(organization.id, {
+		stripeSubscriptionId: subscription.id,
+		stripeCustomerId: subscription.customer as string,
+	});
 
 	if (subscription.trial_end && subscription.status === 'trialing') {
 		await emailAllAdmins(
@@ -185,6 +202,11 @@ export async function handleEntitlementsUpdated(ev: Stripe.EntitlementsActiveEnt
 	await ctx.env.ADMIN_STORE.updateOrganization(organization.id, {
 		hasExtendedAIAccess: !!entitlementMap.get(ENTITLEMENT_NAMES.EXTENDED_AI_ACCESS),
 	});
+	// apply limit to organization's token quota
+	const quotaObject = ctx.env.TOKEN_QUOTA.get(ctx.env.TOKEN_QUOTA.idFromName(organization.id));
+	const newLimit = entitlementMap.get(ENTITLEMENT_NAMES.EXTENDED_AI_ACCESS) ? DAILY_TOKEN_LIMIT.EXTENDED : DAILY_TOKEN_LIMIT.FREE;
+	quotaObject.applyLimit(newLimit);
+	console.info(`Entitlements updated for ${organization.id}: ${JSON.stringify(Object.fromEntries(entitlementMap.entries()), null, 2)}, new token limit: ${newLimit}`);
 }
 
 function getEntitlementsAsMap(entitlements: Stripe.EntitlementsActiveEntitlementSummaryUpdatedEvent) {

@@ -1,7 +1,7 @@
 import { id, PrefixedId } from '@alef/common';
 import { RpcTarget } from 'cloudflare:workers';
 import { DB, userNameSelector } from './kysely/index.js';
-import { DeviceUpdate } from './kysely/tables.js';
+import { DeviceUpdate, PropertyUpdate } from './kysely/tables.js';
 
 export class AuthedStore extends RpcTarget {
 	#userId: PrefixedId<'u'>;
@@ -80,6 +80,10 @@ export class AuthedStore extends RpcTarget {
 
 	async hasProperty(propertyId: PrefixedId<'p'>) {
 		return this.#db.selectFrom('Property').where('id', '=', propertyId).where('Property.ownerId', '=', this.#userId).select('id').executeTakeFirst();
+	}
+
+	async updateProperty(propertyId: PrefixedId<'p'>, data: PropertyUpdate) {
+		return this.#db.updateTable('Property').set(data).where('id', '=', propertyId).where('Property.ownerId', '=', this.#userId).returningAll().executeTakeFirstOrThrow();
 	}
 
 	async getOrganizations() {

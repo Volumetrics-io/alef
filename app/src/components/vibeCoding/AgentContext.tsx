@@ -32,7 +32,6 @@ export function useVibeCoder() {
 		description: '',
 	});
 	const agent = useAgent({
-		id: 'vibe-coder',
 		agent: 'vibe-coder',
 		debug: true,
 		name: projectId,
@@ -90,7 +89,7 @@ export function useVibeCoderChat(agent: VibeCoderAgent, onError: (msg: string) =
 			toast.error(err.message);
 		},
 		// reuses data between hook invocations
-		id: 'vibe-coder',
+		id: `vibe-coder:${agent.name}`,
 	});
 }
 

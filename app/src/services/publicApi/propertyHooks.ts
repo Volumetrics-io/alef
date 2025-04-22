@@ -1,6 +1,7 @@
 import { PrefixedId } from '@alef/common';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { InferResponseType } from 'hono';
+import { queryClient } from '../queryClient';
 import { publicApiClient } from './client';
 import { fallbackWhenOfflineOrError, handleErrors } from './utils';
 
@@ -22,6 +23,41 @@ export function useProperty(propertyId: PrefixedId<'p'>) {
 					param: { id: propertyId },
 				})
 			);
+		},
+	});
+}
+
+export function useUpdateProperty(id: PrefixedId<'p'>) {
+	return useMutation({
+		mutationFn: async (info: { name: string }) => {
+			return handleErrors(
+				publicApiClient.properties[':id'].$put({
+					param: { id },
+					json: info,
+				})
+			);
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: ['properties'],
+			});
+		},
+	});
+}
+
+export function useCreateProperty() {
+	return useMutation({
+		mutationFn: async (info: { name: string }) => {
+			return handleErrors(
+				publicApiClient.properties.$post({
+					json: info,
+				})
+			);
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: ['properties'],
+			});
 		},
 	});
 }

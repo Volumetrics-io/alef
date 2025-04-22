@@ -1,0 +1,44 @@
+.root {
+	height: 100%;
+	width: 4px;
+	overflow: visible;
+	background: var(--track);
+	position: relative;
+	z-index: 10;
+	border: var(--border);
+	display: flex;
+	&:focus-visible {
+		background: var(--paper);
+		outline: 2px solid var(--focus);
+	}
+}
+
+@media (max-width: 768px) {
+	.root {
+		display: none;
+	}
+}
+
+.handle {
+	width: 24px;
+	height: 24px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	border-radius: 6px;
+	background: var(--track);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor: ew-resize;
+	transition: background 0.2s ease-in-out;
+	border: var(--border);
+
+	&:hover {
+		background: var(--hover);
+	}
+	&:active {
+		background: var(--paper);
+	}
+}

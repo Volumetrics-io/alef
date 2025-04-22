@@ -107,6 +107,7 @@ export const stripeRouter = new Hono<Env>()
 			'form',
 			z.object({
 				priceKey: z.string(),
+				returnTo: z.string().optional(),
 			})
 		),
 		async (ctx) => {
@@ -146,6 +147,7 @@ export const stripeRouter = new Hono<Env>()
 				throw new AlefError(AlefError.Code.InternalServerError, 'Could not purchase membership. Please contact support.');
 			}
 
+			const returnTo = body.returnTo || `${ctx.env.UI_ORIGIN}/settings`;
 			const checkout = await ctx.get('stripe').checkout.sessions.create({
 				mode: 'subscription',
 				payment_method_types: ['card'],
@@ -155,8 +157,8 @@ export const stripeRouter = new Hono<Env>()
 						quantity: 1,
 					},
 				],
-				success_url: `${ctx.env.UI_ORIGIN}/settings`,
-				cancel_url: `${ctx.env.UI_ORIGIN}/settings`,
+				success_url: returnTo,
+				cancel_url: returnTo,
 				customer_email: userInfo.email,
 				allow_promotion_codes: true,
 				billing_address_collection: 'auto',

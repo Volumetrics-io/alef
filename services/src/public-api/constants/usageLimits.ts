@@ -1,4 +1,4 @@
 export const DAILY_TOKEN_LIMIT = {
-	FREE: 1_000,
-	EXTENDED: 100_000,
+	FREE: 10_000,
+	EXTENDED: 1_000_000,
 };

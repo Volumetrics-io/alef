@@ -52,7 +52,7 @@ export function VibeCodingUI({}: VibeCodingUIProps) {
 		<Suspense>
 			<Box full className={cls.root} asChild>
 				<Tabs value={tab} onValueChange={setTab}>
-					<AgentProvider>
+					<AgentProvider key={projectId}>
 						<Box className={cls.sidebar}>
 							<Box stretched stacked>
 								<VibeCodingTabs />

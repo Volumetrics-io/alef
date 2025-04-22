@@ -6,7 +6,7 @@ An XR virtual home staging system.
 
 Use [Volta](https://volta.sh) to automatically install the correct Node and PNPM versions. Otherwise, see `package.json` for configured version support.
 
-Then, run `pnpm initialize` in the root of the repo to set up environment stuff. You will need access to Bitwarden to get the secret vars. This script will walk through database migrations and creating your local admin user, too.
+Then, run `pnpm initialize` in the root of the repo to set up environment stuff. You will need access to Bitwarden to get the secret vars. This script will walk through database migrations and creating your local user, too.
 
 After that, run `pnpm dev` in the root directory. This will run all services locally, including the public app, the admin panel, and all backend workers.
 
@@ -15,7 +15,21 @@ After that, run `pnpm dev` in the root directory. This will run all services loc
 - Public API: [localhost:4201](http://localhost:4201)
 - Admin API: [localhost:4202](http://localhost:4202)
 
-### Set up Stripe
+### Local product subscription
+
+There are two ways to become a subscriber in your local environment: simulate it via direct database manipulation, or use Stripe webhook delivery in sandbox mode to actually run the purchase flow.
+
+#### Simulate subscription
+
+The drawback of this method is the app won't have you associated with a Stripe account, so some management features will be unavailable. But otherwise it should work ok.
+
+Run:
+
+```
+pnpm grantLocalEntitlements
+```
+
+#### Subscribe up with Stripe
 
 We use Stripe for subscription processing. You can use the app in anonymous mode without needing it, but to test accounts with subscriptions you will have to set up your local keys and CLI.
 

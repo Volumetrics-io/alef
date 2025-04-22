@@ -5,6 +5,7 @@
 		"build": "turbo build",
 		"initialize": "node ./scripts/initialize.mjs",
 		"makeLocalAdmin": "node ./scripts/makeLocalAdmin.mjs",
+		"grantLocalEntitlements": "node ./scripts/grantLocalEntitlements.mjs",
 		"resetLocal": "node ./scripts/resetLocal.mjs"
 	},
 	"dependencies": {

@@ -1,12 +1,7 @@
-import { ProjectSelector } from '@/components/vibeCoding/projects/ProjectSelector';
-import { Box } from '@alef/sys';
+import { VibeCodingUI } from '@/components/vibeCoding/VibeCodingUI';
 
 const ProjectsPage = () => {
-	return (
-		<Box full layout="center center">
-			<ProjectSelector />
-		</Box>
-	);
+	return <VibeCodingUI />;
 };
 
 export default ProjectsPage;

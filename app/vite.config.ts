@@ -98,7 +98,7 @@ export default defineConfig({
 				// 10MB
 				maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
 
-				globIgnores: ['**/node_modules/**/*', '**/assets/icon-*.js'],
+				globIgnores: ['**/node_modules/**/*', '**/assets/icon-*.js', '**/*.wasm'],
 			},
 
 			workbox: {

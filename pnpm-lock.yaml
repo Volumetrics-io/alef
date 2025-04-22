@@ -252,6 +252,9 @@ importers:
       '@tanstack/react-query':
         specifier: 5.62.15
         version: 5.62.15(react@19.1.0)
+      '@types/mime-db':
+        specifier: ^1.43.5
+        version: 1.43.5
       '@use-gesture/react':
         specifier: ^10.3.1
         version: 10.3.1(react@19.1.0)
@@ -3698,6 +3701,9 @@ packages:
 
   '@types/mdx@2.0.13':
     resolution: { integrity: sha512-+OWZQfAYyio6YkJb3HLxDrvnx6SWWDbC0zVPfBRzUk0/nqoDyf6dNxQi3eArPe8rJ473nobTMQ/8Zk+LxJ+Yuw== }
+
+  '@types/mime-db@1.43.5':
+    resolution: { integrity: sha512-/bfTiIUTNPUBnwnYvUxXAre5MhD88jgagLEQiQtIASjU+bwxd8kS/ASDA4a8ufd8m0Lheu6eeMJHEUpLHoJ28A== }
 
   '@types/ms@2.1.0':
     resolution: { integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA== }
@@ -11521,6 +11527,8 @@ snapshots:
       '@types/unist': 3.0.3
 
   '@types/mdx@2.0.13': {}
+
+  '@types/mime-db@1.43.5': {}
 
   '@types/ms@2.1.0': {}
 

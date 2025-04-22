@@ -8,12 +8,10 @@
 // You can also remove this file if you'd prefer not to use a
 // service worker, and the Workbox build step will be skipped.
 
-import type { Attribute } from '@alef/common';
-import type { WorkboxPlugin } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
 import { NavigationRoute, registerRoute } from 'workbox-routing';
-import { NetworkFirst, StaleWhileRevalidate } from 'workbox-strategies';
+import { StaleWhileRevalidate } from 'workbox-strategies';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -30,15 +28,6 @@ cleanupOutdatedCaches();
 precacheAndRoute(self.__WB_MANIFEST);
 
 registerRoute(new NavigationRoute(createHandlerBoundToURL('/index.html')));
-
-const fallbackToOfflineCachePlugin: WorkboxPlugin = {
-	handlerDidError: async ({ request }: { request: Request }) => {
-		const fallbackResponse = await caches.match(request, { cacheName: 'offline-requirements' });
-		if (fallbackResponse) {
-			return fallbackResponse;
-		}
-	},
-};
 
 const iconPathMatch = /\/assets\/icon-\w+\.js/;
 // Cache icon files as they are fetched. we don't precache all icons
@@ -57,113 +46,20 @@ registerRoute(
 	})
 );
 
-// Cache model files as they are fetched
-const modelPathMatch = /\/furniture\/.+\/model$/;
+// Cache wasm files as they are fetched. we don't precache wasm as they're very large.
+// We just cache the ones that are used.
 registerRoute(
 	// Add in any other file extensions or routing criteria as needed.
-	({ url }) => url.origin === import.meta.env.VITE_PUBLIC_API_ORIGIN && modelPathMatch.test(url.pathname),
+	({ url }) => url.origin === import.meta.env.VITE_PUBLIC_API_ORIGIN && url.pathname.endsWith('.wasm'),
 	new StaleWhileRevalidate({
-		cacheName: 'models',
+		cacheName: 'wasm',
 		plugins: [
 			// Ensure that once this runtime cache reaches a maximum size the
 			// least-recently used files are removed.
-			new ExpirationPlugin({ maxEntries: 800 }),
-			fallbackToOfflineCachePlugin,
+			new ExpirationPlugin({ maxEntries: 200 }),
 		],
 	})
 );
-
-registerRoute(
-	({ url }) => url.origin === import.meta.env.VITE_PUBLIC_API_ORIGIN && (url.pathname.endsWith('.jpg') || url.pathname.endsWith('.jpeg') || url.pathname.endsWith('.png')),
-	new StaleWhileRevalidate({
-		cacheName: 'images',
-		plugins: [new ExpirationPlugin({ maxEntries: 200 }), fallbackToOfflineCachePlugin],
-	})
-);
-
-// route API requests needed for offline mode to a special cache,
-// some of which are prepopulated on install below.
-// Other offline requirement queries can be added here.
-registerRoute(
-	({ url }) => {
-		if (url.origin !== import.meta.env.VITE_PUBLIC_API_ORIGIN) {
-			return false;
-		}
-		// offline furniture core query
-		if (url.pathname === '/furniture' && url.searchParams.has('attribute') && url.searchParams.get('attribute') === 'package:core') {
-			return true;
-		}
-
-		if (url.pathname === '/devices/self') {
-			return true;
-		}
-
-		if (url.pathname === '/users/me') {
-			return true;
-		}
-
-		if (url.pathname.startsWith('/properties')) {
-			return true;
-		}
-
-		return false;
-	},
-	// try network first if available -- we only want cached versions
-	// when we're really offline.
-	new NetworkFirst({
-		cacheName: 'offline-requirements',
-		plugins: [new ExpirationPlugin({ maxEntries: 50 })],
-	})
-);
-
-/**
- * On load, preload all 'starter pack' furniture into a special cache if not already
- * present.
- */
-self.addEventListener('install', (event) => {
-	event.waitUntil(
-		caches.open('offline-requirements').then(async (cache) => {
-			// precache this query too
-			await cache.add(`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture?${new URLSearchParams({ attribute: `package:core` })}`);
-			const coreFurniture = await fetch(
-				`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture?${new URLSearchParams({
-					attribute: `package:core`,
-					pageSize: '1000',
-				})}`
-			);
-
-			if (!coreFurniture.ok) {
-				console.error('Failed to fetch core furniture metadata', coreFurniture);
-				throw new Error('Failed to fetch core furniture metadata');
-			}
-			const coreFurnitureJson = (await coreFurniture.json()) as {
-				items: {
-					id: string;
-					name: string;
-					attributes: Attribute[];
-					modelUpdatedAt: string;
-				}[];
-				pageInfo: {
-					page: number;
-				};
-			};
-
-			// avoid re-fetching the same furniture
-			const cachedFurniture = await cache.keys();
-			const cachedFurnitureIds = cachedFurniture.map((r) => r.url.split('/')[4]);
-			const coreFurnitureJsonFiltered = coreFurnitureJson.items.filter((f) => !cachedFurnitureIds.includes(f.id));
-
-			// Cache all original quality models and preview thumbnails
-			const coreFurnitureModels = coreFurnitureJsonFiltered
-				.map((f) => {
-					return [`${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${f.id}/model?quality=original`, `${import.meta.env.VITE_PUBLIC_API_ORIGIN}/furniture/${f.id}/image.jpg`];
-				})
-				.flat();
-			await cache.addAll(coreFurnitureModels);
-			console.log('Cached core furniture models', coreFurnitureModels);
-		})
-	);
-});
 
 // This allows the web app to trigger skipWaiting via
 // registration.waiting.postMessage({type: 'SKIP_WAITING'})

@@ -138,6 +138,11 @@
 			left: 50%;
 			transform: translateX(-50%);
 		}
+		&[data-float='bottom-center'] {
+			bottom: 0.75rem;
+			left: 50%;
+			transform: translateX(-50%);
+		}
 	}
 
 	.wrap {

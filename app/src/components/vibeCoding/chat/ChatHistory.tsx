@@ -1,8 +1,8 @@
-import { Box, Frame, ScrollArea } from '@alef/sys';
-import { UIMessage } from 'ai';
+import { Frame, ScrollArea } from '@alef/sys';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAgentContext } from '../AgentContext';
 import cls from './ChatHistory.module.css';
+import { ChatMessage } from './ChatMessage';
 
 export function ChatHistory() {
 	const { chat } = useAgentContext();
@@ -15,33 +15,6 @@ export function ChatHistory() {
 				))}
 			</ScrollArea>
 		</Frame>
-	);
-}
-
-function ChatMessage({ message }: { message: UIMessage }) {
-	if (message.role === 'assistant' && message.content.startsWith('{')) {
-		// this is probably a code result
-		let parsed: { code?: string; description?: string };
-		try {
-			parsed = JSON.parse(message.content);
-		} catch (e) {
-			// message may not be done streaming yet.
-			parsed = {};
-		}
-		return (
-			<Box p="squeeze">
-				<div>
-					<strong>{message.role}</strong>: {parsed.description ? parsed.description : '(Generating code)'}
-				</div>
-			</Box>
-		);
-	}
-	return (
-		<Box p="squeeze">
-			<div>
-				<strong>{message.role}</strong>: {message.content}
-			</div>
-		</Box>
 	);
 }
 

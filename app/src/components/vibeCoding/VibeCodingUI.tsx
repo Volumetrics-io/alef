@@ -6,7 +6,9 @@ import { Suspense } from 'react';
 import { AgentProvider } from './AgentContext';
 import { ChatHistory } from './chat/ChatHistory';
 import { ChatInput } from './chat/ChatInput';
+import { SimpleChat } from './chat/SimpleChat';
 import { MainPanelResizer } from './common/MainPanelResizer';
+import { MainPanelToggle } from './common/MainPanelToggle';
 import { CreateProject } from './projects/CreateProject';
 import { ProjectSelector } from './projects/ProjectSelector';
 import { CodeRenderer } from './renderer/CodeRenderer';
@@ -36,6 +38,9 @@ export function VibeCodingUI({}: VibeCodingUIProps) {
 						<Box stretched stacked p="small">
 							<VibeCodingTabs />
 							<ProjectSelector />
+							<Box className={cls.controls}>
+								<CreateProject className={cls.controlsButton} />
+							</Box>
 						</Box>
 					</Box>
 					<Box layout="center center" full stacked gapped className={clsx(cls.content, cls.emptyState)}>
@@ -85,6 +90,10 @@ export function VibeCodingUI({}: VibeCodingUIProps) {
 							<Suspense>
 								<CodeRenderer />
 							</Suspense>
+							<Suspense>
+								<SimpleChat float="bottom-center" />
+							</Suspense>
+							<MainPanelToggle float="top-left" />
 						</Box>
 					</AgentProvider>
 					<MainPanelResizer />

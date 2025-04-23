@@ -37,7 +37,11 @@ export function VibeCodingUI({}: VibeCodingUIProps) {
 					<Box className={cls.sidebar}>
 						<Box stretched stacked p="small">
 							<VibeCodingTabs />
-							<ProjectSelector />
+							<Box stretched stacked gapped>
+								<Suspense>
+									<ProjectSelector />
+								</Suspense>
+							</Box>
 							<Box className={cls.controls}>
 								<CreateProject className={cls.controlsButton} />
 							</Box>

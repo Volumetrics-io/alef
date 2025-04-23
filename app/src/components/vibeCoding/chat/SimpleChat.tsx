@@ -1,5 +1,4 @@
-import { Box, BoxProps, Frame, ScrollArea } from '@alef/sys';
-import { ReactNode } from 'react';
+import { Box, BoxProps } from '@alef/sys';
 import { useAgentContext } from '../AgentContext';
 import { ChatInput } from './ChatInput';
 import { ChatMessage } from './ChatMessage';
@@ -17,29 +16,9 @@ export function SimpleChat({ ...props }: SimpleChatProps) {
 
 	return (
 		<Box stacked gapped {...props}>
-			{lastUserMessage && (
-				<Bubble side="right">
-					<ChatMessage message={lastUserMessage} />
-				</Bubble>
-			)}
-			{lastAgentMessage && (
-				<Bubble side="left">
-					<ChatMessage message={lastAgentMessage} />
-				</Bubble>
-			)}
+			{lastUserMessage && <ChatMessage limitHeight message={lastUserMessage} />}
+			{lastAgentMessage && <ChatMessage limitHeight message={lastAgentMessage} />}
 			<ChatInput />
 		</Box>
-	);
-}
-
-function Bubble({ children, side }: { children: ReactNode; side: 'left' | 'right' }) {
-	return (
-		<Frame style={{ maxHeight: 180, alignSelf: side === 'left' ? 'flex-start' : 'flex-end', maxWidth: '80%', background: side === 'left' ? 'var(--track)' : 'var(--happy-paper)' }}>
-			<ScrollArea>
-				<Box p="small" stacked gapped>
-					{children}
-				</Box>
-			</ScrollArea>
-		</Frame>
 	);
 }

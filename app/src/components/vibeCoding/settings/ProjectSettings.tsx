@@ -18,6 +18,13 @@ export function ProjectSettings({ className }: ProjectSettingsProps) {
 			<ModelSelector />
 			<Heading level={2}>Account</Heading>
 			<SubscriptionProductSelector showFree returnTo={location.href} />
+			{/* TODO: bring back devices */}
+			{/* <Heading level={2}>Devices</Heading>
+			<DeviceIDCard />
+			<Heading level={3}>Pair devices</Heading>
+			<DeviceDiscovery />
+			<DevicePaircodeClaim />
+			<PairedDeviceList /> */}
 		</Box>
 	);
 }

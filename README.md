@@ -6,7 +6,7 @@ An XR virtual home staging system.
 
 Use [Volta](https://volta.sh) to automatically install the correct Node and PNPM versions. Otherwise, see `package.json` for configured version support.
 
-Then, run `pnpm initialize` in the root of the repo to set up environment stuff. You will need access to Bitwarden to get the secret vars. This script will walk through database migrations and creating your local admin user, too.
+Then, run `pnpm initialize` in the root of the repo to set up environment stuff. You will need access to Bitwarden to get the secret vars. This script will walk through database migrations and creating your local user, too.
 
 After that, run `pnpm dev` in the root directory. This will run all services locally, including the public app, the admin panel, and all backend workers.
 
@@ -14,6 +14,32 @@ After that, run `pnpm dev` in the root directory. This will run all services loc
 - Admin panel: [localhost:4203](http://localhost:4203)
 - Public API: [localhost:4201](http://localhost:4201)
 - Admin API: [localhost:4202](http://localhost:4202)
+
+### Local product subscription
+
+There are two ways to become a subscriber in your local environment: simulate it via direct database manipulation, or use Stripe webhook delivery in sandbox mode to actually run the purchase flow.
+
+#### Simulate subscription
+
+The drawback of this method is the app won't have you associated with a Stripe account, so some management features will be unavailable. But otherwise it should work ok.
+
+Run:
+
+```
+pnpm grantLocalEntitlements
+```
+
+#### Subscribe up with Stripe
+
+We use Stripe for subscription processing. You can use the app in anonymous mode without needing it, but to test accounts with subscriptions you will have to set up your local keys and CLI.
+
+[First, install Stripe's CLI for your OS and login.](https://docs.stripe.com/stripe-cli?install-method=homebrew)
+
+[Then, get a test mode secret key to provide to `services/public-api/.dev.vars`.](https://dashboard.stripe.com/test/apikeys) Put it in as `STRIPE_SECRET_KEY`.
+
+Finally, run `pnpm stripe` in `./services`. This will output a webhook signing secret. Place this value in `/services/public-api/.dev.vars` too, under `STRIPE_WEBHOOK_SECRET`.
+
+As long as `pnpm stripe` is running, it should forward test mode webhook events to your local server. This will close the loop and should update user accounts with paid features when you sign up for subscriptions in your local dev app.
 
 ## Architecture
 

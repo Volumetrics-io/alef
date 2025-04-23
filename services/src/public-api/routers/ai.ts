@@ -43,7 +43,18 @@ export const aiRouter = new Hono<Env>()
 			if (!hasProject) {
 				throw new AlefError(AlefError.Code.NotFound, 'Project not found');
 			}
-			const agent = getAgentByName(ctx.env.VIBE_CODER_AGENT, projectId);
-			return (await agent).fetch(ctx.req.raw);
+			const agent = await getAgentByName(ctx.env.VIBE_CODER_AGENT, projectId);
+
+			// this is the best place I know of to update ownership details on the
+			// agent itself.
+			const session = ctx.get('session');
+			const organizationId = session?.organizationId;
+			if (organizationId) {
+				agent.updateOrganizationOwner(organizationId);
+			} else {
+				throw new AlefError(AlefError.Code.InternalServerError, 'No organization ID found in session');
+			}
+
+			return agent.fetch(ctx.req.raw);
 		}
 	);

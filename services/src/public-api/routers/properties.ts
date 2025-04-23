@@ -53,6 +53,13 @@ const propertyRouter = new Hono<EnvWith<'session'>>()
 			rooms,
 		});
 	})
+	.put('/', userStoreMiddleware, zValidator('json', z.object({ name: z.string().min(1) })), async (ctx) => {
+		const propertyMetadata = ctx.req.valid('json');
+		const updated = await ctx.get('userStore').updateProperty(ctx.get('propertyId'), {
+			name: propertyMetadata.name,
+		});
+		return ctx.json(wrapRpcData(updated));
+	})
 	.get('/rooms/:roomId', zValidator('param', z.object({ roomId: z.custom<PrefixedId<'r'>>((v) => isPrefixedId(v, 'r')) })), async (ctx) => {
 		const property = ctx.get('property');
 		const roomId = ctx.req.valid('param').roomId;
@@ -96,4 +103,9 @@ export const propertiesRouter = new Hono<Env>()
 			return ctx.json(wrapRpcData([defaultProperty]));
 		}
 		return ctx.json(wrapRpcData(state));
+	})
+	.post('/', userStoreMiddleware, zValidator('json', z.object({ name: z.string().min(1) })), async (ctx) => {
+		const propertyMetadata = ctx.req.valid('json');
+		const property = await ctx.get('userStore').insertProperty(propertyMetadata.name);
+		return ctx.json(wrapRpcData(property));
 	});

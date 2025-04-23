@@ -1,10 +1,87 @@
 .root {
+	display: grid;
+	grid-template-areas: 'sidebar content';
+	grid-template-columns: var(--sidebar-size) 1fr;
+	grid-template-rows: minmax(0, 1fr);
+
+	width: 100%;
+	height: auto;
+	overflow: hidden;
+	min-height: 0;
+	flex: 1;
+
+	--sidebar-size: 500px;
 }
 
-.chat {
-	flex: 0 0 300px;
+.sidebar {
+	grid-area: sidebar;
+	max-height: 100%;
+	min-height: 0;
+	container: main / inline-size;
+	overflow-y: auto;
+	overflow-x: hidden;
+	width: 100%;
 }
 
-.renderer {
-	flex: 1 1 0;
+.controlsButton {
+	width: 100%;
+}
+
+.content {
+	grid-area: content;
+}
+
+.emptyState {
+	color: var(--faded);
+}
+.emptyStateIcon {
+	width: 20vmin;
+	height: 20vmin;
+}
+
+.controls {
+	position: sticky;
+	bottom: env(safe-area-inset-bottom);
+	background-color: var(--paper);
+	padding: 0.5rem;
+}
+
+.tabs {
+	align-self: center;
+	position: sticky;
+}
+
+.tabLabel {
+	max-width: 0;
+	opacity: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	transform-origin: left;
+}
+.tab[data-state='active'] .tabLabel {
+	padding-left: 0.5rem;
+	max-width: 200px;
+	opacity: 1;
+	transition:
+		max-width 0.3s ease-out,
+		opacity 0.2s ease-out;
+}
+@container main (min-width: 425px) {
+	.tab {
+		gap: 0.25rem;
+	}
+	.tabLabel {
+		padding-left: 0 !important;
+		display: inline;
+		max-width: 200px;
+		opacity: 1;
+	}
+}
+
+@media (max-width: 768px) {
+	.root {
+		grid-template-areas: 'content' 'sidebar';
+		grid-template-columns: 1fr;
+		grid-template-rows: minmax(0, 1fr) var(--sidebar-size);
+	}
 }

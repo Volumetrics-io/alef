@@ -2,6 +2,7 @@ export enum AlefErrorCode {
 	BadRequest = 40000,
 	Unauthorized = 40100,
 	Forbidden = 40300,
+	QuotaExceeded = 40301,
 	NotFound = 40400,
 	Conflict = 40900,
 	InternalServerError = 50000,

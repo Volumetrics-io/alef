@@ -190,7 +190,7 @@ class ReconnectingWebsocket {
 	};
 
 	close = () => {
-		this.websocket?.close();
+		this.websocket?.close(1000);
 	};
 
 	async reconnect() {

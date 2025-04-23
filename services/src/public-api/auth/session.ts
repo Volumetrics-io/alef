@@ -11,11 +11,13 @@ declare module '@a-type/auth' {
 		name: string | null;
 		isProductAdmin: boolean;
 		deviceId?: PrefixedId<'d'>;
+		organizationId?: PrefixedId<'or'>;
 	}
 }
 
-export const sessions = new SessionManager<Context<Env>>({
-	getSessionConfig(ctx) {
+export const sessions = new SessionManager<Context>({
+	getSessionConfig(rawCtx) {
+		const ctx = rawCtx as Context<Env>;
 		const apiUrl = new URL(ctx.env.API_ORIGIN);
 		// adapt refresh cookie path to any base path on API origin
 		const refreshPath = apiUrl.pathname.replace(/\/$/, '') + '/auth/refresh';
@@ -56,6 +58,7 @@ export const sessions = new SessionManager<Context<Env>>({
 		name: 'name',
 		isProductAdmin: 'pad',
 		deviceId: 'dev',
+		organizationId: 'org',
 	},
 	adapter: honoAdapter,
 });

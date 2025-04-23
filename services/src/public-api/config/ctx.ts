@@ -6,6 +6,7 @@ import { VibeCoderAgent } from '../agents/vibeCoder/VibeCoderAgent.js';
 import type { DeviceDiscovery } from '../durableObjects/DeviceDiscovery.js';
 import type { Paircodes } from '../durableObjects/Paircodes.js';
 import type { Property } from '../durableObjects/Property.js';
+import { TokenQuota } from '../durableObjects/TokenQuota.js';
 
 export interface Bindings {
 	// env
@@ -25,6 +26,8 @@ export interface Bindings {
 	EXTRA_CORS_ORIGINS?: string;
 	TOKEN_ISSUER_OVERRIDE?: string;
 	TOKEN_AUDIENCE_OVERRIDE?: string;
+	STRIPE_SECRET_KEY: string;
+	STRIPE_WEBHOOK_SECRET: string;
 
 	// services
 	// TODO: use Service<T> wrapper, but this breaks Hono RPC client types
@@ -37,6 +40,7 @@ export interface Bindings {
 	LAYOUT_AGENT: AgentNamespace<LayoutAgent>;
 	VIBE_CODER_AGENT: AgentNamespace<VibeCoderAgent>;
 	AI: Ai;
+	TOKEN_QUOTA: DurableObjectNamespace<TokenQuota>;
 }
 
 export interface CtxVars {

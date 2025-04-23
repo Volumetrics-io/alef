@@ -1,5 +1,7 @@
+import { LogoutButton } from '@/components/auth/LogoutButton';
 import { SubscriptionProductSelector } from '@/components/subscription/SubscriptionProductSelector';
 import { Box, Heading } from '@alef/sys';
+import { Link } from '@verdant-web/react-router';
 import { useProjectId } from '../hooks';
 import { EditProjectForm } from './EditProjectForm';
 import { ModelSelector } from './ModelSelector';
@@ -18,6 +20,11 @@ export function ProjectSettings({ className }: ProjectSettingsProps) {
 			<ModelSelector />
 			<Heading level={2}>Account</Heading>
 			<SubscriptionProductSelector showFree returnTo={location.href} />
+			<LogoutButton />
+			<Box stacked gapped p>
+				<Link to="https://alef.io/tos">Terms of Service</Link>
+				<Link to="https://alef.io/privacy">Privacy Policy</Link>
+			</Box>
 			{/* TODO: bring back devices */}
 			{/* <Heading level={2}>Devices</Heading>
 			<DeviceIDCard />

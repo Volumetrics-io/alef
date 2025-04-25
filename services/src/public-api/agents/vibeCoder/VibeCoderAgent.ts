@@ -185,13 +185,33 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 				- DO NOT use TypeScript
 				- DO NOT import any libraries directly besides "react", "react-dom", "@react-three/fiber", and "@react-three/drei". For all other libraries you want to use, utilize the "https://esm.sh" CDN.
 				- prioritize React-Three-Fiber and Drei over ThreeJS.
-				- if adding controls, use the ones provided by "@react-three/drei", DO NOT use the ones provided by "three".
+				- always use the provided 'defaultController' for user input mapping. always define named actions for things the player can do.
+				- if adding utilities, use the ones provided by "@react-three/drei", DO NOT use the ones provided by "three".
 				- remember to always add lighting to your scene.
 
 				\`\`\`
 				import { <objects needed> } from 'three';
 				import { useRef } from 'react';
 				import { useFrame } from '@react-three/fiber';
+
+				// default input mapping controller and input devices
+				import { defaultController, devices } from '@alef/framework/runtime';
+
+				// YOU CAN CHANGE THESE INPUTS AND BINDINGS AS YOU LIKE:
+				// add bindable input actions by name and type
+				defaultController.addBoolean('jump').addRange('move-x').addRange('move-y');
+				// bind named actions to device inputs - these are the game's default bindings.
+				devices.keyboard
+					.bindKey('jump', ' ')
+					.bindAxis('move-x', 'ArrowLeft', 'ArrowRight')
+					.bindAxis('move-y', 'ArrowDown', 'ArrowUp');
+				devices.gamepad
+					.bindButton('jump', 0)
+					.bindAxis('move-x', 0)
+					.bindAxis('move-y', 1);
+				devices.onscreen
+					.bindButton('jump', { label: 'A', key: 'a', position: { x: 0.9, y: 0.9 } })
+					.bindStick('move-x', 'move-y', { position: { x: 0.1, y: 0.9 } });
 
 				export const App = () => { // DO NOT RENAME THIS FUNCTION
 					const mainRef = useRef();
@@ -201,6 +221,11 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 					// like using refs when necessary
 
 					useFrame(() => {
+						defaultController.update();
+						// control action values are available through controller API
+						const jumping = defaultController.getValue('jump');
+						const { x: xMovement, y: yMovement } = defaultController.getVector('move-x', 'move-y');
+
 						// utilize for per frame logic such as animations
 						// DO NOT initialize variable in useFrame.
 					});

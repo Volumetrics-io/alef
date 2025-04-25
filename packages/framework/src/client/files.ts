@@ -38,6 +38,45 @@ export const getHtml = ({ importMap: extraImportMap = {} }: { importMap?: Record
 			height: 100dvh;
 			background-color: #000;
 		}
+
+		.alef-onscreen-controls {
+			position: absolute;
+			inset: 0;
+			pointer-events: none;
+		}
+		.alef-onscreen-controls > div {
+			position: absolute;
+			pointer-events: all;
+		}
+		.alef-onscreen-button {
+			background-color: rgba(255, 255, 255, 0.8);
+			border: none;
+			border-radius: 5px;
+			padding: 10px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+		.alef-onscreen-stick {
+			background-color: rgba(255, 255, 255, 0.8);
+			border-radius: 50%;
+			width: 100px;
+			height: 100px;
+			position: relative;
+		}
+		.alef-onscreen-stick__thumb {
+			background-color: rgba(0, 0, 0, 0.8);
+			border-radius: 50%;
+			width: 20px;
+			height: 20px;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%) translate(var(--x), var(--y));
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
 	</style>
 	<script type="importmap">
 		{

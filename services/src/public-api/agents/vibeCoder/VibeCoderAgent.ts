@@ -105,6 +105,45 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 		this.#model = createWorkersAI({ binding: this.env.AI })(VibeCoderModels[modelURI] as any);
 	}
 
+	@callable()
+	async generateCode(prompt: string) {
+		return this.env.AI.autorag('alef-examples')
+			.aiSearch({
+				query: this.#createSystemQuery(prompt),
+				rewrite_query: true,
+			})
+			.then((response) => {
+				console.log(`Step result: ${response.response}`);
+				let result = response.response;
+				if (result.includes('```json')) {
+					result = result.split('```json')[1].replace(/^[\s\r\n]+/, '');
+					result = result.split('```')[0].replace(/^[\s\r\n]+/, '');
+				}
+				if (result.startsWith('{')) {
+					try {
+						result = this.sanitizeJSONString(result);
+						console.log(` sanitized Result: ${result}`);
+						const parsedResult = JSON.parse(result);
+						console.log('parsedResult', parsedResult);
+						if (parsedResult.code) {
+							console.log('parsedResult.code', parsedResult.code);
+
+							this.setState({
+								model: this.state.model ?? 'qwq-32b',
+								code: parsedResult.code ?? '',
+								description: parsedResult.description ?? '',
+							});
+						}
+					} finally {
+						// do nothing
+					}
+				}
+			})
+			.catch((error) => {
+				console.error(`Error in AI model: ${error}`);
+			});
+	}
+
 	async onChatMessage(onFinish: StreamTextOnFinishCallback<{}>): Promise<Response | undefined> {
 		if (!isPrefixedId(this.name, 'p')) {
 			throw new AlefError(AlefError.Code.InternalServerError, 'LayoutAgent must be created with a property ID');
@@ -113,12 +152,12 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 			const dataStreamResponse = createDataStreamResponse({
 				execute: async (dataStream) => {
 					// ensure we have not exceeded the daily token limit
-					const quota = await this.#getQuota();
-					if (quota.exceeded) {
-						// IDK how to actually communicate this to the client
-						console.error(`Quota exceeded for ${this.#organizationId}`);
-						dataStream.write(formatDataStreamPart('error', AGENT_ERRORS.QUOTA_EXCEEDED));
-					}
+					// const quota = await this.#getQuota();
+					// if (quota.exceeded) {
+					// 	// IDK how to actually communicate this to the client
+					// 	console.error(`Quota exceeded for ${this.#organizationId}`);
+					// 	dataStream.write(formatDataStreamPart('error', AGENT_ERRORS.QUOTA_EXCEEDED));
+					// }
 					let processedMessages = this.messages;
 					const result = streamText({
 						model: this.#model,
@@ -139,7 +178,9 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 							if (result.startsWith('{')) {
 								try {
 									console.log(`Result: ${result}`);
-									const parsedResult = JSON.parse(result);
+									let sanitizedResult = this.sanitizeJSONString(result);
+									console.log(`Sanitized Result: ${sanitizedResult}`);
+									const parsedResult = JSON.parse(sanitizedResult);
 									if (parsedResult.code) {
 										this.setState({
 											model: this.state.model ?? 'qwq-32b',
@@ -178,6 +219,60 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 		});
 	}
 
+	#createSystemQuery(prompt: string) {
+		return `complete the following request and ensure that it meets the response meets the following criteria:
+
+		criteria:
+			- use the following template to create a r3f component:
+				- DO NOT rename the component
+				- DO NOT add Canvas or Scene
+				- DO NOT add Camera
+				- DO NOT use TypeScript
+				- DO NOT import any libraries directly besides "react", "react-dom", "@react-three/fiber", and "@react-three/drei".
+				- prioritize React-Three-Fiber and Drei over ThreeJS.
+				- primitives from react-three-fiber follow the camelCase naming convention.
+				- DO NOT import primitives from react-three-fiber, they are already imported.
+				- remember to always add lighting to your scene.
+				- DO NOT import light primitives, they are already imported.
+				- DO NOT add OrbitControls or any other controls.
+				- DO NOT load external assets.
+				- Colors should always be strings in hex format (e.g. "#000000").
+
+				\`\`\`
+				import { useRef } from 'react';
+				import { useFrame } from '@react-three/fiber';
+
+				export const App = () => { // DO NOT RENAME THIS FUNCTION
+					const mainRef = useRef();
+
+					// init variables here and here only
+					// lean towards good r3f practices
+					// like using refs when necessary
+
+					useFrame(() => {
+						// utilize for per frame logic such as animations
+						// DO NOT initialize variable in useFrame.
+					});
+
+					return (
+						<group ref={mainRef}>
+							{/* add any necessary markup here but
+								ONLY r3f compatible elements, DO
+								NOT USE DOM Elements */}
+						</group>
+					);
+				};
+				\`\`\`
+			- format the response as a valid JSON object, it should be parseable using JSON.parse().
+			- the JSON object should have the following properties:
+				- code: the code for the r3f component
+				- description: a description of the component
+
+		request:
+		${prompt}
+		`;
+	}
+
 	#getSystemComponentPrompt() {
 		return `You are a web developer with expertise in THREE.js and React-Three-Fiber. use the following template to create a r3f component:
 
@@ -185,11 +280,15 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 				- DO NOT use TypeScript
 				- DO NOT import any libraries directly besides "react", "react-dom", "@react-three/fiber", and "@react-three/drei". For all other libraries you want to use, utilize the "https://esm.sh" CDN.
 				- prioritize React-Three-Fiber and Drei over ThreeJS.
+				- primitives from react-three-fiber follow the camelCase naming convention.
+				- primitives must be constructed using <mesh>, geometries (e.g. <boxGeometry>), and materials (e.g. <meshStandardMaterial>).
+				- YOU DO NOT need to import primitives from react-three-fiber, they are already imported.
 				- if adding controls, use the ones provided by "@react-three/drei", DO NOT use the ones provided by "three".
+				- if characters are needed, use the browser event system API to control them.
 				- remember to always add lighting to your scene.
 
 				\`\`\`
-				import { <objects needed> } from 'three';
+				import * as THREE from 'three';
 				import { useRef } from 'react';
 				import { useFrame } from '@react-three/fiber';
 
@@ -224,6 +323,36 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 			- the text MUST be formatted as a valid json object. it should be parseable using JSON.parse().
 			- use \\n in place of line breaks.
 		`;
+	}
+
+	sanitizeJSONString(input: string) {
+		let output = '';
+		let inString = false;
+
+		for (let i = 0; i < input.length; i++) {
+			const ch = input[i];
+
+			// toggle inString on un-escaped double-quotes
+			if (ch === '"' && input[i - 1] !== '\\') {
+				inString = !inString;
+				output += ch;
+			} else if (inString) {
+				if (ch === '\\') {
+					// preserve existing backslash+nextChar
+					output += '\\' + input[++i];
+				} else if (ch === '\n') {
+					output += '\\n';
+				} else if (ch === '\r') {
+					output += '\\r';
+				} else {
+					output += ch;
+				}
+			} else {
+				output += ch;
+			}
+		}
+
+		return output;
 	}
 }
 

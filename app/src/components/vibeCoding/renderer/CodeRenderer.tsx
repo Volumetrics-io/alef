@@ -14,6 +14,8 @@ export function CodeRenderer({ className }: CodeRendererProps) {
 
 	const code = state.code;
 
+	console.log('code', code);
+
 	const reloadFrame = useCallback(() => {
 		if (ref.current) {
 			ref.current.src = ref.current.src;

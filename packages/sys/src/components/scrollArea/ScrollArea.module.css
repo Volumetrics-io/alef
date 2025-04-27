@@ -6,3 +6,14 @@
 		max-height: 100%;
 	}
 }
+
+@layer variants {
+	.horizontal {
+		overflow-x: auto;
+		overflow-y: hidden;
+	}
+
+	.both {
+		overflow: auto;
+	}
+}

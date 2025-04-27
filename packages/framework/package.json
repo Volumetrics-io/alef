@@ -21,16 +21,17 @@
 		"dev:runtime": "tsup --watch"
 	},
 	"dependencies": {
-		"three": "0.175.0",
+		"@react-three/drei": "10.0.7",
+		"@react-three/fiber": "9.1.2",
+		"@use-gesture/react": "^10.3.1",
 		"react": "19.1.0",
 		"react-dom": "19.1.0",
-		"@react-three/fiber": "9.1.2",
-		"@react-three/drei": "10.0.7"
+		"three": "0.175.0"
 	},
 	"devDependencies": {
-		"@types/three": "^0.175.0",
 		"@types/react": "^19.1.2",
 		"@types/react-dom": "^19.1.2",
+		"@types/three": "^0.175.0",
 		"tsup": "8.4.0"
 	}
 }

@@ -1,4 +1,4 @@
-import { Frame, ScrollArea } from '@alef/sys';
+import { Box, ScrollArea } from '@alef/sys';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAgentContext } from '../AgentContext';
 import cls from './ChatHistory.module.css';
@@ -8,13 +8,13 @@ export function ChatHistory() {
 	const { chat } = useAgentContext();
 	const { ref, onScroll } = useStayScrolledToBottom();
 	return (
-		<Frame className={cls.root}>
+		<Box className={cls.root}>
 			<ScrollArea stretched gapped stacked ref={ref} onScroll={onScroll}>
 				{chat.messages.map((msg) => (
 					<ChatMessage key={msg.id} message={msg} />
 				))}
 			</ScrollArea>
-		</Frame>
+		</Box>
 	);
 }
 

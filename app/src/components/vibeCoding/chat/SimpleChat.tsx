@@ -19,7 +19,7 @@ export function SimpleChat({ ...props }: SimpleChatProps) {
 		.sort((a, b) => {
 			if (!a.createdAt) return -1;
 			if (!b.createdAt) return 1;
-			return a.createdAt.getTime() - b.createdAt.getTime();
+			return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
 		});
 
 	return (

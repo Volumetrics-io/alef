@@ -13,7 +13,7 @@ export const VibeCoderModelNames = ['llama-3.3-70b', 'deepseek-r1-qwen-32b', 'll
 export type VibeCoderAgent = ReturnType<typeof useVibeCoder>['agent'];
 export type VibeCoderChat = ReturnType<typeof useVibeCoderChat>;
 
-const AgentContext = createContext<{ agent: VibeCoderAgent; chat: VibeCoderChat; state: VibeCoderState; error: string | null } | null>(null);
+const AgentContext = createContext<{ agent: VibeCoderAgent; state: VibeCoderState; error: string | null } | null>(null);
 
 export function useAgentContext() {
 	const ctx = useContext(AgentContext);
@@ -27,9 +27,9 @@ export function useAgentContext() {
 export function useVibeCoder() {
 	const projectId = useProjectId();
 	const [state, setState] = useState<VibeCoderState>({
-		model: 'qwq-32b',
+		model: 'llama-4-scout-17b',
 		code: '',
-		description: '',
+		messages: [],
 	});
 	const agent = useAgent({
 		agent: 'vibe-coder',
@@ -96,6 +96,5 @@ export function useVibeCoderChat(agent: VibeCoderAgent, onError: (msg: string) =
 export const AgentProvider = ({ children }: { children: ReactNode }) => {
 	const [error, setError] = useState<string | null>(null);
 	const { agent, state } = useVibeCoder();
-	const chat = useVibeCoderChat(agent, setError);
-	return <AgentContext.Provider value={{ error, chat, agent, state }}>{children}</AgentContext.Provider>;
+	return <AgentContext.Provider value={{ error, agent, state }}>{children}</AgentContext.Provider>;
 };

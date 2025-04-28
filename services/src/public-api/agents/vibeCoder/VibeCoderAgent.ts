@@ -1,15 +1,16 @@
 import { AGENT_ERRORS, AlefError, assertPrefixedId, isPrefixedId, PrefixedId } from '@alef/common';
-import { unstable_callable as callable } from 'agents';
+import { Agent, unstable_callable as callable } from 'agents';
 import { AIChatAgent } from 'agents/ai-chat-agent';
-import { createDataStreamResponse, formatDataStreamPart, streamText, StreamTextOnFinishCallback } from 'ai';
+import { CoreMessage, createDataStreamResponse, formatDataStreamPart, generateText, streamText, StreamTextOnFinishCallback, UIMessage } from 'ai';
 import { AsyncLocalStorage } from 'async_hooks';
 import { createWorkersAI } from 'workers-ai-provider';
 import { Bindings } from '../../config/ctx';
+import { randomUUID } from 'crypto';
 
 export interface VibeCoderState {
 	model: VibeCoderModel;
 	code: string;
-	description: string;
+	messages: UIMessage[];
 }
 
 const VibeCoderModels = {
@@ -25,13 +26,13 @@ export const VibeCoderModelNames = ['llama-3.3-70b', 'deepseek-r1-qwen-32b', 'll
 
 export type VibeCoderModel = (typeof VibeCoderModelNames)[number];
 
-export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
+export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 	#organizationId: PrefixedId<'or'> | null = null;
 	#model;
 	initialState: VibeCoderState = {
-		model: 'deepseek-r1-qwen-32b',
+		model: 'llama-4-scout-17b',
 		code: '',
-		description: '',
+		messages: [],
 	};
 
 	constructor(state: DurableObjectState, env: Bindings) {
@@ -99,7 +100,7 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 		this.setState({
 			model: modelURI,
 			code: this.state.code,
-			description: this.state.description,
+			messages: this.state.messages,
 		});
 
 		this.#model = createWorkersAI({ binding: this.env.AI })(VibeCoderModels[modelURI] as any);
@@ -116,92 +117,79 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 		if (!isPrefixedId(this.name, 'p')) {
 			throw new AlefError(AlefError.Code.InternalServerError, 'VibeCoderAgent must be created with a property ID');
 		}
-		return agentContext.run({ env: this.env, propertyId: this.name }, async () => {
-			const dataStreamResponse = createDataStreamResponse({
-				execute: async (dataStream) => {
-					const result = streamText({
-						model: this.#model,
-						system: this.#createCodeGenerationQuery(examples),
-						prompt: manifest,
-						maxSteps: 5,
-						maxTokens: 10000,
-						onStepFinish: (stepResult) => {
-							let result = this.parseResult(stepResult.text);
-							let sanitizedResult = this.sanitizeJSONString(result);
-							console.log(`Sanitized Result: ${sanitizedResult}`);
 
-							const parsedResult = JSON.parse(sanitizedResult);
-							if (parsedResult.code) {
-								this.setState({
-									model: this.state.model ?? 'deepseek-r1-qwen-32b',
-									code: parsedResult.code ?? '',
-									description: parsedResult.description ?? '',
-								});
-							}
-						},
-					});
-					result.mergeIntoDataStream(dataStream);
-				},
-				onError: (error) => {
-					console.error(`Error in AI model: ${error}`);
-					return 'Error in AI model';
-				},
-			});
-			return dataStreamResponse;
+		return generateText({
+			model: this.#model,
+			system: this.#getCodeGeneratorSystemPromptNoControllers(examples),
+			prompt: manifest,
+			maxSteps: 5,
+			maxTokens: 10000,
 		});
 	}
 
-	async onChatMessage(onFinish: StreamTextOnFinishCallback<{}>): Promise<Response | undefined> {
+	@callable()
+	async prompt(message: string) {
+		this.setState({
+			model: this.state.model,
+			code: this.state.code,
+			messages: [...this.state.messages, { role: 'user', content: message, id: randomUUID(), parts: [] }],
+		});
+
+		console.log(message);
+
+		this.setState({
+			model: this.state.model,
+			code: this.state.code,
+			messages: [...this.state.messages, { role: 'assistant', content: 'designing...', id: randomUUID(), parts: [] }],
+		});
+
 		if (!isPrefixedId(this.name, 'p')) {
 			throw new AlefError(AlefError.Code.InternalServerError, 'VibeCoderAgent must be created with a property ID');
 		}
-		return agentContext.run({ env: this.env, propertyId: this.name }, async () => {
-			const dataStreamResponse = createDataStreamResponse({
-				execute: async (dataStream) => {
-					// ensure we have not exceeded the daily token limit
-					// const quota = await this.#getQuota();
-					// if (quota.exceeded) {
-					// 	// IDK how to actually communicate this to the client
-					// 	console.error(`Quota exceeded for ${this.#organizationId}`);
-					// 	dataStream.write(formatDataStreamPart('error', AGENT_ERRORS.QUOTA_EXCEEDED));
-					// }
-					let processedMessages = this.messages;
-					const result = streamText({
-						model: this.#model,
-						system: this.#getSystemComponentPrompt(),
-						messages: processedMessages,
-						onStepFinish: (stepResult) => {
-							let result = this.parseResult(stepResult.text);
 
-							this.getExamples(result).then((examples) => {
-								console.log(`Examples: ${examples.response}`);
-								this.generateCode(result, examples.response);
-							});
-						},
-						onFinish: (event) => {
-							onFinish?.(event as any);
-							const { completionTokens, promptTokens } = event.usage;
-							if (this.#organizationId) {
-								this.env.TOKEN_QUOTA.get(this.#getQuotaId()).addUsage(completionTokens + promptTokens, `VibeCoderAgent ${this.name} - ${this.#organizationId}`);
-							}
-						},
-						onError: ({ error }) => {
-							console.error(`Error in AI model: ${error}`);
-						},
-						maxTokens: 10000,
-						maxSteps: 5,
-					});
-
-					result.mergeIntoDataStream(dataStream);
-				},
-				onError: (error) => {
-					console.error(`Error in AI model: ${error}`);
-					return 'Error in AI model';
-				},
-			});
-
-			return dataStreamResponse;
+		let designResult = await generateText({
+			model: this.#model,
+			system: this.#getDesignerPrompt(),
+			prompt: message,
+			maxSteps: 5,
+			maxTokens: 10000,
 		});
+
+		let manifest = this.parseResult(designResult.text);
+
+		console.log(manifest);
+
+		this.setState({
+			model: this.state.model,
+			code: this.state.code,
+			messages: [...this.state.messages, { role: 'assistant', content: 'fetching assets...', id: randomUUID(), parts: [] }],
+		});
+
+		const examples = await this.getExamples(manifest);
+
+		console.log(examples.response);
+
+		this.setState({
+			model: this.state.model,
+			code: this.state.code,
+			messages: [...this.state.messages, { role: 'assistant', content: 'coding...', id: randomUUID(), parts: [] }],
+		});
+		const finalResult = await this.generateCode(manifest, examples.response);
+
+		let result = this.parseResult(finalResult.text);
+		let sanitizedResult = this.sanitizeJSONString(result);
+		console.log(`Sanitized Result: ${sanitizedResult}`);
+
+		const parsedResult = JSON.parse(sanitizedResult);
+		if (parsedResult.code) {
+			this.setState({
+				model: this.state.model ?? 'deepseek-r1-qwen-32b',
+				code: parsedResult.code ?? '',
+				messages: [...this.state.messages, { role: 'assistant', content: parsedResult.description ?? '', id: randomUUID(), parts: [] }],
+			});
+		}
+
+		return;
 	}
 
 	parseResult(result: string) {
@@ -217,7 +205,7 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 		return sanitizedResult;
 	}
 
-	#getSystemComponentPrompt() {
+	#getDesignerPrompt() {
 		return `You are SceneManifestGenerator, a specialist in turning natural-language game scene ideas into minimal, unambiguous JSON manifests.  
 				Always output **only** valid JSON that conforms exactly to the following schema—no comments, no extra keys, no prose:
 
@@ -291,7 +279,71 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 		`;
 	}
 
-	#createCodeGenerationQuery(examples: string) {
+	#getCodeGeneratorSystemPromptNoControllers(examples: string) {
+		return `You are a Senior Game Developer with expertise in THREE.js and React-Three-Fiber, and @react-three/drei. You are given a scene manifest and the following examples, you are to generate a react-three/fiber component that matches the objects and lighting in the examples.
+
+			examples:
+			${examples}
+			
+			use the following template to create a r3f component:
+
+				- DO NOT rename the component
+				- DO NOT use TypeScript
+				- DO NOT import any libraries directly besides "react", "react-dom", "@react-three/fiber", and "@react-three/drei". For all other libraries you want to use, utilize the "https://esm.sh" CDN.
+				- prioritize React-Three-Fiber and Drei over ThreeJS.
+				- DO NOT import r3f primitives (mesh, group, shapeNameGeometry, materialNameMaterial, directionalLight, etc), these are globally available.
+				- you DO need to import drei components (such as shaders) when needed.
+				- r3f primitives use the following format: <primitiveName>
+				- if adding utilities, use the ones provided by "@react-three/drei", DO NOT use the ones provided by "three".
+				- remember to always add lighting to your scene.
+				- behaviors are not components, they must be created using the "useFrame" hook.
+				- useFrame is a react-three/fiber hook.
+
+				\`\`\`
+				import { <objects needed> } from 'three';
+				import { useRef } from 'react';
+				import { useFrame } from '@react-three/fiber'; // KEEP THIS IMPORT
+
+				export const App = () => { // DO NOT RENAME THIS FUNCTION, ALWAYS EXPORT THE FUNCTION AS "App"
+					const mainRef = useRef();
+
+					// init variables here and here only
+					// lean towards good r3f practices
+					// like using refs when necessary
+
+					useFrame(() => {
+						// utilize for per frame logic such as animations
+						// DO NOT initialize variable in useFrame.
+					});
+
+					return (
+						<group ref={mainRef}>
+							{/* add any necessary markup here but
+								ONLY r3f compatible elements, DO
+								NOT USE DOM Elements */}
+						</group>
+					);
+				};
+				\`\`\`
+
+			- STRICTLY ADHERE TO THE TEMPLATE.
+			- DO NOT RENAME THE COMPONENT.
+			- DO NOT add a camera or scene
+			- DO NOT import packages.
+			- the text MUST be formatted as a valid json object. it should be parseable using JSON.parse().
+
+			the final output should be valid JSON object using this format:
+
+			\`\`\`json
+				{
+					"code": "the code for the component",
+					"description": "a short description of the component and any relevant details"
+				}
+			\`\`\`
+		`;
+	}
+
+	#getCodeGeneratorSystemPrompt(examples: string) {
 		return `You are a Senior Game Developer with expertise in THREE.js and React-Three-Fiber, and @react-three/drei. You are given a scene manifest and the following examples, you are to generate a react-three/fiber component that matches the objects and lighting in the examples.
 
 			examples:

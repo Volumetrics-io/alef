@@ -5,7 +5,7 @@ import { useAgentContext, useVibeCoder } from '../AgentContext';
 import { useState, useRef, useCallback } from 'react';
 
 export function ChatInput() {
-	const { chat, error } = useAgentContext();
+	const { error } = useAgentContext();
 	const [isLoading, setIsLoading] = useState(false);
 	const { agent } = useVibeCoder();
 
@@ -22,7 +22,7 @@ export function ChatInput() {
 		);
 	}
 
-	const handleRAGSubmit = useCallback(
+	const handleSubmit = useCallback(
 		(e: React.FormEvent<HTMLFormElement>) => {
 			e.preventDefault();
 			if (!chatRef.current) return;
@@ -30,8 +30,7 @@ export function ChatInput() {
 			if (!input) return;
 			chatRef.current.value = '';
 			setIsLoading(true);
-			agent.call('generateCode', [input]).then((result) => {
-				console.log(result);
+			agent.call('prompt', [input]).then((result) => {
 				setIsLoading(false);
 			});
 		},
@@ -40,9 +39,9 @@ export function ChatInput() {
 
 	return (
 		<Box stacked gapped asChild full>
-			<form onSubmit={chat.handleSubmit}>
+			<form onSubmit={handleSubmit}>
 				<Box gapped>
-					<Input value={chat.input} onChange={chat.handleInputChange} placeholder="Type your message..." />
+					<Input ref={chatRef} placeholder="Type your message..." />
 					<Button color="suggested" type="submit" loading={isLoading}>
 						<Icon name="send" />
 					</Button>

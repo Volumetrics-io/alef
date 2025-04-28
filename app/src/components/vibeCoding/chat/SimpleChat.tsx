@@ -6,11 +6,11 @@ import { ChatMessage } from './ChatMessage';
 export interface SimpleChatProps extends BoxProps {}
 
 export function SimpleChat({ ...props }: SimpleChatProps) {
-	const { chat } = useAgentContext();
+	const { state } = useAgentContext();
 
 	// get most recent user and agent messages
-	const userMessages = chat.messages.filter((msg) => msg.role === 'user');
-	const agentMessages = chat.messages.filter((msg) => msg.role === 'assistant');
+	const userMessages = state.messages.filter((msg) => msg.role === 'user');
+	const agentMessages = state.messages.filter((msg) => msg.role === 'assistant');
 	const lastUserMessage = userMessages[userMessages.length - 1];
 	const lastAgentMessage = agentMessages[agentMessages.length - 1];
 

@@ -5,12 +5,13 @@ import cls from './ChatHistory.module.css';
 import { ChatMessage } from './ChatMessage';
 
 export function ChatHistory() {
-	const { chat } = useAgentContext();
+	const { state } = useAgentContext();
 	const { ref, onScroll } = useStayScrolledToBottom();
+	console.log(state);
 	return (
 		<Box className={cls.root}>
 			<ScrollArea stretched gapped stacked ref={ref} onScroll={onScroll}>
-				{chat.messages.map((msg) => (
+				{state.messages.map((msg) => (
 					<ChatMessage key={msg.id} message={msg} />
 				))}
 			</ScrollArea>

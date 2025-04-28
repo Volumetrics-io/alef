@@ -29,7 +29,7 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 	#organizationId: PrefixedId<'or'> | null = null;
 	#model;
 	initialState: VibeCoderState = {
-		model: 'qwq-32b',
+		model: 'deepseek-r1-qwen-32b',
 		code: '',
 		description: '',
 	};
@@ -105,48 +105,55 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 		this.#model = createWorkersAI({ binding: this.env.AI })(VibeCoderModels[modelURI] as any);
 	}
 
-	@callable()
-	async generateCode(prompt: string) {
-		return this.env.AI.autorag('alef-examples')
-			.aiSearch({
-				query: this.#createSystemQuery(prompt),
-				rewrite_query: true,
-			})
-			.then((response) => {
-				console.log(`Step result: ${response.response}`);
-				let result = response.response;
-				if (result.includes('```json')) {
-					result = result.split('```json')[1].replace(/^[\s\r\n]+/, '');
-					result = result.split('```')[0].replace(/^[\s\r\n]+/, '');
-				}
-				if (result.startsWith('{')) {
-					try {
-						result = this.sanitizeJSONString(result);
-						console.log(` sanitized Result: ${result}`);
-						const parsedResult = JSON.parse(result);
-						console.log('parsedResult', parsedResult);
-						if (parsedResult.code) {
-							console.log('parsedResult.code', parsedResult.code);
+	async getExamples(prompt: string) {
+		return this.env.AI.autorag('alef-examples').aiSearch({
+			query: this.#createRAGQuery(prompt),
+			rewrite_query: true,
+		});
+	}
 
-							this.setState({
-								model: this.state.model ?? 'qwq-32b',
-								code: parsedResult.code ?? '',
-								description: parsedResult.description ?? '',
-							});
-						}
-					} finally {
-						// do nothing
-					}
-				}
-			})
-			.catch((error) => {
-				console.error(`Error in AI model: ${error}`);
+	async generateCode(manifest: string, examples: string) {
+		if (!isPrefixedId(this.name, 'p')) {
+			throw new AlefError(AlefError.Code.InternalServerError, 'VibeCoderAgent must be created with a property ID');
+		}
+		return agentContext.run({ env: this.env, propertyId: this.name }, async () => {
+			const dataStreamResponse = createDataStreamResponse({
+				execute: async (dataStream) => {
+					const result = streamText({
+						model: this.#model,
+						system: this.#createCodeGenerationQuery(examples),
+						prompt: manifest,
+						maxSteps: 5,
+						maxTokens: 10000,
+						onStepFinish: (stepResult) => {
+							let result = this.parseResult(stepResult.text);
+							let sanitizedResult = this.sanitizeJSONString(result);
+							console.log(`Sanitized Result: ${sanitizedResult}`);
+
+							const parsedResult = JSON.parse(sanitizedResult);
+							if (parsedResult.code) {
+								this.setState({
+									model: this.state.model ?? 'deepseek-r1-qwen-32b',
+									code: parsedResult.code ?? '',
+									description: parsedResult.description ?? '',
+								});
+							}
+						},
+					});
+					result.mergeIntoDataStream(dataStream);
+				},
+				onError: (error) => {
+					console.error(`Error in AI model: ${error}`);
+					return 'Error in AI model';
+				},
 			});
+			return dataStreamResponse;
+		});
 	}
 
 	async onChatMessage(onFinish: StreamTextOnFinishCallback<{}>): Promise<Response | undefined> {
 		if (!isPrefixedId(this.name, 'p')) {
-			throw new AlefError(AlefError.Code.InternalServerError, 'LayoutAgent must be created with a property ID');
+			throw new AlefError(AlefError.Code.InternalServerError, 'VibeCoderAgent must be created with a property ID');
 		}
 		return agentContext.run({ env: this.env, propertyId: this.name }, async () => {
 			const dataStreamResponse = createDataStreamResponse({
@@ -164,34 +171,12 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 						system: this.#getSystemComponentPrompt(),
 						messages: processedMessages,
 						onStepFinish: (stepResult) => {
-							console.log(`Step result: ${stepResult.text}`);
-							let result = stepResult.text;
-							if (result.includes('</think>')) {
-								result = result.split('</think>')[1].replace(/^[\s\r\n]+/, '');
-								console.log(`Result: ${result}`);
-							}
-							if (result.includes('```json')) {
-								result = result.split('```json')[1].replace(/^[\s\r\n]+/, '');
-								result = result.split('```')[0].replace(/^[\s\r\n]+/, '');
-								console.log(`Result: ${result}`);
-							}
-							if (result.startsWith('{')) {
-								try {
-									console.log(`Result: ${result}`);
-									let sanitizedResult = this.sanitizeJSONString(result);
-									console.log(`Sanitized Result: ${sanitizedResult}`);
-									const parsedResult = JSON.parse(sanitizedResult);
-									if (parsedResult.code) {
-										this.setState({
-											model: this.state.model ?? 'qwq-32b',
-											code: parsedResult.code ?? '',
-											description: parsedResult.description ?? '',
-										});
-									}
-								} finally {
-									// do nothing
-								}
-							}
+							let result = this.parseResult(stepResult.text);
+
+							this.getExamples(result).then((examples) => {
+								console.log(`Examples: ${examples.response}`);
+								this.generateCode(result, examples.response);
+							});
 						},
 						onFinish: (event) => {
 							onFinish?.(event as any);
@@ -219,80 +204,118 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 		});
 	}
 
-	#createSystemQuery(prompt: string) {
-		return `complete the following request and ensure that it meets the response meets the following criteria:
-
-		criteria:
-			- use the following template to create a r3f component:
-				- DO NOT rename the component
-				- DO NOT add Canvas or Scene
-				- DO NOT add Camera
-				- DO NOT use TypeScript
-				- DO NOT import any libraries directly besides "react", "react-dom", "@react-three/fiber", and "@react-three/drei".
-				- prioritize React-Three-Fiber and Drei over ThreeJS.
-				- primitives from react-three-fiber follow the camelCase naming convention.
-				- DO NOT import primitives from react-three-fiber, they are already imported.
-				- remember to always add lighting to your scene.
-				- DO NOT import light primitives, they are already imported.
-				- DO NOT add OrbitControls or any other controls.
-				- DO NOT load external assets.
-				- Colors should always be strings in hex format (e.g. "#000000").
-
-				\`\`\`
-				import { useRef } from 'react';
-				import { useFrame } from '@react-three/fiber';
-
-				export const App = () => { // DO NOT RENAME THIS FUNCTION
-					const mainRef = useRef();
-
-					// init variables here and here only
-					// lean towards good r3f practices
-					// like using refs when necessary
-
-					useFrame(() => {
-						// utilize for per frame logic such as animations
-						// DO NOT initialize variable in useFrame.
-					});
-
-					return (
-						<group ref={mainRef}>
-							{/* add any necessary markup here but
-								ONLY r3f compatible elements, DO
-								NOT USE DOM Elements */}
-						</group>
-					);
-				};
-				\`\`\`
-			- format the response as a valid JSON object, it should be parseable using JSON.parse().
-			- the JSON object should have the following properties:
-				- code: the code for the r3f component
-				- description: a description of the component
-
-		request:
-		${prompt}
-		`;
+	parseResult(result: string) {
+		let sanitizedResult = result;
+		if (result.includes('</think>')) {
+			sanitizedResult = result.split('</think>')[1].replace(/^[\s\r\n]+/, '');
+		}
+		if (sanitizedResult.includes('```json')) {
+			sanitizedResult = sanitizedResult.split('```json')[1].replace(/^[\s\r\n]+/, '');
+			sanitizedResult = sanitizedResult.split('```')[0].replace(/^[\s\r\n]+/, '');
+			console.log(`Result: ${sanitizedResult}`);
+		}
+		return sanitizedResult;
 	}
 
 	#getSystemComponentPrompt() {
-		return `You are a web developer with expertise in THREE.js and React-Three-Fiber. use the following template to create a r3f component:
+		return `You are SceneManifestGenerator, a specialist in turning natural-language game scene ideas into minimal, unambiguous JSON manifests.  
+				Always output **only** valid JSON that conforms exactly to the following schema—no comments, no extra keys, no prose:
+
+				\`\`\`json
+				"lighting": [
+					{
+					"key": "ambient" | "dir" | "spot",
+					"color": string,        // hex or CSS color
+					"intensity": number
+					}
+				],
+				"objects": [
+					{
+					"id": string,
+					"model": "box" | "sphere" | "plane" | "cylinder" | "torus" | "dreiComponent",
+					"dreiComponentName"?: string,  // name of the @react-three/drei component when model is "dreiComponent"
+					"position": [number, number, number],
+					"scale": number,
+					"material": { "color": string },  // only solid colors (hex or CSS color), no textures
+					"behaviors"?: ["spin" | "bounce" | "follow" | "orbit" | "lookAt" | "float"],
+					"userControls"?: boolean,
+					"dreiProps"?: object,   // optional properties to pass to the drei component, only for model = "dreiComponent"
+					"shader"?: {
+						"type": "MeshReflectorMaterial" | "MeshWobbleMaterial" | "MeshDistortMaterial" | "MeshRefractionMaterial" | "ShaderMaterial" | string,  // name of the drei shader material
+						"props": object      // shader-specific properties
+					}
+					}
+				],
+				}
+				\`\`\`
+
+				Constraints:
+
+				Use only built-in primitives: box, sphere, plane, cylinder, torus.
+				You can also use @react-three/drei components by setting model to "dreiComponent" and specifying the component name in dreiComponentName.
+				
+				Support for drei shaders is available through the shader field, which can specify shader type and properties.
+
+				No external assets—do not reference .glb, image textures, or URLs.
+
+				Materials must be solid colors when not using shaders; omit any texture property.
+
+				Output must be pure JSON (wrapped in a single code block if required).
+
+				Omit optional fields when not needed.
+
+				User: "Replace this with the user's scene description."
+
+				Your Response:
+
+				\`\`\`json
+				<SceneManifest JSON>
+				\`\`\`
+		`;
+	}
+
+	#createRAGQuery(prompt: string) {
+		return `provide a selection of code snippets that match the objects and lighting in the following manifest, strictly following this criteria:
+
+				- use only built-in primitives: box, sphere, plane, cylinder, torus.
+				- primitives should be constructed using r3f <mesh>, <group>, <shapeNameGeometry>, and <materialNameMaterial> components.
+				- use @react-three/drei components by setting model to "dreiComponent" and specifying the component name in dreiComponentName.
+				- support for drei shaders is available through the shader field, which can specify shader type and properties.
+				- no external assets—do not reference .glb, image textures, or URLs.
+				- materials must be solid colors when not using shaders; omit any texture property.
+				- omit optional fields when not needed.
+				- DO NOT import or use <Canvas>, <OrbitControls>, or <Stats> components.
+				- object.behaviors are not existing components, they must be created using the "useFrame" hook.
+				manifest:
+				${prompt}
+		`;
+	}
+
+	#createCodeGenerationQuery(examples: string) {
+		return `You are a Senior Game Developer with expertise in THREE.js and React-Three-Fiber, and @react-three/drei. You are given a scene manifest and the following examples, you are to generate a react-three/fiber component that matches the objects and lighting in the examples.
+
+			examples:
+			${examples}
+			
+			use the following template to create a r3f component:
 
 				- DO NOT rename the component
 				- DO NOT use TypeScript
 				- DO NOT import any libraries directly besides "react", "react-dom", "@react-three/fiber", and "@react-three/drei". For all other libraries you want to use, utilize the "https://esm.sh" CDN.
 				- prioritize React-Three-Fiber and Drei over ThreeJS.
-				- primitives from react-three-fiber follow the camelCase naming convention.
-				- primitives must be constructed using <mesh>, geometries (e.g. <boxGeometry>), and materials (e.g. <meshStandardMaterial>).
-				- YOU DO NOT need to import primitives from react-three-fiber, they are already imported.
-				- if adding controls, use the ones provided by "@react-three/drei", DO NOT use the ones provided by "three".
-				- if characters are needed, use the browser event system API to control them.
+				- DO NOT import r3f primitives (mesh, group, shapeNameGeometry, materialNameMaterial, directionalLight, etc), these are globally available.
+				- you DO need to import drei components (such as shaders) when needed.
+				- r3f primitives use the following format: <primitiveName>
 				- always use the provided 'defaultController' for user input mapping. always define named actions for things the player can do.
 				- if adding utilities, use the ones provided by "@react-three/drei", DO NOT use the ones provided by "three".
 				- remember to always add lighting to your scene.
+				- behaviors are not components, they must be created using the "useFrame" hook.
+				- useFrame is a react-three/fiber hook.
 
 				\`\`\`
-				import * as THREE from 'three';
+				import { <objects needed> } from 'three';
 				import { useRef } from 'react';
-				import { useFrame } from '@react-three/fiber';
+				import { useFrame } from '@react-three/fiber'; // KEEP THIS IMPORT
 
 				// default input mapping controller and input devices
 				import { defaultController, devices } from '@alef/framework/runtime';
@@ -313,7 +336,7 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 					.bindButton('jump', { label: 'A', key: 'a', position: { x: 0.9, y: 0.9 } })
 					.bindStick('move-x', 'move-y', { position: { x: 0.1, y: 0.9 } });
 
-				export const App = () => { // DO NOT RENAME THIS FUNCTION
+				export const App = () => { // DO NOT RENAME THIS FUNCTION, ALWAYS EXPORT THE FUNCTION AS "App"
 					const mainRef = useRef();
 
 					// init variables here and here only
@@ -344,10 +367,16 @@ export class VibeCoderAgent extends AIChatAgent<Bindings, VibeCoderState> {
 			- DO NOT RENAME THE COMPONENT.
 			- DO NOT add a camera or scene
 			- DO NOT import packages.
-			- DO NOT use textures or external files. Limit yourself to the primitives provided by react-three-fiber, THREE.js, and drei.
-			- DO NOT FORMAT AS A CODEBLOCK, I WILL HUNT YOU DOWN IF YOU DO.
 			- the text MUST be formatted as a valid json object. it should be parseable using JSON.parse().
-			- use \\n in place of line breaks.
+
+			the final output should be valid JSON object using this format:
+
+			\`\`\`json
+				{
+					"code": "the code for the component",
+					"description": "a short description of the component and any relevant details"
+				}
+			\`\`\`
 		`;
 	}
 

@@ -4,11 +4,12 @@ const THREE_VERSION = '0.175.0';
 const REACT_VERSION = `19.1.0`;
 const R3F_VERSION = '9.1.2';
 const DREI_VERSION = '10.0.6';
-
+const USE_GESTURE_VERSION = '10.3.1';
 const CDN = 'https://esm.sh';
 
 const importMap = {
 	// TODO: configurable framework versions per-app
+	'@use-gesture/react': `${CDN}/@use-gesture/react@${USE_GESTURE_VERSION}`,
 	'@alef/framework/runtime': '/runtime.js',
 	'~/': '/src/',
 	three: `${CDN}/three@${THREE_VERSION}/build/three.module.js`,

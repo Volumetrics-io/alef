@@ -22,7 +22,7 @@ export function ChatInput() {
 		);
 	}
 
-	const handleSubmit = useCallback(
+	const handleRAGSubmit = useCallback(
 		(e: React.FormEvent<HTMLFormElement>) => {
 			e.preventDefault();
 			if (!chatRef.current) return;
@@ -40,9 +40,9 @@ export function ChatInput() {
 
 	return (
 		<Box stacked gapped asChild full>
-			<form onSubmit={handleSubmit}>
+			<form onSubmit={chat.handleSubmit}>
 				<Box gapped>
-					<Input ref={chatRef} placeholder="Type your message..." />
+					<Input value={chat.input} onChange={chat.handleInputChange} placeholder="Type your message..." />
 					<Button color="suggested" type="submit" loading={isLoading}>
 						<Icon name="send" />
 					</Button>

@@ -1,5 +1,6 @@
 import { Canvas } from '@react-three/fiber';
 import { Sky } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei';
 import { ReactNode, Suspense } from 'react';
 import { ErrorBoundary } from './ErrorBoundary';
 import { OnscreenControls } from './controls/OnscreenControls';
@@ -15,6 +16,7 @@ export function RootScene({ children }: RootSceneProps) {
 				<Canvas style={{ width: '100%', height: '100%' }} shadows camera={{ position: [0, 0, 5], fov: 75 }}>
 					<Sky />
 					<Suspense fallback={null}>{children}</Suspense>
+					<OrbitControls />
 				</Canvas>
 			</ErrorBoundary>
 			<OnscreenControls />

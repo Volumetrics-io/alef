@@ -37,7 +37,6 @@ export class GamepadDevice extends Device<`button:${number}` | `axis:${number}`>
 	update() {
 		this.#device = navigator.getGamepads()[this.#deviceIndex ?? 0];
 		if (!this.#device) {
-			console.debug('no gamepad detected at index', this.#deviceIndex);
 			return;
 		}
 

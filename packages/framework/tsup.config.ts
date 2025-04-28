@@ -7,10 +7,12 @@ export default defineConfig({
 	outDir: 'dist-runtime',
 	bundle: true,
 	external: ['react', 'react-dom', 'three', '@react-three/fiber'],
+	noExternal: ['@use-gesture/react'],
 	format: 'esm',
 	splitting: false,
 	clean: true,
 	platform: 'browser',
+	dts: true,
 	target: 'es2020',
 	esbuildOptions(options, ctx) {
 		options.keepNames = true;

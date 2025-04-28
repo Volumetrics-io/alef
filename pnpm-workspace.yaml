@@ -4,6 +4,7 @@ packages:
   - packages/*
   - services
   - homepage
+  - testbed
 
 catalog:
   hono: 4.6.19
@@ -11,7 +12,7 @@ catalog:
   react-dom: 19.1.0
   '@types/react': ^19.1.0
   '@types/react-dom': ^19.1.1
-  wrangler: ^4.12.0
+  wrangler: ^4.13.2
   typescript: ^5.8.2
   '@cloudflare/workers-types': ^4.20250414.0
   zod: ^3.24.1
@@ -24,3 +25,5 @@ catalog:
   three: ^0.175.0
   '@types/three': ^0.175.0
   vitest: 3.0.8
+  vite: 6.3.3
+  '@vitejs/plugin-react-swc': 3.9.0

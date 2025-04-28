@@ -86,7 +86,9 @@ export function VibeCodingUI({}: VibeCodingUIProps) {
 									</Box>
 								</Tabs.Content>
 								<Tabs.Content value="settings">
-									<ProjectSettings />
+									<Suspense>
+										<ProjectSettings />
+									</Suspense>
 								</Tabs.Content>
 							</Box>
 						</Box>

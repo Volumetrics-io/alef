@@ -386,10 +386,10 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 					.bindAxis('move-y', 1);
 				devices.onscreen
 					.bindButton('jump', { label: 'A', key: 'a', position: { x: 0.9, y: 0.9 } })
-					.bindStick('move-x', 'move-y', { position: { x: 0.1, y: 0.9 } });
+					.bindStick('move-x', 'move-y', { xAxisKey: 'left-stick-x', yAxisKey: 'left-stick-y', position: { x: 0.1, y: 0.9 } });
 
 				export const App = () => { // DO NOT RENAME THIS FUNCTION, ALWAYS EXPORT THE FUNCTION AS "App"
-					const mainRef = useRef();
+					const mainRef = useRef(null);
 
 					// init variables here and here only
 					// lean towards good r3f practices
@@ -399,7 +399,7 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 						defaultController.update();
 						// control action values are available through controller API
 						const jumping = defaultController.getValue('jump');
-						const { x: xMovement, y: yMovement } = defaultController.getVector('move-x', 'move-y');
+						const { x: xMovement, y: yMovement } = defaultController.getVector2('move-x', 'move-y');
 
 						// utilize for per frame logic such as animations
 						// DO NOT initialize variable in useFrame.

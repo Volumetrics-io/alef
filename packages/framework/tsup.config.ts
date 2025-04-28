@@ -12,6 +12,7 @@ export default defineConfig({
 	splitting: false,
 	clean: true,
 	platform: 'browser',
+	dts: true,
 	target: 'es2020',
 	esbuildOptions(options, ctx) {
 		options.keepNames = true;

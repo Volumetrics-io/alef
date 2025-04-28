@@ -14,10 +14,19 @@ export function SimpleChat({ ...props }: SimpleChatProps) {
 	const lastUserMessage = userMessages[userMessages.length - 1];
 	const lastAgentMessage = agentMessages[agentMessages.length - 1];
 
+	const shownMessages = [lastAgentMessage, lastUserMessage]
+		.filter((m) => !!m)
+		.sort((a, b) => {
+			if (!a.createdAt) return -1;
+			if (!b.createdAt) return 1;
+			return a.createdAt.getTime() - b.createdAt.getTime();
+		});
+
 	return (
-		<Box stacked gapped {...props}>
-			{lastUserMessage && <ChatMessage limitHeight message={lastUserMessage} />}
-			{lastAgentMessage && <ChatMessage limitHeight message={lastAgentMessage} />}
+		<Box stacked gapped full="width" constrained {...props}>
+			{shownMessages.map((message, index) => (
+				<ChatMessage key={index} message={message} limitHeight />
+			))}
 			<ChatInput />
 		</Box>
 	);

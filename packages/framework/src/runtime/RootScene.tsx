@@ -14,7 +14,6 @@ export function RootScene({ children }: RootSceneProps) {
 		<ErrorBoundary fallback={<div>An Alef bug caused this app to crash</div>}>
 			<ErrorBoundary fallback={<div>The app crashed</div>}>
 				<Canvas style={{ width: '100%', height: '100%' }} shadows camera={{ position: [0, 0, 5], fov: 75 }}>
-					<Sky />
 					<Suspense fallback={null}>{children}</Suspense>
 					<OrbitControls />
 				</Canvas>

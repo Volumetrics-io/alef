@@ -604,6 +604,9 @@ importers:
       '@a-type/utils':
         specifier: 'catalog:'
         version: 1.1.5
+      '@ai-sdk/google':
+        specifier: ^1.2.14
+        version: 1.2.14(zod@3.24.2)
       '@ai-sdk/openai':
         specifier: ^1.3.18
         version: 1.3.20(zod@3.24.2)
@@ -662,31 +665,6 @@ importers:
         specifier: 'catalog:'
         version: 3.24.2
 
-  testbed:
-    dependencies:
-      '@alef/framework':
-        specifier: workspace:*
-        version: link:../packages/framework
-    devDependencies:
-      '@react-three/drei':
-        specifier: 'catalog:'
-        version: 10.0.5(@react-three/fiber@9.1.1(@types/react@19.1.0)(immer@10.1.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(three@0.175.0))(@types/react@19.1.0)(@types/three@0.175.0)(immer@10.1.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(three@0.175.0)
-      '@react-three/fiber':
-        specifier: 'catalog:'
-        version: 9.1.1(@types/react@19.1.0)(immer@10.1.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(three@0.175.0)
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.1.0
-      '@types/three':
-        specifier: 'catalog:'
-        version: 0.175.0
-      '@vitejs/plugin-react-swc':
-        specifier: 'catalog:'
-        version: 3.9.0(vite@6.3.3(@types/node@22.14.0)(jiti@1.21.7)(less@4.2.1)(lightningcss@1.28.2)(sass@1.83.0)(stylus@0.62.0)(terser@5.39.0)(yaml@2.7.0))
-      vite:
-        specifier: 'catalog:'
-        version: 6.3.3(@types/node@22.14.0)(jiti@1.21.7)(less@4.2.1)(lightningcss@1.28.2)(sass@1.83.0)(stylus@0.62.0)(terser@5.39.0)(yaml@2.7.0)
-
 packages:
   '@a-type/auth-email-ses@2.1.4':
     resolution: { integrity: sha512-IZ5+hVXC5O/60pmahzh5jHxvAl2YA0Kee/Iiu4aLmwnDpocbka9kXQgsscZLxrmI+QeRtq9SdEhROLOVsKx7Yw== }
@@ -717,6 +695,12 @@ packages:
 
   '@adobe/css-tools@4.4.1':
     resolution: { integrity: sha512-12WGKBQzjUAI4ayyF4IAtfw2QR/IDoqk6jTddXDhtYTJF9ASmoE1zst7cVtP0aL/F1jUJL5r+JxKXKEgHNbEUQ== }
+
+  '@ai-sdk/google@1.2.14':
+    resolution: { integrity: sha512-r3FSyyWl0KVjUlKn5o+vMl+Nk8Z/mV6xrqW+49g7fMoRVr/wkRxJZtHorrdDGRreCJubZyAk8ziSQSLpgv2H6w== }
+    engines: { node: '>=18' }
+    peerDependencies:
+      zod: ^3.0.0
 
   '@ai-sdk/openai@1.3.20':
     resolution: { integrity: sha512-/DflUy7ROG9k6n6YTXMBFPbujBKnbGY58f3CwvicLvDar9nDAloVnUWd3LUoOxpSVnX8vtQ7ngxF52SLWO6RwQ== }
@@ -3552,6 +3536,7 @@ packages:
   '@swc/core@1.11.22':
     resolution: { integrity: sha512-mjPYbqq8XjwqSE0hEPT9CzaJDyxql97LgK4iyvYlwVSQhdN1uK0DBG4eP9PxYzCS2MUGAXB34WFLegdUj5HGpg== }
     engines: { node: '>=10' }
+    deprecated: It has a bug. See https://github.com/swc-project/swc/issues/10413
     peerDependencies:
       '@swc/helpers': '>=0.5.17'
     peerDependenciesMeta:
@@ -7941,6 +7926,12 @@ snapshots:
   '@adobe/css-tools@4.3.3': {}
 
   '@adobe/css-tools@4.4.1': {}
+
+  '@ai-sdk/google@1.2.14(zod@3.24.2)':
+    dependencies:
+      '@ai-sdk/provider': 1.1.3
+      '@ai-sdk/provider-utils': 2.2.7(zod@3.24.2)
+      zod: 3.24.2
 
   '@ai-sdk/openai@1.3.20(zod@3.24.2)':
     dependencies:

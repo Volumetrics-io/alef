@@ -8,7 +8,7 @@ import { createContext, ReactNode, useContext, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useProjectId } from './hooks';
 
-export const VibeCoderModelNames = ['llama-3.3-70b', 'deepseek-r1-qwen-32b', 'llama-4-scout-17b', 'gemma-3-12b', 'qwq-32b', 'qwen2.5-coder-32b'] as const;
+export const VibeCoderModelNames = ['llama-3.3-70b', 'deepseek-r1-qwen-32b', 'llama-4-scout-17b', 'gemma-3-12b', 'qwen2.5-coder-32b', 'gemini-2.5-flash'] as const;
 
 export type VibeCoderAgent = ReturnType<typeof useVibeCoder>['agent'];
 export type VibeCoderChat = ReturnType<typeof useVibeCoderChat>;
@@ -27,7 +27,7 @@ export function useAgentContext() {
 export function useVibeCoder() {
 	const projectId = useProjectId();
 	const [state, setState] = useState<VibeCoderState>({
-		model: 'llama-4-scout-17b',
+		model: 'qwen2.5-coder-32b',
 		code: '',
 		messages: [],
 	});

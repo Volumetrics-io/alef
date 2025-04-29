@@ -1,11 +1,17 @@
 import { AGENT_ERRORS, AlefError, assertPrefixedId, isPrefixedId, PrefixedId } from '@alef/common';
 import { Agent, unstable_callable as callable } from 'agents';
-import { AIChatAgent } from 'agents/ai-chat-agent';
-import { CoreMessage, createDataStreamResponse, formatDataStreamPart, generateText, streamText, StreamTextOnFinishCallback, UIMessage } from 'ai';
+import { generateText, UIMessage } from 'ai';
 import { AsyncLocalStorage } from 'async_hooks';
 import { createWorkersAI } from 'workers-ai-provider';
 import { Bindings } from '../../config/ctx';
 import { randomUUID } from 'crypto';
+
+// other providers
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+
+const google = createGoogleGenerativeAI({
+	apiKey: 'AIzaSyBp7LmF3sFr4IzdMIgMPLzRCW7ZdgLBkFs',
+});
 
 export interface VibeCoderState {
 	model: VibeCoderModel;
@@ -20,24 +26,30 @@ const VibeCoderModels = {
 	'gemma-3-12b': '@cf/google/gemma-3-12b-it',
 	'qwq-32b': '@cf/qwen/qwq-32b',
 	'qwen2.5-coder-32b': '@cf/qwen/qwen2.5-coder-32b-instruct',
+	'gemini-2.5-flash': 'third-party',
 };
 
-export const VibeCoderModelNames = ['llama-3.3-70b', 'deepseek-r1-qwen-32b', 'llama-4-scout-17b', 'gemma-3-12b', 'qwq-32b', 'qwen2.5-coder-32b'] as const;
+export const VibeCoderModelNames = ['llama-3.3-70b', 'deepseek-r1-qwen-32b', 'llama-4-scout-17b', 'gemma-3-12b', 'qwq-32b', 'qwen2.5-coder-32b', 'gemini-2.5-flash'] as const;
 
 export type VibeCoderModel = (typeof VibeCoderModelNames)[number];
 
 export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 	#organizationId: PrefixedId<'or'> | null = null;
 	#model;
+	#thirdPartyModel: any;
 	initialState: VibeCoderState = {
-		model: 'llama-4-scout-17b',
+		model: 'qwen2.5-coder-32b',
 		code: '',
 		messages: [],
 	};
 
 	constructor(state: DurableObjectState, env: Bindings) {
 		super(state, env);
-		this.#model = createWorkersAI({ binding: env.AI })(VibeCoderModels[this.state.model] as any);
+		if (this.state.model === 'gemini-2.5-flash') {
+			this.#thirdPartyModel = google('gemini-2.5-flash-preview-04-17');
+		} else {
+			this.#model = createWorkersAI({ binding: env.AI })(VibeCoderModels[this.state.model] as any);
+		}
 		// setup SQL tables
 		this.sql`
 			CREATE TABLE IF NOT EXISTS metadata (
@@ -103,24 +115,30 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 			messages: this.state.messages,
 		});
 
-		this.#model = createWorkersAI({ binding: this.env.AI })(VibeCoderModels[modelURI] as any);
+		if (modelURI === 'gemini-2.5-flash') {
+			this.#thirdPartyModel = google('gemini-2.5-flash-preview-04-17');
+		} else {
+			this.#thirdPartyModel = null;
+			this.#model = createWorkersAI({ binding: this.env.AI })(VibeCoderModels[modelURI] as any);
+		}
 	}
 
-	async getExamples(prompt: string) {
+	async getExamples(manifest: string) {
 		return this.env.AI.autorag('alef-examples').aiSearch({
-			query: this.#createRAGQuery(prompt),
+			query: this.#createRAGQuery(manifest),
 			rewrite_query: true,
+			max_num_results: 5,
 		});
 	}
 
-	async generateCode(manifest: string, examples: string) {
+	async generateCode(manifest: string, examples: string, originalPrompt: string) {
 		if (!isPrefixedId(this.name, 'p')) {
 			throw new AlefError(AlefError.Code.InternalServerError, 'VibeCoderAgent must be created with a property ID');
 		}
 
 		return generateText({
-			model: this.#model,
-			system: this.#getCodeGeneratorSystemPromptNoControllers(examples),
+			model: this.#thirdPartyModel ?? this.#model,
+			system: this.#getCodeGeneratorSystemPromptNoControllers(examples, originalPrompt),
 			prompt: manifest,
 			maxSteps: 5,
 			maxTokens: 10000,
@@ -148,7 +166,7 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 		}
 
 		let designResult = await generateText({
-			model: this.#model,
+			model: this.#thirdPartyModel ?? this.#model,
 			system: this.#getDesignerPrompt(),
 			prompt: message,
 			maxSteps: 5,
@@ -174,7 +192,7 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 			code: this.state.code,
 			messages: [...this.state.messages, { role: 'assistant', content: 'coding...', id: randomUUID(), parts: [] }],
 		});
-		const finalResult = await this.generateCode(manifest, examples.response);
+		const finalResult = await this.generateCode(manifest, examples.response, message);
 
 		let result = this.parseResult(finalResult.text);
 		let sanitizedResult = this.sanitizeJSONString(result);
@@ -183,7 +201,7 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 		const parsedResult = JSON.parse(sanitizedResult);
 		if (parsedResult.code) {
 			this.setState({
-				model: this.state.model ?? 'deepseek-r1-qwen-32b',
+				model: this.state.model ?? 'qwen2.5-coder-32b',
 				code: parsedResult.code ?? '',
 				messages: [...this.state.messages, { role: 'assistant', content: parsedResult.description ?? '', id: randomUUID(), parts: [] }],
 			});
@@ -220,6 +238,7 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 				"objects": [
 					{
 					"id": string,
+					"count": number, // number of this object type to create
 					"model": "box" | "sphere" | "plane" | "cylinder" | "torus" | "dreiComponent",
 					"dreiComponentName"?: string,  // name of the @react-three/drei component when model is "dreiComponent"
 					"position": [number, number, number],
@@ -262,7 +281,7 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 		`;
 	}
 
-	#createRAGQuery(prompt: string) {
+	#createRAGQuery(manifest: string) {
 		return `provide a selection of code snippets that match the objects and lighting in the following manifest, strictly following this criteria:
 
 				- use only built-in primitives: box, sphere, plane, cylinder, torus.
@@ -273,13 +292,16 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 				- materials must be solid colors when not using shaders; omit any texture property.
 				- omit optional fields when not needed.
 				- DO NOT import or use <Canvas>, <OrbitControls>, or <Stats> components.
+				- r3f primitives use the following format: <primitiveName>
+				- DO NOT import r3f primitives (mesh, group, shapeNameGeometry, materialNameMaterial, directionalLight, etc), these are globally available.
 				- object.behaviors are not existing components, they must be created using the "useFrame" hook.
+				- keep the examples concise and to the point.
 				manifest:
-				${prompt}
+				${manifest}
 		`;
 	}
 
-	#getCodeGeneratorSystemPromptNoControllers(examples: string) {
+	#getCodeGeneratorSystemPromptNoControllers(examples: string, originalPrompt: string) {
 		return `You are a Senior Game Developer with expertise in THREE.js and React-Three-Fiber, and @react-three/drei. You are given a scene manifest and the following examples, you are to generate a react-three/fiber component that matches the objects and lighting in the examples.
 
 			examples:
@@ -297,7 +319,8 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 				- if adding utilities, use the ones provided by "@react-three/drei", DO NOT use the ones provided by "three".
 				- remember to always add lighting to your scene.
 				- behaviors are not components, they must be created using the "useFrame" hook.
-				- useFrame is a react-three/fiber hook.
+				- useFrame is a 'react-three/fiber' hook, NOT a 'react' hook.
+				- ALWAYS EXPORT THE FUNCTION AS "App"
 
 				\`\`\`
 				import { <objects needed> } from 'three';
@@ -337,13 +360,31 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 			\`\`\`json
 				{
 					"code": "the code for the component",
-					"description": "a short description of the component and any relevant details"
+					"description": "a description of the final experience and any relevant details. \\n \\n <suggestions>"
 				}
 			\`\`\`
+
+			- the description should be in the context of the original request and using similar terms.
+			- the description should be in plain language, 
+			- keep the description brief, under 100 words.
+			- DO NOT use technical jargon, like "component", or "app".
+			- refer to the final result as the thing that was requested. 
+				- ex: the user requests a "solar system", then refer to the final result as a "solar system".
+				- ex: the user requests a "game", then refer to the final result as a "game".
+				- ex: the user requests a "3d scene", then refer to the final result as a "3d scene".
+			- keep it friendly but not over the top.
+			- as a separate paragraph, suggest ideas or ask if there is anything the user would like to add to enhance the experience.
+
+			example:
+
+
+
+			original request:
+			${originalPrompt}
 		`;
 	}
 
-	#getCodeGeneratorSystemPrompt(examples: string) {
+	#getCodeGeneratorSystemPrompt(examples: string, originalPrompt: string) {
 		return `You are a Senior Game Developer with expertise in THREE.js and React-Three-Fiber, and @react-three/drei. You are given a scene manifest and the following examples, you are to generate a react-three/fiber component that matches the objects and lighting in the examples.
 
 			examples:
@@ -426,9 +467,23 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 			\`\`\`json
 				{
 					"code": "the code for the component",
-					"description": "a short description of the component and any relevant details"
+					"description": "a description of the final experience and any relevant details. \\n \\n <suggestions>"
 				}
 			\`\`\`
+
+			- the description should be in the context of the original request and using similar terms.
+			- the description should be in plain language, 
+			- DO NOT use technical jargon, like "component", or "app".
+			- refer to the final result as the thing that was requested. 
+				- ex: the user requests a "solar system", then refer to the final result as a "solar system".
+				- ex: the user requests a "game", then refer to the final result as a "game".
+				- ex: the user requests a "3d scene", then refer to the final result as a "3d scene".
+			- keep it friendly but not over the top.
+			- suggest ideas or ask if there is anything the user would like to add to enhance the experience.
+				- have these suggestions as a separate paragraph.
+
+			original request:
+			${originalPrompt}
 		`;
 	}
 

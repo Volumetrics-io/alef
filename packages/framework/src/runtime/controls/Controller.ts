@@ -31,7 +31,7 @@ export abstract class Device<Keys extends InputKey = InputKey> {
 	/** Call when someone interacts with this device in any way. */
 	protected onActivity: () => void = () => {};
 	/** Maps action names to inputs on this device */
-	bindings = new Map<string, InputKey>();
+	bindings = new Map<string, InputKey[]>();
 
 	constructor(public readonly name: string) {}
 
@@ -43,11 +43,12 @@ export abstract class Device<Keys extends InputKey = InputKey> {
 	abstract update(): void;
 
 	protected bind<K extends Keys>(actionName: string, inputKey: K) {
-		this.bindings.set(actionName, inputKey);
+		const bindingList = this.bindings.get(actionName) ?? [];
+		this.bindings.set(actionName, [...bindingList, inputKey]);
 		return this;
 	}
-	protected unbind(actionName: string) {
-		this.bindings.delete(actionName);
+	protected unbind<K extends Keys>(actionName: string, inputKey: K) {
+		this.bindings.set(actionName, this.bindings.get(actionName)?.filter((key) => key !== inputKey) ?? []);
 		return this;
 	}
 }
@@ -129,21 +130,23 @@ export class Controller {
 			return;
 		}
 
-		for (const [actionName, inputKey] of activeDevice.bindings) {
-			const inputValue = activeDevice.inputs.get(inputKey);
-			if (inputValue === undefined) {
-				continue;
-			}
+		for (const [actionName, inputKeys] of activeDevice.bindings) {
+			for (const inputKey of inputKeys) {
+				const inputValue = activeDevice.inputs.get(inputKey);
+				if (inputValue === undefined) {
+					continue;
+				}
 
-			const action = this.actions[actionName];
-			if (!action) {
-				continue;
-			}
+				const action = this.actions[actionName];
+				if (!action) {
+					continue;
+				}
 
-			if (action.value.type === 'boolean') {
-				action.value.value = !!inputValue;
-			} else if (action.value.type === 'range') {
-				action.value.value = Number(inputValue);
+				if (action.value.type === 'boolean') {
+					action.value.value = !!inputValue;
+				} else if (action.value.type === 'range') {
+					action.value.value = Number(inputValue);
+				}
 			}
 		}
 	};

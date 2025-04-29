@@ -29,6 +29,7 @@ const button = (inputKey: string): KeyProcessor => {
 
 export class KeyboardDevice extends Device<string> {
 	#processors = new Map<string, KeyProcessor[]>();
+	#processedEvents = new WeakSet<KeyboardEvent>();
 	constructor() {
 		super('keyboard');
 		window.addEventListener('keydown', this.#onKeyDown);
@@ -58,6 +59,11 @@ export class KeyboardDevice extends Device<string> {
 	};
 
 	#onKeyDown = (event: KeyboardEvent) => {
+		if (this.#processedEvents.has(event)) {
+			return;
+		}
+		this.#processedEvents.add(event);
+
 		const processors = this.#processors.get(event.key);
 		if (processors) {
 			processors.forEach((processor) => {
@@ -68,6 +74,11 @@ export class KeyboardDevice extends Device<string> {
 	};
 
 	#onKeyUp = (event: KeyboardEvent) => {
+		if (this.#processedEvents.has(event)) {
+			return;
+		}
+		this.#processedEvents.add(event);
+
 		const processors = this.#processors.get(event.key);
 		if (processors) {
 			processors.forEach((processor) => {

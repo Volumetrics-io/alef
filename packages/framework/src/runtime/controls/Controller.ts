@@ -131,22 +131,25 @@ export class Controller {
 		}
 
 		for (const [actionName, inputKeys] of activeDevice.bindings) {
+			const action = this.actions[actionName];
+			if (!action) {
+				continue;
+			}
+
+			let summedValue: number = 0;
 			for (const inputKey of inputKeys) {
 				const inputValue = activeDevice.inputs.get(inputKey);
 				if (inputValue === undefined) {
 					continue;
 				}
 
-				const action = this.actions[actionName];
-				if (!action) {
-					continue;
-				}
+				summedValue += Number(inputValue);
+			}
 
-				if (action.value.type === 'boolean') {
-					action.value.value = !!inputValue;
-				} else if (action.value.type === 'range') {
-					action.value.value = Number(inputValue);
-				}
+			if (action.value.type === 'boolean') {
+				action.value.value = !!summedValue;
+			} else if (action.value.type === 'range') {
+				action.value.value = summedValue;
 			}
 		}
 	};

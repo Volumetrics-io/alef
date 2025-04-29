@@ -67,6 +67,7 @@ function Bubble({ children, side, limitHeight }: { children: ReactNode; limitHei
 				alignSelf: side === 'left' ? 'flex-start' : 'flex-end',
 				maxWidth: '80%',
 				background: side === 'left' ? 'var(--track)' : 'var(--happy-paper)',
+				color: side === 'left' ? 'var(--ink)' : 'var(--happy-ink)',
 			}}
 		>
 			<ScrollArea direction="both">

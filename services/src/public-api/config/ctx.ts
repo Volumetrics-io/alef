@@ -28,6 +28,7 @@ export interface Bindings {
 	TOKEN_AUDIENCE_OVERRIDE?: string;
 	STRIPE_SECRET_KEY: string;
 	STRIPE_WEBHOOK_SECRET: string;
+	GOOGLE_AI_API_KEY: string;
 
 	// services
 	// TODO: use Service<T> wrapper, but this breaks Hono RPC client types

@@ -6,4 +6,5 @@ export type Client = typeof client;
 export const hcWithType = (...args: Parameters<typeof hc>): Client => hc<typeof app>(...args);
 
 // convenience export... TODO: maybe this should be a different entrypoint
-export type { VibeCoderState, VibeCoderModel } from './agents/vibeCoder/VibeCoderAgent.js';
+export { defaultModel, modelNames, type VibeCoderModel } from './agents/vibeCoder/models.js';
+export type { VibeCoderState } from './agents/vibeCoder/VibeCoderAgent.js';

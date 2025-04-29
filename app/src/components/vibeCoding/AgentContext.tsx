@@ -1,14 +1,12 @@
 import { fetch } from '@/services/fetch';
 import { AGENT_ERRORS } from '@alef/common';
-import { VibeCoderState } from '@alef/services/public-api';
+import { defaultModel, VibeCoderState } from '@alef/services/public-api';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useAgentChat } from 'agents/ai-react';
 import { useAgent } from 'agents/react';
 import { createContext, ReactNode, useContext, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useProjectId } from './hooks';
-
-export const VibeCoderModelNames = ['llama-3.3-70b', 'deepseek-r1-qwen-32b', 'llama-4-scout-17b', 'gemma-3-12b', 'qwen2.5-coder-32b', 'gemini-2.5-flash'] as const;
 
 export type VibeCoderAgent = ReturnType<typeof useVibeCoder>['agent'];
 export type VibeCoderChat = ReturnType<typeof useVibeCoderChat>;
@@ -24,10 +22,10 @@ export function useAgentContext() {
 	return ctx;
 }
 
-export function useVibeCoder() {
+export function useVibeCoder(onError: (msg: string) => void) {
 	const projectId = useProjectId();
 	const [state, setState] = useState<VibeCoderState>({
-		model: 'qwen2.5-coder-32b',
+		model: defaultModel,
 		code: '',
 		messages: [],
 	});
@@ -39,6 +37,7 @@ export function useVibeCoder() {
 		host: import.meta.env.VITE_PUBLIC_API_ORIGIN,
 		onStateUpdate: setState,
 		onError(event) {
+			// TODO: detect known errors here...
 			console.error('Agent error', event);
 			toast.error('An error occurred while communicating with the agent');
 		},
@@ -95,6 +94,6 @@ export function useVibeCoderChat(agent: VibeCoderAgent, onError: (msg: string) =
 
 export const AgentProvider = ({ children }: { children: ReactNode }) => {
 	const [error, setError] = useState<string | null>(null);
-	const { agent, state } = useVibeCoder();
+	const { agent, state } = useVibeCoder(setError);
 	return <AgentContext.Provider value={{ error, agent, state }}>{children}</AgentContext.Provider>;
 };

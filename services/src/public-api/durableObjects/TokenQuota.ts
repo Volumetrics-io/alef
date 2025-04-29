@@ -56,7 +56,7 @@ export class TokenQuota extends DurableObject<Bindings> {
 	addUsage(amount: number, memo: string) {
 		this.#dailyUsage += amount;
 		this.#saveState();
-		console.info(`TokenQuota: ${memo} - ${amount} tokens used. Daily limit: ${this.#dailyLimit}.`);
+		console.info(`TokenQuota: ${memo} - ${amount} tokens used (${this.#dailyUsage} total today). Daily limit: ${this.#dailyLimit}.`);
 	}
 
 	getDetails() {

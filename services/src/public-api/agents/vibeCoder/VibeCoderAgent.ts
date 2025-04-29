@@ -1,17 +1,12 @@
-import { AGENT_ERRORS, AlefError, assertPrefixedId, isPrefixedId, PrefixedId } from '@alef/common';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { AlefError, assertPrefixedId, isPrefixedId, PrefixedId } from '@alef/common';
 import { Agent, unstable_callable as callable } from 'agents';
-import { generateText, UIMessage } from 'ai';
+import { generateText, LanguageModelV1, UIMessage } from 'ai';
 import { AsyncLocalStorage } from 'async_hooks';
+import { randomUUID } from 'crypto';
 import { createWorkersAI } from 'workers-ai-provider';
 import { Bindings } from '../../config/ctx';
-import { randomUUID } from 'crypto';
-
-// other providers
-import { createGoogleGenerativeAI } from '@ai-sdk/google';
-
-const google = createGoogleGenerativeAI({
-	apiKey: '', // ADD API KEY HERE,
-});
+import { defaultModel, VibeCoderModel } from './models';
 
 export interface VibeCoderState {
 	model: VibeCoderModel;
@@ -19,37 +14,30 @@ export interface VibeCoderState {
 	messages: UIMessage[];
 }
 
-const VibeCoderModels = {
-	'llama-3.3-70b': '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
-	'deepseek-r1-qwen-32b': '@cf/deepseek-ai/deepseek-r1-distill-qwen-32b',
-	'llama-4-scout-17b': '@cf/meta/llama-4-scout-17b-16e-instruct',
-	'gemma-3-12b': '@cf/google/gemma-3-12b-it',
-	'qwq-32b': '@cf/qwen/qwq-32b',
-	'qwen2.5-coder-32b': '@cf/qwen/qwen2.5-coder-32b-instruct',
-	'gemini-2.5-flash': 'third-party',
+type ModelFactory = (env: Bindings) => LanguageModelV1;
+const modelFactories: Record<VibeCoderModel, ModelFactory> = {
+	'llama-3.3-70b': (env) => createWorkersAI({ binding: env.AI })('@cf/meta/llama-3.3-70b-instruct-fp8-fast'),
+	'deepseek-r1-qwen-32b': (env) => createWorkersAI({ binding: env.AI })('@cf/deepseek-ai/deepseek-r1-distill-qwen-32b'),
+	// these CF models aren't included in typings yet
+	'llama-4-scout-17b': (env) => createWorkersAI({ binding: env.AI })('@cf/meta/llama-4-scout-17b-16e-instruct' as any),
+	'gemma-3-12b': (env) => createWorkersAI({ binding: env.AI })('@cf/google/gemma-3-12b-it' as any),
+	'qwq-32b': (env) => createWorkersAI({ binding: env.AI })('@cf/qwen/qwq-32b' as any),
+	'qwen2.5-coder-32b': (env) => createWorkersAI({ binding: env.AI })('@cf/qwen/qwen2.5-coder-32b-instruct' as any),
+	'gemini-2.5-flash': (env) => createGoogleGenerativeAI({ apiKey: env.GOOGLE_AI_API_KEY })('gemini-2.5-flash-preview-04-17'),
 };
-
-export const VibeCoderModelNames = ['llama-3.3-70b', 'deepseek-r1-qwen-32b', 'llama-4-scout-17b', 'gemma-3-12b', 'qwq-32b', 'qwen2.5-coder-32b', 'gemini-2.5-flash'] as const;
-
-export type VibeCoderModel = (typeof VibeCoderModelNames)[number];
 
 export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 	#organizationId: PrefixedId<'or'> | null = null;
-	#model;
-	#thirdPartyModel: any;
+	#model: LanguageModelV1;
 	initialState: VibeCoderState = {
-		model: 'qwen2.5-coder-32b',
+		model: defaultModel,
 		code: '',
 		messages: [],
 	};
 
 	constructor(state: DurableObjectState, env: Bindings) {
 		super(state, env);
-		if (this.state.model === 'gemini-2.5-flash') {
-			this.#thirdPartyModel = google('gemini-2.5-flash-preview-04-17');
-		} else {
-			this.#model = createWorkersAI({ binding: env.AI })(VibeCoderModels[this.state.model] as any);
-		}
+		this.#model = modelFactories[this.state.model](env);
 		// setup SQL tables
 		this.sql`
 			CREATE TABLE IF NOT EXISTS metadata (
@@ -62,6 +50,14 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 			assertPrefixedId(organizationId, 'or');
 			this.#organizationId = organizationId;
 		}
+		this.#migrateState();
+	}
+
+	#migrateState() {
+		this.setState({
+			...this.initialState,
+			...this.state,
+		});
 	}
 
 	async onStart() {
@@ -88,7 +84,7 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 
 	async #getQuota() {
 		const quotaObject = this.env.TOKEN_QUOTA.get(this.#getQuotaId());
-		return quotaObject.getDetails();
+		return quotaObject;
 	}
 
 	/**
@@ -107,20 +103,15 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 	}
 
 	@callable()
-	async setModel(modelURI: VibeCoderModel) {
-		if (this.state.model === modelURI) return;
+	async setModel(modelName: VibeCoderModel) {
+		if (this.state.model === modelName) return;
 		this.setState({
-			model: modelURI,
+			model: modelName,
 			code: this.state.code,
 			messages: this.state.messages,
 		});
 
-		if (modelURI === 'gemini-2.5-flash') {
-			this.#thirdPartyModel = google('gemini-2.5-flash-preview-04-17');
-		} else {
-			this.#thirdPartyModel = null;
-			this.#model = createWorkersAI({ binding: this.env.AI })(VibeCoderModels[modelURI] as any);
-		}
+		this.#model = modelFactories[modelName](this.env);
 	}
 
 	async getExamples(manifest: string) {
@@ -137,7 +128,7 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 		}
 
 		return generateText({
-			model: this.#thirdPartyModel ?? this.#model,
+			model: this.#model,
 			system: this.#getCodeGeneratorSystemPromptNoControllers(examples, originalPrompt),
 			prompt: manifest,
 			maxSteps: 5,
@@ -145,69 +136,68 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 		});
 	}
 
+	#addMessage(message: UIMessage) {
+		this.setState({
+			model: this.state.model,
+			code: this.state.code,
+			messages: [...this.state.messages, message],
+		});
+	}
+
+	#setCode(code: string) {
+		this.setState({
+			model: this.state.model,
+			code: code,
+			messages: this.state.messages,
+		});
+	}
+
 	@callable()
 	async prompt(message: string) {
-		this.setState({
-			model: this.state.model,
-			code: this.state.code,
-			messages: [...this.state.messages, { role: 'user', content: message, id: randomUUID(), parts: [] }],
-		});
-
-		console.log(message);
-
-		this.setState({
-			model: this.state.model,
-			code: this.state.code,
-			messages: [...this.state.messages, { role: 'assistant', content: 'designing...', id: randomUUID(), parts: [] }],
-		});
-
 		if (!isPrefixedId(this.name, 'p')) {
 			throw new AlefError(AlefError.Code.InternalServerError, 'VibeCoderAgent must be created with a property ID');
 		}
 
-		let designResult = await generateText({
-			model: this.#thirdPartyModel ?? this.#model,
+		const quota = await this.#getQuota();
+
+		// check for quota
+		if ((await quota.getDetails()).exceeded) {
+			throw new AlefError(AlefError.Code.QuotaExceeded, 'Quota exceeded');
+		}
+
+		this.#addMessage({ role: 'user', content: message, id: randomUUID(), parts: [] });
+		this.#addMessage({ role: 'assistant', content: 'designing...', id: randomUUID(), parts: [] });
+
+		const designResult = await generateText({
+			model: this.#model,
 			system: this.#getDesignerPrompt(),
 			prompt: message,
 			maxSteps: 5,
 			maxTokens: 10000,
 		});
+		quota.addUsage(designResult.usage.totalTokens, 'VibeCoderAgent design phase');
 
-		let manifest = this.parseResult(designResult.text);
-
+		const manifest = this.parseResult(designResult.text);
 		console.log(manifest);
 
-		this.setState({
-			model: this.state.model,
-			code: this.state.code,
-			messages: [...this.state.messages, { role: 'assistant', content: 'fetching assets...', id: randomUUID(), parts: [] }],
-		});
+		this.#addMessage({ role: 'assistant', content: 'fetching assets...', id: randomUUID(), parts: [] });
 
 		const examples = await this.getExamples(manifest);
-
 		console.log(examples.response);
 
-		this.setState({
-			model: this.state.model,
-			code: this.state.code,
-			messages: [...this.state.messages, { role: 'assistant', content: 'coding...', id: randomUUID(), parts: [] }],
-		});
+		this.#addMessage({ role: 'assistant', content: 'coding...', id: randomUUID(), parts: [] });
 		const finalResult = await this.generateCode(manifest, examples.response, message);
+		quota.addUsage(finalResult.usage.totalTokens, 'VibeCoderAgent code generation phase');
 
-		let result = this.parseResult(finalResult.text);
-		let sanitizedResult = this.sanitizeJSONString(result);
+		const rawResult = this.parseResult(finalResult.text);
+		const sanitizedResult = this.sanitizeJSONString(rawResult);
 		console.log(`Sanitized Result: ${sanitizedResult}`);
 
 		const parsedResult = JSON.parse(sanitizedResult);
 		if (parsedResult.code) {
-			this.setState({
-				model: this.state.model ?? 'qwen2.5-coder-32b',
-				code: parsedResult.code ?? '',
-				messages: [...this.state.messages, { role: 'assistant', content: parsedResult.description ?? '', id: randomUUID(), parts: [] }],
-			});
+			this.#addMessage({ role: 'assistant', content: parsedResult.description ?? '', id: randomUUID(), parts: [] });
+			this.#setCode(parsedResult.code);
 		}
-
-		return;
 	}
 
 	parseResult(result: string) {
@@ -218,13 +208,12 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 		if (sanitizedResult.includes('```json')) {
 			sanitizedResult = sanitizedResult.split('```json')[1].replace(/^[\s\r\n]+/, '');
 			sanitizedResult = sanitizedResult.split('```')[0].replace(/^[\s\r\n]+/, '');
-			console.log(`Result: ${sanitizedResult}`);
 		}
 		return sanitizedResult;
 	}
 
 	#getDesignerPrompt() {
-		return `You are SceneManifestGenerator, a specialist in turning natural-language game scene ideas into minimal, unambiguous JSON manifests.  
+		return `You are SceneManifestGenerator, a specialist in turning natural-language game scene ideas into minimal, unambiguous JSON manifests.
 				Always output **only** valid JSON that conforms exactly to the following schema—no comments, no extra keys, no prose:
 
 				\`\`\`json
@@ -260,7 +249,7 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 
 				Use only built-in primitives: box, sphere, plane, cylinder, torus.
 				You can also use @react-three/drei components by setting model to "dreiComponent" and specifying the component name in dreiComponentName.
-				
+
 				Support for drei shaders is available through the shader field, which can specify shader type and properties.
 
 				No external assets—do not reference .glb, image textures, or URLs.
@@ -306,7 +295,7 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 
 			examples:
 			${examples}
-			
+
 			use the following template to create a r3f component:
 
 				- DO NOT rename the component
@@ -365,10 +354,10 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 			\`\`\`
 
 			- the description should be in the context of the original request and using similar terms.
-			- the description should be in plain language, 
+			- the description should be in plain language,
 			- keep the description brief, under 100 words.
 			- DO NOT use technical jargon, like "component", or "app".
-			- refer to the final result as the thing that was requested. 
+			- refer to the final result as the thing that was requested.
 				- ex: the user requests a "solar system", then refer to the final result as a "solar system".
 				- ex: the user requests a "game", then refer to the final result as a "game".
 				- ex: the user requests a "3d scene", then refer to the final result as a "3d scene".
@@ -389,7 +378,7 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 
 			examples:
 			${examples}
-			
+
 			use the following template to create a r3f component:
 
 				- DO NOT rename the component
@@ -472,9 +461,9 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 			\`\`\`
 
 			- the description should be in the context of the original request and using similar terms.
-			- the description should be in plain language, 
+			- the description should be in plain language,
 			- DO NOT use technical jargon, like "component", or "app".
-			- refer to the final result as the thing that was requested. 
+			- refer to the final result as the thing that was requested.
 				- ex: the user requests a "solar system", then refer to the final result as a "solar system".
 				- ex: the user requests a "game", then refer to the final result as a "game".
 				- ex: the user requests a "3d scene", then refer to the final result as a "3d scene".

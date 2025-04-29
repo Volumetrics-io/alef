@@ -1,7 +1,7 @@
-import { VibeCoderModel } from '@alef/services/public-api';
+import { VibeCoderModel, modelNames } from '@alef/services/public-api';
 import { Select } from '@alef/sys';
 import { useCallback } from 'react';
-import { useAgentContext, VibeCoderModelNames } from '../AgentContext';
+import { useAgentContext } from '../AgentContext';
 
 export interface ModelSelectorProps {}
 
@@ -17,7 +17,7 @@ export function ModelSelector({}: ModelSelectorProps) {
 	);
 	return (
 		<Select value={state.model} onValueChange={(value) => setModel(value as VibeCoderModel)}>
-			{VibeCoderModelNames.map((key) => (
+			{modelNames.map((key) => (
 				<Select.Item key={key} value={key}>
 					{key}
 				</Select.Item>

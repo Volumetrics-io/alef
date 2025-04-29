@@ -1,5 +1,4 @@
 import { Canvas } from '@react-three/fiber';
-import { Sky } from '@react-three/drei';
 import { OrbitControls } from '@react-three/drei';
 import { ReactNode, Suspense } from 'react';
 import { ErrorBoundary } from './ErrorBoundary';

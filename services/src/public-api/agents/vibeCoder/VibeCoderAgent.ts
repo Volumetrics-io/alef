@@ -10,7 +10,7 @@ import { randomUUID } from 'crypto';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 
 const google = createGoogleGenerativeAI({
-	apiKey: 'AIzaSyBp7LmF3sFr4IzdMIgMPLzRCW7ZdgLBkFs',
+	apiKey: '', // ADD API KEY HERE,
 });
 
 export interface VibeCoderState {

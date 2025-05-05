@@ -55,13 +55,16 @@ export abstract class Device<Keys extends InputKey = InputKey> {
 
 export class Controller {
 	actions: Record<string, Action> = {};
-	devices: Device[] = [];
+	devices: Record<string, Device> = {};
 
-	#activeDeviceIndex: number = 0;
+	#activeDeviceName!: string;
 
 	addDevice = <T extends Device>(device: T): T => {
-		this.devices.push(device);
+		this.devices[device.name] = device;
 		device[registerOnActivity](this.#onDeviceActivity.bind(this, device));
+		if (!this.#activeDeviceName) {
+			this.#activeDeviceName = device.name;
+		}
 		return device;
 	};
 
@@ -120,12 +123,15 @@ export class Controller {
 	};
 
 	#onDeviceActivity = (device: Device) => {
-		this.#activeDeviceIndex = this.devices.indexOf(device);
+		this.#activeDeviceName = device.name;
 	};
 
 	update = () => {
-		this.devices.forEach((device) => device.update());
-		const activeDevice = this.devices[this.#activeDeviceIndex];
+		Object.values(this.devices).forEach((device) => device.update());
+		if (!this.#activeDeviceName) {
+			return;
+		}
+		const activeDevice = this.devices[this.#activeDeviceName];
 		if (!activeDevice) {
 			return;
 		}

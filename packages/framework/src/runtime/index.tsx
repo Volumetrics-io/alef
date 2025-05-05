@@ -2,7 +2,7 @@ import { ComponentType, StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RootScene } from './RootScene';
 
-export * from './controls/defaultController';
+export * from './controls/index';
 
 export function mountApp(App: ComponentType) {
 	const rootEl = document.createElement('div');

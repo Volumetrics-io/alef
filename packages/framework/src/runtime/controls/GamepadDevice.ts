@@ -6,8 +6,9 @@ export class GamepadDevice extends Device<`button:${number}` | `axis:${number}`>
 	#lastSeen: number = 0;
 	#deadzones: number[] = new Array(100).fill(0.05);
 
-	constructor() {
-		super('gamepad');
+	constructor(gamepadIndex = 0) {
+		super(`gamepad${gamepadIndex}`);
+		this.#deviceIndex = gamepadIndex;
 		window.addEventListener('gamepadconnected', this.#onGamepadConnected);
 		window.addEventListener('gamepaddisconnected', this.#onGamepadDisconnected);
 	}
@@ -64,14 +65,14 @@ export class GamepadDevice extends Device<`button:${number}` | `axis:${number}`>
 	}
 
 	#onGamepadConnected = (event: GamepadEvent) => {
-		console.debug('gamepad connected', event.gamepad.index);
-		this.#deviceIndex = event.gamepad.index;
+		if (event.gamepad.index === this.#deviceIndex) {
+			console.debug('gamepad connected', this.name);
+		}
 	};
 
 	#onGamepadDisconnected = (event: GamepadEvent) => {
-		console.debug('gamepad disconnected', event.gamepad.index);
-		if (this.#deviceIndex === event.gamepad.index) {
-			this.#deviceIndex = null;
+		if (event.gamepad.index === this.#deviceIndex) {
+			console.debug('gamepad disconnected', this.name);
 		}
 	};
 }

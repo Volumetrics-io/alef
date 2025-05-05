@@ -29,23 +29,31 @@ export class OnscreenDevice extends Device {
 		this.controls = [...this.controls, control];
 		this.#controlsChanged();
 	}
-
-	bindButton = (action: string, button: Omit<OnscreenButtonControl, 'type'>) => {
+	addButton(button: Omit<OnscreenButtonControl, 'type'>) {
 		const control = {
 			type: 'button' as const,
 			...button,
 		};
 		this.addControl(control);
-		this.bind(action, button.key);
 		return this;
-	};
-
-	bindStick = (xAxisAction: string, yAxisAction: string, stick: Omit<OnscreenStickControl, 'type'>) => {
+	}
+	addStick(stick: Omit<OnscreenStickControl, 'type'>) {
 		const control = {
 			type: 'stick' as const,
 			...stick,
 		};
 		this.addControl(control);
+		return this;
+	}
+
+	bindButton = (action: string, button: Omit<OnscreenButtonControl, 'type'>) => {
+		this.addButton(button);
+		this.bind(action, button.key);
+		return this;
+	};
+
+	bindStick = (xAxisAction: string, yAxisAction: string, stick: Omit<OnscreenStickControl, 'type'>) => {
+		this.addStick(stick);
 		this.bind(xAxisAction, stick.xAxisKey);
 		this.bind(yAxisAction, stick.yAxisKey);
 		return this;

@@ -1,8 +1,8 @@
 import { AGENT_ERRORS } from '@alef/common';
 import { Box, Button, Frame, Icon, Input } from '@alef/sys';
 import { Link } from '@verdant-web/react-router';
+import { useCallback, useRef, useState } from 'react';
 import { useAgentContext, useVibeCoder } from '../AgentContext';
-import { useState, useRef, useCallback } from 'react';
 
 export function ChatInput() {
 	const { error } = useAgentContext();
@@ -30,7 +30,7 @@ export function ChatInput() {
 			if (!input) return;
 			chatRef.current.value = '';
 			setIsLoading(true);
-			agent.call('prompt', [input]).then((result) => {
+			agent.call('prompt', [input]).then((_result) => {
 				setIsLoading(false);
 			});
 		},

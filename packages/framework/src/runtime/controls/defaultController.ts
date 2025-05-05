@@ -5,12 +5,9 @@ import { OnscreenDevice } from './OnscreenDevice';
 
 export const defaultController = new Controller();
 
-const keyboard = defaultController.addDevice(new KeyboardDevice());
-const gamepad = defaultController.addDevice(new GamepadDevice());
-const onscreen = defaultController.addDevice(new OnscreenDevice());
-
-export const devices = {
-	keyboard,
-	gamepad,
-	onscreen,
-};
+defaultController.addDevice(new KeyboardDevice());
+defaultController.addDevice(new GamepadDevice(0));
+defaultController.addDevice(new GamepadDevice(1));
+defaultController.addDevice(new GamepadDevice(2));
+defaultController.addDevice(new GamepadDevice(3));
+defaultController.addDevice(new OnscreenDevice());

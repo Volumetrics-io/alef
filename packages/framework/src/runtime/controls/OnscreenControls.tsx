@@ -1,9 +1,9 @@
 import { useDrag } from '@use-gesture/react';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { devices } from './defaultController';
-import { OnscreenButtonControl, OnscreenStickControl } from './OnscreenDevice';
+import { defaultController } from './defaultController';
+import { OnscreenButtonControl, OnscreenDevice, OnscreenStickControl } from './OnscreenDevice';
 
-const onscreen = devices.onscreen;
+const onscreen = defaultController.devices.onscreen as OnscreenDevice;
 
 let wasTouchEverDetected = false;
 window.addEventListener('touchstart', () => {

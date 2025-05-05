@@ -22,7 +22,7 @@ export function useAgentContext() {
 	return ctx;
 }
 
-export function useVibeCoder(onError: (msg: string) => void) {
+export function useVibeCoder(_onError?: (msg: string) => void) {
 	const projectId = useProjectId();
 	const [state, setState] = useState<VibeCoderState>({
 		model: defaultModel,

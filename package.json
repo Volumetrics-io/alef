@@ -6,7 +6,8 @@
 		"initialize": "node ./scripts/initialize.mjs",
 		"makeLocalAdmin": "node ./scripts/makeLocalAdmin.mjs",
 		"grantLocalEntitlements": "node ./scripts/grantLocalEntitlements.mjs",
-		"resetLocal": "node ./scripts/resetLocal.mjs"
+		"resetLocal": "node ./scripts/resetLocal.mjs",
+		"frameworkDocs": "node ./scripts/frameworkDocs.mjs"
 	},
 	"dependencies": {
 		"@clack/prompts": "^0.9.1",

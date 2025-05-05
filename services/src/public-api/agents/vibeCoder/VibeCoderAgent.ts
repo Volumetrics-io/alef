@@ -5,6 +5,7 @@ import { generateText, LanguageModelV1, UIMessage } from 'ai';
 import { AsyncLocalStorage } from 'async_hooks';
 import { randomUUID } from 'crypto';
 import { createWorkersAI } from 'workers-ai-provider';
+import frameworkDocs from '../../.generated/frameworkDocs';
 import { Bindings } from '../../config/ctx';
 import { defaultModel, VibeCoderModel } from './models';
 
@@ -343,6 +344,8 @@ export class VibeCoderAgent extends Agent<Bindings, VibeCoderState> {
 			- DO NOT add a camera or scene
 			- DO NOT import packages.
 			- the text MUST be formatted as a valid json object. it should be parseable using JSON.parse().
+
+			${frameworkDocs}
 
 			the final output should be valid JSON object using this format:
 
